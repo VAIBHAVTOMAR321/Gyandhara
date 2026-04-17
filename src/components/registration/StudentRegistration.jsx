@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import './registration.css';
 
 const StudentRegistration = () => {
@@ -438,7 +439,7 @@ const StudentRegistration = () => {
           </div>
 
           <p className="login-link">
-            Already have an account? <a href="/">Login here</a>
+            Already have an account? <Link to="/login">Login here</Link>
           </p>
         </form>
       </div>
