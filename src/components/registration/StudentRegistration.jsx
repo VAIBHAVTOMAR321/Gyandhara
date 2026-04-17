@@ -171,30 +171,28 @@ const StudentRegistration = () => {
         class_name: formData.class_name,
       };
 
-      const response = await axios.post(
+      await axios.post(
         'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
         registrationData
       );
 
-      if (response.data.status || response.status === 200) {
-        // Show browser alert
-        alert('Registration successful! You can now login.');
-        // Reset form after alert is dismissed
-        setFormData({
-          full_name: '',
-          aadhaar_no: '',
-          phone: '',
-          email: '',
-          password: '',
-          confirm_password: '',
-          state: 'Uttarakhand',
-          district: '',
-          block: '',
-          class_name: '',
-          associate_wings: '',
-        });
-        setSuccess('');
-      }
+      // Show browser alert and reset form after user clicks OK
+      alert('Registration successful! You can now login.');
+      setFormData({
+        full_name: '',
+        aadhaar_no: '',
+        phone: '',
+        email: '',
+        password: '',
+        confirm_password: '',
+        state: 'Uttarakhand',
+        district: '',
+        block: '',
+        class_name: '',
+        associate_wings: '',
+      });
+      setBlocks([]);
+      setSuccess('Registration successful! You can now login.');
     } catch (err) {
       console.error('Registration error:', err);
       setError(
