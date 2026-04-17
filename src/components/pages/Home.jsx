@@ -5,7 +5,7 @@ function Home() {
   return (
     <div>Home
 
-      <Link to="/UserDashBord">
+      <Link to="/UserDashboard">
         Go to User Dashboard
       </Link>
     </div>

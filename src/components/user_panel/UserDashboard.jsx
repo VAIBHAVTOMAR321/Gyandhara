@@ -8,7 +8,7 @@ import { useAuth } from "../all_login/AuthContext";
 
 
 
-const UserDashBord = () => {
+const UserDashboard = () => {
   // Device width state
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -79,4 +79,4 @@ const UserDashBord = () => {
 
 };
 
-export default UserDashBord;
+export default UserDashboard;

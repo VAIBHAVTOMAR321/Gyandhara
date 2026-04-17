@@ -14,7 +14,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import Home from './components/pages/Home';
 import { AuthProvider } from './components/all_login/AuthContext';
 import { LanguageProvider } from './components/all_login/LanguageContext';
-import UserDashBord from "./components/user_panel/UserDashBord";
+import UserDashboard from "./components/user_panel/UserDashboard";
 import StudentRegistration from './components/registration/StudentRegistration';
 import Login from './components/all_login/Login';
 
@@ -44,7 +44,7 @@ function AppContent() {
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<StudentRegistration />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/UserDashBord" element={<UserDashBord />} />
+          <Route path="/UserDashboard" element={<UserDashboard />} />
         </Routes>
         {!hideFooter && <Footer />}
     </>
