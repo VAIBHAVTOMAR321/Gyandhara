@@ -3,13 +3,10 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate,
-  useLocation,
 } from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
 
 import Home from './components/pages/Home';
 import { AuthProvider } from './components/all_login/AuthContext';
@@ -18,36 +15,14 @@ import UserDashboard from "./components/user_panel/UserDashboard";
 import StudentRegistration from './components/registration/StudentRegistration';
 import Login from './components/all_login/Login';
 
-
-
-
-
-
-
-
-
-
 function AppContent() {
-  const location = useLocation();
-
-  const initialRender = React.useRef(true);
-
-
-
-  const hideFooter = location.pathname.includes("/register") || location.pathname.includes("/unauthorized") || location.pathname.includes("/login");
-  const hideNavBar = location.pathname.includes("/register") || location.pathname.includes("/unauthorized") || location.pathname.includes("/login");
-
   return (
-    <>
-      {!hideNavBar && <NavBar />}
-      <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/register" element={<StudentRegistration />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/UserDashboard" element={<UserDashboard />} />
-        </Routes>
-        {!hideFooter && <Footer />}
-    </>
+    <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/register" element={<StudentRegistration />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/UserDashboard" element={<UserDashboard />} />
+    </Routes>
   );
 }
 

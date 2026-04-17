@@ -19,7 +19,7 @@ const UserDashboard = () => {
   const [profile, setProfile] = useState(null);
   const [queries, setQueries] = useState([]);
   // Always call hooks at the top level
-  const { user, tokens } = useAuth();
+  const { user, accessToken } = useAuth();
   // Service requests state
   const [serviceLoading, setServiceLoading] = useState(true);
   const [serviceError, setServiceError] = useState("");
