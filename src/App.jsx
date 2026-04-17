@@ -16,6 +16,7 @@ import UserDashboard from "./components/user_panel/UserDashboard";
 import UserProfile from "./components/user_panel/UserProfile";
 import StudentRegistration from './components/registration/StudentRegistration';
 import Login from './components/all_login/Login';
+import NavBar from "./components/nav_bar/NavBar";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -31,6 +32,7 @@ function AppContent() {
   return (
     <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/NavBar" element={<NavBar />} />
         <Route path="/register" element={<StudentRegistration />} />
         <Route path="/login" element={<Login />} />
         <Route 
