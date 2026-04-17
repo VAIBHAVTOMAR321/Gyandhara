@@ -1,9 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import NavBar from '../nav_bar/NavBar'
 
 function Home() {
   return (
-    <div>Home
+    <div>
+      <NavBar />
+      Home
 
       <Link to="/UserDashboard">
         Go to User Dashboard
