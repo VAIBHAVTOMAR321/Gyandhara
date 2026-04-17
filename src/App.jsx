@@ -1,0 +1,62 @@
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
+
+import Home from './components/pages/Home';
+import { AuthProvider } from './components/all_login/AuthContext';
+import { LanguageProvider } from './components/all_login/LanguageContext';
+import UserDashBord from "./components/user_panel/UserDashBord";
+
+
+
+
+
+
+
+
+
+
+function AppContent() {
+  const location = useLocation();
+
+  const initialRender = React.useRef(true);
+
+
+
+  const hideFooter = location.pathname.includes("/") || location.pathname.includes("/unauthorized");
+  const hideNavBar = location.pathname.includes("/") || location.pathname.includes("/unauthorized");
+
+  return (
+    <>
+      {!hideNavBar && <NavBar />}
+      <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/UserDashBord" element={<UserDashBord />} />
+        </Routes>
+        {!hideFooter && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <LanguageProvider>
+        <Router>
+          <AppContent />
+        </Router>
+      </LanguageProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
