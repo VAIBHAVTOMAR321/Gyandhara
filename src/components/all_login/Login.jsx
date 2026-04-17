@@ -73,7 +73,7 @@ const Login = () => {
           user: response.data.user || null,
         });
         alert('Login successful!');
-        navigate('/UserDashBord');
+        navigate('/UserDashboard');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
