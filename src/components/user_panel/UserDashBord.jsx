@@ -47,18 +47,37 @@ const UserDashBord = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <UserLeftNav
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        isMobile={isMobile}
-        isTablet={isTablet}
-      />
-      <div className="main-content-dash">
-        <UserHeader toggleSidebar={toggleSidebar} />
-      </div>
+   
+  <div className="dashboard-container">
+    <UserLeftNav
+      sidebarOpen={sidebarOpen}
+      setSidebarOpen={setSidebarOpen}
+      isMobile={isMobile}
+      isTablet={isTablet}
+    />
+
+    <div className="main-content-dash">
+      <UserHeader toggleSidebar={toggleSidebar} />
+
+      {/* ✅ Add container with shadow */}
+      <Container className="dashboard-box mt-3">
+        <Row>
+          <Col>
+            <Card className="shadow-box">
+              <Card.Body>
+                <h4>User Dashboard</h4>
+                <p>Welcome to your dashboard</p>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+
     </div>
-  );
+  </div>
+);
+    
+
 };
 
 export default UserDashBord;
