@@ -15,6 +15,7 @@ import Home from './components/pages/Home';
 import { AuthProvider } from './components/all_login/AuthContext';
 import { LanguageProvider } from './components/all_login/LanguageContext';
 import UserDashBord from "./components/user_panel/UserDashBord";
+import StudentRegistration from './components/registration/StudentRegistration';
 
 
 
@@ -32,14 +33,15 @@ function AppContent() {
 
 
 
-  const hideFooter = location.pathname.includes("/") || location.pathname.includes("/unauthorized");
-  const hideNavBar = location.pathname.includes("/") || location.pathname.includes("/unauthorized");
+  const hideFooter = location.pathname.includes("/register") || location.pathname.includes("/unauthorized");
+  const hideNavBar = location.pathname.includes("/register") || location.pathname.includes("/unauthorized");
 
   return (
     <>
       {!hideNavBar && <NavBar />}
       <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/register" element={<StudentRegistration />} />
           <Route path="/UserDashBord" element={<UserDashBord />} />
         </Routes>
         {!hideFooter && <Footer />}

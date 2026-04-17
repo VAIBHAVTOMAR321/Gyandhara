@@ -1,0 +1,415 @@
+/* ==========================================
+   STUDENT REGISTRATION STYLES
+   ========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.registration-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.registration-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  max-width: 1200px;
+  width: 100%;
+  padding: 20px 25px;
+  animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================
+   HEADER STYLES
+   ========================================== */
+
+.registration-header {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.registration-header h1 {
+  color: #333;
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 3px;
+  letter-spacing: -0.5px;
+}
+
+.registration-subtitle {
+  color: #667eea;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   FORM STYLES
+   ========================================== */
+
+.registration-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.form-row-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.form-row.full-width {
+  grid-template-columns: 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ==========================================
+   LABEL STYLES
+   ========================================== */
+
+.form-label {
+  color: #333;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+}
+
+.required {
+  color: #e74c3c;
+  margin-left: 4px;
+  font-weight: bold;
+}
+
+/* ==========================================
+   INPUT & SELECT STYLES
+   ========================================== */
+
+.form-control {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 12px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+}
+
+.form-control:hover:not(:disabled) {
+  border-color: #bbb;
+}
+
+.form-control:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.form-control::placeholder {
+  color: #999;
+}
+
+/* Select dropdown specific styling */
+.form-control:is(select) {
+  cursor: pointer;
+  appearance: none;
+  padding-right: 35px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+.form-control:is(select):disabled {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236c757d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+/* ==========================================
+   ALERT STYLES
+   ========================================== */
+
+.alert {
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 4px solid #f5c6cb;
+}
+
+.alert-success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #c3e6cb;
+}
+
+.alert strong {
+  font-weight: 600;
+}
+
+.btn-close {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  padding: 0;
+  width: auto;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* ==========================================
+   BUTTON STYLES
+   ========================================== */
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+  margin-bottom: 12px;
+}
+
+.btn-submit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 10px 40px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  min-width: 160px;
+}
+
+.btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-submit:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================
+   LOGIN LINK
+   ========================================== */
+
+.login-link {
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+}
+
+.login-link a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+@media (max-width: 768px) {
+  .registration-wrapper {
+    padding: 20px 15px;
+  }
+
+  .registration-header h1 {
+    font-size: 20px;
+  }
+
+  .form-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .form-row-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-group {
+    margin-bottom: 0;
+  }
+
+  .btn-submit {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+@media (max-width: 480px) {
+  .registration-container {
+    padding: 10px;
+  }
+
+  .registration-wrapper {
+    padding: 15px 10px;
+    border-radius: 8px;
+  }
+
+  .registration-header h1 {
+    font-size: 18px;
+  }
+
+  .registration-subtitle {
+    font-size: 12px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .form-row-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-control {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .form-label {
+    font-size: 10px;
+  }
+
+  .alert {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  .btn-submit {
+    padding: 9px 25px;
+    font-size: 13px;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.form-control:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* ==========================================
+   PRINT STYLES
+   ========================================== */
+
+@media print {
+  .registration-container {
+    background: white;
+  }
+
+  .registration-wrapper {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+
+  .btn-submit,
+  .login-link {
+    display: none;
+  }
+}
