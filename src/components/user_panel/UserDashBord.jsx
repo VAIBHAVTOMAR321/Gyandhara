@@ -55,11 +55,10 @@ const UserDashBord = () => {
       isMobile={isMobile}
       isTablet={isTablet}
     />
-
     <div className="main-content-dash">
       <UserHeader toggleSidebar={toggleSidebar} />
 
-      {/* ✅ Add container with shadow */}
+      {/*  Add container with shadow */}
       <Container className="dashboard-box mt-3">
         <Row>
           <Col>
