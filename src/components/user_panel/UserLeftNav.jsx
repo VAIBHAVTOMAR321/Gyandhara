@@ -37,13 +37,14 @@ import {
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
-
+import { useNavigate } from "react-router-dom";
 
 
 
 
 const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
     const [userRole, setUserRole] = useState(null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
@@ -57,6 +58,27 @@ const menuItems = [
       label: "DASHBOARD",
       path: "/UserDashboard",
       active: true,
+    },
+    {
+      icon: <FaUserCircle />,
+      label: "PROFILE",
+      path: "/UserProfile",
+    },
+    {
+      icon: <FaTools />,
+      label: "Test",
+      submenu: [
+        {
+          label: "test1",
+          path: "#",
+          icon: <FaPlusSquare />,
+        },
+         {
+          label: "test1",
+          path: "#",
+          icon: <FaPlusSquare />,
+        },
+      ],
     },
     {
       icon: <FaTools />,
@@ -173,6 +195,7 @@ const menuItems = [
             onClick={() => {
               if (typeof logout === "function") {
                 logout();
+                navigate("/login");
               }
             }}
           >
