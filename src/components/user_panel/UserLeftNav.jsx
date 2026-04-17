@@ -36,6 +36,8 @@ import {
   FaTasks
 } from "react-icons/fa";
 
+import { useAuth } from "../all_login/AuthContext";
+
 
 
 
@@ -53,49 +55,26 @@ const menuItems = [
     {
       icon: <FaTachometerAlt />,
       label: "DASHBOARD",
-      path: "/UserDashBoard",
+      path: "/UserDashBord",
       active: true,
     },
     {
       icon: <FaTools />,
-      label: "SERVICE REQUEST",
+      label: "Test",
       submenu: [
         {
-          label: "Request Service",
-          path: "/RequestService",
+          label: "test1",
+          path: "#",
           icon: <FaPlusSquare />,
         },
-        {
-          label: "View Service Requests",
-          path: "/ViewRequestService",
-          icon: <FaListUl />,
+         {
+          label: "test1",
+          path: "#",
+          icon: <FaPlusSquare />,
         },
       ],
     },
-    {
-      icon: <FaComments />,
-      label: "CONTACT WITH ADMIN ",
-      submenu: [
-        {
-          label: "Generate Query",
-          path: "/UserQuery",
-          icon: <FaEdit />,
-        },
-        {
-          label: "All Queries",
-          path: "/UserAllQuery",
-          icon: <FaTasks />,
-        },
-      ],
-    },
-   
-    
 
-   
-    
-   
-
-    // {
     //   icon: <FaCalendarAlt />,
     //   label: "Event",
     //   submenu: [
