@@ -19,7 +19,11 @@ import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isReady } = useAuth();
+  
+  if (!isReady) {
+    return null;
+  }
   
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

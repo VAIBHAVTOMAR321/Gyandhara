@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 
 const AuthContext = createContext(null);
+
+const STORAGE_KEY = 'gyandhara_auth';
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -8,6 +10,42 @@ export function AuthProvider({ children }) {
   const [refreshToken, setRefreshToken] = useState(null);
   const [role, setRole] = useState(null);
   const [uniqueId, setUniqueId] = useState(null);
+  const [isReady, setIsReady] = useState(false);
+
+  // Restore auth state from localStorage on mount
+  useEffect(() => {
+    const savedAuth = localStorage.getItem(STORAGE_KEY);
+    if (savedAuth) {
+      try {
+        const parsed = JSON.parse(savedAuth);
+        setUser(parsed.user || null);
+        setAccessToken(parsed.access || null);
+        setRefreshToken(parsed.refresh || null);
+        setRole(parsed.role || null);
+        setUniqueId(parsed.unique_id || null);
+      } catch (err) {
+        console.error('Failed to parse auth data:', err);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+    setIsReady(true);
+  }, []);
+
+  // Persist auth state to localStorage on changes
+  useEffect(() => {
+    if (accessToken) {
+      const authData = {
+        user,
+        access: accessToken,
+        refresh: refreshToken,
+        role,
+        unique_id: uniqueId,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(authData));
+    } else {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [user, accessToken, refreshToken, role, uniqueId]);
 
   const login = (data) => {
     setUser(data.user);
@@ -23,6 +61,7 @@ export function AuthProvider({ children }) {
     setRefreshToken(null);
     setRole(null);
     setUniqueId(null);
+    localStorage.removeItem(STORAGE_KEY);
   };
 
   const value = useMemo(() => ({
@@ -34,7 +73,8 @@ export function AuthProvider({ children }) {
     login,
     logout,
     isAuthenticated: !!accessToken,
-  }), [user, accessToken, refreshToken, role, uniqueId]);
+    isReady,
+  }), [user, accessToken, refreshToken, role, uniqueId, isReady]);
 
   return (
     <AuthContext.Provider value={value}>
