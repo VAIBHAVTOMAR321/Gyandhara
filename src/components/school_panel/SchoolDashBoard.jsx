@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "../../assets/css/userleftnav.css"
-import UserHeader from "./UserHeader";
-import UserLeftNav from "./UserLeftNav";
+
 import { useAuth } from "../all_login/AuthContext";
+import SchoolHeader from "./SchoolHeader";
+import SchoolLeftNav from "./SchoolLeftNav";
 
 
-
-const SchoolDashBord = () => {
+const SchoolDashBoard = () => {
   // Device width state
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -49,14 +49,14 @@ const SchoolDashBord = () => {
   return (
    
   <div className="dashboard-container">
-    <UserLeftNav
+    <SchoolLeftNav
       sidebarOpen={sidebarOpen}
       setSidebarOpen={setSidebarOpen}
       isMobile={isMobile}
       isTablet={isTablet}
     />
     <div className="main-content-dash">
-      <UserHeader toggleSidebar={toggleSidebar} />
+      <SchoolHeader toggleSidebar={toggleSidebar} />
 
       {/*  Add container with shadow */}
       <Container className="dashboard-box mt-3">
@@ -79,4 +79,4 @@ const SchoolDashBord = () => {
 
 };
 
-export default SchoolDashBord;
+export default SchoolDashBoard;

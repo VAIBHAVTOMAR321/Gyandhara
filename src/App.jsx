@@ -20,13 +20,14 @@ import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
 
 import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
+import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
 
 
 //  Navbar Wrapper (Hide on specific routes)
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -90,6 +91,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <AdminDashBoard />
+            </ProtectedRoute>
+          } 
+        />
+          <Route 
+          path="/SchoolDashBord" 
+          element={
+            <ProtectedRoute>
+              <SchoolDashBoard />
             </ProtectedRoute>
           } 
         />
