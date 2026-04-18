@@ -73,5 +73,7 @@ body {
 
 @media (max-width: 568px) {
  
-
+.submenu-arrow {
+margin-left: 233px !important;
+}
 }

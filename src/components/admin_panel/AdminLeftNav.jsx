@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { Nav, Offcanvas, Collapse } from "react-bootstrap";
+import { Nav, Offcanvas, Collapse, Button } from "react-bootstrap";
 import {
   FaTachometerAlt,
   FaSignOutAlt,
@@ -210,9 +210,12 @@ const menuItems = [
   scroll={false}
   enforceFocus={false} //  ADD THIS LINE — fixes close button focus issue
 >
-  <Offcanvas.Header closeButton className="br-offcanvas-header">
-    <Offcanvas.Title className="br-off-title">Menu</Offcanvas.Title>
-  </Offcanvas.Header>
+  <Offcanvas.Header 
+      closeButton 
+      className="br-offcanvas-header"
+    >
+      <Offcanvas.Title className="br-off-title">Menu</Offcanvas.Title>
+    </Offcanvas.Header>
 
   <Offcanvas.Body className="br-offcanvas">
     <Nav className="flex-column">

@@ -22,7 +22,7 @@ import NavBar from "./components/nav_bar/NavBar";
 import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
 
 
-// ✅ Navbar Wrapper (Hide on specific routes)
+//  Navbar Wrapper (Hide on specific routes)
 function NavBarWrapper() {
   const location = useLocation();
 
