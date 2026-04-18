@@ -132,6 +132,51 @@ margin-top: 60px;
   grid-column: 1 / -1;
 }
 
+.form-group.full-width-3 {
+  grid-column: span 3;
+}
+
+/* ==========================================
+   SECTION STYLES
+   ========================================== */
+
+.prefilled-section {
+  background: #f8f9fa;
+  padding: 18px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.editable-section {
+  margin-top: 4px;
+  padding-top: 4px;
+}
+
+.section-title {
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 14px 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #667eea;
+  display: inline-block;
+}
+
+.editable-section {
+  margin-top: 4px;
+}
+
+.section-title {
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 14px 0;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #667eea;
+  display: inline-block;
+}
+
 /* ==========================================
    LABEL STYLES
    ========================================== */
@@ -239,6 +284,12 @@ margin-top: 60px;
   border-left: 4px solid #c3e6cb;
 }
 
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border-left: 4px solid #ffeeba;
+}
+
 .alert strong {
   font-weight: 600;
 }
@@ -256,6 +307,62 @@ margin-top: 60px;
 
 .btn-close:hover {
   opacity: 1;
+}
+
+/* ==========================================
+   INPUT WITH BUTTON STYLES
+   ========================================== */
+
+.input-with-button {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.input-with-button .form-control {
+  flex: 1;
+}
+
+.btn-aadhaar-check {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 7px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  margin-top: 0;
+  min-width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+}
+
+.btn-aadhaar-check:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.btn-aadhaar-check:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-aadhaar-check:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-aadhaar-check.btn-reset {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  min-width: 60px;
+}
+
+.btn-aadhaar-check.btn-reset:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
 }
 
 /* ==========================================

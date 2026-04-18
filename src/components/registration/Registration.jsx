@@ -39,6 +39,10 @@ const Registration = () => {
   const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [loadingBlocks, setLoadingBlocks] = useState(false);
   const [schools, setSchools] = useState([]);
+  const [aadhaarVerified, setAadhaarVerified] = useState(false);
+  const [verifyingAadhaar, setVerifyingAadhaar] = useState(false);
+  const [aadhaarExists, setAadhaarExists] = useState(null);
+  const [checkingAadhaar, setCheckingAadhaar] = useState(false);
 
   const classOptions = ['9th', '10th', '11th', '12th'];
 
@@ -94,22 +98,103 @@ const Registration = () => {
     }
   };
 
-  const fetchSchools = async (searchTerm = '') => {
-    try {
-      const response = await axios.get(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-list/`
-      );
-      if (response.data.success && response.data.data) {
-        setSchools(response.data.data);
+   const fetchSchools = async (searchTerm = '') => {
+     try {
+       const response = await axios.get(
+         'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-list/'
+       );
+       if (response.data.success && response.data.data) {
+         setSchools(response.data.data);
+       }
+     } catch (err) {
+       console.error('Error fetching schools:', err);
+     }
+   };
+
+    const verifyAadhaar = async () => {
+      if (!studentData.aadhaar_no.trim()) {
+        setError('Please enter Aadhaar number');
+        return;
       }
-    } catch (err) {
-      console.error('Error fetching schools:', err);
-    }
+      if (!/^\d{12}$/.test(studentData.aadhaar_no)) {
+        setError('Aadhaar number must be 12 digits');
+        return;
+      }
+
+      if (aadhaarExists) {
+        setError('This Aadhaar number is already registered. Please use a different Aadhaar or login.');
+        return;
+      }
+
+      setVerifyingAadhaar(true);
+      setError('');
+
+      try {
+        const response = await axios.get(
+          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-details/`,
+          { params: { aadhaar_no: studentData.aadhaar_no } }
+        );
+
+        if (response.data.success && response.data.data) {
+          const data = response.data.data;
+          setStudentData(prev => ({
+            ...prev,
+            full_name: data.full_name || '',
+            school_name: data.school_name || '',
+            state: data.state || 'Uttarakhand',
+            district: data.district || '',
+            block: data.block || '',
+          }));
+          setAadhaarVerified(true);
+          setAadhaarExists(false);
+        } else {
+          setError('No student data found for this Aadhaar number');
+        }
+      } catch (err) {
+        console.error('Aadhaar verification error:', err);
+        setError(
+          err.response?.data?.message || 'Failed to verify Aadhaar. Please try again.'
+        );
+      } finally {
+        setVerifyingAadhaar(false);
+      }
+    };
+
+    const checkAadhaarExists = async (aadhaarNo) => {
+      if (!aadhaarNo || !/^\d{12}$/.test(aadhaarNo)) {
+        setAadhaarExists(null);
+        return;
+      }
+
+      setCheckingAadhaar(true);
+      try {
+        const response = await axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-aadhaar-list/'
+        );
+
+        if (response.data.success && response.data.aadhaar_nos) {
+          const exists = response.data.aadhaar_nos.includes(aadhaarNo);
+          setAadhaarExists(exists);
+        }
+      } catch (err) {
+        console.error('Error checking Aadhaar list:', err);
+        setAadhaarExists(null);
+      } finally {
+        setCheckingAadhaar(false);
+      }
   };
 
   React.useEffect(() => {
     fetchSchools();
   }, []);
+
+  React.useEffect(() => {
+    if (studentData.aadhaar_no.length === 12 && !aadhaarVerified) {
+      checkAadhaarExists(studentData.aadhaar_no);
+    } else {
+      setAadhaarExists(null);
+    }
+  }, [studentData.aadhaar_no]);
 
   const handleStudentChange = (e) => {
     const { name, value } = e.target;
@@ -132,65 +217,57 @@ const Registration = () => {
     setError('');
   };
 
-  const validateStudentForm = () => {
-    if (!studentData.full_name.trim()) {
-      setError('Full name is required');
-      return false;
-    }
-    if (!studentData.aadhaar_no.trim()) {
-      setError('Aadhaar number is required');
-      return false;
-    }
-    if (!/^\d{12}$/.test(studentData.aadhaar_no)) {
-      setError('Aadhaar number must be 12 digits');
-      return false;
-    }
-    if (!studentData.phone.trim()) {
-      setError('Phone number is required');
-      return false;
-    }
-    if (!/^\d{10}$/.test(studentData.phone)) {
-      setError('Phone number must be 10 digits');
-      return false;
-    }
-    if (!studentData.email.trim()) {
-      setError('Email is required');
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentData.email)) {
-      setError('Please enter a valid email');
-      return false;
-    }
-    if (!studentData.password) {
-      setError('Password is required');
-      return false;
-    }
-    if (studentData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return false;
-    }
-    if (studentData.password !== studentData.confirm_password) {
-      setError('Passwords do not match');
-      return false;
-    }
-    if (!studentData.district) {
-      setError('Please select a district');
-      return false;
-    }
-    if (!studentData.block) {
-      setError('Please select a block');
-      return false;
-    }
-    if (!studentData.class_name) {
-      setError('Please select a class');
-      return false;
-    }
-    if (!studentData.school_name) {
-      setError('School name is required');
-      return false;
-    }
-    return true;
-  };
+   const validateStudentForm = () => {
+     if (!studentData.full_name.trim()) {
+       setError('Full name is required');
+       return false;
+     }
+     if (!studentData.aadhaar_no.trim()) {
+       setError('Aadhaar number is required');
+       return false;
+     }
+     if (!/^\d{12}$/.test(studentData.aadhaar_no)) {
+       setError('Aadhaar number must be 12 digits');
+       return false;
+     }
+     if (!studentData.phone.trim()) {
+       setError('Phone number is required');
+       return false;
+     }
+     if (!/^\d{10}$/.test(studentData.phone)) {
+       setError('Phone number must be 10 digits');
+       return false;
+     }
+     if (!studentData.email.trim()) {
+       setError('Email is required');
+       return false;
+     }
+     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentData.email)) {
+       setError('Please enter a valid email');
+       return false;
+     }
+     if (!studentData.password) {
+       setError('Password is required');
+       return false;
+     }
+     if (studentData.password.length < 6) {
+       setError('Password must be at least 6 characters');
+       return false;
+     }
+     if (studentData.password !== studentData.confirm_password) {
+       setError('Passwords do not match');
+       return false;
+     }
+     if (!studentData.class_name) {
+       setError('Please select a class');
+       return false;
+     }
+     if (!studentData.school_name) {
+       setError('School name is required');
+       return false;
+     }
+     return true;
+   };
 
   const validateSchoolForm = () => {
     if (!schoolData.school_id.trim()) {
@@ -236,10 +313,15 @@ const Registration = () => {
     setSuccess('');
 
     try {
+      // Find school_uni_id from schools list based on school_name
+      const selectedSchool = schools.find(
+        school => school.school_name === studentData.school_name
+      );
+
       const registrationData = {
         full_name: studentData.full_name,
         aadhaar_no: studentData.aadhaar_no,
-        school_uni_id: studentData.school_uni_id,
+        school_uni_id: selectedSchool?.school_uni_id || '',
         school_name: studentData.school_name,
         phone: studentData.phone,
         email: studentData.email,
@@ -271,6 +353,7 @@ const Registration = () => {
         school_uni_id: '',
       });
       setBlocks([]);
+      setAadhaarVerified(false);
       setSuccess('Student Registration successful! You can now login.');
     } catch (err) {
       console.error('Registration error:', err);
@@ -355,6 +438,23 @@ const Registration = () => {
               setActiveTab('student');
               setError('');
               setSuccess('');
+              // Reset student form state when switching to student tab
+              setStudentData({
+                full_name: '',
+                aadhaar_no: '',
+                phone: '',
+                email: '',
+                password: '',
+                confirm_password: '',
+                state: 'Uttarakhand',
+                district: '',
+                block: '',
+                class_name: '',
+                school_name: '',
+                school_uni_id: '',
+              });
+              setAadhaarVerified(false);
+              setBlocks([]);
             }}
           >
             Student Registration
@@ -518,226 +618,261 @@ const Registration = () => {
             </p>
           </form>
         ) : (
-          <form onSubmit={handleStudentSubmit} className="registration-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="full_name" className="form-label">
-                  Full Name <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="full_name"
-                  name="full_name"
-                  value={studentData.full_name}
-                  onChange={handleStudentChange}
-                  placeholder="Full name"
-                />
+           <form onSubmit={handleStudentSubmit} className="registration-form">
+              {/* Aadhaar Verification Section - Always visible first */}
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="aadhaar_no" className="form-label">
+                    Aadhaar Number <span className="required">*</span>
+                  </label>
+                  <div className="input-with-button">
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="aadhaar_no"
+                      name="aadhaar_no"
+                      value={studentData.aadhaar_no}
+                      onChange={handleStudentChange}
+                      placeholder="12 digits"
+                      maxLength="12"
+                      disabled={aadhaarVerified || verifyingAadhaar}
+                    />
+                    {aadhaarVerified ? (
+                      <button
+                        type="button"
+                        className="btn-aadhaar-check btn-reset"
+                        onClick={() => {
+                          setAadhaarVerified(false);
+                          setAadhaarExists(null);
+                          setStudentData(prev => ({
+                            ...prev,
+                            full_name: '',
+                            school_name: '',
+                            state: 'Uttarakhand',
+                            district: '',
+                            block: '',
+                          }));
+                        }}
+                      >
+                        Change
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="btn-aadhaar-check"
+                        onClick={verifyAadhaar}
+                        disabled={verifyingAadhaar || aadhaarExists === true}
+                      >
+                        {verifyingAadhaar ? 'Verifying...' : 'Check'}
+                      </button>
+                    )}
+                  </div>
+                  {aadhaarExists === true && (
+                    <div className="alert alert-warning" style={{ marginTop: '6px', padding: '8px 10px', fontSize: '11px' }}>
+                      <strong>Already Registered!</strong> This Aadhaar number is already associated with a student account.
+                    </div>
+                  )}
+                </div>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="aadhaar_no" className="form-label">
-                  Aadhaar <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="aadhaar_no"
-                  name="aadhaar_no"
-                  value={studentData.aadhaar_no}
-                  onChange={handleStudentChange}
-                  placeholder="12 digits"
-                  maxLength="12"
-                />
-              </div>
+              {/* Full Registration Form - Visible only after Aadhaar verification */}
+              {aadhaarVerified && (
+                <>
+                  {/* Prefilled Information Section - Read Only */}
+                  <div className="prefilled-section">
+                    <h3 className="section-title">Verified Aadhaar Details</h3>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="full_name" className="form-label">
+                          Full Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="full_name"
+                          name="full_name"
+                          value={studentData.full_name}
+                          disabled
+                        />
+                      </div>
 
-              <div className="form-group">
-                <label htmlFor="phone" className="form-label">
-                  Phone <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="phone"
-                  name="phone"
-                  value={studentData.phone}
-                  onChange={handleStudentChange}
-                  placeholder="10 digits"
-                  maxLength="10"
-                />
-              </div>
+                      <div className="form-group">
+                        <label htmlFor="state" className="form-label">
+                          State
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="state"
+                          name="state"
+                          value={studentData.state}
+                          disabled
+                        />
+                      </div>
 
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">
-                  Email <span className="required">*</span>
-                </label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  name="email"
-                  value={studentData.email}
-                  onChange={handleStudentChange}
-                  placeholder="Email"
-                />
-              </div>
-            </div>
+                      <div className="form-group">
+                        <label htmlFor="district" className="form-label">
+                          District
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="district"
+                          name="district"
+                          value={studentData.district}
+                          disabled
+                        />
+                      </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="password" className="form-label">
-                  Password <span className="required">*</span>
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="password"
-                  name="password"
-                  value={studentData.password}
-                  onChange={handleStudentChange}
-                  placeholder="Min. 6 chars"
-                />
-              </div>
+                      <div className="form-group">
+                        <label htmlFor="block" className="form-label">
+                          Block
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="block"
+                          name="block"
+                          value={studentData.block}
+                          disabled
+                        />
+                      </div>
+                    </div>
 
-              <div className="form-group">
-                <label htmlFor="confirm_password" className="form-label">
-                  Confirm Password <span className="required">*</span>
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="confirm_password"
-                  name="confirm_password"
-                  value={studentData.confirm_password}
-                  onChange={handleStudentChange}
-                  placeholder="Confirm"
-                />
-              </div>
+                    <div className="form-row">
+                      <div className="form-group full-width">
+                        <label htmlFor="school_name" className="form-label">
+                          School Name
+                        </label>
+                        <select
+                          className="form-control"
+                          id="school_name"
+                          name="school_name"
+                          value={studentData.school_name}
+                          onChange={handleStudentChange}
+                          disabled
+                        >
+                          <option value="">Select School</option>
+                          {schools.map((school) => (
+                            <option key={school.school_uni_id} value={school.school_name}>
+                              {school.school_name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="form-group">
-                <label htmlFor="class_name" className="form-label">
-                  Class <span className="required">*</span>
-                </label>
-                <select
-                  className="form-control"
-                  id="class_name"
-                  name="class_name"
-                  value={studentData.class_name}
-                  onChange={handleStudentChange}
-                >
-                  <option value="">Select class</option>
-                  {classOptions.map((cls) => (
-                    <option key={cls} value={cls}>
-                      {cls}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {/* Additional Information Section - Editable */}
+                  <div className="editable-section">
+                    <h3 className="section-title">Additional Information</h3>
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="phone" className="form-label">
+                          Mobile Number <span className="required">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="phone"
+                          name="phone"
+                          value={studentData.phone}
+                          onChange={handleStudentChange}
+                          placeholder="10 digits"
+                          maxLength="10"
+                        />
+                      </div>
 
-              <div className="form-group">
-                <label htmlFor="state" className="form-label">
-                  State <span className="required">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="state"
-                  name="state"
-                  value={studentData.state}
-                  disabled
-                />
-              </div>
-            </div>
+                      <div className="form-group">
+                        <label htmlFor="email" className="form-label">
+                          Email <span className="required">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          className="form-control"
+                          id="email"
+                          name="email"
+                          value={studentData.email}
+                          onChange={handleStudentChange}
+                          placeholder="Email"
+                        />
+                      </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="district" className="form-label">
-                  District <span className="required">*</span>
-                </label>
-                <select
-                  className="form-control"
-                  id="district"
-                  name="district"
-                  value={studentData.district}
-                  onChange={handleStudentChange}
-                  disabled={loadingDistricts}
-                >
-                  <option value="">
-                    {loadingDistricts ? 'Loading...' : 'Select district'}
-                  </option>
-                  {districts.map((district) => (
-                    <option key={district} value={district}>
-                      {district}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                      <div className="form-group">
+                        <label htmlFor="password" className="form-label">
+                          Password <span className="required">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          id="password"
+                          name="password"
+                          value={studentData.password}
+                          onChange={handleStudentChange}
+                          placeholder="Min. 6 chars"
+                        />
+                      </div>
 
-              <div className="form-group">
-                <label htmlFor="block" className="form-label">
-                  Block <span className="required">*</span>
-                </label>
-                <select
-                  className="form-control"
-                  id="block"
-                  name="block"
-                  value={studentData.block}
-                  onChange={handleStudentChange}
-                  disabled={!studentData.district || loadingBlocks}
-                >
-                  <option value="">
-                    {loadingBlocks ? 'Loading...' : 'Select block'}
-                  </option>
-                  {blocks.map((block) => (
-                    <option key={block} value={block}>
-                      {block}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                      <div className="form-group">
+                        <label htmlFor="confirm_password" className="form-label">
+                          Confirm Password <span className="required">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          className="form-control"
+                          id="confirm_password"
+                          name="confirm_password"
+                          value={studentData.confirm_password}
+                          onChange={handleStudentChange}
+                          placeholder="Confirm"
+                        />
+                      </div>
+                    </div>
 
-              <div className="form-group">
-                <label htmlFor="school_name" className="form-label">
-                  School Name <span className="required">*</span>
-                </label>
-                <select
-                  className="form-control"
-                  id="school_name"
-                  name="school_name"
-                  value={studentData.school_name}
-                  onChange={handleStudentChange}
-                >
-                  <option value="">Select School</option>
-                  {schools.map((school) => (
-                    <option key={school.school_uni_id} value={school.school_name}>
-                      {school.school_name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+                    <div className="form-row">
+                      <div className="form-group full-width">
+                        <label htmlFor="class_name" className="form-label">
+                          Class <span className="required">*</span>
+                        </label>
+                        <select
+                          className="form-control"
+                          id="class_name"
+                          name="class_name"
+                          value={studentData.class_name}
+                          onChange={handleStudentChange}
+                        >
+                          <option value="">Select class</option>
+                          {classOptions.map((cls) => (
+                            <option key={cls} value={cls}>
+                              {cls}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
 
-            <div className="form-actions">
-              <button
-                type="submit"
-                className="btn-submit"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner"></span> Registering...
-                  </>
-                ) : (
-                  'Register as Student'
-                )}
-              </button>
-            </div>
-
-            <p className="login-link">
-              Already have an account? <Link to="/login">Login here</Link>
-            </p>
-          </form>
-        )}
+             <div className="form-actions">
+               {aadhaarVerified && (
+                 <button
+                   type="submit"
+                   className="btn-submit"
+                   disabled={loading}
+                 >
+                   {loading ? (
+                     <>
+                       <span className="spinner"></span> Registering...
+                     </>
+                   ) : (
+                     'Register as Student'
+                   )}
+                 </button>
+               )}
+             </div>
+           </form>
+         )}
       </div>
     </div>
   );
