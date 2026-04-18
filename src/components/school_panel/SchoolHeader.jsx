@@ -65,44 +65,10 @@ function SchoolHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
    const [error, setError] = useState(null);
    const [imageError, setImageError] = useState(false);
 
-   // Fetch user profile on mount (matching UserProfile)
-   useEffect(() => {
-     const fetchUserProfile = async () => {
-       if (!uniqueId || !accessToken) {
-         setIsLoading(false);
-         return;
-       }
-       try {
-         const response = await axios.get(
-           `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/?student_id=${uniqueId}`,
-           {
-             headers: {
-               Authorization: `Bearer ${accessToken}`,
-             },
-           }
-         );
 
-         if (response.data.success && response.data.data) {
-           const data = response.data.data;
-           setUserDetails({
-             full_name: data.full_name || "",
-             profile_picture: data.profile_picture || null,
-           });
-           setError(null);
-         } else {
-           setError("Failed to fetch user profile");
-         }
-       } catch (err) {
-         setError("Error fetching user profile");
-       } finally {
-         setIsLoading(false);
-       }
-     };
-     fetchUserProfile();
-   }, [uniqueId, accessToken]);
 
     const getDisplayName = () => {
-      return userDetails.full_name || "User";
+      return userDetails.full_name || "School";
     };
 
   // Function to fetch user data with auth handling
