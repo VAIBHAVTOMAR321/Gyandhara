@@ -298,12 +298,9 @@ const StudentIssue = () => {
             <Row>
               <Col xs={12}>
                   {/* Filter Section */}
-                  <Card className="mb-4 border">
-                    <Card.Header className="bg-light border-bottom py-2 px-3">
-                      <h6 className="mb-0 fw-semibold text-secondary">Filters</h6>
-                    </Card.Header>
-                    <Card.Body className="py-3 px-3">
-                      <Row className="g-3">
+                  <Card className="mb-4">
+                    <Card.Body className="py-3">
+                      <Row className="g-3 align-items-end">
                         <Col md={4} xs={12}>
                           <Form.Group controlId="searchTerm">
                             <Form.Label className="small fw-medium mb-1">Search</Form.Label>
@@ -312,7 +309,6 @@ const StudentIssue = () => {
                               placeholder="Search by name, ID, title..."
                               value={searchTerm}
                               onChange={(e) => setSearchTerm(e.target.value)}
-                              className="search-input"
                               size="sm"
                             />
                           </Form.Group>
@@ -333,7 +329,7 @@ const StudentIssue = () => {
                             </Form.Select>
                           </Form.Group>
                         </Col>
-                        <Col md={4} xs={6} className="d-flex align-items-end">
+                        <Col md={4} xs={6}>
                           <Button
                             variant="outline-secondary"
                             size="sm"
@@ -347,10 +343,10 @@ const StudentIssue = () => {
                     </Card.Body>
                   </Card>
 
-                  <Card className="enrollments-table-card border">
-                    <Card.Header className="bg-light border-bottom py-2 px-3 d-flex justify-content-between align-items-center">
+                  <Card className="table-card border">
+                    <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
                       <div className="d-flex align-items-center paid-btn gap-2">
-                        <h5 className="mb-0 fw-semibold text-secondary">
+                        <h5 className="mb-0 fw-semibold">
                           All Queries
                         </h5>
                       </div>
@@ -361,18 +357,18 @@ const StudentIssue = () => {
                     <Card.Body className="p-0">
                       {/* Desktop Table View */}
                       <div className="table-responsive d-none d-lg-block">
-                        <Table hover className="custom-table align-middle mb-0">
-                          <thead className="table-light custom-table">
+                        <Table striped bordered hover responsive className="mb-0">
+                          <thead className="bg-primary text-white">
                             <tr>
-                              <th className="ps-2">Query ID</th>
-                              <th>Student Name</th>
-                              <th>Student ID</th>
-                              <th>Title</th>
-                              <th>Issue</th>
-                              <th>Status</th>
-                              <th>Extra Remark</th>
-                              <th>Date</th>
-                              <th className="text-end pe-3">Actions</th>
+                              <th className="py-3 px-2">Query ID</th>
+                              <th className="py-3 px-2">Student Name</th>
+                              <th className="py-3 px-2">Student ID</th>
+                              <th className="py-3 px-2">Title</th>
+                              <th className="py-3 px-2">Issue</th>
+                              <th className="py-3 px-2">Status</th>
+                              <th className="py-3 px-2">Extra Remark</th>
+                              <th className="py-3 px-2">Date</th>
+                              <th className="py-3 px-2 text-end">Actions</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -385,24 +381,24 @@ const StudentIssue = () => {
                             ) : (
                               currentRecords.map((query) => (
                                 <tr key={query.id}>
-                                  <td className="ps-2"><span className="text-muted small fw-medium">{query.query_id}</span></td>
-                                  <td className="fw-medium text-dark">{query.full_name}</td>
-                                  <td className="small">{query.student_id}</td>
-                                  <td className="small">{query.title}</td>
-                                  <td className="small" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  <td className="py-3 px-2"><span className="text-muted small fw-medium">{query.query_id}</span></td>
+                                  <td className="py-3 px-2 fw-medium text-dark">{query.full_name}</td>
+                                  <td className="py-3 px-2 small">{query.student_id}</td>
+                                  <td className="py-3 px-2 small">{query.title}</td>
+                                  <td className="py-3 px-2 small" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {query.issue}
                                   </td>
-                                  <td className="small">
+                                  <td className="py-3 px-2 small">
                                     {getStatusBadge(query.status)}
                                   </td>
-                                  <td className="small text-muted" style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                  <td className="py-3 px-2 small text-muted" style={{ maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {query.extra_remark || '-'}
                                   </td>
-                                  <td className="small">{formatDate(query.created_at)}</td>
-                                  <td className="text-end pe-3">
+                                  <td className="py-3 px-2 small">{formatDate(query.created_at)}</td>
+                                  <td className="py-3 px-2 text-end">
                                     <div className="d-flex gap-1 justify-content-end">
                                       <Button
-                                        variant="outline-primary"
+                                        variant="outline-light"
                                         size="sm"
                                         className="p-1"
                                         style={{ width: '28px', height: '28px' }}
@@ -412,7 +408,7 @@ const StudentIssue = () => {
                                         <FaReply style={{ fontSize: '12px' }} />
                                       </Button>
                                       <Button
-                                        variant="outline-danger"
+                                        variant="outline-light"
                                         size="sm"
                                         className="p-1"
                                         style={{ width: '28px', height: '28px' }}
@@ -438,26 +434,19 @@ const StudentIssue = () => {
                           </div>
                         ) : (
                           currentRecords.map((query) => (
-                            <Card key={query.id} className="mb-3 mx-2 query-card">
+                            <Card key={query.id} className="mb-3 mx-2">
                               <Card.Body className="p-3">
                                 <div className="d-flex justify-content-between align-items-start mb-2">
                                   <div>
                                     <h6 className="mb-1 fw-semibold">{query.full_name}</h6>
                                     <small className="text-muted">ID: {query.student_id}</small>
                                   </div>
-                                  <Badge bg="secondary" className="small">#{query.query_id}</Badge>
+                                  {getStatusBadge(query.status)}
                                 </div>
                                 
                                 <div className="mb-2">
                                   <small className="text-muted d-block">Title:</small>
                                   <span className="small fw-medium">{query.title}</span>
-                                </div>
-
-                                <div className="mb-2">
-                                  <small className="text-muted d-block">Status:</small>
-                                  <span className={`badge ${getStatusBadgeClass(query.status)} small`}>
-                                    {query.status || 'Pending'}
-                                  </span>
                                 </div>
 
                                 <div className="mb-2">
