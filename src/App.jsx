@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -18,27 +19,53 @@ import StudentRegistration from './components/registration/StudentRegistration';
 import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
 
+
+// ✅ Navbar Wrapper (Hide on specific routes)
+function NavBarWrapper() {
+  const location = useLocation();
+
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile'];
+
+  const shouldHide = hideOnRoutes.some(route =>
+    location.pathname.startsWith(route)
+  );
+
+  if (shouldHide) return null;
+
+  return <NavBar />;
+}
+
+
+// ✅ Protected Route
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isReady } = useAuth();
-  
+
   if (!isReady) {
-    return null;
+    return <div>Loading...</div>;
   }
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return children;
 }
 
+
+// ✅ App Content
 function AppContent() {
   return (
-    <Routes>
+    <>
+      {/* Navbar conditionally visible */}
+      <NavBarWrapper />
+
+      <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/NavBar" element={<NavBar />} />
+
+        <Route path="/StudentRegistration" element={<StudentRegistration />} />
         <Route path="/register" element={<StudentRegistration />} />
         <Route path="/login" element={<Login />} />
+
         <Route 
           path="/UserDashboard" 
           element={
@@ -47,6 +74,7 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
+
         <Route 
           path="/UserProfile" 
           element={
@@ -55,10 +83,13 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-    </Routes>
+      </Routes>
+    </>
   );
 }
 
+
+// ✅ Main App
 function App() {
   return (
     <AuthProvider>

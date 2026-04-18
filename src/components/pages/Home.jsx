@@ -5,7 +5,7 @@ import NavBar from '../nav_bar/NavBar'
 function Home() {
   return (
     <div>
-      <NavBar />
+    
       Home
 
       <Link to="/UserDashboard">
