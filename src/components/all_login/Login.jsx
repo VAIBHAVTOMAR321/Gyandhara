@@ -73,7 +73,12 @@ const Login = () => {
           user: response.data.user || null,
         });
         alert('Login successful!');
-        navigate('/UserDashboard');
+        
+        if (response.data.role === 'admin') {
+          navigate('/AdminDashboard');
+        } else {
+          navigate('/UserDashboard');
+        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed. Please try again.');
