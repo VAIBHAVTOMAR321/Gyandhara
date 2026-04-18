@@ -26,6 +26,9 @@ const Registration = () => {
     school_name: '',
     password: '',
     confirm_password: '',
+    state: 'Uttarakhand',
+    district: '',
+    block: '',
   });
 
   const [districts, setDistricts] = useState([]);
@@ -50,6 +53,14 @@ const Registration = () => {
       setBlocks([]);
     }
   }, [studentData.district]);
+
+  React.useEffect(() => {
+    if (schoolData.district) {
+      fetchBlocks(schoolData.district);
+    } else {
+      setBlocks([]);
+    }
+  }, [schoolData.district]);
 
   const fetchDistricts = async () => {
     setLoadingDistricts(true);
@@ -115,6 +126,9 @@ const Registration = () => {
       ...schoolData,
       [name]: value,
     });
+    if (name === 'district') {
+      setSchoolData(prev => ({ ...prev, block: '' }));
+    }
     setError('');
   };
 
@@ -181,6 +195,14 @@ const Registration = () => {
   const validateSchoolForm = () => {
     if (!schoolData.school_id.trim()) {
       setError('School ID is required');
+      return false;
+    }
+    if (!schoolData.district) {
+      setError('Please select a district');
+      return false;
+    }
+    if (!schoolData.block) {
+      setError('Please select a block');
       return false;
     }
     if (!schoolData.school_name.trim()) {
@@ -278,6 +300,9 @@ const Registration = () => {
         {
           school_id: schoolData.school_id,
           school_name: schoolData.school_name,
+          district: schoolData.district,
+          block: schoolData.block,
+          state: schoolData.state,
           password: schoolData.password,
         }
       );
@@ -288,7 +313,11 @@ const Registration = () => {
         school_name: '',
         password: '',
         confirm_password: '',
+        state: 'Uttarakhand',
+        district: '',
+        block: '',
       });
+      setBlocks([]);
       setSuccess('School Registration successful! You can now login.');
     } catch (err) {
       console.error('Registration error:', err);
@@ -361,6 +390,68 @@ const Registration = () => {
               </div>
 
               <div className="form-group">
+                <label htmlFor="state" className="form-label">
+                  State <span className="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  id="state"
+                  name="state"
+                  value={schoolData.state}
+                  disabled
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="district" className="form-label">
+                  District <span className="required">*</span>
+                </label>
+                <select
+                  className="form-control"
+                  id="district"
+                  name="district"
+                  value={schoolData.district}
+                  onChange={handleSchoolChange}
+                  disabled={loadingDistricts}
+                >
+                  <option value="">
+                    {loadingDistricts ? 'Loading...' : 'Select district'}
+                  </option>
+                  {districts.map((district) => (
+                    <option key={district} value={district}>
+                      {district}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="block" className="form-label">
+                  Block <span className="required">*</span>
+                </label>
+                <select
+                  className="form-control"
+                  id="block"
+                  name="block"
+                  value={schoolData.block}
+                  onChange={handleSchoolChange}
+                  disabled={!schoolData.district || loadingBlocks}
+                >
+                  <option value="">
+                    {loadingBlocks ? 'Loading...' : 'Select block'}
+                  </option>
+                  {blocks.map((block) => (
+                    <option key={block} value={block}>
+                      {block}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
                 <label htmlFor="school_name" className="form-label">
                   School Name <span className="required">*</span>
                 </label>
@@ -374,9 +465,7 @@ const Registration = () => {
                   placeholder="School Name"
                 />
               </div>
-            </div>
 
-            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="password" className="form-label">
                   Password <span className="required">*</span>
