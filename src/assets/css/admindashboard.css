@@ -104,12 +104,14 @@
 .table-card .table tbody tr:hover {
   background-color: #f8f9ff;
 }
-
+.table-card h4{
+  text-align: left;
+}
 .table-card .table tbody td {
   padding: 12px;
   vertical-align: middle;
   color: #555;
-  font-size: 0.9rem;
+  font-size:12px;
   white-space: nowrap;
 }
 

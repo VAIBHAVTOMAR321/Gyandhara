@@ -264,8 +264,8 @@ const AdminDashBoard = () => {
       />
       <div className="main-content-dash">
         <AdminHeader toggleSidebar={toggleSidebar} />
-
-        <Container className="dashboard-box mt-3">
+<div className="dashboard-content">
+        <Container className="dashboard-box">
           {loading ? (
             <div className="loading-spinner">
               <Spinner animation="border" variant="primary" />
@@ -410,6 +410,7 @@ const AdminDashBoard = () => {
             </>
           )}
         </Container>
+        </div>
       </div>
     </div>
   );
