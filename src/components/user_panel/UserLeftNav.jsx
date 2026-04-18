@@ -59,6 +59,12 @@ const menuItems = [
       path: "/UserDashboard",
       active: true,
     },
+     {
+      icon: <FaTachometerAlt />,
+      label: "Send Query",
+      path: "/SendQuery",
+      active: true,
+    },
     {
       icon: <FaUserCircle />,
       label: "PROFILE",
