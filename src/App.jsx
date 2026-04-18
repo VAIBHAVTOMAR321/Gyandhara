@@ -88,8 +88,9 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-          <Route 
-          path="/UserProfile" 
+        
+        <Route 
+          path="/SendQuery" 
           element={
             <ProtectedRoute>
               <SendQuery />
