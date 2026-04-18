@@ -10,6 +10,7 @@ function Home() {
     en: {
       heroTitle: "Stream of Knowledge",
       heroSubtitle: "Welcome to Gyandhara - Your gateway to unlimited learning. Explore diverse courses, connect with expert instructors, and transform your future.",
+      heroImg: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=400&fit=crop",
       exploreBtn: "Explore Courses",
       joinBtn: "Join Now",
       streamsTitle: "Our Knowledge Streams",
@@ -55,6 +56,7 @@ function Home() {
     hi: {
       heroTitle: "ज्ञान की धारा",
       heroSubtitle: "Gyandhara में आपका स्वागत है - असीमित सीखने का द्वार। विविध पाठ्यक्रमों का अन्वेषण करें, विशेषज्ञ प्रशिक्षकों से जुड़ें, और अपना भविष्य बदलें।",
+      heroImg: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=400&fit=crop",
       exploreBtn: "पाठ्यक्रम देखें",
       joinBtn: "अभी जुड़ें",
       streamsTitle: "हमारी ज्ञान धाराएं",
@@ -105,16 +107,19 @@ function Home() {
     <div className="home-wrapper">
       <div className="home-container">
         <section className="hero-section">
-          <div className="hero-badge">🎓 Gyandhara Education</div>
-          <h1>{t.heroTitle}</h1>
-          <p>{t.heroSubtitle}</p>
-          <div className="hero-buttons">
-            <Link to="/register" className="btn-gyandhara btn-primary-custom">
-              <i className="bi bi-person-plus"></i> {t.joinBtn}
-            </Link>
-            <Link to="/register" className="btn-gyandhara btn-outline-custom">
-              <i className="bi bi-compass"></i> {t.exploreBtn}
-            </Link>
+          <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
+          <div className="hero-content">
+            <div className="hero-badge">🎓 Gyandhara Education</div>
+            <h1>{t.heroTitle}</h1>
+            <p>{t.heroSubtitle}</p>
+            <div className="hero-buttons">
+              <Link to="/register" className="btn-gyandhara btn-primary-custom">
+                <i className="bi bi-person-plus"></i> {t.joinBtn}
+              </Link>
+              <Link to="/register" className="btn-gyandhara btn-outline-custom">
+                <i className="bi bi-compass"></i> {t.exploreBtn}
+              </Link>
+            </div>
           </div>
         </section>
 
