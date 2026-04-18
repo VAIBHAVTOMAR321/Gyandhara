@@ -57,10 +57,14 @@ const menuItems = [
     {
       icon: <FaTachometerAlt />,
       label: "DASHBOARD",
-      path: "/AdminDashBoard",
+      path: "/AdminDashboard",
       active: true,
     },
-   
+    {
+      icon: <FaQuestionCircle />,
+      label: "Student Issues",
+      path: "/StudentIssue",
+    },
     {
       icon: <FaTools />,
       label: " Students",
