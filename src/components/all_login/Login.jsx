@@ -9,6 +9,7 @@ const Login = () => {
     role: '9th-student',
     email_or_phone: '',
     aadhaar_no: '',
+    school_id: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
@@ -24,6 +25,7 @@ const Login = () => {
     { value: '11th-student', label: '11th Student', icon: 'bi-mortarboard' },
     { value: '12th-student', label: '12th Student', icon: 'bi-mortarboard' },
     { value: 'admin', label: 'Admin', icon: 'bi-shield-lock' },
+    { value: 'school', label: 'School', icon: 'bi-building' },
   ];
 
   const handleChange = (e) => {
@@ -35,8 +37,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.email_or_phone && !formData.aadhaar_no) {
-      setError('Email/Phone or Aadhaar number is required');
+    if (formData.role === 'admin' && !formData.email_or_phone) {
+      setError('Email/Phone is required');
+      return;
+    }
+    if (formData.role === 'school' && !formData.school_id) {
+      setError('School ID is required');
+      return;
+    }
+    if (formData.role !== 'admin' && formData.role !== 'school' && !formData.aadhaar_no) {
+      setError('Aadhaar number is required');
       return;
     }
     if (!formData.password) {
@@ -55,6 +65,8 @@ const Login = () => {
 
       if (formData.role === 'admin') {
         payload.email_or_phone = formData.email_or_phone;
+      } else if (formData.role === 'school') {
+        payload.school_id = formData.school_id;
       } else {
         payload.aadhaar_no = formData.aadhaar_no;
       }
@@ -76,6 +88,8 @@ const Login = () => {
         
         if (response.data.role === 'admin') {
           navigate('/AdminDashboard');
+        } else if (response.data.role === 'school') {
+          navigate('/SchoolDashBoard');
         } else {
           navigate('/UserDashboard');
         }
@@ -141,6 +155,20 @@ const Login = () => {
                     value={formData.email_or_phone}
                     onChange={handleChange}
                     placeholder="Enter email or phone"
+                  />
+                </div>
+              </div>
+            ) : formData.role === 'school' ? (
+              <div className="form-group">
+                <label>School ID</label>
+                <div className="input-wrapper">
+                  <i className="bi bi-building"></i>
+                  <input
+                    type="text"
+                    name="school_id"
+                    value={formData.school_id}
+                    onChange={handleChange}
+                    placeholder="Enter school ID"
                   />
                 </div>
               </div>

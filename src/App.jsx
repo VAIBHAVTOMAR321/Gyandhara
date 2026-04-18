@@ -94,13 +94,13 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-          <Route 
-          path="/SchoolDashBord" 
+          <Route
+          path="/SchoolDashBoard"
           element={
             <ProtectedRoute>
               <SchoolDashBoard />
             </ProtectedRoute>
-          } 
+          }
         />
       </Routes>
     </>
