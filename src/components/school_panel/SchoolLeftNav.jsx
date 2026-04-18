@@ -54,13 +54,18 @@ const menuItems = [
     {
       icon: <FaTachometerAlt />,
       label: "DASHBOARD",
-      path: "/UserDashboard",
+      path: "/SchoolDashBoard",
       active: true,
     },
     {
       icon: <FaUserCircle />,
       label: "PROFILE",
       path: "/UserProfile",
+    },
+    {
+      icon: <FaPlusSquare />,
+      label: "ADD STUDENTS",
+      path: "/SchoolStudentRegistration",
     },
     {
       icon: <FaTools />,
@@ -111,7 +116,7 @@ const menuItems = [
     //   ],
     // },
 
-    
+      
   ];
 
   //  Auto-close sidebar when switching to mobile or tablet

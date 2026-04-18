@@ -16,6 +16,7 @@ import { LanguageProvider } from './components/all_login/LanguageContext';
 import UserDashboard from "./components/user_panel/UserDashboard";
 import UserProfile from "./components/user_panel/UserProfile";
 import StudentRegistration from './components/registration/Registration';
+import SchoolStudentRegistration from './components/school_panel/StudentRegistration';
 import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
 
@@ -28,7 +29,7 @@ import SendQuery from "./components/user_panel/SendQuery";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -108,6 +109,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <SchoolDashBoard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SchoolStudentRegistration"
+          element={
+            <ProtectedRoute>
+              <SchoolStudentRegistration />
             </ProtectedRoute>
           }
         />
