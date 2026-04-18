@@ -28,7 +28,7 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 
-import "../../assets/css/UserLeftNav.css";
+import "../../assets/css/schoolleftnav.css";
 import { Link } from "react-router-dom";
 import {
   FaInfoCircle,
@@ -40,9 +40,7 @@ import { useAuth } from "../all_login/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 
-
-
-const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
+const SchoolLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -273,4 +271,4 @@ const menuItems = [
   );
 };
 
-export default UserLeftNav;
+export default SchoolLeftNav;

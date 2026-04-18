@@ -24,7 +24,7 @@ import { useAuth } from "../all_login/AuthContext";
 
 
 // 1. Accept searchTerm and setSearchTerm as props
-function UserHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
+function SchoolHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
   
   const navigate = useNavigate();
 
@@ -224,4 +224,4 @@ function UserHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
   );
 }
 
-export default UserHeader;
+export default SchoolHeader;
