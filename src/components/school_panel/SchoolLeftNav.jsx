@@ -120,13 +120,13 @@ const menuItems = [
     <>
       {/* Desktop Sidebar */}
       <div
-        className={`user-Left ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
+        className={`school-Left ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
       >
         {sidebarOpen && (
           <div className="sidebar-header">
             <div className="logo-container">
               <div className="logo">
-                User DashBoard
+                School DashBoard
                 {/* <span className="logo-text"><img src={BRLogo} alt="text"></img></span> */}
               </div>
             </div>
@@ -167,7 +167,7 @@ const menuItems = [
       {/* Submenu */}
       {item.submenu && (
         <Collapse in={openSubmenu === index}>
-          <div className="submenu-container-user">
+          <div className="submenu-container-school">
             {item.submenu.map((subItem, subIndex) => (
               <Link
                 key={subIndex}
@@ -247,7 +247,7 @@ const menuItems = [
 
           {item.submenu && (
             <Collapse in={openSubmenu === index}>
-              <div className="submenu-container-user">
+              <div className="submenu-container-school">
                 {item.submenu.map((subItem, subIndex) => (
                   <Link
                     key={subIndex}
