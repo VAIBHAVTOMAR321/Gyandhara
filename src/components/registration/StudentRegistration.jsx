@@ -15,7 +15,8 @@ const StudentRegistration = () => {
     district: '',
     block: '',
     class_name: '',
-    associate_wings: '',
+    school_name: '',
+    school_uni_id: '',
   });
 
   const [districts, setDistricts] = useState([]);
@@ -27,7 +28,6 @@ const StudentRegistration = () => {
   const [loadingBlocks, setLoadingBlocks] = useState(false);
 
   const classOptions = ['9th', '10th', '11th', '12th'];
-  const wingOptions = ['North Wing', 'South Wing', 'East Wing', 'West Wing', 'Central Wing'];
 
   // Fetch districts on component mount
   useEffect(() => {
@@ -139,8 +139,12 @@ const StudentRegistration = () => {
       setError('Please select a class');
       return false;
     }
-    if (!formData.associate_wings) {
-      setError('Please select an associate wing');
+    if (!formData.school_name) {
+      setError('School name is required');
+      return false;
+    }
+    if (!formData.school_uni_id) {
+      setError('School ID is required');
       return false;
     }
     return true;
@@ -162,7 +166,8 @@ const StudentRegistration = () => {
       const registrationData = {
         full_name: formData.full_name,
         aadhaar_no: formData.aadhaar_no,
-        associate_wings: formData.associate_wings,
+        school_uni_id: formData.school_uni_id,
+        school_name: formData.school_name,
         phone: formData.phone,
         email: formData.email,
         password: formData.password,
@@ -190,7 +195,8 @@ const StudentRegistration = () => {
         district: '',
         block: '',
         class_name: '',
-        associate_wings: '',
+        school_name: '',
+        school_uni_id: '',
       });
       setBlocks([]);
       setSuccess('Registration successful! You can now login.');
@@ -336,6 +342,21 @@ const StudentRegistration = () => {
               </select>
             </div>
 
+            {/* <div className="form-group">
+              <label htmlFor="school_uni_id" className="form-label">
+                School ID <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="school_uni_id"
+                name="school_uni_id"
+                value={formData.school_uni_id}
+                onChange={handleInputChange}
+                placeholder="SCH/2026/000001"
+              />
+            </div> */}
+
             <div className="form-group">
               <label htmlFor="state" className="form-label">
                 State <span className="required">*</span>
@@ -352,7 +373,7 @@ const StudentRegistration = () => {
             </div>
           </div>
 
-          {/* Row 3: District, Block, Associate Wings */}
+          {/* Row 3: District, Block, School Name */}
           <div className="form-row form-row-3">
             <div className="form-group">
               <label htmlFor="district" className="form-label">
@@ -401,23 +422,18 @@ const StudentRegistration = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="associate_wings" className="form-label">
-                Wing <span className="required">*</span>
+              <label htmlFor="school_name" className="form-label">
+                School Name <span className="required">*</span>
               </label>
-              <select
+              <input
+                type="text"
                 className="form-control"
-                id="associate_wings"
-                name="associate_wings"
-                value={formData.associate_wings}
+                id="school_name"
+                name="school_name"
+                value={formData.school_name}
                 onChange={handleInputChange}
-              >
-                <option value="">Select wing</option>
-                {wingOptions.map((wing) => (
-                  <option key={wing} value={wing}>
-                    {wing}
-                  </option>
-                ))}
-              </select>
+                placeholder="School Name"
+              />
             </div>
           </div>
 

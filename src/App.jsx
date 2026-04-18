@@ -15,7 +15,7 @@ import { AuthProvider, useAuth } from './components/all_login/AuthContext';
 import { LanguageProvider } from './components/all_login/LanguageContext';
 import UserDashboard from "./components/user_panel/UserDashboard";
 import UserProfile from "./components/user_panel/UserProfile";
-import StudentRegistration from './components/registration/StudentRegistration';
+import StudentRegistration from './components/registration/Registration';
 import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
 
