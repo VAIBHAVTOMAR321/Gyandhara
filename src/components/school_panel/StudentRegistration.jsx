@@ -79,7 +79,7 @@ const StudentRegistration = () => {
     setStudentsLoading(true);
     try {
       const response = await axios.get(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?school_uni_id=${school_uni_id}&page=${page}&limit=${recordsPerPage}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?school_uni_id=${school_uni_id}`,
         {
           headers: { 
             'Content-Type': 'application/json',
@@ -89,21 +89,19 @@ const StudentRegistration = () => {
       );
       
       let studentsData = [];
-      let total = 0;
       
-      if (response.data.success) {
-        if (Array.isArray(response.data.data)) {
-          studentsData = response.data.data;
-          total = response.data.data.length;
-        } else if (response.data.data && Array.isArray(response.data.data.results)) {
-          studentsData = response.data.data.results;
-          total = response.data.data.count || response.data.data.results.length;
+      if (response.data.success && response.data.data) {
+        const data = response.data.data;
+        if (Array.isArray(data)) {
+          studentsData = data;
+        } else if (data.id) {
+          studentsData = [data];
         }
       }
       
       setStudents(studentsData);
-      setTotalStudents(total);
-      setCurrentPage(page);
+      setTotalStudents(studentsData.length);
+      setCurrentPage(1);
     } catch (err) {
       console.error('Fetch students error:', err);
       setError('Failed to load students');
@@ -162,8 +160,9 @@ const StudentRegistration = () => {
     setError('');
     try {
       await axios.put(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?send_id=${editingStudent.id}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/`,
         {
+          id: editingStudent.id,
           school_uni_id,
           aadhaar_no: editForm.aadhaar_no,
           full_name: editForm.full_name
@@ -205,21 +204,27 @@ const StudentRegistration = () => {
     try {
       if (deletingMultiple) {
         await axios.delete(
-          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?send_id=${JSON.stringify(selectedIds)}`,
-          { headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          } }
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/',
+          {
+            data: { id: selectedIds },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }
         );
         setSuccess(`${selectedIds.length} students deleted successfully`);
         setSelectedIds([]);
       } else {
         await axios.delete(
-          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?send_id=${deletingStudentId}`,
-          { headers: { 
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`
-          } }
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/',
+          {
+            data: { id: [deletingStudentId] },
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            }
+          }
         );
         setSuccess('Student deleted successfully');
       }
@@ -249,13 +254,19 @@ const StudentRegistration = () => {
     }
   };
 
-  // Pagination
+  // Client-side pagination
   const totalPages = Math.ceil(totalStudents / recordsPerPage);
+  const getCurrentPageData = () => {
+    const start = (currentPage - 1) * recordsPerPage;
+    const end = start + recordsPerPage;
+    return students.slice(start, end);
+  };
+  
   const renderPagination = () => {
     const items = [];
     for (let i = 1; i <= totalPages; i++) {
       items.push(
-        <Pagination.Item key={i} active={i === currentPage} onClick={() => fetchStudents(i)}>
+        <Pagination.Item key={i} active={i === currentPage} onClick={() => setCurrentPage(i)}>
           {i}
         </Pagination.Item>
       );
@@ -304,14 +315,13 @@ const StudentRegistration = () => {
 
     try {
       const payload = {
+        school_uni_id,
         aadhaar_no: singleForm.aadhaar_no,
         full_name: singleForm.full_name
       };
 
-      console.log('Single registration payload:', payload);
-
       await axios.post(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?school_uni_id=${school_uni_id}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/`,
         payload,
         {
           headers: {
@@ -440,11 +450,15 @@ const StudentRegistration = () => {
       );
 
       let existingAadhaars = new Set();
-      if (response.data.success) {
-        const data = Array.isArray(response.data.data) ? response.data.data : response.data.data?.results || [];
-        data.forEach(s => {
-          if (s.aadhaar_no) existingAadhaars.add(s.aadhaar_no);
-        });
+      if (response.data.success && response.data.data) {
+        const data = response.data.data;
+        if (Array.isArray(data)) {
+          data.forEach(s => {
+            if (s.aadhaar_no) existingAadhaars.add(s.aadhaar_no);
+          });
+        } else if (data.id && data.aadhaar_no) {
+          existingAadhaars.add(data.aadhaar_no);
+        }
       }
 
       // Mark duplicates in current batch
@@ -487,9 +501,6 @@ const StudentRegistration = () => {
       return;
     }
 
-    console.log('Registering new students:', newStudents.length);
-    console.log('school_uni_id:', school_uni_id);
-    
     setSubmittingBulk(true);
     setError('');
     setSuccess('');
@@ -501,19 +512,21 @@ const StudentRegistration = () => {
     }));
     setRowStatuses(newRowStatuses);
 
+    const statusResults = [...newRowStatuses];
+
     for (let i = 0; i < newStudents.length; i++) {
       const row = newStudents[i];
       const originalIndex = parsedData.findIndex(p => p.aadhaar_no === row.aadhaar_no);
+      const statusIndex = statusResults.findIndex(s => s.index === originalIndex);
       const payload = {
+        school_uni_id,
         aadhaar_no: row.aadhaar_no,
         full_name: row.full_name
       };
 
-      console.log(`Registering row ${i + 1}:`, payload);
-
       try {
         await axios.post(
-          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?school_uni_id=${school_uni_id}`,
+          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/`,
           payload,
           {
             headers: {
@@ -523,34 +536,28 @@ const StudentRegistration = () => {
           }
         );
 
-        setRowStatuses(prev => prev.map(s => 
-          s.index === originalIndex ? { ...s, status: 'success', message: 'Registered' } : s
-        ));
+        statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'success', message: 'Registered' };
+        setRowStatuses([...statusResults]);
       } catch (err) {
-        console.error(`Row ${i + 1} error:`, err);
-        console.error('Error response data:', err.response?.data);
         const isDuplicate = err.response?.data?.errors?.aadhaar_no?.some(e => 
           e.toLowerCase().includes('already exists')
         );
         
         if (isDuplicate) {
-          setRowStatuses(prev => prev.map(s => 
-            s.index === originalIndex ? { ...s, status: 'skipped', message: 'Already exists' } : s
-          ));
+          statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'skipped', message: 'Already exists' };
         } else {
           const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || 'Failed';
-          setRowStatuses(prev => prev.map(s => 
-            s.index === originalIndex ? { ...s, status: 'failed', message } : s
-          ));
+          statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'failed', message };
         }
+        setRowStatuses([...statusResults]);
       }
     }
 
     setSubmittingBulk(false);
     
-    const successCount = rowStatuses.filter(s => s.status === 'success').length;
-    const skippedCount = rowStatuses.filter(s => s.status === 'skipped').length;
-    const failedCount = rowStatuses.filter(s => s.status === 'failed').length;
+    const successCount = statusResults.filter(s => s.status === 'success').length;
+    const skippedCount = statusResults.filter(s => s.status === 'skipped').length;
+    const failedCount = statusResults.filter(s => s.status === 'failed').length;
     
     setSuccess(`Completed: ${successCount} registered, ${skippedCount} already exists, ${failedCount} failed`);
   };
@@ -600,7 +607,6 @@ const StudentRegistration = () => {
     setSubmittingBulk(true);
     setError('');
     setSuccess('');
-    setRowStatuses([]);
 
     const newRowStatuses = parsedData.map((row, idx) => ({
       index: idx,
@@ -609,16 +615,19 @@ const StudentRegistration = () => {
     }));
     setRowStatuses(newRowStatuses);
 
+    const statusResults = [...newRowStatuses];
+
     for (let i = 0; i < parsedData.length; i++) {
       const row = parsedData[i];
       const payload = {
+        school_uni_id,
         aadhaar_no: row.aadhaar_no,
         full_name: row.full_name
       };
 
       try {
         await axios.post(
-          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?school_uni_id=${school_uni_id}`,
+          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/`,
           payload,
           {
             headers: {
@@ -628,32 +637,28 @@ const StudentRegistration = () => {
           }
         );
 
-        setRowStatuses(prev => prev.map(s => 
-          s.index === i ? { ...s, status: 'success', message: 'Registered' } : s
-        ));
+        statusResults[i] = { ...statusResults[i], status: 'success', message: 'Registered' };
+        setRowStatuses([...statusResults]);
       } catch (err) {
         const isDuplicate = err.response?.data?.errors?.aadhaar_no?.some(e => 
           e.toLowerCase().includes('already exists')
         );
         
         if (isDuplicate) {
-          setRowStatuses(prev => prev.map(s => 
-            s.index === i ? { ...s, status: 'skipped', message: 'Already exists' } : s
-          ));
+          statusResults[i] = { ...statusResults[i], status: 'skipped', message: 'Already exists' };
         } else {
           const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || 'Failed';
-          setRowStatuses(prev => prev.map(s => 
-            s.index === i ? { ...s, status: 'failed', message } : s
-          ));
+          statusResults[i] = { ...statusResults[i], status: 'failed', message };
         }
+        setRowStatuses([...statusResults]);
       }
-}
+    }
 
     setSubmittingBulk(false);
     
-    const successCount = rowStatuses.filter(s => s.status === 'success').length;
-    const skippedCount = rowStatuses.filter(s => s.status === 'skipped').length;
-    const failedCount = rowStatuses.filter(s => s.status === 'failed').length;
+    const successCount = statusResults.filter(s => s.status === 'success').length;
+    const skippedCount = statusResults.filter(s => s.status === 'skipped').length;
+    const failedCount = statusResults.filter(s => s.status === 'failed').length;
     
     setSuccess(`Completed: ${successCount} registered, ${skippedCount} skipped, ${failedCount} failed`);
   };
@@ -946,13 +951,12 @@ const StudentRegistration = () => {
                                   <th>#</th>
                                   <th>Aadhaar Number</th>
                                   <th>Full Name</th>
-                                  <th>School Name</th>
                                   <th>Created At</th>
                                   <th>Actions</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {students.map((student, idx) => (
+                                {getCurrentPageData().map((student, idx) => (
                                   <tr key={student.id}>
                                     <td>
                                       <Form.Check
@@ -964,7 +968,6 @@ const StudentRegistration = () => {
                                     <td>{(currentPage - 1) * recordsPerPage + idx + 1}</td>
                                     <td>{student.aadhaar_no}</td>
                                     <td>{student.full_name}</td>
-                                    <td>{student.school_name || '-'}</td>
                                     <td>{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
                                     <td>
                                       <Button
