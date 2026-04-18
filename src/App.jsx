@@ -24,13 +24,14 @@ import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
 import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
 import SendQuery from "./components/user_panel/SendQuery";
 import StudentIssue from "./components/admin_panel/StudentIssue";
+import UserQuiz from "./components/user_panel/UserQuiz";
 
 
 //  Navbar Wrapper (Hide on specific routes)
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/UserQuiz'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -129,6 +130,15 @@ function AppContent() {
               <SchoolStudentRegistration />
             </ProtectedRoute>
           }
+        />
+        
+        <Route 
+          path="/UserQuiz" 
+          element={
+            <ProtectedRoute>
+              <UserQuiz />
+            </ProtectedRoute>
+          } 
         />
       </Routes>
     </>

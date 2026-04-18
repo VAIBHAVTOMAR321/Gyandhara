@@ -66,6 +66,11 @@ const menuItems = [
       active: true,
     },
     {
+      icon: <FaQuestionCircle />,
+      label: "Quiz",
+      path: "/UserQuiz",
+    },
+    {
       icon: <FaUserCircle />,
       label: "PROFILE",
       path: "/UserProfile",
