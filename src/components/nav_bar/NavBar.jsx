@@ -7,10 +7,10 @@ import { Link } from "react-router-dom";
 import "../../assets/css/navbar.css"
 function NavBar() {
   return (
-    <Navbar expand="lg" className="custom-navbar">
+  <Navbar expand="lg" fixed="top" className="custom-navbar">
       <Container>
-        <Navbar.Brand as={Link} to="/" className="brand-logo">
-          MyApp
+        <Navbar.Brand as={Link} to="/" className="brand-logo-logo">
+        Gyandhara 
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

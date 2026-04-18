@@ -1,0 +1,28 @@
+/* Full page wrapper */
+.home-wrapper {
+ 
+  background: #f5f7fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 52px;
+}
+
+/* Container (like bootstrap container) */
+.home-container {
+  width: 100%;
+ 
+  padding: 20px;
+}
+
+/* Box */
+.home-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+
+  /* 🔥 shadow */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+
+  text-align: center;
+}   

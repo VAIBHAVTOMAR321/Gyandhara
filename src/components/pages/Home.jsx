@@ -1,17 +1,16 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import NavBar from '../nav_bar/NavBar'
+import '../../assets/css/home.css' // 👈 add css file
 
 function Home() {
   return (
-    <div>
-    
-      Home
-
-      <Link to="/UserDashboard">
-        Go to User Dashboard
-      </Link>
+   <div className="home-wrapper">
+  <div className="home-container">
+    <div className="home-box">
+      <h2>Home</h2>
     </div>
+  </div>
+</div>
   )
 }
 

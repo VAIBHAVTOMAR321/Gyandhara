@@ -89,7 +89,7 @@ function AppContent() {
 }
 
 
-// ✅ Main App
+// Main App
 function App() {
   return (
     <AuthProvider>
