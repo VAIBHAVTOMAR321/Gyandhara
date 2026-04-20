@@ -440,7 +440,7 @@
   align-items: center;
   gap: 12px;
   padding: 16px 42px;
-  background: var(--gd-gradient-blue);
+ background: linear-gradient(135deg, var(--gd-saffron) 0%, var(--gd-orange) 100%) !important;
   color: var(--gd-white);
   font-size: 1.1rem;
   font-weight: 700;
