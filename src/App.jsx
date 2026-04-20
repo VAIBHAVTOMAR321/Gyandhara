@@ -17,6 +17,7 @@ import UserDashboard from "./components/user_panel/UserDashboard";
 import UserProfile from "./components/user_panel/UserProfile";
 import StudentRegistration from './components/registration/Registration';
 import SchoolStudentRegistration from './components/school_panel/StudentRegistration';
+import SchoolQuizList from './components/school_panel/SchoolQuizList';
 import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
 
@@ -24,6 +25,7 @@ import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
 import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
 import SendQuery from "./components/user_panel/SendQuery";
 import StudentIssue from "./components/admin_panel/StudentIssue";
+import SchoolQuiz from "./components/admin_panel/SchoolQuiz";
 import UserQuiz from "./components/user_panel/UserQuiz";
 import TenthGuidance from "./components/user_panel/TenthGuidance";
 import OccupationDetails from "./components/user_panel/OccupationDetails";
@@ -34,7 +36,7 @@ import OccupationDetails from "./components/user_panel/OccupationDetails";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -110,6 +112,14 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
+        <Route 
+          path="/SchoolQuiz" 
+          element={
+            <ProtectedRoute>
+              <SchoolQuiz />
+            </ProtectedRoute>
+          } 
+        />
           <Route 
           path="/AdminDashboard" 
           element={
@@ -131,6 +141,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <SchoolStudentRegistration />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SchoolQuizList"
+          element={
+            <ProtectedRoute>
+              <SchoolQuizList />
             </ProtectedRoute>
           }
         />

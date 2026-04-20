@@ -33,7 +33,8 @@ import { Link } from "react-router-dom";
 import {
   FaInfoCircle,
   FaBullseye,
-  FaTasks
+  FaTasks,
+  FaGraduationCap
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
@@ -64,6 +65,11 @@ const menuItems = [
       icon: <FaQuestionCircle />,
       label: "Student Issues",
       path: "/StudentIssue",
+    },
+    {
+      icon: <FaGraduationCap />,
+      label: "School Quiz",
+      path: "/SchoolQuiz",
     },
     {
       icon: <FaTools />,
