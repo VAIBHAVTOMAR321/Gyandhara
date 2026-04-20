@@ -1,6 +1,6 @@
 /* Dashboard Layout Fix */
 .dashboard-content {
-  margin-left: 220px;
+  
   /* Default sidebar width */
   padding: 20px;
   min-height: calc(100vh - 70px);
