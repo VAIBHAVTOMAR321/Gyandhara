@@ -96,6 +96,11 @@ const menuItems = [
       label: "Government Schemes",
       path: "/GovernmentSchemes",
     },
+     {
+      icon: <FaQuestionCircle />,
+      label: "Grooming Classes",
+      path: "/GroomingClasses",
+    },
   
 
     //   icon: <FaCalendarAlt />,
