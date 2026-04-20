@@ -1608,9 +1608,7 @@ h5 { font-size: clamp(12px, 3vw, 18px); }
 h6 { font-size: clamp(11px, 2.5vw, 16px); }
 
 /* Nav & Sidebar Responsive */
-.navbar {
-    padding: clamp(8px, 2vw, 12px) 0;
-}
+
 
 .nav-link {
     padding: clamp(6px, 1.5vw, 10px) clamp(8px, 2vw, 16px);
