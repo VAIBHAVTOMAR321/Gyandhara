@@ -89,6 +89,25 @@ const menuItems = [
          
       ],
     },
+
+     {
+      icon: <FaTools />,
+      label: " Govt schemes",
+      submenu: [
+       
+        {
+          label: "Manage Scheme",
+          path: "/ManageGovtSchemes",
+          icon: <FaPlusSquare />,
+        },
+          {
+          label: "Add Scheme",
+          path: "/AddGovtSchemes",
+          icon: <FaPlusSquare />,
+        },
+      ],
+    
+    },
     {
       icon: <FaTools />,
       label: "Test",

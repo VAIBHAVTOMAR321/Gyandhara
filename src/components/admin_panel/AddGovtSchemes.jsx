@@ -1,21 +1,19 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { 
-  Container, Row, Col, Card, Spinner, Button, Form, Badge, Table
-} from 'react-bootstrap'
+import React, { useState, useEffect } from 'react'
+import { Container, Row, Col, Card, Button, Form, Badge, Table, Spinner } from 'react-bootstrap'
 import AdminLeftNav from './AdminLeftNav'
-import AdminTopNav from './AdminTopNav'
+import AdminHeader from './AdminHeader'
 import axios from 'axios'
 import '../../assets/css/AdminDashboard.css'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../all_login/AuthContext'
 import { FaPlus, FaArrowLeft, FaEdit, FaTrash } from 'react-icons/fa'
 
 const AddGovtSchemes = () => {
-  const isMounted = useRef(true)
-  const [showSidebar, setShowSidebar] = useState(true)
+  const { accessToken } = useAuth()
   
-  const authData = useAuth()
-  const authToken = authData?.accessToken
-
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+  
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -63,38 +61,61 @@ const AddGovtSchemes = () => {
   })
 
   useEffect(() => {
-    if (isMounted.current) {
+    const handleResize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (accessToken) {
       fetchCategories()
       fetchAllSchemes()
     }
-    return () => { isMounted.current = false }
-  }, [authToken])
+  }, [accessToken])
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
 
   const getAuthConfig = () => {
     const headers = {}
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`
     }
     return { headers }
   }
 
   const fetchCategories = async () => {
-    if (!authToken) {
+    if (!accessToken) {
+      console.log('No access token, waiting...')
       setLoading(false)
       return
     }
-    
+
     try {
+      setLoading(true)
       const config = getAuthConfig()
-      const response = await axios.get('https://brjobsedu.com/girls_course/girls_course_backend/api/scheme-category/', config)
+      const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme-category/', config)
       if (response.data && response.data.success) {
         setCategories(response.data.data)
         if (response.data.data.length > 0) {
           setFormData(prev => ({ ...prev, scheme_category_id: response.data.data[0].scheme_category_id }))
           setSelectedCategory(response.data.data[0])
         }
+      } else {
+        setCategories([])
       }
     } catch (error) {
+      console.error('Error fetching categories:', error)
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access - Token might be expired')
+      }
       setCategories([])
     } finally {
       setLoading(false)
@@ -102,12 +123,11 @@ const AddGovtSchemes = () => {
   }
 
   const fetchAllSchemes = async () => {
-    setLoadingSchemes(true)
     try {
+      setLoadingSchemes(true)
       const config = getAuthConfig()
-      const response = await axios.get('https://brjobsedu.com/girls_course/girls_course_backend/api/scheme-category-with-schemes/', config)
+      const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme-category-with-schemes/', config)
       if (response.data && response.data.success) {
-        // Flatten all schemes from all categories
         const allSchemes = response.data.data.flatMap(cat => 
           (cat.schemes || []).map(scheme => ({
             ...scheme,
@@ -116,8 +136,14 @@ const AddGovtSchemes = () => {
           }))
         )
         setSchemes(allSchemes)
+      } else {
+        setSchemes([])
       }
     } catch (error) {
+      console.error('Error fetching schemes:', error)
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access - Token might be expired')
+      }
       setSchemes([])
     } finally {
       setLoadingSchemes(false)
@@ -136,7 +162,12 @@ const AddGovtSchemes = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (submitting) return
+    if (submitting || !accessToken) return
+
+    if (!accessToken) {
+      alert('Authentication required')
+      return
+    }
 
     setSubmitting(true)
 
@@ -162,14 +193,9 @@ const AddGovtSchemes = () => {
         web_link: formData.web_link || ''
       }
 
-      // Log payload for debugging
-      console.log('📤 Submitting payload:', JSON.stringify(payload, null, 2))
-
       if (formData.gov_scheme_id) {
         payload.gov_scheme_id = formData.gov_scheme_id
-        console.log('🔄 Updating scheme:', formData.gov_scheme_id)
         
-        // Handle image update for existing scheme
         if (formData.scheme_image) {
           const imageFormData = new FormData()
           imageFormData.append('gov_scheme_id', formData.gov_scheme_id)
@@ -181,10 +207,9 @@ const AddGovtSchemes = () => {
             }
           })
           imageFormData.append('scheme_image', formData.scheme_image)
-          console.log('📤 Update with new image payload:', JSON.stringify(Object.fromEntries(imageFormData), null, 2))
           
-          const response = await axios.put(
-            'https://brjobsedu.com/girls_course/girls_course_backend/api/scheme/',
+          await axios.put(
+            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme/',
             imageFormData,
             {
               ...config,
@@ -192,13 +217,9 @@ const AddGovtSchemes = () => {
               timeout: 10000
             }
           )
-          console.log('✅ Update response:', response.data)
         } else {
-          // Update without new image - don't send scheme_image field
-          // Backend will preserve existing image if not sending a new one
-          console.log('📤 Update payload (no new image):', JSON.stringify(payload, null, 2))
-          const response = await axios.put(
-            'https://brjobsedu.com/girls_course/girls_course_backend/api/scheme/',
+          await axios.put(
+            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme/',
             payload,
             {
               ...config,
@@ -206,14 +227,11 @@ const AddGovtSchemes = () => {
               timeout: 10000
             }
           )
-          console.log('✅ Update response:', response.data)
         }
-        alert('✅ Scheme updated successfully!')
+        alert('Scheme updated successfully!')
       } else {
-        // Add image if provided
         if (formData.scheme_image) {
           const imageFormData = new FormData()
-          // Add JSON fields
           Object.keys(payload).forEach(key => {
             if (key === 'sub_mod' || key === 'sub_mod_hindi') {
               imageFormData.append(key, JSON.stringify(payload[key]))
@@ -223,10 +241,8 @@ const AddGovtSchemes = () => {
           })
           imageFormData.append('scheme_image', formData.scheme_image)
           
-          console.log('📸 Adding scheme with image')
-          console.log('📤 Create with image payload:', JSON.stringify(Object.fromEntries(imageFormData), null, 2))
-          const response = await axios.post(
-            'https://brjobsedu.com/girls_course/girls_course_backend/api/scheme/',
+          await axios.post(
+            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme/',
             imageFormData,
             {
               ...config,
@@ -234,13 +250,9 @@ const AddGovtSchemes = () => {
               timeout: 10000
             }
           )
-          console.log('✅ Add response:', response.data)
         } else {
-          console.log('📝 Adding scheme without image')
-          console.log('📤 Add payload:', JSON.stringify(payload, null, 2))
-          // Send without image as JSON
-          const response = await axios.post(
-            'https://brjobsedu.com/girls_course/girls_course_backend/api/scheme/',
+          await axios.post(
+            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme/',
             payload,
             {
               ...config,
@@ -248,26 +260,19 @@ const AddGovtSchemes = () => {
               timeout: 10000
             }
           )
-          console.log('✅ Add response:', response.data)
         }
-        alert('✅ Scheme added successfully!')
+        alert('Scheme added successfully!')
       }
 
       resetForm()
       fetchAllSchemes()
     } catch (error) {
-      console.error('❌ Error details:', error)
+      console.error('Error details:', error)
       
       let errorMessage = 'An error occurred'
-      let errorDetails = ''
       
       if (error.response) {
-        console.error('Status:', error.response.status)
-        console.error('Response data:', JSON.stringify(error.response.data, null, 2))
-        
-        // Extract error message from various response formats
         if (error.response.data) {
-          let errorMsg = ''
           if (typeof error.response.data === 'string') {
             errorMessage = error.response.data
           } else if (error.response.data.detail) {
@@ -277,27 +282,16 @@ const AddGovtSchemes = () => {
           } else if (error.response.data.error) {
             errorMessage = error.response.data.error
           } else if (error.response.data.errors) {
-            const errors = error.response.data.errors
-            if (typeof errors === 'object') {
-              errorDetails = Object.entries(errors)
-                .map(([field, msgs]) => `• ${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
-                .join('\n')
-              errorMessage = 'Validation Failed: ' + errorDetails
-            } else {
-              errorMessage = JSON.stringify(errors)
-            }
+            errorMessage = 'Validation Failed'
           } else {
             errorMessage = JSON.stringify(error.response.data)
           }
         }
-        
         alert(`Error ${error.response.status}: ${errorMessage}`)
       } else if (error.request) {
-        console.error('No response received')
-        alert('❌ Failed: No response from server. Check your internet connection.')
+        alert('Failed: No response from server. Check your internet connection.')
       } else {
-        console.error('Error:', error.message)
-        alert('❌ Failed: ' + error.message)
+        alert('Failed: ' + error.message)
       }
     } finally {
       setSubmitting(false)
@@ -363,17 +357,27 @@ const AddGovtSchemes = () => {
   }
 
   const handleDelete = async (scheme) => {
-    if (window.confirm(`Are you sure you want to delete the scheme "${scheme.title}"?`)) {
-      try {
-        const config = getAuthConfig()
-        await axios.delete('https://brjobsedu.com/girls_course/girls_course_backend/api/scheme/', {
-          data: { gov_scheme_id: scheme.gov_scheme_id },
-          ...config
-        })
-        fetchAllSchemes()
-        alert('Scheme deleted successfully!')
-      } catch (error) {
-        alert('Failed to delete scheme. Please check the console for details.')
+    if (!window.confirm(`Are you sure you want to delete the scheme "${scheme.title}"?`)) return
+
+    if (!accessToken) {
+      alert('Authentication required')
+      return
+    }
+
+    try {
+      const config = getAuthConfig()
+      await axios.delete('https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme/', {
+        data: { gov_scheme_id: scheme.gov_scheme_id },
+        ...config
+      })
+      fetchAllSchemes()
+      alert('Scheme deleted successfully!')
+    } catch (error) {
+      console.error('Error deleting scheme:', error)
+      if (error.response && error.response.status === 401) {
+        alert('Session expired. Please login again.')
+      } else {
+        alert('Failed to delete scheme. Please try again.')
       }
     }
   }
@@ -432,15 +436,28 @@ const AddGovtSchemes = () => {
   }
 
   return (
-    <div className="d-flex">
-      <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-      <div className="flex-grow-1" style={{ marginLeft: showSidebar ? '238px' : '', transition: 'margin-left 0.3s' }}>
-        <AdminTopNav />
-        <Container fluid className="py-4">
-          <div className="fade-in">
-            <h4 className="mb-4">Add Government Schemes</h4>
+    <div className="dashboard-container">
+      <AdminLeftNav
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <AdminHeader toggleSidebar={toggleSidebar} />
+        <div className="dashboard-content">
+          <Container fluid className="py-4">
+              <div className="fade-in">
+                <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+                  <div className="d-flex align-items-center all-en-box gap-3">
+                    <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
+                      <FaArrowLeft /> Dashboard
+                    </Button>
+                    <h4 className="mb-0">Add Government Schemes</h4>
+                  </div>
+                </div>
 
-            <Row className="g-4">
+              <Row className="g-4">
               <Col lg={8}>
                 <Card className="shadow-sm border-0">
                   <Card.Header className="bg-primary text-white">
@@ -748,9 +765,10 @@ const AddGovtSchemes = () => {
                   </Card.Body>
                 </Card>
               </Col>
-            </Row>
-          </div>
-        </Container>
+              </Row>
+            </div>
+          </Container>
+        </div>
       </div>
     </div>
   )

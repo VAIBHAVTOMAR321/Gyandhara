@@ -34,6 +34,8 @@ import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 import GovernmentSchemes from "./components/user_panel/GovernmentSchemes";
 import GroomingClasses from "./components/user_panel/GroomingClasses";
 import Competition from "./components/user_panel/Competition";
+import ManageGovtSchemes from "./components/admin_panel/ManageGovtSchemes";
+import AddGovtSchemes from "./components/admin_panel/AddGovtSchemes";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 
@@ -41,7 +43,7 @@ import Competition from "./components/user_panel/Competition";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -133,13 +135,29 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        <Route 
-          path="/SendQuery" 
+        <Route
+          path="/ManageGovtSchemes"
+          element={
+            <ProtectedRoute>
+              <ManageGovtSchemes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AddGovtSchemes"
+          element={
+            <ProtectedRoute>
+              <AddGovtSchemes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SendQuery"
           element={
             <ProtectedRoute>
               <SendQuery />
             </ProtectedRoute>
-          } 
+          }
         />
           <Route 
           path="/StudentIssue" 
