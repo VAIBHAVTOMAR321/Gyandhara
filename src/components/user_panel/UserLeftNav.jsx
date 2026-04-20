@@ -24,7 +24,8 @@ import {
   FaGlassCheers,
   FaChalkboardTeacher,
   FaIndustry,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaTrophy
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -69,6 +70,11 @@ const menuItems = [
       icon: <FaQuestionCircle />,
       label: "Quiz",
       path: "/UserQuiz",
+    },
+    {
+      icon: <FaTrophy />,
+      label: "Competition",
+      path: "/Competition",
     },
     {
       icon: <FaUserCircle />,
