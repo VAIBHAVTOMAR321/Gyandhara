@@ -3,21 +3,24 @@ import { Container, Card, Button, Row, Col, Badge, Form, Modal, Alert, Tab, Nav,
 import { FaGraduationCap, FaArrowLeft, FaCheckCircle, FaInfoCircle, FaBook, FaMoneyBillWave, FaBriefcase, FaLaptop, FaUniversity, FaBus, FaUtensils, FaHeart, FaShieldAlt, FaLaptopCode, FaUserGraduate, FaAward, FaPiggyBank, FaHandHoldingUsd, FaTools, FaMedal, FaBaby, FaFemale } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import UseLeftNav from './UseLeftNav'
-import UserTopNav from './UserTopNav'
-import { useAuth } from '../../contexts/AuthContext'
-import { useLanguage } from '../../contexts/LanguageContext'
-import TransText from '../TransText'
-import '../../assets/css/UserSettings.css'
+import UserLeftNav from './UserLeftNav'
+import UserHeader from './UserHeader'
+import { useAuth } from '../all_login/AuthContext'
+import { useLanguage } from '../all_login/LanguageContext'
+
+
 
 const GovernmentSchemes = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
+  
   const { uniqueId, userRoleType, accessToken } = useAuth()
   const { language } = useLanguage()
   const navigate = useNavigate()
-  const [showOffcanvas, setShowOffcanvas] = useState(false)
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
-  const [selectedCategory, setSelectedCategory] = useState('')
   const [loading, setLoading] = useState(true)
+  
+  const [selectedCategory, setSelectedCategory] = useState('')
   const [showModal, setShowModal] = useState(false)
   const [selectedScheme, setSelectedScheme] = useState(null)
   const [activeTab, setActiveTab] = useState('category')
@@ -27,24 +30,35 @@ const GovernmentSchemes = () => {
   const [retryCount, setRetryCount] = useState(0)
   const schemesSectionRef = useRef(null)
 
-  
-
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768)
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
     }
+    
+    handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  const toggleSidebar = () => {
+    if (isMobile || isTablet) {
+      setSidebarOpen(!sidebarOpen)
+    } else {
+      setSidebarOpen(!sidebarOpen)
+    }
+  }
 
   // Fetch categories and schemes from API
   useEffect(() => {
     const fetchSchemesData = async () => {
       try {
         setError(null)
+        setLoading(true)
         
         const response = await axios.get(
-          'https://brjobsedu.com/girls_course/girls_course_backend/api/scheme-category-with-schemes/',
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/scheme-category-with-schemes/',
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -55,7 +69,6 @@ const GovernmentSchemes = () => {
         )
         
         if (response.data.success && response.data.data && Array.isArray(response.data.data)) {
-          // Transform API data into categories and schemes
           const categoryList = response.data.data
           const schemesMap = {}
           
@@ -64,7 +77,7 @@ const GovernmentSchemes = () => {
               const categoryKey = category.scheme_category_id
               schemesMap[categoryKey] = category.schemes.map(scheme => {
                 const imgPath = scheme.scheme_image || ''
-                const imgUrl = imgPath && !imgPath.startsWith('http') ? `https://brjobsedu.com/girls_course/girls_course_backend${imgPath}` : imgPath
+                const imgUrl = imgPath && !imgPath.startsWith('http') ? `https://brjobsedu.com/gyandhara/gyandhara_backend${imgPath}` : imgPath
                 return {
                   gov_scheme_id: scheme.gov_scheme_id,
                   title: scheme.title || 'Untitled Scheme',
@@ -94,7 +107,6 @@ const GovernmentSchemes = () => {
         setLoading(false)
         
         if (error.response) {
-          // Server responded with error status
           if (error.response.status === 401) {
             setError('Unauthorized: Please login again')
           } else if (error.response.status === 403) {
@@ -107,7 +119,6 @@ const GovernmentSchemes = () => {
             setError(`Server error: ${error.response.status} ${error.response.statusText}`)
           }
         } else if (error.request) {
-          // Request made but no response
           if (error.code === 'ECONNREFUSED') {
             setError('Connection refused: Server may be down')
           } else if (error.code === 'ETIMEDOUT' || error.code === 'ENOTFOUND') {
@@ -118,7 +129,6 @@ const GovernmentSchemes = () => {
             setError('Network error: No response from server')
           }
         } else {
-          // Other errors
           setError(error.message || 'Unknown error occurred')
         }
       }
@@ -128,12 +138,6 @@ const GovernmentSchemes = () => {
       fetchSchemesData()
     }
   }, [accessToken, retryCount])
-
-  const handleMenuToggle = () => {
-    if (isMobile) {
-      setShowOffcanvas(!showOffcanvas)
-    }
-  }
 
   // Build categories from API data for display
   const getCategoriesForDisplay = () => {
@@ -150,11 +154,9 @@ const GovernmentSchemes = () => {
       
       return {
         id: category.scheme_category_id,
-        nameKey: category.title,
         name: category.title,
         name_hindi: category.title_hindi,
         icon: categoryIconMap[category.scheme_category_id] || <FaAward />,
-        descriptionKey: category.description,
         description: category.description,
         description_hindi: category.description_hindi,
         categoryIcon: category.icon,
@@ -186,7 +188,7 @@ const GovernmentSchemes = () => {
     return [value]
   }
 
-  // Helper to get title from sub_mod item (handles both string and object)
+  // Helper to get title from sub_mod item
   const getSubModTitle = (item) => {
     if (typeof item === 'string') return item
     if (item && typeof item === 'object') return item.title || item.description || item.name || ''
@@ -199,43 +201,35 @@ const GovernmentSchemes = () => {
     return ''
   }
 
-  // Check if title matches a section (order matters - more specific first)
+  // Check if title matches a section
   const getSectionFromTitle = (title) => {
-    const t = title?.toLowerCase().replace(/^-*\s*/, '') || '' // remove leading dashes/spaces
+    const t = title?.toLowerCase().replace(/^-*\s*/, '') || ''
     if (t.includes('documents needed') || t.includes('आवश्यक दस्तावेज़') || t.includes('documents') || t.includes('दस्तावेज़')) return 'documents'
     if (t.includes('how to apply') || t.includes('आवेदन कैसे करें') || t.includes('apply')) return 'howToApply'
     if (t.includes('important tips') || t.includes('महत्वपूर्ण सुझाव') || t.includes('tips') || t.includes('सुझाव')) return 'tips'
     if (t.includes('who can apply') || t.includes('आवेदन कौन कर सकते हैं') || t.includes('eligibility') || t.includes('कौन')) return 'eligibility'
     if (t.includes('benefits') || t.includes('मुख्य लाभ') || t.includes('लाभ')) return 'benefits'
     if (t.includes('about') || t.includes('योजना के बारे में') || t.includes('विवरण')) return 'about'
-    return '' // no default - skip items that don't match any section
+    return ''
   }
 
   // Enrich scheme data with API information
   const enrichSchemeData = (apiScheme) => {
-    const subMod = language === 'hi' ? apiScheme.sub_mod_hindi : apiScheme.sub_mod
-    // Section 1: About this Scheme - only description
-    const about = language === 'hi' ? apiScheme.description_hindi : apiScheme.description
+    const subMod = apiScheme.sub_mod_hindi || apiScheme.sub_mod
+    const about = apiScheme.description_hindi || apiScheme.description
     
-    // Initialize arrays for each section
     let benefits = []
     let eligibility = []
     let documents = []
     let howToApply = []
     let tips = []
-    // Get total_amount from API, fallback to "Visit Website"
     const totalAmount = apiScheme.total_amount || 'Visit Website'
     
-    // Process sub_mod array - use title to determine section
     if (subMod && Array.isArray(subMod) && subMod.length > 0) {
       subMod.forEach(item => {
         const title = getSubModTitle(item)
         const description = getSubModDesc(item)
-        
-        // Parse comma/newline separated values from description
         const items = parseListField(description).filter(i => i && i.trim())
-        
-        // Determine which section based on title
         const section = getSectionFromTitle(title)
         
         if (section === 'eligibility') {
@@ -247,10 +241,8 @@ const GovernmentSchemes = () => {
         } else if (section === 'tips') {
           tips = [...tips, ...items]
         } else if (section === 'benefits' && items.length > 0) {
-          // Only add to benefits if title explicitly contains "benefits"
           benefits = [...benefits, ...items]
         }
-        // Items with non-matching titles are skipped
       })
     }
     
@@ -294,311 +286,311 @@ const GovernmentSchemes = () => {
   const displayedSchemes = selectedCategory ? getCategorySchemes() : []
   const allSchemes = getAllSchemes()
   const categories = getCategoriesForDisplay()
-
   const schemesToDisplay = activeTab === 'all' ? allSchemes : displayedSchemes
 
   return (
-    <div className="d-flex flex-column">
-      <UserTopNav onMenuToggle={handleMenuToggle} isMobile={isMobile} />
-      <div className="d-flex flex-1">
-        <UseLeftNav 
-          showOffcanvas={showOffcanvas} 
-          setShowOffcanvas={setShowOffcanvas} 
-        />
-        
-        <div className="flex-grow-1" style={{ marginLeft: isMobile ? '0px' : '220px', padding: isMobile ? '10px' : '20px', minHeight: 'calc(100vh - 70px)' }}>
-          <Container fluid className='fixed-notifications'>
-            <div className="mb-4">
-              <Button 
-                variant="outline-secondary" 
-                onClick={() => navigate('/UserDashboard')} 
-                className="d-flex align-items-center"
-              >
-                <FaArrowLeft className="me-2" />
-                <TransText k="schemes.backToDashboard" as="span" />
-              </Button>
-            </div>
+    <div className="dashboard-container">
+      <UserLeftNav
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <UserHeader toggleSidebar={toggleSidebar} />
 
-            {loading ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status" style={{ width: '60px', height: '60px' }}>
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="mt-3"><TransText k="schemes.loading" as="span" /></p>
+        <Container className="dashboard-box mt-3">
+          {/* Back Button */}
+          <div className="mb-4">
+            <Button 
+              variant="outline-secondary" 
+              onClick={() => navigate('/UserDashboard')} 
+              className="d-flex align-items-center"
+            >
+              <FaArrowLeft className="me-2" />
+              Back to Dashboard
+            </Button>
+          </div>
+
+          {loading ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status" style={{ width: '60px', height: '60px' }}>
+                <span className="visually-hidden">Loading...</span>
               </div>
-            ) : error ? (
-              <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: '10px', borderLeft: '5px solid #dc3545' }}>
-                <Card.Body className="p-4">
-                  <div className="d-flex align-items-start gap-3">
-                    <div style={{fontSize: '1.5rem'}}>⚠️</div>
-                    <div style={{flex: 1}}>
-                      <h5 className="text-danger mb-2">Error Loading Government Schemes</h5>
-                      <p className="text-muted mb-3">{error}</p>
-                      <Button 
-                        variant="outline-danger" 
-                        size="sm"
-                        onClick={() => setRetryCount(prev => prev + 1)}
-                      >
-                        Retry
-                      </Button>
+              <p className="mt-3">Loading Government Schemes...</p>
+            </div>
+          ) : error ? (
+            <Card className="shadow-box mb-4">
+              <Card.Body className="p-4">
+                <div className="d-flex align-items-start gap-3">
+                  <div style={{fontSize: '1.5rem'}}>⚠️</div>
+                  <div style={{flex: 1}}>
+                    <h5 className="text-danger mb-2">Error Loading Government Schemes</h5>
+                    <p className="text-muted mb-3">{error}</p>
+                    <Button 
+                      variant="outline-danger" 
+                      size="sm"
+                      onClick={() => setRetryCount(prev => prev + 1)}
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                </div>
+              </Card.Body>
+            </Card>
+          ) : apiCategories.length === 0 ? (
+            <Card className="shadow-box mb-4">
+              <Card.Body className="p-4 text-center">
+                <p className="text-muted mb-0">No government schemes available at the moment. Please try again later.</p>
+              </Card.Body>
+            </Card>
+          ) : (
+            <div>
+              {/* Header Card */}
+              <Card className="shadow-box mb-4">
+                <Card.Body>
+                  <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
+                    <div>
+                      <h3 className="mb-2">
+                        <FaAward className="me-2 text-primary" />
+                        Government Schemes
+                      </h3>
+                      <p className="text-muted mb-0">
+                        Explore government schemes available for you
+                      </p>
                     </div>
                   </div>
                 </Card.Body>
               </Card>
-            ) : apiCategories.length === 0 ? (
-              <Card className="shadow-sm border-0 mb-4" style={{ borderRadius: '10px', borderLeft: '5px solid #ffc107' }}>
-                <Card.Body className="p-4 text-center">
-                  <p className="text-muted mb-0">No government schemes available at the moment. Please try again later.</p>
+
+              {/* Step 1: Select Category */}
+              <Card className="shadow-box mb-4">
+                <Card.Body>
+                  <h5 className="mb-3">
+                    <Badge bg="primary" className="me-2">Step 1</Badge>
+                    Select Scheme Category
+                  </h5>
+                  <Row>
+                    {categories.map((category) => (
+                      <Col lg={3} md={6} className="mb-3" key={category.id}>
+                        <Card
+                          className={`h-100 border stream-selection-card ${selectedCategory === category.id ? 'selected' : ''}`}
+                          style={{
+                            cursor: 'pointer',
+                            borderColor: selectedCategory === category.id ? '#667eea' : '#dee2e6',
+                            overflow: 'hidden',
+                            width: '100%'
+                          }}
+                          onClick={() => handleCategoryChange(category.id)}
+                        >
+                          {category.image && (
+                            <div style={{
+                              height: '120px',
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderBottom: '1px solid #e0e0e0'
+                            }}>
+                              <img
+                                src={category.image}
+                                alt={category.name}
+                                style={{
+                                  maxHeight: '100%',
+                                  maxWidth: '100%',
+                                  objectFit: 'contain',
+                                  padding: '10px'
+                                }}
+                                onError={(e) => { e.target.style.display = 'none' }}
+                              />
+                            </div>
+                          )}
+                          <Card.Body className="p-3 text-center">
+                            <h6 className="mb-1">{category.name_hindi || category.name}</h6>
+                            <small className="text-muted">{category.description_hindi || category.description}</small>
+                            {selectedCategory === category.id && (
+                              <Badge bg="primary" className="mt-2">
+                                <FaCheckCircle className="me-1" /> Selected
+                              </Badge>
+                            )}
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
                 </Card.Body>
               </Card>
-            ) : (
-              <div>
-                <Card className="shadow-sm mb-4 border-0 notifications-header-card" style={{ borderRadius: '10px' }}>
-                  <Card.Body className="card-mobile">
-                    <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
-                      <div>
-                        <h3 className="mb-2">
-                          <FaAward className="me-2 text-primary" />
-                          <TransText k="schemes.title" as="span" />
-                        </h3>
-                        <p className="text-muted mb-0">
-                          <TransText k="schemes.subtitle" as="span" />
-                        </p>
-                      </div>
-                    </div>
-                  </Card.Body>
-                </Card>
 
-                <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
-                  <Card.Body className="card-mobile">
-                    <h5 className="mb-3">
-                      <Badge bg="primary" className="me-2"><TransText k="schemes.selectCategory" as="span" /></Badge>
-                      <TransText k="schemes.chooseCategory" as="span" />
+              {/* Step 2: Schemes List */}
+              {(selectedCategory || activeTab === 'all') && (
+                <Card ref={schemesSectionRef} className="shadow-box mb-4">
+                  <Card.Header className="bg-white border-0 pt-4 pb-0">
+                    <h5 className="mb-0">
+                      <FaUniversity className="me-2 text-primary" />
+                      Available Schemes - {activeTab === 'all' ? 'All Schemes' : (categories.find(c => c.id === selectedCategory)?.name_hindi || categories.find(c => c.id === selectedCategory)?.name)}
                     </h5>
-                    <Row>
-                      {categories.map((category) => (
-                        <Col lg={3} md={6} className="mb-3" key={category.id}>
-                          <Card
-                            className={`h-100 border stream-selection-card ${selectedCategory === category.id ? 'selected' : ''}`}
-                            style={{
-                              cursor: 'pointer',
-                              borderColor: selectedCategory === category.id ? '#667eea' : '#dee2e6',
-                              overflow: 'hidden',
-                              width: '100%'
-                            }}
-                            onClick={() => handleCategoryChange(category.id)}
-                          >
-                            {category.image && (
-                              <div style={{
-                                height: '120px',
-                                width: '100%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                           
-                                borderBottom: '1px solid #e0e0e0'
-                              }}>
-                                <img
-                                  src={category.image}
-                                  alt={category.name}
-                                  style={{
-                                    maxHeight: '100%',
-                                    maxWidth: '100%',
-                                    objectFit: 'contain',
-                                    padding: '10px'
-                                  }}
-                                  onError={(e) => { e.target.style.display = 'none' }}
-                                />
-                              </div>
-                            )}
-                            <Card.Body className="p-3 text-center">
-                              <h6 className="mb-1">{language === 'hi' ? category.name_hindi : category.name}</h6>
-                              <small className="text-muted">{language === 'hi' ? category.description_hindi : category.description}</small>
-                              {selectedCategory === category.id && (
-                                <Badge bg="primary" className="mt-2">
-                                  <FaCheckCircle className="me-1" /> <TransText k="schemes.selected" as="span" />
-                                </Badge>
-                              )}
-                            </Card.Body>
-                          </Card>
-                        </Col>
-                      ))}
-                    </Row>
+                    <p className="text-muted mb-0">
+                      Browse and click on any scheme for details
+                    </p>
+                  </Card.Header>
+                  <Card.Body>
+                    <Tab.Container id="schemes-tabs" activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
+                      <Nav variant="tabs" className="mb-4">
+                        <Nav.Item>
+                          <Nav.Link eventKey="category" disabled={!selectedCategory}>
+                            <FaBook className="me-2" />
+                            Category Schemes
+                          </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                          <Nav.Link eventKey="all">
+                            <FaAward className="me-2" />
+                            All Schemes
+                          </Nav.Link>
+                        </Nav.Item>
+                      </Nav>
+                      <Tab.Content>
+                        <Tab.Pane eventKey="category">
+                          {selectedCategory ? (
+                            <Row>
+                              {displayedSchemes.map((scheme) => (
+                                <Col lg={4} md={6} className="mb-4" key={scheme.id || scheme.gov_scheme_id}>
+                                  <Card 
+                                    className="h-100 border course-card"
+                                    style={{ cursor: 'pointer', overflow: 'hidden', width: '100%' }}
+                                    onClick={() => handleSchemeClick(scheme)}
+                                  >
+                                    {scheme.scheme_image ? (
+                                      <div style={{
+                                        height: '120px',
+                                        width: '100%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderBottom: '1px solid #e0e0e0'
+                                      }}>
+                                        <img
+                                          src={scheme.scheme_image}
+                                          alt={scheme.title}
+                                          style={{
+                                            maxHeight: '100%',
+                                            maxWidth: '100%',
+                                            objectFit: 'contain',
+                                            padding: '8px'
+                                          }}
+                                          onError={(e) => { e.target.style.display = 'none' }}
+                                        />
+                                      </div>
+                                    ) : null}
+                                    <Card.Body className="p-3 text-center">
+                                      <h6 className="mb-1">{scheme.title_hindi || scheme.title}</h6>
+                                      {scheme.amount && scheme.amount !== 'Visit Website' ? (
+                                        <Badge bg="success" className="mb-2">₹{Number(scheme.amount).toLocaleString('en-IN')}</Badge>
+                                      ) : (
+                                        <Badge bg="warning" text="dark" className="mb-2">{scheme.amount}</Badge>
+                                      )}
+                                      <p className="text-muted small mb-2">
+                                        {scheme.about}
+                                      </p>
+                                      <div className="d-flex flex-wrap gap-1 justify-content-center">
+                                        {scheme.benefits?.slice(0, 3).map((benefit, idx) => (
+                                          <Badge bg="light" text="dark" key={idx} className="small">
+                                            {benefit}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </Card.Body>
+                                  </Card>
+                                </Col>
+                              ))}
+                            </Row>
+                          ) : (
+                            <div className="text-center py-4">
+                              <p className="text-muted mb-0">
+                                Please select a category above to view schemes
+                              </p>
+                            </div>
+                          )}
+                        </Tab.Pane>
+                        <Tab.Pane eventKey="all">
+                          <Row>
+                            {allSchemes.map((scheme) => (
+                              <Col lg={4} md={6} className="mb-4" key={scheme.id || scheme.gov_scheme_id}>
+                                <Card 
+                                  className="h-100 border course-card"
+                                  style={{ cursor: 'pointer', overflow: 'hidden', width: '100%' }}
+                                  onClick={() => handleSchemeClick(scheme)}
+                                >
+                                  {scheme.scheme_image ? (
+                                    <div style={{
+                                      height: '120px',
+                                      width: '100%',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      borderBottom: '1px solid #e0e0e0'
+                                    }}>
+                                      <img
+                                        src={scheme.scheme_image}
+                                        alt={scheme.title}
+                                        style={{
+                                          maxHeight: '100%',
+                                          maxWidth: '100%',
+                                          objectFit: 'contain',
+                                          padding: '8px'
+                                        }}
+                                        onError={(e) => { e.target.style.display = 'none' }}
+                                      />
+                                    </div>
+                                  ) : null}
+                                  <Card.Body className="p-3 text-center">
+                                    <h6 className="mb-1">{scheme.title_hindi || scheme.title}</h6>
+                                    {scheme.amount && scheme.amount !== 'Visit Website' ? (
+                                      <Badge bg="success" className="mb-2">₹{Number(scheme.amount).toLocaleString('en-IN')}</Badge>
+                                    ) : (
+                                      <Badge bg="warning" text="dark" className="mb-2">{scheme.amount}</Badge>
+                                    )}
+                                    <p className="text-muted small mb-2">
+                                      {scheme.about}
+                                    </p>
+                                    <div className="d-flex flex-wrap gap-1 justify-content-center">
+                                      {scheme.benefits?.slice(0, 3).map((benefit, idx) => (
+                                        <Badge bg="light" text="dark" key={idx} className="small">
+                                          {benefit}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </Card.Body>
+                                </Card>
+                              </Col>
+                            ))}
+                          </Row>
+                        </Tab.Pane>
+                      </Tab.Content>
+                    </Tab.Container>
                   </Card.Body>
                 </Card>
+              )}
 
-                {(selectedCategory || activeTab === 'all') && (
-                  <>
-                    <Card ref={schemesSectionRef} className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
-                      <Card.Header className="bg-white border-0 pt-4 pb-0">
-                        <h5 className="mb-0">
-                          <FaUniversity className="me-2 text-primary" />
-                          <TransText k="schemes.availableSchemes" as="span" /> - {activeTab === 'all' ? (language === 'hi' ? 'सभी योजनाएं' : 'All Schemes') : (language === 'hi' ? categories.find(c => c.id === selectedCategory)?.name_hindi : categories.find(c => c.id === selectedCategory)?.name)}
-                        </h5>
-                        <p className="text-muted mb-0">
-                          <TransText k="schemes.browseSchemes" as="span" />
-                        </p>
-                      </Card.Header>
-                      <Card.Body className="">
-                        <Tab.Container id="schemes-tabs" activeKey={activeTab} onSelect={(k) => setActiveTab(k)}>
-                          <Nav variant="tabs" className="mb-4">
-                            <Nav.Item>
-                              <Nav.Link eventKey="category" disabled={!selectedCategory}>
-                                <FaBook className="me-2" />
-                                <TransText k="schemes.categorySchemes" as="span" />
-                              </Nav.Link>
-                            </Nav.Item>
-                            <Nav.Item>
-                              <Nav.Link eventKey="all">
-                                <FaAward className="me-2" />
-                                <TransText k="schemes.allSchemes" as="span" />
-                              </Nav.Link>
-                            </Nav.Item>
-                          </Nav>
-                          <Tab.Content>
-                            <Tab.Pane eventKey="category">
-                              {selectedCategory ? (
-                                <Row>
-                                  {displayedSchemes.map((scheme) => (
-                                    <Col lg={4} md={6} className="mb-4" key={scheme.id || scheme.gov_scheme_id}>
-                                      <Card 
-                                        className="h-100 border course-card"
-                                        style={{ cursor: 'pointer', overflow: 'hidden', width: '100%' }}
-                                        onClick={() => handleSchemeClick(scheme)}
-                                      >
-                                      {scheme.scheme_image ? (
-                                          <div style={{
-                                            height: '120px',
-                                            width: '100%',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                          
-                                            borderBottom: '1px solid #e0e0e0'
-                                          }}>
-                                            <img
-                                              src={scheme.scheme_image}
-                                              alt={scheme.title}
-                                              style={{
-                                                maxHeight: '100%',
-                                                maxWidth: '100%',
-                                                objectFit: 'contain',
-                                                padding: '8px'
-                                              }}
-                                              onError={(e) => { e.target.style.display = 'none' }}
-                                            />
-                                          </div>
-                                        ) : null}
-                                        <Card.Body className="p-3 text-center">
-                                          <h6 className="mb-1">{language === 'hi' ? scheme.title_hindi : scheme.title}</h6>
-                                          {scheme.amount && scheme.amount !== 'Visit Website' ? (
-                                            <Badge bg="success" className="mb-2">₹{Number(scheme.amount).toLocaleString('en-IN')}</Badge>
-                                          ) : (
-                                            <Badge bg="warning" text="dark" className="mb-2">{scheme.amount}</Badge>
-                                          )}
-                                          <p className="text-muted small mb-2">
-                                            {scheme.about}
-                                          </p>
-                                          <div className="d-flex flex-wrap gap-1 justify-content-center">
-                                            {scheme.benefits?.slice(0, 3).map((benefit, idx) => (
-                                              <Badge bg="light" text="dark" key={idx} className="small">
-                                                {benefit}
-                                              </Badge>
-                                            ))}
-                                          </div>
-                                        </Card.Body>
-                                      </Card>
-                                    </Col>
-                                  ))}
-                                </Row>
-                              ) : (
-                                <div className="text-center py-4">
-                                  <p className="text-muted mb-0">
-                                    {language === 'hi' ? 'कृपया ऊपर से कोई श्रेणी चुनें' : 'Please select a category above'}
-                                  </p>
-                                </div>
-                              )}
-                            </Tab.Pane>
-                            <Tab.Pane eventKey="all">
-                              <Row>
-                                {allSchemes.map((scheme) => (
-                                  <Col lg={4} md={6} className="mb-4" key={scheme.id || scheme.gov_scheme_id}>
-                                    <Card 
-                                      className="h-100 border course-card"
-                                      style={{ cursor: 'pointer', overflow: 'hidden', width: '100%' }}
-                                      onClick={() => handleSchemeClick(scheme)}
-                                    >
-                                    {scheme.scheme_image ? (
-                                        <div style={{
-                                          height: '120px',
-                                          width: '100%',
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                        
-                                          borderBottom: '1px solid #e0e0e0'
-                                        }}>
-                                          <img
-                                            src={scheme.scheme_image}
-                                            alt={scheme.title}
-                                            style={{
-                                              maxHeight: '100%',
-                                              maxWidth: '100%',
-                                              objectFit: 'contain',
-                                              padding: '8px'
-                                            }}
-                                            onError={(e) => { e.target.style.display = 'none' }}
-                                          />
-                                        </div>
-                                      ) : null}
-                                      <Card.Body className="p-3 text-center">
-                                        <h6 className="mb-1">{language === 'hi' ? scheme.title_hindi : scheme.title}</h6>
-                                        {scheme.amount && scheme.amount !== 'Visit Website' ? (
-                                          <Badge bg="success" className="mb-2">₹{Number(scheme.amount).toLocaleString('en-IN')}</Badge>
-                                        ) : (
-                                          <Badge bg="warning" text="dark" className="mb-2">{scheme.amount}</Badge>
-                                        )}
-                                        <p className="text-muted small mb-2">
-                                          {scheme.about}
-                                        </p>
-                                        <div className="d-flex flex-wrap gap-1 justify-content-center">
-                                          {scheme.benefits?.slice(0, 3).map((benefit, idx) => (
-                                            <Badge bg="light" text="dark" key={idx} className="small">
-                                              {benefit}
-                                            </Badge>
-                                          ))}
-                                        </div>
-                                      </Card.Body>
-                                    </Card>
-                                  </Col>
-                                ))}
-                              </Row>
-                            </Tab.Pane>
-                          </Tab.Content>
-                        </Tab.Container>
-                      </Card.Body>
-                    </Card>
-                  </>
-                )}
-
-                {!selectedCategory && (
-                  <Card className="shadow-sm border-0 instructions-card" style={{ borderRadius: '10px' }}>
-                    <Card.Body className="">
-                      <h4><TransText k="schemes.howToApply" as="span" /></h4>
-                      <p className="text-muted mb-0">
-                        <strong><TransText k="schemes.step1" as="span" />:</strong> <TransText k="schemes.instructionStep1" as="span" /><br />
-                        <strong><TransText k="schemes.step2" as="span" />:</strong> <TransText k="schemes.instructionStep2" as="span" /><br />
-                        <strong><TransText k="schemes.step3" as="span" />:</strong> <TransText k="schemes.instructionStep3" as="span" />
-                      </p>
-                    </Card.Body>
-                  </Card>
-                )}
-              </div>
-            )}
-          </Container>
-        </div>
+              {/* Instructions when no category selected */}
+              {!selectedCategory && (
+                <Card className="shadow-box instructions-card">
+                  <Card.Body>
+                    <h4>How to Use Government Schemes</h4>
+                    <p className="text-muted mb-0">
+                      <strong>Step 1:</strong> Select a scheme category from the options above<br />
+                      <strong>Step 2:</strong> Browse available schemes in that category<br />
+                      <strong>Step 3:</strong> Click on any scheme to view full details and apply
+                    </p>
+                  </Card.Body>
+                </Card>
+              )}
+            </div>
+          )}
+        </Container>
       </div>
 
+      {/* Scheme Details Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered scrollable className="government-schemes-modal">
         <Modal.Header closeButton className="border-0" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', borderRadius: '8px 8px 0 0'}}>
           <Modal.Title className="w-100">
@@ -608,10 +600,10 @@ const GovernmentSchemes = () => {
               </div>
               <div style={{flex: 1}}>
                 <h3 className="mb-2 fw-bold" style={{color: 'white', fontSize: '1.5rem'}}>
-                  {language === 'hi' ? selectedScheme?.title_hindi : selectedScheme?.title}
+                  {selectedScheme?.title_hindi || selectedScheme?.title}
                 </h3>
                 <p className="mb-0" style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)'}}>
-                  {language === 'hi' ? '✓ सरकारी योजना' : '✓ Government Scheme'}
+                  ✓ Government Scheme
                 </p>
               </div>
             </div>
@@ -620,27 +612,27 @@ const GovernmentSchemes = () => {
         <Modal.Body className="pt-4" style={{background: '#f8f9fa'}}>
           {selectedScheme && (
             <div>
-              {/* Amount Badge - Prominent */}
+              {/* Amount Badge */}
               <div className="mb-4">
                 <div className="text-center p-4 rounded" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white'}}>
-                  <small style={{fontSize: '0.85rem', opacity: 0.9}}>{language === 'hi' ? 'कुल लाभ की राशि' : 'Total Benefit Amount'}</small>
+                  <small style={{fontSize: '0.85rem', opacity: 0.9}}>Total Benefit Amount</small>
                   <h2 className="mb-0 mt-2 fw-bold">{selectedScheme.amount}</h2>
                 </div>
               </div>
 
-              {/* Section 1: About this Scheme */}
+              {/* About Section */}
               <div className="mb-4 p-4 bg-white rounded border-start border-5" style={{borderColor: '#667eea'}}>
                 <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                  {language === 'hi' ? '📌 योजना का विवरण' : '📌 About this Scheme'}
+                  📌 About this Scheme
                 </h6>
                 <p className="mb-0 text-muted" style={{lineHeight: '1.6'}}>{selectedScheme.about}</p>
               </div>
 
-              {/* Section 2: Key Benefits */}
+              {/* Benefits Section */}
               {selectedScheme.benefits && selectedScheme.benefits.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded">
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#28a745'}}>✨ {language === 'hi' ? 'मुख्य लाभ' : 'Key Benefits'}</span>
+                    <span style={{color: '#28a745'}}>✨ Key Benefits</span>
                   </h6>
                   <div className="ps-2">
                     {selectedScheme.benefits.map((benefit, idx) => (
@@ -653,11 +645,11 @@ const GovernmentSchemes = () => {
                 </div>
               )}
 
-              {/* Section 3: Who Can Apply? */}
+              {/* Eligibility Section */}
               {selectedScheme.eligibility && selectedScheme.eligibility.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded border-start border-5" style={{borderColor: '#0d6efd'}}>
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#0d6efd'}}>👤 {language === 'hi' ? 'कौन आवेदन कर सकता है?' : 'Who Can Apply?'}</span>
+                    <span style={{color: '#0d6efd'}}>👤 Who Can Apply?</span>
                   </h6>
                   <div className="ps-2">
                     {selectedScheme.eligibility.map((elig, idx) => (
@@ -670,11 +662,11 @@ const GovernmentSchemes = () => {
                 </div>
               )}
 
-              {/* Section 4: Documents Needed */}
+              {/* Documents Section */}
               {selectedScheme.documents && selectedScheme.documents.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded">
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#fd7e14'}}>📄 {language === 'hi' ? 'आवश्यक दस्तावेज़' : 'Documents Needed'}</span>
+                    <span style={{color: '#fd7e14'}}>📄 Documents Needed</span>
                   </h6>
                   <div className="row g-3 ps-2">
                     {selectedScheme.documents.map((doc, idx) => (
@@ -689,11 +681,11 @@ const GovernmentSchemes = () => {
                 </div>
               )}
 
-              {/* Section 5: How to Apply? */}
+              {/* How to Apply Section */}
               {selectedScheme.howToApply && selectedScheme.howToApply.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded border-top border-5" style={{borderColor: '#0dcaf0'}}>
                   <h6 className="text-dark mb-4 fw-bold" style={{fontSize: '1.05rem'}}>
-                    <span style={{color: '#0dcaf0'}}>📍 {language === 'hi' ? 'आवेदन कैसे करें?' : 'How to Apply?'}</span>
+                    <span style={{color: '#0dcaf0'}}>📍 How to Apply?</span>
                   </h6>
                   <div className="ms-2">
                     {selectedScheme.howToApply.map((step, idx) => (
@@ -710,11 +702,11 @@ const GovernmentSchemes = () => {
                 </div>
               )}
 
-              {/* Section 6: Important Tips */}
+              {/* Tips Section */}
               {selectedScheme.tips && selectedScheme.tips.length > 0 && (
                 <div className="mb-4 p-4 rounded" style={{background: '#fff3cd', border: '2px solid #ffc107'}}>
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#fd7e14'}}>⚠️ {language === 'hi' ? 'महत्वपूर्ण सुझाव' : 'Important Tips'}</span>
+                    <span style={{color: '#fd7e14'}}>⚠️ Important Tips</span>
                   </h6>
                   <ul className="mb-0 ps-4 small" style={{color: '#856404', fontSize: '0.9rem'}}>
                     {selectedScheme.tips.map((tip, idx) => (
@@ -724,10 +716,10 @@ const GovernmentSchemes = () => {
                 </div>
               )}
 
-              {/* Section 7: Official Website */}
+              {/* Official Website Section */}
               <div className="p-4 rounded" style={{background: '#e7f3ff', border: '2px solid #0d6efd'}}>
                 <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                  <span style={{color: '#0d6efd'}}>🔗 {language === 'hi' ? 'आधिकारिक वेबसाइट' : 'Official Website'}</span>
+                  <span style={{color: '#0d6efd'}}>🔗 Official Website</span>
                 </h6>
                 <a href={selectedScheme.officialLink} target="_blank" rel="noopener noreferrer" className="text-break" style={{color: '#0d6efd', textDecoration: 'none', fontWeight: '500'}}>
                   {selectedScheme.officialLink}
@@ -738,13 +730,13 @@ const GovernmentSchemes = () => {
         </Modal.Body>
         <Modal.Footer className="border-0 bg-white pt-3 pb-3">
           <Button variant="secondary" onClick={() => setShowModal(false)} style={{borderRadius: '8px', padding: '0.5rem 2rem'}}>
-            {language === 'hi' ? 'बंद करें' : 'Close'}
+            Close
           </Button>
           <Button 
             style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none', borderRadius: '8px', padding: '0.5rem 2rem', fontWeight: 'bold'}} 
             onClick={() => window.open(selectedScheme?.officialLink, '_blank')}
           >
-            {language === 'hi' ? '🚀 अभी आवेदन करें' : '🚀 Apply Now'}
+            🚀 Apply Now
           </Button>
         </Modal.Footer>
       </Modal>

@@ -29,6 +29,8 @@ import SchoolQuiz from "./components/admin_panel/SchoolQuiz";
 import UserQuiz from "./components/user_panel/UserQuiz";
 import TenthGuidance from "./components/user_panel/TenthGuidance";
 import OccupationDetails from "./components/user_panel/OccupationDetails";
+import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
+import GovernmentSchemes from "./components/user_panel/GovernmentSchemes";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 
@@ -36,7 +38,7 @@ import OccupationDetails from "./components/user_panel/OccupationDetails";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -83,6 +85,22 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <UserDashboard />
+            </ProtectedRoute>
+          } 
+        />
+         <Route 
+          path="/TwelfthGuidance" 
+          element={
+            <ProtectedRoute>
+              <TwelfthGuidance />
+            </ProtectedRoute>
+          } 
+        />
+         <Route 
+          path="/GovernmentSchemes" 
+          element={
+            <ProtectedRoute>
+              <GovernmentSchemes />
             </ProtectedRoute>
           } 
         />

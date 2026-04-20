@@ -91,22 +91,12 @@ const menuItems = [
         },
       ],
     },
-    {
-      icon: <FaTools />,
-      label: "Test",
-      submenu: [
-        {
-          label: "test1",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
-         {
-          label: "test1",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
-      ],
+     {
+      icon: <FaQuestionCircle />,
+      label: "Government Schemes",
+      path: "/GovernmentSchemes",
     },
+  
 
     //   icon: <FaCalendarAlt />,
     //   label: "Event",
