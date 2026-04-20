@@ -8,7 +8,15 @@ import SchoolLeftNav from './SchoolLeftNav'
 import SchoolHeader from './SchoolHeader'
 
 const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-competition-items/'
-const API_URL_REGISTRATION = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-registrations/'
+const API_URL_REGISTRATION = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-competition-participants/'
+const API_URL_STUDENTS = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-schoolwise/'
+
+// Helper to normalize class names for comparison (e.g., "9th" -> 9, 9 -> 9)
+const normalizeClass = (cls) => {
+  if (typeof cls === 'number') return cls
+  const match = String(cls).match(/\d+/)
+  return match ? parseInt(match[0], 10) : NaN
+}
 
 const SchoolQuizList = () => {
   const { accessToken, uniqueId: school_uni_id } = useAuth()
@@ -25,10 +33,12 @@ const SchoolQuizList = () => {
   const [showRegisterModal, setShowRegisterModal] = useState(false)
   const [selectedQuiz, setSelectedQuiz] = useState(null)
   const [registerLoading, setRegisterLoading] = useState(false)
-  const [students, setStudents] = useState([])
-  const [studentsLoading, setStudentsLoading] = useState(false)
-  const [selectedStudents, setSelectedStudents] = useState([])
-  const [registeredStudents, setRegisteredStudents] = useState({})
+   const [students, setStudents] = useState({})
+   const [studentsLoading, setStudentsLoading] = useState(false)
+   const [allStudentsFlat, setAllStudentsFlat] = useState([])
+   const [selectedStudents, setSelectedStudents] = useState([])
+   const [registeredStudents, setRegisteredStudents] = useState({})
+   const [selectedClassFilter, setSelectedClassFilter] = useState('all')
 
   useEffect(() => {
     const handleResize = () => {
@@ -75,112 +85,132 @@ const SchoolQuizList = () => {
     }
   }
 
-  const fetchSchoolStudents = async () => {
-    if (!accessToken || !school_uni_id) return
-    
-    try {
-      setStudentsLoading(true)
-      const response = await axios.get(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-aadhaar-reg/?school_uni_id=${school_uni_id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
+   const fetchSchoolStudents = async () => {
+     if (!accessToken || !school_uni_id) return
+     
+     try {
+       setStudentsLoading(true)
+       const response = await axios.get(
+         `${API_URL_STUDENTS}?school_uni_id=${school_uni_id}`,
+         {
+           headers: {
+             'Authorization': `Bearer ${accessToken}`
+           }
+         }
+       )
+
+       if (response.data.success && response.data.data) {
+         const data = response.data.data
+         setStudents(data)
+         
+         // Create a flat array of all students with class info
+         const flatStudents = []
+         Object.keys(data).forEach(className => {
+           if (Array.isArray(data[className])) {
+             data[className].forEach(student => {
+               flatStudents.push({
+                 ...student,
+                 class_name: className
+               })
+             })
+           }
+         })
+         setAllStudentsFlat(flatStudents)
+       } else {
+         setStudents({})
+         setAllStudentsFlat([])
+       }
+     } catch (error) {
+       console.error('Error fetching students:', error)
+       setStudents({})
+       setAllStudentsFlat([])
+     } finally {
+       setStudentsLoading(false)
+     }
+   }
+
+    const checkRegisteredStudents = async (quizId) => {
+      if (!accessToken) return []
+      
+      try {
+        const response = await axios.get(
+          `${API_URL_REGISTRATION}?quiz_id=${quizId}&school_uni_id=${school_uni_id}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`
+            }
           }
+        )
+
+        if (response.data.success && response.data.data) {
+          const data = response.data.data
+          const registered = Array.isArray(data)
+            ? data.map(d => d.student?.student_id || d.student_id)
+            : [data.student?.student_id || data.student_id]
+          return registered.filter(Boolean)
         }
-      )
-
-      if (response.data.success && response.data.data) {
-        const data = response.data.data
-        setStudents(Array.isArray(data) ? data : [data])
-      } else {
-        setStudents([])
+      } catch (error) {
+        console.error('Error checking registrations:', error)
       }
-    } catch (error) {
-      console.error('Error fetching students:', error)
-      setStudents([])
-    } finally {
-      setStudentsLoading(false)
+      return []
     }
-  }
 
-  const checkRegisteredStudents = async (quizId) => {
-    if (!accessToken) return []
-    
-    try {
-      const response = await axios.get(
-        `${API_URL_REGISTRATION}?quiz_id=${quizId}&school_uni_id=${school_uni_id}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
+   const handleRegisterClick = async (quiz) => {
+     setSelectedQuiz(quiz)
+     setSelectedStudents([])
+     setError('')
+     setSuccess('')
+     setSelectedClassFilter('all')
+     await fetchSchoolStudents()
+     
+     const registered = await checkRegisteredStudents(quiz.quiz_id || quiz.id)
+     setRegisteredStudents(prev => ({ ...prev, [quiz.quiz_id || quiz.id]: registered }))
+     
+     setShowRegisterModal(true)
+   }
+
+   const toggleStudentSelection = (studentId) => {
+     setSelectedStudents(prev => 
+       prev.includes(studentId) 
+         ? prev.filter(id => id !== studentId)
+         : [...prev, studentId]
+     )
+   }
+
+   const registerStudents = async () => {
+     if (!selectedQuiz || selectedStudents.length === 0) {
+       setError('Please select at least one student')
+       return
+     }
+
+     setRegisterLoading(true)
+     setError('')
+     setSuccess('')
+
+      try {
+        const payload = {
+          student_id: selectedStudents,
+          quiz_id: selectedQuiz.quiz_id || selectedQuiz.id,
+          school_uni_id: school_uni_id
         }
-      )
 
-      if (response.data.success && response.data.data) {
-        const data = response.data.data
-        return Array.isArray(data) ? data.map(d => d.aadhaar_no) : [data.aadhaar_no]
-      }
-    } catch (error) {
-      console.error('Error checking registrations:', error)
-    }
-    return []
-  }
+       await axios.post(API_URL_REGISTRATION, payload, {
+         headers: {
+           'Authorization': `Bearer ${accessToken}`,
+           'Content-Type': 'application/json'
+         }
+       })
 
-  const handleRegisterClick = async (quiz) => {
-    setSelectedQuiz(quiz)
-    setSelectedStudents([])
-    setError('')
-    setSuccess('')
-    await fetchSchoolStudents()
-    
-    const registered = await checkRegisteredStudents(quiz.id)
-    setRegisteredStudents(prev => ({ ...prev, [quiz.id]: registered }))
-    
-    setShowRegisterModal(true)
-  }
-
-  const toggleStudentSelection = (aadhaarNo) => {
-    setSelectedStudents(prev => 
-      prev.includes(aadhaarNo) 
-        ? prev.filter(id => id !== aadhaarNo)
-        : [...prev, aadhaarNo]
-    )
-  }
-
-  const registerStudents = async () => {
-    if (!selectedQuiz || selectedStudents.length === 0) {
-      setError('Please select at least one student')
-      return
-    }
-
-    setRegisterLoading(true)
-    setError('')
-    setSuccess('')
-
-    try {
-      const payload = {
-        quiz_id: selectedQuiz.id,
-        school_uni_id: school_uni_id,
-        students: selectedStudents.map(aadhaar_no => ({ aadhaar_no }))
-      }
-
-      await axios.post(API_URL_REGISTRATION, payload, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      setSuccess(`${selectedStudents.length} student(s) registered for ${selectedQuiz.title}`)
-      setShowRegisterModal(false)
-      fetchQuizzes()
-    } catch (error) {
-      console.error('Error registering students:', error)
-      setError(error.response?.data?.message || 'Failed to register students')
-    } finally {
-      setRegisterLoading(false)
-    }
-  }
+       setSuccess(`${selectedStudents.length} student(s) registered for ${selectedQuiz.title}`)
+       setShowRegisterModal(false)
+       fetchQuizzes()
+     } catch (error) {
+       console.error('Error registering students:', error)
+       setError(error.response?.data?.message || 'Failed to register students')
+     } finally {
+       setRegisterLoading(false)
+     }
+   }
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Not set'
@@ -364,109 +394,165 @@ const SchoolQuizList = () => {
             Register Students for Quiz
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="">
-          {selectedQuiz && (
-            <>
-              <Alert variant="info" className="mb-3">
-                <strong>Quiz:</strong> {selectedQuiz.title}<br />
-                <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
-                <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
-              </Alert>
+         <Modal.Body className="">
+           {selectedQuiz && (
+             <>
+               <Alert variant="info" className="mb-3">
+                 <strong>Quiz:</strong> {selectedQuiz.title}<br />
+                 <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
+                 <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
+               </Alert>
 
-              {error && (
-                <Alert variant="danger" dismissible onClose={() => setError('')}>
-                  {error}
-                </Alert>
-              )}
+               {error && (
+                 <Alert variant="danger" dismissible onClose={() => setError('')}>
+                   {error}
+                 </Alert>
+               )}
 
-              {studentsLoading ? (
-                <div className="text-center py-4">
-                  <Spinner animation="border" variant="primary" />
-                  <p className="mt-2">Loading students...</p>
-                </div>
-              ) : students.length === 0 ? (
-                <Alert variant="warning">
-                  No students registered in your school yet.
-                  <Button 
-                    variant="link" 
-                    size="sm" 
-                    onClick={() => navigate('/SchoolStudentRegistration')}
-                    className="p-0 ms-2"
-                  >
-                    Register students here
-                  </Button>
-                </Alert>
-              ) : (
-                <>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <span className="small text-muted">
-                      Select students to register ({selectedStudents.length} selected)
-                    </span>
-                    <div>
-                      <Button 
-                        variant="outline-primary" 
-                        size="sm" 
-                        className="me-2"
-                        onClick={() => setSelectedStudents(students.map(s => s.aadhaar_no))}
-                      >
-                        Select All
-                      </Button>
-                      <Button 
-                        variant="outline-secondary" 
-                        size="sm"
-                        onClick={() => setSelectedStudents([])}
-                      >
-                        Clear
-                      </Button>
+               {studentsLoading ? (
+                 <div className="text-center py-4">
+                   <Spinner animation="border" variant="primary" />
+                   <p className="mt-2">Loading students...</p>
+                 </div>
+                ) : allStudentsFlat.length === 0 ? (
+                  <Alert variant="warning">
+                    No students registered in your school yet.
+                    <Button 
+                      variant="link" 
+                      size="sm" 
+                      onClick={() => navigate('/SchoolStudentRegistration')}
+                      className="p-0 ms-2"
+                    >
+                      Register students here
+                    </Button>
+                  </Alert>
+                ) : (
+                  <>
+                    <div className="mb-3">
+                        <Form.Select 
+                          value={selectedClassFilter}
+                          onChange={(e) => {
+                            setSelectedClassFilter(e.target.value)
+                            setSelectedStudents([])
+                          }}
+                          style={{ width: '200px' }}
+                        >
+                          <option value="all">All Classes</option>
+                          {selectedQuiz.class_allowed?.map(cls => {
+                            const classNum = normalizeClass(cls)
+                            return (
+                              <option key={cls} value={classNum}>Class {cls}</option>
+                            )
+                          })}
+                        </Form.Select>
+                      <small className="text-muted ms-2">
+                        Showing eligible students only
+                      </small>
                     </div>
-                  </div>
 
-                  <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-                    <table className="table table-bordered table-hover">
-                      <thead className="bg-light">
-                        <tr>
-                          <th style={{ width: '40px' }}>Select</th>
-                          <th>Aadhaar Number</th>
-                          <th>Full Name</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {students.map((student) => {
-                          const isRegistered = registeredStudents[selectedQuiz?.id]?.includes(student.aadhaar_no)
-                          const isSelected = selectedStudents.includes(student.aadhaar_no)
-                          return (
-                            <tr key={student.id} className={isSelected ? 'table-primary' : ''}>
-                              <td>
-                                <Form.Check
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={() => toggleStudentSelection(student.aadhaar_no)}
-                                  disabled={isRegistered}
-                                />
-                              </td>
-                              <td>{student.aadhaar_no}</td>
-                              <td>{student.full_name}</td>
-                              <td>
-                                {isRegistered ? (
-                                  <Badge bg="success">
-                                    <FaCheck className="me-1" /> Registered
-                                  </Badge>
-                                ) : (
-                                  <Badge bg="secondary">Not Registered</Badge>
-                                )}
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              )}
-            </>
-          )}
-        </Modal.Body>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <span className="small text-muted">
+                        {selectedClassFilter === 'all' 
+                          ? `All students (${selectedStudents.length} selected)`
+                          : `Class ${selectedClassFilter} students (${selectedStudents.length} selected)`
+                        }
+                      </span>
+                      <div className="d-flex gap-2">
+                        <Button 
+                          variant="outline-primary" 
+                          size="sm" 
+                          className="me-2"
+                          onClick={() => {
+                            const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
+                            const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
+                            
+                            const eligibleStudents = allStudentsFlat.filter(s => {
+                              const studentClassNum = normalizeClass(s.class_name)
+                              const isEligible = selectedQuiz.class_allowed?.some(allowed => 
+                                normalizeClass(allowed) === studentClassNum
+                              )
+                              const notRegistered = !registeredList.includes(s.student_id)
+                              const matchesFilter = filterNum === null || studentClassNum === filterNum
+                              return isEligible && notRegistered && matchesFilter
+                            })
+                            setSelectedStudents(eligibleStudents.map(s => s.student_id))
+                          }}
+                        >
+                          Select All
+                        </Button>
+                        <Button 
+                          variant="outline-secondary" 
+                          size="sm"
+                          onClick={() => setSelectedStudents([])}
+                        >
+                          Clear
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                      <table className="table table-bordered table-hover">
+                        <thead className="bg-light">
+                          <tr>
+                            <th style={{ width: '40px' }}>Select</th>
+                            <th>Student ID</th>
+                            <th>Full Name</th>
+                            <th>Class</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {allStudentsFlat
+                            .filter(student => {
+                              const studentClassNum = normalizeClass(student.class_name)
+                              // Only show students from eligible classes
+                              const isEligible = selectedQuiz.class_allowed?.some(allowed => 
+                                normalizeClass(allowed) === studentClassNum
+                              )
+                              // Apply class filter
+                              const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
+                              const classMatch = filterNum === null || studentClassNum === filterNum
+                              return isEligible && classMatch
+                            })
+                            .map((student) => {
+                              const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
+                              const isRegistered = registeredList.includes(student.student_id)
+                              const isSelected = selectedStudents.includes(student.student_id)
+                              return (
+                                <tr key={student.student_id} className={isSelected ? 'table-primary' : ''}>
+                                  <td>
+                                    <Form.Check
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={() => toggleStudentSelection(student.student_id)}
+                                      disabled={isRegistered}
+                                    />
+                                  </td>
+                                  <td>{student.student_id}</td>
+                                  <td>{student.full_name}</td>
+                                  <td>
+                                    <Badge bg="secondary">{student.class_name}</Badge>
+                                  </td>
+                                  <td>
+                                    {isRegistered ? (
+                                      <Badge bg="success">
+                                        <FaCheck className="me-1" /> Registered
+                                      </Badge>
+                                    ) : (
+                                      <Badge bg="secondary">Not Registered</Badge>
+                                    )}
+                                  </td>
+                                </tr>
+                              )
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+                 </>
+               )}
+             </>
+           )}
+         </Modal.Body>
         <Modal.Footer className="border-top py-2 px-3">
           <Button variant="secondary" onClick={() => setShowRegisterModal(false)}>
             Cancel
