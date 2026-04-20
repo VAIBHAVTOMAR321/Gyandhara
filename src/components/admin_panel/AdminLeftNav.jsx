@@ -34,7 +34,8 @@ import {
   FaInfoCircle,
   FaBullseye,
   FaTasks,
-  FaGraduationCap
+  FaGraduationCap,
+  FaClipboardList
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
@@ -65,6 +66,11 @@ const menuItems = [
       icon: <FaQuestionCircle />,
       label: "Student Issues",
       path: "/StudentIssue",
+    },
+    {
+      icon: <FaClipboardList />,
+      label: "Quiz Management",
+      path: "/QuizManagement",
     },
     {
       icon: <FaGraduationCap />,
