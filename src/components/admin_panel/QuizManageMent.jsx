@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Button, Modal, Form, Badge, Table, Spinner } from 'react-bootstrap'
 import AdminLeftNav from './AdminLeftNav'
-import AdminTopNav from './AdminTopNav'
+import AdminHeader from './AdminHeader'
 import axios from 'axios'
-import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes } from 'react-icons/fa'
-import { useAuth } from '../../contexts/AuthContext'
+import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaArrowLeft } from 'react-icons/fa'
+import { useAuth } from '../all_login/AuthContext'
+import { useNavigate } from 'react-router-dom'
+import '../../assets/css/admindashboard.css'
 
-import '../../assets/css/AdminDashboard.css'
+const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/'
 
 const QuizManageMent = () => {
   const { accessToken } = useAuth()
-  const [showSidebar, setShowSidebar] = useState(true)
+  const navigate = useNavigate()
+  
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
   const [loading, setLoading] = useState(true)
   const [quizzes, setQuizzes] = useState([])
   const [showModal, setShowModal] = useState(false)
@@ -18,7 +24,6 @@ const QuizManageMent = () => {
   const [editingQuiz, setEditingQuiz] = useState(null)
   const [viewingQuiz, setViewingQuiz] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
 
   const [quizFormData, setQuizFormData] = useState({
     title: '',
@@ -39,24 +44,54 @@ const QuizManageMent = () => {
   })
 
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    const handleResize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   useEffect(() => {
-    fetchQuizzes()
-  }, [])
+    if (accessToken) {
+      fetchQuizzes()
+    }
+  }, [accessToken])
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
 
   const fetchQuizzes = async () => {
+    if (!accessToken) {
+      console.log('No access token, waiting...')
+      return
+    }
+    
     try {
-      const response = await axios.get('https://brjobsedu.com/girls_course/girls_course_backend/api/quiz-items/')
+      setLoading(true)
+      const response = await axios.get(API_URL, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
       if (response.data.success) {
         setQuizzes(response.data.data)
+      } else if (Array.isArray(response.data)) {
+        // Fallback if API returns array directly
+        setQuizzes(response.data)
+      } else {
+        setQuizzes([])
       }
     } catch (error) {
       console.error('Error fetching quizzes:', error)
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access - Token might be expired');
+      }
+      setQuizzes([])
     } finally {
       setLoading(false)
     }
@@ -107,6 +142,11 @@ const QuizManageMent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!accessToken) {
+      alert('Authentication required')
+      return
+    }
+    
     setSubmitting(true)
 
     try {
@@ -149,7 +189,7 @@ const QuizManageMent = () => {
         })
 
         await axios.put(
-          `https://brjobsedu.com/girls_course/girls_course_backend/api/quiz-items/`,
+          API_URL,
           {
             id: editingQuiz.id,
             questions: questionsPayload,
@@ -164,10 +204,21 @@ const QuizManageMent = () => {
             end_date_time: formatDateTime(quizFormData.end_date_time),
             number_of_questions: questionsPayload.length,
             is_active: editingQuiz.is_active
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            }
           }
         )
       } else {
-        await axios.post('https://brjobsedu.com/girls_course/girls_course_backend/api/quiz-items/', payload)
+        await axios.post(API_URL, payload, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
       }
 
       await fetchQuizzes()
@@ -175,7 +226,11 @@ const QuizManageMent = () => {
       setShowModal(false)
     } catch (error) {
       console.error('Error submitting quiz:', error)
-      alert('Failed to submit quiz. Please try again.')
+      if (error.response && error.response.status === 401) {
+         alert('Session expired. Please login again.');
+      } else {
+         alert('Failed to submit quiz. Please try again.')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -213,9 +268,18 @@ const QuizManageMent = () => {
   const handleDelete = async (quiz) => {
     if (!window.confirm(`Are you sure you want to delete "${quiz.title}"?`)) return
 
+    if (!accessToken) {
+      alert('Authentication required')
+      return
+    }
+
     try {
-      await axios.delete('https://brjobsedu.com/girls_course/girls_course_backend/api/quiz-items/', {
-        data: { quiz_id: quiz.quiz_id }
+      await axios.delete(API_URL, {
+        data: { quiz_id: quiz.quiz_id },
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
       })
       await fetchQuizzes()
     } catch (error) {
@@ -250,29 +314,57 @@ const QuizManageMent = () => {
     setShowModal(true)
   }
 
-  return (
-    <div className="d-flex flex-column">
-      <AdminTopNav onMenuToggle={() => setShowSidebar(!showSidebar)} isMobile={isMobile} />
-      <div className="d-flex flex-1">
-        <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-        
-        <div className="flex-grow-1" style={{ marginLeft: isMobile ? '0px' : showSidebar ? '220px' : '60px', padding: '20px', minHeight: 'calc(100vh - 70px)' }}>
-          <Container fluid>
-            <Card className="shadow-sm mb-4">
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h4 className="mb-0">Quiz Management</h4>
-                  <Button variant="primary" onClick={openCreateModal}>
-                    <FaPlus className="me-2" /> Create Quiz
-                  </Button>
-                </div>
+  if (loading) {
+    return (
+      <div className="dashboard-container">
+        <AdminLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+        <div className="main-content-dash">
+          <AdminHeader toggleSidebar={toggleSidebar} />
+          <div className="dashboard-content">
+            <Container className="dashboard-box">
+              <div className="loading-spinner">
+                <Spinner animation="border" variant="primary" />
+              </div>
+            </Container>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-                {loading ? (
-                  <div className="text-center py-5">
-                    <Spinner animation="border" variant="primary" />
+  return (
+    <>
+      <div className="dashboard-container">
+        <AdminLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+        <div className="main-content-dash">
+          <AdminHeader toggleSidebar={toggleSidebar} />
+          <div className="dashboard-content">
+            <Container className="dashboard-box">
+              <Card className="shadow-sm mb-4">
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+                    <div className="d-flex align-items-center all-en-box gap-3">
+                      <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
+                        <FaArrowLeft /> Dashboard
+                      </Button>
+                      <h4 className="mb-0">Quiz Management</h4>
+                    </div>
+                    <Button variant="primary" onClick={openCreateModal}>
+                      <FaPlus className="me-2" /> Create Quiz
+                    </Button>
                   </div>
-                ) : (
-                  <Table responsive hover>
+
+                  <Table responsive hover className="table-card">
                     <thead>
                       <tr>
                         <th>ID</th>
@@ -286,7 +378,7 @@ const QuizManageMent = () => {
                     <tbody>
                       {quizzes.length === 0 ? (
                         <tr>
-                          <td colSpan="5" className="text-center text-muted py-4">
+                          <td colSpan="6" className="text-center text-muted py-4">
                             No quizzes available
                           </td>
                         </tr>
@@ -318,10 +410,10 @@ const QuizManageMent = () => {
                       )}
                     </tbody>
                   </Table>
-                )}
-              </Card.Body>
-            </Card>
-          </Container>
+                </Card.Body>
+              </Card>
+            </Container>
+          </div>
         </div>
       </div>
 
@@ -603,7 +695,7 @@ const QuizManageMent = () => {
           <Button variant="secondary" onClick={() => setShowViewModal(false)}>Close</Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   )
 }
 
