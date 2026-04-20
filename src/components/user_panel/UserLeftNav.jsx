@@ -77,16 +77,16 @@ const menuItems = [
     },
     {
       icon: <FaTools />,
-      label: "Test",
+      label: "Career Guidance",
       submenu: [
         {
-          label: "test1",
-          path: "#",
+          label: "12th Guidance",
+          path: "/TwelfthGuidance",
           icon: <FaPlusSquare />,
         },
          {
-          label: "test1",
-          path: "#",
+          label: "10th Guidance",
+          path: "/TenthGuidance",
           icon: <FaPlusSquare />,
         },
       ],

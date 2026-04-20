@@ -25,13 +25,16 @@ import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
 import SendQuery from "./components/user_panel/SendQuery";
 import StudentIssue from "./components/admin_panel/StudentIssue";
 import UserQuiz from "./components/user_panel/UserQuiz";
+import TenthGuidance from "./components/user_panel/TenthGuidance";
+import OccupationDetails from "./components/user_panel/OccupationDetails";
+// import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 
 //  Navbar Wrapper (Hide on specific routes)
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/UserQuiz'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -140,6 +143,30 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
+         <Route 
+           path="/TenthGuidance" 
+           element={
+             <ProtectedRoute>
+               <TenthGuidance />
+             </ProtectedRoute>
+           } 
+         />
+         <Route 
+           path="/OccupationDetails" 
+           element={
+             <ProtectedRoute>
+               <OccupationDetails />
+             </ProtectedRoute>
+           } 
+         />
+          {/* <Route 
+          path="/TwelfthGuidance" 
+          element={
+            <ProtectedRoute>
+              <TwelfthGuidance />
+            </ProtectedRoute>
+          } 
+        /> */}
       </Routes>
     </>
   );
