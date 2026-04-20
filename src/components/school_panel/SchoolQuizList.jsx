@@ -39,6 +39,7 @@ const SchoolQuizList = () => {
    const [selectedStudents, setSelectedStudents] = useState([])
    const [registeredStudents, setRegisteredStudents] = useState({})
    const [selectedClassFilter, setSelectedClassFilter] = useState('all')
+   const [showRegistered, setShowRegistered] = useState(true)
 
   useEffect(() => {
     const handleResize = () => {
@@ -177,15 +178,15 @@ const SchoolQuizList = () => {
      )
    }
 
-   const registerStudents = async () => {
-     if (!selectedQuiz || selectedStudents.length === 0) {
-       setError('Please select at least one student')
-       return
-     }
+    const registerStudents = async () => {
+      if (!selectedQuiz || selectedStudents.length === 0) {
+        setError('Please select at least one student')
+        return
+      }
 
-     setRegisterLoading(true)
-     setError('')
-     setSuccess('')
+      setRegisterLoading(true)
+      setError('')
+      setSuccess('')
 
       try {
         const payload = {
@@ -194,23 +195,56 @@ const SchoolQuizList = () => {
           school_uni_id: school_uni_id
         }
 
-       await axios.post(API_URL_REGISTRATION, payload, {
-         headers: {
-           'Authorization': `Bearer ${accessToken}`,
-           'Content-Type': 'application/json'
-         }
-       })
+        await axios.post(API_URL_REGISTRATION, payload, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
 
-       setSuccess(`${selectedStudents.length} student(s) registered for ${selectedQuiz.title}`)
-       setShowRegisterModal(false)
-       fetchQuizzes()
-     } catch (error) {
-       console.error('Error registering students:', error)
-       setError(error.response?.data?.message || 'Failed to register students')
-     } finally {
-       setRegisterLoading(false)
-     }
-   }
+        setSuccess(`${selectedStudents.length} student(s) registered for ${selectedQuiz.title}`)
+        setShowRegisterModal(false)
+        fetchQuizzes()
+      } catch (error) {
+        console.error('Error registering students:', error)
+        setError(error.response?.data?.message || 'Failed to register students')
+      } finally {
+        setRegisterLoading(false)
+      }
+    }
+
+    const removeStudents = async () => {
+      if (!selectedQuiz || selectedStudents.length === 0) {
+        setError('Please select at least one student to remove')
+        return
+      }
+
+      setRegisterLoading(true)
+      setError('')
+      setSuccess('')
+
+      try {
+        await axios.delete(API_URL_REGISTRATION, {
+          data: {
+            student_id: selectedStudents,
+            quiz_id: selectedQuiz.quiz_id || selectedQuiz.id
+          },
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        setSuccess(`${selectedStudents.length} student(s) removed from ${selectedQuiz.title}`)
+        setShowRegisterModal(false)
+        fetchQuizzes()
+      } catch (error) {
+        console.error('Error removing students:', error)
+        setError(error.response?.data?.message || 'Failed to remove students')
+      } finally {
+        setRegisterLoading(false)
+      }
+    }
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Not set'
@@ -450,42 +484,57 @@ const SchoolQuizList = () => {
                       </small>
                     </div>
 
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                      <span className="small text-muted">
-                        {selectedClassFilter === 'all' 
-                          ? `All students (${selectedStudents.length} selected)`
-                          : `Class ${selectedClassFilter} students (${selectedStudents.length} selected)`
-                        }
-                      </span>
-                      <div className="d-flex gap-2">
-                        <Button 
-                          variant="outline-primary" 
-                          size="sm" 
-                          className="me-2"
-                          onClick={() => {
-                            const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
-                            const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
-                            
-                            const eligibleStudents = allStudentsFlat.filter(s => {
-                              const studentClassNum = normalizeClass(s.class_name)
-                              const isEligible = selectedQuiz.class_allowed?.some(allowed => 
-                                normalizeClass(allowed) === studentClassNum
-                              )
-                              const notRegistered = !registeredList.includes(s.student_id)
-                              const matchesFilter = filterNum === null || studentClassNum === filterNum
-                              return isEligible && notRegistered && matchesFilter
-                            })
-                            setSelectedStudents(eligibleStudents.map(s => s.student_id))
-                          }}
-                        >
-                          Select All
-                        </Button>
-                        <Button 
-                          variant="outline-secondary" 
-                          size="sm"
-                          onClick={() => setSelectedStudents([])}
-                        >
-                          Clear
+                   <div className="d-flex justify-content-between align-items-center mb-3">
+                     <div className="d-flex align-items-center gap-3">
+                       <span className="small text-muted">
+                         {selectedClassFilter === 'all' 
+                           ? `All students (${selectedStudents.length} selected)`
+                           : `Class ${selectedClassFilter} students (${selectedStudents.length} selected)`
+                         }
+                       </span>
+                       <Form.Check 
+                         type="checkbox"
+                         id="show-registered"
+                         label="Show registered"
+                         checked={selectedClassFilter !== 'all' || showRegistered}
+                         onChange={(e) => {
+                           if (e.target.checked) {
+                             setShowRegistered(true)
+                           } else {
+                             setShowRegistered(false)
+                             // Optionally also uncheck the filter or handle differently
+                           }
+                         }}
+                       />
+                     </div>
+                     <div className="d-flex gap-2">
+                       <Button 
+                         variant="outline-primary" 
+                         size="sm" 
+                         className="me-2"
+                         onClick={() => {
+                           const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
+                           const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
+                           
+                           const eligibleStudents = allStudentsFlat.filter(s => {
+                             const studentClassNum = normalizeClass(s.class_name)
+                             const isEligible = selectedQuiz.class_allowed?.some(allowed => 
+                               normalizeClass(allowed) === studentClassNum
+                             )
+                             const matchesFilter = filterNum === null || studentClassNum === filterNum
+                             return isEligible && matchesFilter
+                           })
+                           setSelectedStudents(eligibleStudents.map(s => s.student_id))
+                         }}
+                       >
+                         Select All Eligible
+                       </Button>
+                       <Button 
+                         variant="outline-secondary" 
+                         size="sm"
+                         onClick={() => setSelectedStudents([])}
+                       >
+                         Clear
                         </Button>
                       </div>
                     </div>
@@ -525,7 +574,6 @@ const SchoolQuizList = () => {
                                       type="checkbox"
                                       checked={isSelected}
                                       onChange={() => toggleStudentSelection(student.student_id)}
-                                      disabled={isRegistered}
                                     />
                                   </td>
                                   <td>{student.student_id}</td>
@@ -548,30 +596,61 @@ const SchoolQuizList = () => {
                         </tbody>
                       </table>
                     </div>
-                 </>
+                  </>
                )}
              </>
            )}
          </Modal.Body>
-        <Modal.Footer className="border-top py-2 px-3">
-          <Button variant="secondary" onClick={() => setShowRegisterModal(false)}>
-            Cancel
-          </Button>
-          <Button 
-            variant="primary" 
-            onClick={registerStudents} 
-            disabled={registerLoading || selectedStudents.length === 0}
-          >
-            {registerLoading ? (
-              <>
-                <Spinner animation="border" size="sm" className="me-2" />
-                Registering...
-              </>
-            ) : (
-              `Register ${selectedStudents.length} Student${selectedStudents.length !== 1 ? 's' : ''}`
-            )}
-          </Button>
-        </Modal.Footer>
+         <Modal.Footer className="border-top py-2 px-3">
+           <Button variant="secondary" onClick={() => setShowRegisterModal(false)}>
+             Cancel
+           </Button>
+           
+           {selectedStudents.length > 0 && (
+             <>
+               <Button 
+                 variant="success" 
+                 onClick={registerStudents} 
+                 disabled={registerLoading}
+                 className="me-2"
+               >
+                 {registerLoading ? (
+                   <>
+                     <Spinner animation="border" size="sm" className="me-2" />
+                     Registering...
+                   </>
+                 ) : (
+                   `Register ${selectedStudents.length} Student${selectedStudents.length !== 1 ? 's' : ''}`
+                 )}
+               </Button>
+               
+               {(() => {
+                const registeredCount = selectedStudents.filter(id => 
+                  (registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []).includes(id)
+                ).length
+                if (registeredCount > 0) {
+                  return (
+                    <Button 
+                      variant="danger" 
+                      onClick={removeStudents} 
+                      disabled={registerLoading}
+                    >
+                      {registerLoading ? (
+                        <>
+                          <Spinner animation="border" size="sm" className="me-2" />
+                          Removing...
+                        </>
+                      ) : (
+                        `Remove ${registeredCount} Registered`
+                      )}
+                    </Button>
+                  )
+                }
+                return null
+              })()}
+             </>
+           )}
+         </Modal.Footer>
       </Modal>
     </>
   )
