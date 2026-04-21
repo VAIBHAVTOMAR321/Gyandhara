@@ -101,8 +101,8 @@ const UserDashboard = () => {
       setError(null)
       
       const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/girls_course/girls_course_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
-        : `https://brjobsedu.com/girls_course/girls_course_backend/api/student-entrollment/?student_id=${uniqueId}`
+        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
+        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-entrollment/?student_id=${uniqueId}`
       
       const response = await axios.get(endpoint, {
         headers: {
@@ -116,7 +116,7 @@ const UserDashboard = () => {
         
         try {
           const allCoursesResponse = await axios.get(
-            'https://brjobsedu.com/girls_course/girls_course_backend/api/course-items/'
+            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/'
           )
           
           if (allCoursesResponse.data.success && Array.isArray(allCoursesResponse.data.data)) {
@@ -151,7 +151,7 @@ const UserDashboard = () => {
   const fetchRefundRequests = async () => {
     try {
       const response = await axios.get(
-        `https://brjobsedu.com/girls_course/girls_course_backend/api/student-unpaid/?student_id=${uniqueId}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -173,7 +173,7 @@ const UserDashboard = () => {
     try {
       setAllCoursesLoading(true)
       const response = await axios.get(
-        'https://brjobsedu.com/girls_course/girls_course_backend/api/course-items/'
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/'
       )
       
       if (response.data.success && Array.isArray(response.data.data)) {
@@ -196,7 +196,7 @@ const UserDashboard = () => {
 
     try {
       const response = await axios.get(
-        `https://brjobsedu.com/girls_course/girls_course_backend/api/course-feedback/?student_id=${uniqueId}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-feedback/?student_id=${uniqueId}`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -238,9 +238,9 @@ const UserDashboard = () => {
       let response
       
       if (userRoleType === 'student-unpaid') {
-        response = await axios.get(`https://brjobsedu.com/girls_course/girls_course_backend/api/student-unpaid/?student_id=${uniqueId}`, config)
+        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`, config)
       } else {
-        response = await axios.get(`https://brjobsedu.com/girls_course/girls_course_backend/api/all-registration/?student_id=${uniqueId}`)
+        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/all-registration/?student_id=${uniqueId}`)
       }
       
       const { data } = response
@@ -265,7 +265,7 @@ const UserDashboard = () => {
       setError(null)
       
       const response = await axios.get(
-        `https://brjobsedu.com/girls_course/girls_course_backend/api/course-module/?course_id=${courseId}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-module/?course_id=${courseId}`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`
@@ -383,8 +383,8 @@ const UserDashboard = () => {
   const generateCertificate = async (course) => {
     try {
       const endpoint = userRoleType === 'student-unpaid' 
-        ? 'https://brjobsedu.com/girls_course/girls_course_backend/api/enrollment-unpaid/'
-        : 'https://brjobsedu.com/girls_course/girls_course_backend/api/student-entrollment/'
+        ? 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
+        : 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
         
       const response = await axios.post(
         endpoint,
@@ -482,8 +482,8 @@ const UserDashboard = () => {
       setProgressLoading(true)
       
       const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/girls_course/girls_course_backend/api/module-progress-unpaid/?student_id=${uniqueId}`
-        : `https://brjobsedu.com/girls_course/girls_course_backend/api/module-progress/?student_id=${uniqueId}`
+        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/?student_id=${uniqueId}`
+        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/?student_id=${uniqueId}`
       
       const response = await axios.get(endpoint, {
         headers: {
@@ -600,7 +600,7 @@ const UserDashboard = () => {
       setFeedbackError(null)
       
       const response = await axios.post(
-        'https://brjobsedu.com/girls_course/girls_course_backend/api/course-feedback/',
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-feedback/',
         {
           course_id: feedbackCourse.course_id,
           student_id: uniqueId,
@@ -760,8 +760,8 @@ const UserDashboard = () => {
       const currentModule = courseModules.modules[moduleIndex]
       
       const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/girls_course/girls_course_backend/api/module-progress-unpaid/`
-        : `https://brjobsedu.com/girls_course/girls_course_backend/api/module-progress/`
+        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/`
+        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/`
         
       const response = await axios.put(
         endpoint,
@@ -792,7 +792,7 @@ const UserDashboard = () => {
   const handleEnrollCourse = async (courseId) => {
     try {
       const response = await axios.post(
-        'https://brjobsedu.com/girls_course/girls_course_backend/api/enroll-unpaid/',
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enroll-unpaid/',
         {
           student_id: uniqueId,
           course_id: courseId
@@ -1223,7 +1223,7 @@ const UserDashboard = () => {
                                                   <div className="image-wrapper">
                                                     <div className="book-image-container rounded-3 overflow-hidden shadow-lg">
                                                       <img
-                                                        src={`https://brjobsedu.com/girls_course/girls_course_backend/${subModule.image}`}
+                                                        src={`https://brjobsedu.com/gyandhara/gyandhara_backend/${subModule.image}`}
                                                         alt={subModule.sub_modu_title}
                                                         className="book-image w-100 h-100"
                                                         style={{ objectFit: 'contain', objectPosition: 'center' }}

@@ -23,6 +23,7 @@ import NavBar from "./components/nav_bar/NavBar";
 
 import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
 import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
+import DashBord from "./components/admin_panel/DashBord";
 import SendQuery from "./components/user_panel/SendQuery";
 import StudentIssue from "./components/admin_panel/StudentIssue";
 import QuizManageMent from "./components/admin_panel/QuizManageMent";
@@ -45,7 +46,7 @@ import ManageGroomingClasses from "./components/admin_panel/ManageGroomingClass"
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -201,7 +202,7 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-          <Route 
+<Route 
           path="/AdminDashboard" 
           element={
             <ProtectedRoute>
@@ -209,7 +210,15 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-          <Route
+        <Route 
+          path="/DashBord" 
+          element={
+            <ProtectedRoute>
+              <DashBord />
+            </ProtectedRoute>
+          } 
+        />
+        <Route
           path="/SchoolDashBoard"
           element={
             <ProtectedRoute>

@@ -62,6 +62,12 @@ const menuItems = [
       path: "/AdminDashboard",
       active: true,
     },
+     {
+      icon: <FaTachometerAlt />,
+      label: "Course Dashboard",
+      path: "/DashBord",
+      active: true,
+    },
     {
       icon: <FaQuestionCircle />,
       label: "Student Issues",
