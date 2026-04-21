@@ -39,7 +39,7 @@ import ManageGovtSchemes from "./components/admin_panel/ManageGovtSchemes";
 import AddGovtSchemes from "./components/admin_panel/AddGovtSchemes";
 import CreateGroomingClass from "./components/admin_panel/CreateGroomingClass";
 import ManageGroomingClasses from "./components/admin_panel/ManageGroomingClass";
-import Courses from "./components/user_panel/Courses";
+
 import JobOpenings from "./components/user_panel/JobOpenings";
 import UserEvents from "./components/user_panel/UserEvents";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
@@ -49,7 +49,7 @@ import UserEvents from "./components/user_panel/UserEvents";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses', '/Courses', '/JobOpenings', '/UserEvents'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -125,14 +125,7 @@ function AppContent() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/Courses" 
-          element={
-            <ProtectedRoute>
-              <Courses />
-            </ProtectedRoute>
-          } 
-        />
+       
         <Route 
           path="/JobOpenings" 
           element={
