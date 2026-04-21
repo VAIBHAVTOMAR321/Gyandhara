@@ -36,6 +36,8 @@ import GroomingClasses from "./components/user_panel/GroomingClasses";
 import Competition from "./components/user_panel/Competition";
 import ManageGovtSchemes from "./components/admin_panel/ManageGovtSchemes";
 import AddGovtSchemes from "./components/admin_panel/AddGovtSchemes";
+import CreateGroomingClass from "./components/admin_panel/CreateGroomingClass";
+import ManageGroomingClasses from "./components/admin_panel/ManageGroomingClass";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 
@@ -43,7 +45,7 @@ import AddGovtSchemes from "./components/admin_panel/AddGovtSchemes";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -148,6 +150,22 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <AddGovtSchemes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/CreateGroomingClass"
+          element={
+            <ProtectedRoute>
+              <CreateGroomingClass />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageGroomingClasses"
+          element={
+            <ProtectedRoute>
+              <ManageGroomingClasses />
             </ProtectedRoute>
           }
         />

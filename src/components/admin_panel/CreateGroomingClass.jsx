@@ -1,35 +1,28 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Button, Spinner, Modal, Form, Badge } from 'react-bootstrap'
 import AdminLeftNav from './AdminLeftNav'
-import AdminTopNav from './AdminTopNav'
+import AdminHeader from './AdminHeader'
 import axios from 'axios'
-import '../../assets/css/Enrollments.css'
-import { useAuth } from '../../contexts/AuthContext'
+
+import { useAuth } from '../all_login/AuthContext'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaClock, FaCalendar, FaUsers, FaLink } from 'react-icons/fa'
 
-const API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/grooming-classes/'
+const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/grooming-classes/'
 
 const CreateGroomingClass = () => {
   const { accessToken } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
+  
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(true)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [editClassId, setEditClassId] = useState(null)
-
-  const [formData, setFormData] = useState({
-    title: '',
-    title_hindi: '',
-    description: '',
-    description_hindi: '',
-    class_link: '',
-    start_date_time: '',
-    end_date_time: ''
-  })
 
   useEffect(() => {
     if (location.state?.editData) {
@@ -47,6 +40,32 @@ const CreateGroomingClass = () => {
       })
     }
   }, [location.state])
+
+  const [formData, setFormData] = useState({
+    title: '',
+    title_hindi: '',
+    description: '',
+    description_hindi: '',
+    class_link: '',
+    start_date_time: '',
+    end_date_time: ''
+  })
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+}, [])
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
 
   const getAuthConfig = () => ({
     headers: {
@@ -96,12 +115,16 @@ const CreateGroomingClass = () => {
       if (editMode && editClassId) {
         payload.class_id = editClassId
         await axios.put(API_URL, payload, getAuthConfig())
+        setShowSuccessModal(true)
+        resetForm()
+        setTimeout(() => {
+          navigate('/ManageGroomingClasses')
+        }, 1500)
       } else {
         await axios.post(API_URL, payload, getAuthConfig())
+        setShowSuccessModal(true)
+        resetForm()
       }
-
-      setShowSuccessModal(true)
-      resetForm()
     } catch (error) {
       console.error('Error:', error)
       alert('Failed to save grooming class')
@@ -126,18 +149,21 @@ const CreateGroomingClass = () => {
 
   if (loading) {
     return (
-      <div className="admin-layout">
-        <div className="admin-wrapper d-flex">
-          <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-          <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-            <AdminTopNav />
-            <div className="content-area">
-              <Container fluid className=''>
-                <div className="d-flex align-items-center justify-content-center h-100">
-                  <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-                </div>
-              </Container>
-            </div>
+      <div className="dashboard-container">
+        <AdminLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+        <div className="main-content-dash">
+          <AdminHeader toggleSidebar={toggleSidebar} />
+          <div className="dashboard-content">
+            <Container className="dashboard-box">
+              <div className="loading-spinner">
+                <Spinner animation="border" variant="primary" />
+              </div>
+            </Container>
           </div>
         </div>
       </div>
@@ -145,13 +171,18 @@ const CreateGroomingClass = () => {
   }
 
   return (
-    <div className="admin-layout">
-      <div className="admin-wrapper d-flex">
-        <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-        <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-          <AdminTopNav />
-          <div className="content-area">
-            <Container className='mob-top-view'>
+    <>
+    <div className="dashboard-container">
+      <AdminLeftNav
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <AdminHeader toggleSidebar={toggleSidebar} />
+        <div className="dashboard-content">
+          <Container className="dashboard-box">
               <div className="d-flex justify-content-between align-items-center mb-4 page-header">
                 <div className="d-flex align-items-center all-en-box gap-3">
                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
@@ -306,7 +337,7 @@ const CreateGroomingClass = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   )
 }
 

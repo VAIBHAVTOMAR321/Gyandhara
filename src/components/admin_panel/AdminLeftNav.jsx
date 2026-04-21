@@ -90,23 +90,39 @@ const menuItems = [
       ],
     },
 
-     {
-      icon: <FaTools />,
-      label: " Govt schemes",
-      submenu: [
+{
+       icon: <FaTools />,
+       label: " Govt schemes",
+       submenu: [
        
+         {
+           label: "Manage Scheme",
+           path: "/ManageGovtSchemes",
+           icon: <FaPlusSquare />,
+         },
+           {
+           label: "Add Scheme",
+           path: "/AddGovtSchemes",
+           icon: <FaPlusSquare />,
+         },
+       ],
+     
+    },
+    {
+      icon: <FaChalkboardTeacher />,
+      label: " Grooming Classes",
+      submenu: [
         {
-          label: "Manage Scheme",
-          path: "/ManageGovtSchemes",
+          label: "Create Class",
+          path: "/CreateGroomingClass",
           icon: <FaPlusSquare />,
         },
-          {
-          label: "Add Scheme",
-          path: "/AddGovtSchemes",
-          icon: <FaPlusSquare />,
+        {
+          label: "Manage Classes",
+          path: "/ManageGroomingClasses",
+          icon: <FaListUl />,
         },
       ],
-    
     },
     {
       icon: <FaTools />,
