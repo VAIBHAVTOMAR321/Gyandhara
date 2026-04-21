@@ -25,7 +25,8 @@ import {
   FaChalkboardTeacher,
   FaIndustry,
   FaQuestionCircle,
-  FaTrophy
+  FaTrophy,
+  FaBriefcase
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -80,6 +81,16 @@ const menuItems = [
       icon: <FaTrophy />,
       label: "Competition",
       path: "/Competition",
+    },
+    {
+      icon: <FaBriefcase />,
+      label: "Jobs & Seminars",
+      path: "/JobOpenings",
+    },
+    {
+      icon: <FaCalendarAlt />,
+      label: "Events",
+      path: "/UserEvents",
     },
     {
       icon: <FaUserCircle />,

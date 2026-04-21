@@ -59,7 +59,9 @@ const UserDashboard = () => {
   const [courseLanguage, setCourseLanguage] = useState('hindi')
 
   const navigate = useNavigate()
-  const { uniqueId, accessToken, isAuthenticated, userRoleType } = useAuth()
+  const { uniqueId, accessToken, isAuthenticated, role } = useAuth()
+  
+  console.log('UserDashboard - role:', role, 'uniqueId:', uniqueId)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -91,7 +93,8 @@ const UserDashboard = () => {
   }
 
   const fetchCourses = async () => {
-    if (!uniqueId || !accessToken) {
+    if (!accessToken || !role) {
+      console.log('fetchCourses: missing accessToken or role', { accessToken, role })
       setLoading(false)
       return
     }
@@ -100,48 +103,56 @@ const UserDashboard = () => {
       setLoading(true)
       setError(null)
       
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
-        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-entrollment/?student_id=${uniqueId}`
+      const roleToCourseId = {
+        '9th-student': 'COUR-001',
+        '10th-student': 'COUR-001',
+        '11th-student': 'COUR-002',
+        '12th-student': 'COUR-002',
+      }
       
-      const response = await axios.get(endpoint, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
+      const courseId = roleToCourseId[role?.toLowerCase()] || 'COUR-001'
       
-      if (response.data.success && Array.isArray(response.data.data)) {
-        let coursesWithDates = response.data.data
-        
-        try {
-          const allCoursesResponse = await axios.get(
-            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/'
-          )
-          
-          if (allCoursesResponse.data.success && Array.isArray(allCoursesResponse.data.data)) {
-            coursesWithDates = response.data.data.map(enrolledCourse => {
-              const courseDetails = allCoursesResponse.data.data.find(
-                c => c.course_id === enrolledCourse.course_id
-              )
-              return {
-                ...enrolledCourse,
-                start_date: courseDetails?.start_date || null,
-                end_date: courseDetails?.end_date || null
-              }
-            })
+      console.log('fetchCourses - role:', role, 'courseId:', courseId)
+      
+      const response = await axios.get(
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-module/?course_id=${courseId}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
           }
-        } catch (courseError) {
-          console.warn('Could not fetch course details for dates')
+        }
+      )
+      
+      console.log('fetchCourses response:', response.data)
+      
+      if (response.data.success && response.data.data) {
+        const courseData = response.data.data
+        
+        const formattedCourse = {
+          course_id: courseData.course_id,
+          course_name: courseData.course_name,
+          course_status: courseData.course_status,
+          price: courseData.price,
+          start_date: courseData.start_date,
+          end_date: courseData.end_date,
+          enrolled_at: new Date().toISOString(),
+          completed_at: null,
+          student_name: 'Student',
+          certificate_file: null,
+          course_fee: courseData.price,
+          is_completed: false,
+          student_id: uniqueId,
+          modules: courseData.modules || []
         }
         
-        setCourses(coursesWithDates)
+        setCourses([formattedCourse])
       } else {
-        setError(response.data.message || 'Failed to fetch courses')
+        console.log('fetchCourses: response not successful or no data', response.data)
         setCourses([])
       }
     } catch (error) {
-      setError('Network error while fetching courses')
+      console.error('fetchCourses error:', error.response?.status, error.response?.data, error.message)
       setCourses([])
     } finally {
       setLoading(false)
@@ -151,7 +162,7 @@ const UserDashboard = () => {
   const fetchRefundRequests = async () => {
     try {
       const response = await axios.get(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/?student_id=${uniqueId}`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -215,6 +226,7 @@ const UserDashboard = () => {
   }
 
   useEffect(() => {
+    console.log('useEffect - fetching data, role:', role)
     const fetchData = async () => {
       await fetchCourses()
       await fetchModuleProgress()
@@ -223,8 +235,10 @@ const UserDashboard = () => {
       await fetchFeedbackData()
     }
     
-    fetchData()
-  }, [uniqueId, accessToken])
+    if (uniqueId && accessToken) {
+      fetchData()
+    }
+  }, [uniqueId, accessToken, role])
 
   const [userData, setUserData] = useState(null)
   const fetchUserData = async () => {
@@ -237,10 +251,10 @@ const UserDashboard = () => {
       
       let response
       
-      if (userRoleType === 'student-unpaid') {
-        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`, config)
+      if (role === 'student-unpaid') {
+        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/?student_id=${uniqueId}`, config)
       } else {
-        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/all-registration/?student_id=${uniqueId}`)
+        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/all-registration/?student_id=${uniqueId}`, config)
       }
       
       const { data } = response
@@ -257,7 +271,7 @@ const UserDashboard = () => {
     if (uniqueId) {
       fetchUserData()
     }
-  }, [uniqueId, userRoleType])
+  }, [uniqueId, role])
 
   const fetchCourseModules = async (courseId) => {
     try {
@@ -294,11 +308,18 @@ const UserDashboard = () => {
     }
     
     setSelectedCourse(course)
-    setCourseModules(null)
-    setCompletedModules([])
     setError(null)
     setActiveAccordionKey('0')
-    await fetchCourseModules(course.course_id)
+    
+    if (course.modules && course.modules.length > 0) {
+      setCourseModules({
+        modules: course.modules,
+        course_id: course.course_id,
+        course_name: course.course_name
+      })
+    } else {
+      await fetchCourseModules(course.course_id)
+    }
     await fetchModuleProgress()
   }
 
@@ -382,9 +403,7 @@ const UserDashboard = () => {
 
   const generateCertificate = async (course) => {
     try {
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
-        : 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
+      const endpoint = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-enrollment/'
         
       const response = await axios.post(
         endpoint,
@@ -481,9 +500,9 @@ const UserDashboard = () => {
     try {
       setProgressLoading(true)
       
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/?student_id=${uniqueId}`
-        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/?student_id=${uniqueId}`
+      const endpoint = `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/?student_id=${uniqueId}`
+      
+      console.log('fetchModuleProgress - role:', role, 'endpoint:', endpoint)
       
       const response = await axios.get(endpoint, {
         headers: {
@@ -492,11 +511,13 @@ const UserDashboard = () => {
         }
       })
 
+      console.log('fetchModuleProgress response:', response.data)
+
       if (response.data.success && Array.isArray(response.data.data)) {
         setModuleProgress(response.data.data)
       }
     } catch (error) {
-      // Handle error silently
+      console.error('fetchModuleProgress error:', error.response?.status, error.response?.data)
     } finally {
       setProgressLoading(false)
     }
@@ -514,7 +535,7 @@ const UserDashboard = () => {
     }
     
     if (now < start) {
-      return { status: 'upcoming', text: 'Starts on ' + start.toLocaleDateString() }
+      return { status: 'upcoming', text: 'Starts on ' + start.toLocaleDateString('en-GB') }
     }
     
     const diffTime = end - now
@@ -759,9 +780,7 @@ const UserDashboard = () => {
     try {
       const currentModule = courseModules.modules[moduleIndex]
       
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/`
-        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/`
+      const endpoint = `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/`
         
       const response = await axios.put(
         endpoint,
@@ -792,7 +811,7 @@ const UserDashboard = () => {
   const handleEnrollCourse = async (courseId) => {
     try {
       const response = await axios.post(
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enroll-unpaid/',
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-enrollment/',
         {
           student_id: uniqueId,
           course_id: courseId
@@ -1467,7 +1486,7 @@ const UserDashboard = () => {
                         My Courses
                         ({courses.length})
                       </Button>
-                      {userRoleType === 'student-unpaid' && (
+                      {role === 'student-unpaid' && (
                         <Button 
                           variant={activeTab === 'all-courses' ? 'primary' : 'outline-primary'}
                           onClick={() => setActiveTab('all-courses')}
@@ -1548,7 +1567,7 @@ const UserDashboard = () => {
                                             <FaCalendarCheck className="me-1" /> Enrolled
                                           </span>
                                           <span className="fw-semibold">
-                                            {course.enrolled_at ? new Date(course.enrolled_at).toLocaleDateString() : 'N/A'}
+                                            {course.enrolled_at ? new Date(course.enrolled_at).toLocaleDateString('en-GB') : 'N/A'}
                                           </span>
                                         </div>
                                         {course.start_date && course.end_date && (
@@ -1570,7 +1589,7 @@ const UserDashboard = () => {
                                               <FaAward className="me-1" /> Completed
                                             </span>
                                             <span className="fw-semibold text-success">
-                                              {new Date(course.completed_at).toLocaleDateString()}
+                                              {new Date(course.completed_at).toLocaleDateString('en-GB')}
                                             </span>
                                           </div>
                                         )}
@@ -1678,7 +1697,7 @@ const UserDashboard = () => {
                                               )}
                                             </Button>
                                           )}
-                                          {userRoleType !== 'student-unpaid' && !isAllModulesCompleted(course) && !refundRequests.some(req => req.status === 'pending') && (
+                                          {role !== 'student-unpaid' && !isAllModulesCompleted(course) && !refundRequests.some(req => req.status === 'pending') && (
                                             <Button 
                                               variant="outline-danger" 
                                               onClick={() => {
@@ -1738,7 +1757,7 @@ const UserDashboard = () => {
                       </div>
                     )}
 
-                    {activeTab === 'all-courses' && userRoleType === 'student-unpaid' && (
+                    {activeTab === 'all-courses' && role === 'student-unpaid' && (
                       <div>
                         <h4 className="mb-3">All Courses</h4>
                         
