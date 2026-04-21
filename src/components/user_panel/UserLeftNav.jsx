@@ -60,6 +60,11 @@ const menuItems = [
       path: "/UserDashboard",
       active: true,
     },
+    {
+      icon: <FaBook />,
+      label: "COURSES",
+      path: "/Courses",
+    },
      {
       icon: <FaTachometerAlt />,
       label: "Send Query",
