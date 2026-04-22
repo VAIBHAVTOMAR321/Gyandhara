@@ -40,6 +40,7 @@ const SchoolQuizList = () => {
    const [registeredStudents, setRegisteredStudents] = useState({})
    const [selectedClassFilter, setSelectedClassFilter] = useState('all')
    const [showRegistered, setShowRegistered] = useState(true)
+   const [maxParticipants, setMaxParticipants] = useState(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -156,27 +157,34 @@ const SchoolQuizList = () => {
       return []
     }
 
-   const handleRegisterClick = async (quiz) => {
-     setSelectedQuiz(quiz)
-     setSelectedStudents([])
-     setError('')
-     setSuccess('')
-     setSelectedClassFilter('all')
-     await fetchSchoolStudents()
-     
-     const registered = await checkRegisteredStudents(quiz.quiz_id || quiz.id)
-     setRegisteredStudents(prev => ({ ...prev, [quiz.quiz_id || quiz.id]: registered }))
-     
-     setShowRegisterModal(true)
-   }
+const handleRegisterClick = async (quiz) => {
+      setSelectedQuiz(quiz)
+      setSelectedStudents([])
+      setError('')
+      setSuccess('')
+      setSelectedClassFilter('all')
+      setMaxParticipants(quiz.total_participants || null)
+      await fetchSchoolStudents()
+      
+      const registered = await checkRegisteredStudents(quiz.quiz_id || quiz.id)
+      setRegisteredStudents(prev => ({ ...prev, [quiz.quiz_id || quiz.id]: registered }))
+      
+      setShowRegisterModal(true)
+    }
 
-   const toggleStudentSelection = (studentId) => {
-     setSelectedStudents(prev => 
-       prev.includes(studentId) 
-         ? prev.filter(id => id !== studentId)
-         : [...prev, studentId]
-     )
-   }
+const toggleStudentSelection = (studentId) => {
+      setError('')
+      
+      if (selectedStudents.includes(studentId)) {
+        setSelectedStudents(prev => prev.filter(id => id !== studentId))
+      } else {
+        if (maxParticipants && selectedStudents.length >= maxParticipants) {
+          setError(`You can only select up to ${maxParticipants} participants for this quiz.`)
+          return
+        }
+        setSelectedStudents(prev => [...prev, studentId])
+      }
+    }
 
     const registerStudents = async () => {
       if (!selectedQuiz || selectedStudents.length === 0) {
@@ -400,6 +408,13 @@ const SchoolQuizList = () => {
                               })}
                             </div>
                           </div>
+                          {quiz.total_participants && (
+                            <div className="mt-2">
+                              <small className="text-muted d-block">
+                                Max Participants: {quiz.total_participants}
+                              </small>
+                            </div>
+                          )}
                         </Card.Body>
                         <Card.Footer className="bg-white py-3">
                           <Button 
@@ -431,11 +446,15 @@ const SchoolQuizList = () => {
          <Modal.Body className="">
            {selectedQuiz && (
              <>
-               <Alert variant="info" className="mb-3">
-                 <strong>Quiz:</strong> {selectedQuiz.title}<br />
-                 <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
-                 <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
-               </Alert>
+<Alert variant="info" className="mb-3">
+                  <strong>Quiz:</strong> {selectedQuiz.title}<br />
+                  <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
+                  <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
+                  {maxParticipants && (
+                    <><br />
+                    <strong>Max Participants:</strong> {maxParticipants}</>
+                  )}
+                </Alert>
 
                {error && (
                  <Alert variant="danger" dismissible onClose={() => setError('')}>
@@ -468,6 +487,7 @@ const SchoolQuizList = () => {
                           onChange={(e) => {
                             setSelectedClassFilter(e.target.value)
                             setSelectedStudents([])
+                            setError('')
                           }}
                           style={{ width: '200px' }}
                         >
@@ -484,14 +504,19 @@ const SchoolQuizList = () => {
                       </small>
                     </div>
 
-                   <div className="d-flex justify-content-between align-items-center mb-3">
-                     <div className="d-flex align-items-center gap-3">
-                       <span className="small text-muted">
-                         {selectedClassFilter === 'all' 
-                           ? `All students (${selectedStudents.length} selected)`
-                           : `Class ${selectedClassFilter} students (${selectedStudents.length} selected)`
-                         }
-                       </span>
+<div className="d-flex justify-content-between align-items-center mb-3">
+                      <div className="d-flex align-items-center gap-3">
+                        <span className="small text-muted">
+                          {selectedClassFilter === 'all' 
+                            ? `All students (${selectedStudents.length} selected)`
+                            : `Class ${selectedClassFilter} students (${selectedStudents.length} selected)`
+                          }
+                          {maxParticipants && (
+                            <span className="ms-2 text-danger">
+                              (Max: {maxParticipants})
+                            </span>
+                          )}
+                        </span>
                        <Form.Check 
                          type="checkbox"
                          id="show-registered"
@@ -508,33 +533,43 @@ const SchoolQuizList = () => {
                        />
                      </div>
                      <div className="d-flex gap-2">
-                       <Button 
-                         variant="outline-primary" 
-                         size="sm" 
-                         className="me-2"
-                         onClick={() => {
-                           const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
-                           const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
-                           
-                           const eligibleStudents = allStudentsFlat.filter(s => {
-                             const studentClassNum = normalizeClass(s.class_name)
-                             const isEligible = selectedQuiz.class_allowed?.some(allowed => 
-                               normalizeClass(allowed) === studentClassNum
-                             )
-                             const matchesFilter = filterNum === null || studentClassNum === filterNum
-                             return isEligible && matchesFilter
-                           })
-                           setSelectedStudents(eligibleStudents.map(s => s.student_id))
-                         }}
-                       >
-                         Select All Eligible
-                       </Button>
-                       <Button 
-                         variant="outline-secondary" 
-                         size="sm"
-                         onClick={() => setSelectedStudents([])}
-                       >
-                         Clear
+<Button 
+                          variant="outline-primary" 
+                          size="sm" 
+                          className="me-2"
+                          onClick={() => {
+                            const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
+                            const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
+                            
+                            const eligibleStudents = allStudentsFlat.filter(s => {
+                              const studentClassNum = normalizeClass(s.class_name)
+                              const isEligible = selectedQuiz.class_allowed?.some(allowed => 
+                                normalizeClass(allowed) === studentClassNum
+                              )
+                              const matchesFilter = filterNum === null || studentClassNum === filterNum
+                              return isEligible && matchesFilter
+                            })
+                            
+                            if (maxParticipants) {
+                              const availableSlots = maxParticipants - selectedStudents.length
+                              const toSelect = eligibleStudents.slice(0, availableSlots).map(s => s.student_id)
+                              setSelectedStudents(prev => [...prev, ...toSelect])
+                            } else {
+                              setSelectedStudents(eligibleStudents.map(s => s.student_id))
+                            }
+                          }}
+                        >
+                          Select All Eligible
+                        </Button>
+<Button 
+                          variant="outline-secondary" 
+                          size="sm"
+                          onClick={() => {
+                            setSelectedStudents([])
+                            setError('')
+                          }}
+                        >
+                          Clear
                         </Button>
                       </div>
                     </div>
