@@ -41,8 +41,13 @@ const SchoolQuiz = () => {
     end_date_time: '',
     is_active: true,
     class_allowed: [],
+    school_allowed: [],
+    total_participants: 8,
     questions: []
   })
+
+  const [schools, setSchools] = useState([])
+  const [schoolsLoading, setSchoolsLoading] = useState(false)
 
   const [newQuestion, setNewQuestion] = useState({
     question_text: '',
@@ -68,8 +73,28 @@ const SchoolQuiz = () => {
   useEffect(() => {
     if (accessToken) {
       fetchQuizzes()
+      fetchSchools()
     }
   }, [accessToken])
+
+  const fetchSchools = async () => {
+    if (!accessToken) return
+    try {
+      setSchoolsLoading(true)
+      const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-list/', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+      if (response.data && response.data.data) {
+        setSchools(response.data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching schools:', error)
+    } finally {
+      setSchoolsLoading(false)
+    }
+  }
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
@@ -157,6 +182,8 @@ const SchoolQuiz = () => {
       end_date_time: '',
       is_active: true,
       class_allowed: [],
+      school_allowed: [],
+      total_participants: 8,
       questions: []
     })
     setNewQuestion({
@@ -167,6 +194,9 @@ const SchoolQuiz = () => {
       correct_answer: 0,
       marks: 1
     })
+    if (schools.length === 0) {
+      fetchSchools()
+    }
     setShowModal(true)
   }
 
@@ -183,8 +213,13 @@ const SchoolQuiz = () => {
       end_date_time: quiz.end_date_time ? quiz.end_date_time.slice(0, 16) : '',
       is_active: quiz.is_active ?? true,
       class_allowed: quiz.class_allowed || [],
+      school_allowed: quiz.school_allowed || [],
+      total_participants: quiz.total_participants || 8,
       questions: quiz.questions || []
     })
+    if (schools.length === 0) {
+      fetchSchools()
+    }
     setShowModal(true)
   }
 
@@ -220,6 +255,16 @@ const SchoolQuiz = () => {
       class_allowed: prev.class_allowed.includes(value)
         ? prev.class_allowed.filter(c => c !== value)
         : [...prev.class_allowed, value]
+    }))
+  }
+
+  const handleSchoolChange = (e) => {
+    const value = e.target.value
+    setQuizForm(prev => ({
+      ...prev,
+      school_allowed: prev.school_allowed.includes(value)
+        ? prev.school_allowed.filter(s => s !== value)
+        : [...prev.school_allowed, value]
     }))
   }
 
@@ -307,6 +352,8 @@ const SchoolQuiz = () => {
         end_date_time: quizForm.end_date_time ? new Date(quizForm.end_date_time).toISOString() : null,
         is_active: quizForm.is_active,
         class_allowed: quizForm.class_allowed,
+        school_allowed: quizForm.school_allowed,
+        total_participants: quizForm.total_participants,
         questions: cleanedQuestions
       }
 
@@ -484,22 +531,24 @@ const SchoolQuiz = () => {
                     <Card.Body className="p-0">
                       <div className="table-responsive d-none d-lg-block">
                         <table className="table table-striped table-bordered table-hover mb-0">
-                          <thead className="bg-primary text-white">
-                            <tr>
-                              <th className="py-3 px-2">Title</th>
-                              <th className="py-3 px-2">Category</th>
-                              <th className="py-3 px-2">Classes</th>
-                              <th className="py-3 px-2">Questions</th>
-                              <th className="py-3 px-2">Start Date</th>
-                              <th className="py-3 px-2">End Date</th>
-                              <th className="py-3 px-2">Status</th>
-                              <th className="py-3 px-2 text-end">Actions</th>
-                            </tr>
-                          </thead>
+<thead className="bg-primary text-white">
+                              <tr>
+                                <th className="py-3 px-2">Title</th>
+                                <th className="py-3 px-2">Category</th>
+                                <th className="py-3 px-2">Classes</th>
+                                <th className="py-3 px-2">Schools</th>
+                                <th className="py-3 px-2">Participants</th>
+                                <th className="py-3 px-2">Questions</th>
+                                <th className="py-3 px-2">Start Date</th>
+                                <th className="py-3 px-2">End Date</th>
+                                <th className="py-3 px-2">Status</th>
+                                <th className="py-3 px-2 text-end">Actions</th>
+                              </tr>
+                            </thead>
                           <tbody>
                             {currentRecords.length === 0 ? (
                               <tr>
-                                <td colSpan="8" className="text-center py-4 text-muted">
+                                <td colSpan="10" className="text-center py-4 text-muted">
                                   No quizzes found
                                 </td>
                               </tr>
@@ -513,6 +562,8 @@ const SchoolQuiz = () => {
                                       <Badge key={c} bg="info" className="me-1">{c}</Badge>
                                     ))}
                                   </td>
+                                  <td className="py-3 px-2 small">{quiz.school_allowed?.length || 0}</td>
+                                  <td className="py-3 px-2 small">{quiz.total_participants || 0}</td>
                                   <td className="py-3 px-2 small">{quiz.questions?.length || 0}</td>
                                   <td className="py-3 px-2 small">{formatDate(quiz.start_date_time)}</td>
                                   <td className="py-3 px-2 small">{formatDate(quiz.end_date_time)}</td>
@@ -571,19 +622,29 @@ const SchoolQuiz = () => {
                                   </Badge>
                                 </div>
                                 
-                                <div className="mb-2">
-                                  <small className="text-muted d-block">Classes:</small>
-                                  <div>
-                                    {quiz.class_allowed?.map(c => (
-                                      <Badge key={c} bg="info" className="me-1">{c}</Badge>
-                                    ))}
-                                  </div>
-                                </div>
+<div className="mb-2">
+                                   <small className="text-muted d-block">Classes:</small>
+                                   <div>
+                                     {quiz.class_allowed?.map(c => (
+                                       <Badge key={c} bg="info" className="me-1">{c}</Badge>
+                                     ))}
+                                   </div>
+                                 </div>
 
-                                <div className="mb-2">
-                                  <small className="text-muted d-block">Questions:</small>
-                                  <span className="small fw-medium">{quiz.questions?.length || 0}</span>
-                                </div>
+                                 <div className="mb-2">
+                                   <small className="text-muted d-block">Schools:</small>
+                                   <span className="small fw-medium">{quiz.school_allowed?.length || 0}</span>
+                                 </div>
+
+                                 <div className="mb-2">
+                                   <small className="text-muted d-block">Participants:</small>
+                                   <span className="small fw-medium">{quiz.total_participants || 0}</span>
+                                 </div>
+
+                                 <div className="mb-2">
+                                   <small className="text-muted d-block">Questions:</small>
+                                   <span className="small fw-medium">{quiz.questions?.length || 0}</span>
+                                 </div>
 
                                 <div className="mb-2">
                                   <small className="text-muted d-block">Start Date:</small>
@@ -754,7 +815,7 @@ const SchoolQuiz = () => {
             </Row>
 
             <Row className="mb-3">
-              <Col md={6} xs={12}>
+              <Col md={4} xs={12}>
                 <Form.Group>
                   <Form.Label>Classes Allowed</Form.Label>
                   <div className="d-flex flex-wrap gap-2">
@@ -771,8 +832,43 @@ const SchoolQuiz = () => {
                   </div>
                 </Form.Group>
               </Col>
-              <Col md={6} xs={12}>
+              <Col md={4} xs={12}>
                 <Form.Group>
+                  <Form.Label>Schools Allowed</Form.Label>
+                  {schoolsLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : schools.length === 0 ? (
+                    <Button variant="outline-secondary" size="sm" onClick={fetchSchools}>
+                      Load Schools
+                    </Button>
+                  ) : (
+                    <div className="d-flex flex-wrap gap-2" style={{ maxHeight: '100px', overflowY: 'auto' }}>
+                      {schools.map(school => (
+                        <Form.Check
+                          key={school.school_uni_id}
+                          type="checkbox"
+                          label={school.school_name}
+                          value={school.school_uni_id}
+                          checked={quizForm.school_allowed.includes(school.school_uni_id)}
+                          onChange={handleSchoolChange}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </Form.Group>
+              </Col>
+              <Col md={4} xs={12}>
+                <Form.Group>
+                  <Form.Label>Total Participants</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="total_participants"
+                    value={quizForm.total_participants}
+                    onChange={handleInputChange}
+                    min="1"
+                  />
+                </Form.Group>
+                <Form.Group className="mt-3">
                   <Form.Label>Status</Form.Label>
                   <Form.Check
                     type="switch"
