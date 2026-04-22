@@ -488,7 +488,7 @@ function UserHeader({ toggleSidebar }) {
                       alt="User"
                     />
                   ) : (
-                    <FaUserCircle style={{ fontSize: 32, color: "#6366f1" }} />
+                    <FaUserCircle style={{ fontSize: 32, color: "rgb(250 93 77)" }} />
                   )}
                   <span style={{ fontWeight: 500, fontSize: "0.9rem" }}>
                     {getDisplayName()}

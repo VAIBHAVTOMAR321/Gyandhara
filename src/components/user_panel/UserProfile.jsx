@@ -88,7 +88,7 @@ const UserProfile = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {loading ? (
             <div className="profile-loading">
               <Spinner animation="border" variant="primary" />
