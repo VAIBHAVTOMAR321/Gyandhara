@@ -1522,10 +1522,14 @@ html, body {
     margin-bottom: 0.5rem;
 }
 
-.table th, .table td {
-    font-size: 14px;
+ .table td {
+    font-size: 12px !important;
     padding: clamp(4px, 0px, 12px) !important;
     vertical-align: middle;
+}
+.table th{
+    font-size: 14px !important;
+    padding: clamp(6px, 0px, 14px) !important;
 }
 
 @media (max-width: 768px) {

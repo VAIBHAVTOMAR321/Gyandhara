@@ -579,7 +579,7 @@ padding: 4px !important;
 
 .course-accordion .accordion-body {
   background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  padding: 12px;
+
   border-radius: 0 0 8px 8px !important;
   border-top: 1px solid rgba(102, 126, 234, 0.1);
 }
@@ -1088,6 +1088,13 @@ padding: 4px !important;
     bottom: 20px;
     transform: none;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  .accordion-body {
+padding: 0px !important;
+  }
+  .view-certificate-btn{
+    padding: 0px !important;
+    font-size: 12px !important;
   }
 }
 

@@ -259,6 +259,7 @@ return (
                         type="submit" 
                         disabled={submitting}
                         className="d-flex align-items-center"
+                        style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}
                       >
                         <FaPaperPlane className="me-2" />
                         {submitting ? 'Submitting...' : 'Submit Query'}
@@ -291,7 +292,7 @@ return (
                       {/* Desktop Table View */}
                       <div className="d-none d-md-block table-responsive">
                         <Table hover className="mb-0">
-                          <thead className="bg-primary text-white">
+                          <thead className="text-white table-thead" >
                             <tr>
                               <th className="py-3 px-2">ID</th>
                               <th className="py-3 px-2">Title</th>
