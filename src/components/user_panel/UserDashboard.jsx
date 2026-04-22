@@ -59,7 +59,7 @@ const UserDashboard = () => {
   const [courseLanguage, setCourseLanguage] = useState('hindi')
 
   const navigate = useNavigate()
-  const { uniqueId, accessToken, isAuthenticated, userRoleType } = useAuth()
+  const { uniqueId, accessToken, isAuthenticated } = useAuth()
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -100,58 +100,8 @@ const UserDashboard = () => {
       setLoading(true)
       setError(null)
       
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
-        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-entrollment/?student_id=${uniqueId}`
-      
-      const response = await axios.get(endpoint, {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      })
-      
-      if (response.data.success && Array.isArray(response.data.data)) {
-        let coursesWithDates = response.data.data
-        
-        try {
-          const allCoursesResponse = await axios.get(
-            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/'
-          )
-          
-          if (allCoursesResponse.data.success && Array.isArray(allCoursesResponse.data.data)) {
-            coursesWithDates = response.data.data.map(enrolledCourse => {
-              const courseDetails = allCoursesResponse.data.data.find(
-                c => c.course_id === enrolledCourse.course_id
-              )
-              return {
-                ...enrolledCourse,
-                start_date: courseDetails?.start_date || null,
-                end_date: courseDetails?.end_date || null
-              }
-            })
-          }
-        } catch (courseError) {
-          console.warn('Could not fetch course details for dates')
-        }
-        
-        setCourses(coursesWithDates)
-      } else {
-        setError(response.data.message || 'Failed to fetch courses')
-        setCourses([])
-      }
-    } catch (error) {
-      setError('Network error while fetching courses')
-      setCourses([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchRefundRequests = async () => {
-    try {
       const response = await axios.get(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?student_id=${uniqueId}`,
         {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -161,28 +111,50 @@ const UserDashboard = () => {
       )
       
       if (response.data.success && Array.isArray(response.data.data)) {
-        setRefundRequests(response.data.data)
+        const coursesData = response.data.data.map(course => ({
+          ...course,
+          start_date: course.start_date || null,
+          end_date: course.end_date || null
+        }))
+        console.log('✅ Courses fetched successfully:', coursesData)
+        setCourses(coursesData)
+      } else {
+        console.error('❌ Invalid response format:', response.data)
+        setError(response.data.message || 'Failed to fetch courses')
+        setCourses([])
       }
     } catch (error) {
-      console.error('Error fetching refund requests:', error)
-      setRefundRequests([])
+      console.error('❌ Error fetching courses:', error)
+      setError('Network error while fetching courses')
+      setCourses([])
+    } finally {
+      setLoading(false)
     }
   }
 
+  const fetchRefundRequests = async () => {
+    // Refund requests functionality removed
+    setRefundRequests([])
+  }
+
   const fetchAllCourses = async () => {
+    console.log('🔄 Fetching all courses...')
     try {
       setAllCoursesLoading(true)
       const response = await axios.get(
         'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/'
       )
+      console.log('📚 All courses API response:', response.data)
       
       if (response.data.success && Array.isArray(response.data.data)) {
         setAllCourses(response.data.data)
+        console.log('✅ All courses set:', response.data.data)
       } else {
+        console.warn('⚠️ Invalid response format for all courses:', response.data)
         setAllCourses([])
       }
     } catch (error) {
-      console.error('Error fetching all courses:', error)
+      console.error('❌ Error fetching all courses:', error)
       setAllCourses([])
     } finally {
       setAllCoursesLoading(false)
@@ -215,49 +187,27 @@ const UserDashboard = () => {
   }
 
   useEffect(() => {
+    console.log('📌 useEffect triggered, uniqueId:', uniqueId, 'accessToken:', !!accessToken)
     const fetchData = async () => {
+      console.log('🔄 Starting data fetch for student:', uniqueId)
       await fetchCourses()
       await fetchModuleProgress()
       await fetchRefundRequests()
       await fetchAllCourses()
       await fetchFeedbackData()
+      console.log('✅ Data fetch completed')
     }
     
-    fetchData()
+    if (uniqueId && accessToken) {
+      fetchData()
+    } else {
+      console.warn('⚠️ No uniqueId or accessToken, not fetching data')
+    }
   }, [uniqueId, accessToken])
 
-  const [userData, setUserData] = useState(null)
-  const fetchUserData = async () => {
-    try {
-      const config = {
-        headers: {
-          'Authorization': `Bearer ${accessToken}`
-        }
-      }
-      
-      let response
-      
-      if (userRoleType === 'student-unpaid') {
-        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`, config)
-      } else {
-        response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/all-registration/?student_id=${uniqueId}`)
-      }
-      
-      const { data } = response
-      
-      if (data.success) {
-        setUserData(data.data)
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
-  }
-
-  useEffect(() => {
-    if (uniqueId) {
-      fetchUserData()
-    }
-  }, [uniqueId, userRoleType])
+  const [userData, setUserData] = useState({
+    full_name: 'Student'
+  })
 
   const fetchCourseModules = async (courseId) => {
     try {
@@ -382,9 +332,7 @@ const UserDashboard = () => {
 
   const generateCertificate = async (course) => {
     try {
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
-        : 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
+      const endpoint = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
         
       const response = await axios.post(
         endpoint,
@@ -481,9 +429,7 @@ const UserDashboard = () => {
     try {
       setProgressLoading(true)
       
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/?student_id=${uniqueId}`
-        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/?student_id=${uniqueId}`
+      const endpoint = `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/?student_id=${uniqueId}`
       
       const response = await axios.get(endpoint, {
         headers: {
@@ -759,9 +705,7 @@ const UserDashboard = () => {
     try {
       const currentModule = courseModules.modules[moduleIndex]
       
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/`
-        : `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress/`
+      const endpoint = `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/`
         
       const response = await axios.put(
         endpoint,
@@ -812,12 +756,6 @@ const UserDashboard = () => {
           await fetchCourses()
         } catch (e) {
           console.error('Error fetching courses:', e)
-        }
-        
-        try {
-          await fetchAllCourses()
-        } catch (e) {
-          console.error('Error fetching all courses:', e)
         }
         
         setTimeout(() => {
@@ -1467,17 +1405,15 @@ const UserDashboard = () => {
                         My Courses
                         ({courses.length})
                       </Button>
-                      {userRoleType === 'student-unpaid' && (
-                        <Button 
-                          variant={activeTab === 'all-courses' ? 'primary' : 'outline-primary'}
-                          onClick={() => setActiveTab('all-courses')}
-                          className="fw-semibold"
-                        >
-                          <FaGraduationCap className="me-2" />
-                          All Courses
-                          ({allCourses.filter(c => c.course_status === 'unpaid' && !isCourseExpired(c)).length})
-                        </Button>
-                      )}
+                      <Button 
+                        variant={activeTab === 'all-courses' ? 'primary' : 'outline-primary'}
+                        onClick={() => setActiveTab('all-courses')}
+                        className="fw-semibold"
+                      >
+                        <FaGraduationCap className="me-2" />
+                        All Courses
+                        ({allCourses.filter(c => !isCourseExpired(c)).length})
+                      </Button>
                     </div>
 
                     {activeTab === 'my-courses' && (
@@ -1678,33 +1614,6 @@ const UserDashboard = () => {
                                               )}
                                             </Button>
                                           )}
-                                          {userRoleType !== 'student-unpaid' && !isAllModulesCompleted(course) && !refundRequests.some(req => req.status === 'pending') && (
-                                            <Button 
-                                              variant="outline-danger" 
-                                              onClick={() => {
-                                                navigate('/RefundRequest', {
-                                                  state: {
-                                                    course: course,
-                                                    userData: {
-                                                      ...userData,
-                                                      status: userData?.status || 'pending',
-                                                      amount: course.course_fee || userData?.course_fee || userData?.amount || ''
-                                                    }
-                                                  }
-                                                })
-                                              }}
-                                              className="d-flex align-items-center"
-                                            >
-                                              <i className="bi bi-currency-exchange me-2"></i>
-                                              Request Refund
-                                            </Button>
-                                          )}
-                                          {refundRequests.some(req => req.status === 'pending') && (
-                                            <Badge bg="warning" className="d-flex align-items-center p-2">
-                                              <i className="bi bi-clock me-2"></i>
-                                              Refund Pending
-                                            </Badge>
-                                          )}
                                           {isAllModulesCompleted(course) && (
                                             <Button 
                                               variant={submittedFeedbackCourses.includes(course.course_id) ? "outline-success" : "outline-primary"} 
@@ -1738,7 +1647,7 @@ const UserDashboard = () => {
                       </div>
                     )}
 
-                    {activeTab === 'all-courses' && userRoleType === 'student-unpaid' && (
+                    {activeTab === 'all-courses' && (
                       <div>
                         <h4 className="mb-3">All Courses</h4>
                         
@@ -1747,10 +1656,10 @@ const UserDashboard = () => {
                             <Spinner animation="border" variant="primary" style={{ width: '60px', height: '60px' }} />
                             <p className="mt-3">Loading...</p>
                           </div>
-                        ) : allCourses.filter(c => c.course_status === 'unpaid' && !isCourseExpired(c)).length > 0 ? (
+                        ) : allCourses.filter(c => !isCourseExpired(c)).length > 0 ? (
                           <Row>
                             {allCourses
-                              .filter(c => c.course_status === 'unpaid' && !isCourseExpired(c))
+                              .filter(c => !isCourseExpired(c))
                               .slice()
                               .sort((a, b) => {
                                 const aEnrolled = courses.some(ec => ec.course_id === a.course_id);
@@ -1890,7 +1799,7 @@ const UserDashboard = () => {
                         ) : (
                           <div className="text-center py-5">
                             <FaGraduationCap className="text-muted mb-3" style={{ fontSize: '48px' }} />
-                            <p className="text-muted fs-4">Enroll in a new course</p>
+                            <p className="text-muted fs-4">No courses available</p>
                           </div>
                         )}
                       </div>
