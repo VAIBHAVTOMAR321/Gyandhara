@@ -10,6 +10,7 @@ import {
   FaGraduationCap, FaExternalLinkAlt, FaSearch, FaFilter, 
   FaInfoCircle, FaChalkboardTeacher, FaTools 
 } from 'react-icons/fa'
+import '../../assets/css/JobOpenings.css'
 
 const JobOpenings = () => {
   const { accessToken, uniqueId } = useAuth()
@@ -364,15 +365,15 @@ const JobOpenings = () => {
         <UserHeader toggleSidebar={handleToggleSidebar} />
 
         <Container className="dashboard-box mt-3">
-          <Row className="mb-4">
-            <Col xs={12} className="mt-4">
-              <div className="d-flex align-items-center mb-3">
-                <FaBriefcase className="me-2 text-primary" style={{ fontSize: '24px' }} />
-                <h3 className="mb-0 fw-bold">
+          <Row className="mb-3">
+            <Col xs={12} className="mt-3">
+              <div className="d-flex align-items-center mb-2">
+                <FaBriefcase className="me-1 text-primary" style={{ fontSize: '18px' }} />
+                <h5 className="mb-0 fw-bold job-heading">
                   {isLanguageHindi ? 'नौकरियां और सेमिनार' : 'Jobs & Seminars'}
-                </h3>
+                </h5>
               </div>
-              <p className="text-muted">
+              <p className="text-muted job-subtitle">
                 {isLanguageHindi 
                   ? 'नई नौकरियों और सेमिनार के अवसरों की खोज करें और अपने करियर को नई ऊँचाइयों तक ले जाएं।' 
                   : 'Explore new job opportunities and seminars and take your career to new heights.'}
@@ -381,22 +382,22 @@ const JobOpenings = () => {
           </Row>
 
           <Tab.Container id="jobs-seminars-tabs" defaultActiveKey="jobs">
-            <Nav variant="tabs" className="mb-4">
+            <Nav variant="tabs" className="mb-3 job-tabs">
               <Nav.Item>
-                <Nav.Link eventKey="jobs">
-                  <FaBriefcase className="me-2" />
+                <Nav.Link eventKey="jobs" className="job-tab-link">
+                  <FaBriefcase className="me-1" />
                   {isLanguageHindi ? 'नौकरियां' : 'Jobs'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="seminars">
-                  <FaChalkboardTeacher className="me-2" />
+                <Nav.Link eventKey="seminars" className="job-tab-link">
+                  <FaChalkboardTeacher className="me-1" />
                   {isLanguageHindi ? 'सेमिनार' : 'Seminars'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link eventKey="workshops">
-                  <FaTools className="me-2" />
+                <Nav.Link eventKey="workshops" className="job-tab-link">
+                  <FaTools className="me-1" />
                   {isLanguageHindi ? 'वर्कशॉप' : 'Workshops'}
                 </Nav.Link>
               </Nav.Item>
@@ -408,35 +409,36 @@ const JobOpenings = () => {
                 {uniqueQualifications.length > 0 && (
                   <Row className="mb-4">
                     <Col xs={12}>
-                      <div className="d-flex align-items-center gap-3 ">
-                        <div className="d-flex align-items-center">
-                          <FaFilter className="me-2 text-primary" />
-                          <span className="fw-semibold me-2">
-                            {isLanguageHindi ? 'योग्यता फ़िल्टर:' : 'Qualification Filter:'}
-                          </span>
-                        </div>
-                        <Form.Select 
-                          style={{ width: 'auto', display: 'inline-block' }}
-                          value={selectedQualification}
-                          onChange={(e) => setSelectedQualification(e.target.value)}
-                        >
-                          <option value="">
-                            {isLanguageHindi ? 'सभी योग्यताएं' : 'All Qualifications'}
-                          </option>
-                          {uniqueQualifications.map((qual, idx) => (
-                            <option key={idx} value={qual}>{qual}</option>
-                          ))}
-                        </Form.Select>
-                        {selectedQualification && (
-                          <Button 
-                            variant="outline-secondary" 
-                            size="sm"
-                            onClick={() => setSelectedQualification('')}
+<div className="d-flex align-items-center gap-2 job-filters">
+                          <div className="d-flex align-items-center">
+                            <FaFilter className="me-1 text-primary" />
+                            <span className="fw-semibold me-1 job-filter-select">
+                              {isLanguageHindi ? 'योग्यता:' : 'Qualification:'}
+                            </span>
+                          </div>
+                          <Form.Select 
+                            style={{ width: 'auto', display: 'inline-block', fontSize: '10px' }}
+                            value={selectedQualification}
+                            onChange={(e) => setSelectedQualification(e.target.value)}
                           >
-                            {isLanguageHindi ? 'साफ़ करें' : 'Clear'}
-                          </Button>
-                        )}
-                      </div>
+                            <option value="">
+                              {isLanguageHindi ? 'सभी' : 'All'}
+                            </option>
+                            {uniqueQualifications.map((qual, idx) => (
+                              <option key={idx} value={qual}>{qual}</option>
+                            ))}
+                          </Form.Select>
+                          {selectedQualification && (
+                            <Button 
+                              variant="outline-secondary" 
+                              size="sm"
+                              className="job-btn"
+                              onClick={() => setSelectedQualification('')}
+                            >
+                              {isLanguageHindi ? 'साफ़' : 'Clear'}
+                            </Button>
+                          )}
+                        </div>
                     </Col>
                   </Row>
                 )}
@@ -475,56 +477,56 @@ const JobOpenings = () => {
                           <Card className={`h-100 job-card ${isExpired ? 'job-card-expired' : ''}`}>
                             <Card.Body className="d-flex flex-column">
                               <div className="d-flex justify-content-between align-items-start mb-2">
-                                <Badge bg={getJobTypeBadge(job.job_type)}>
+                                <Badge bg={getJobTypeBadge(job.job_type)} className="job-badge">
                                   {job.job_type === 'full_time' ? 'Full Time' : 
                                    job.job_type === 'part_time' ? 'Part Time' : 
                                    job.job_type === 'internship' ? 'Internship' : 
                                    job.job_type || 'Job'}
                                 </Badge>
-                                {isExpired && <Badge bg="secondary">Expired</Badge>}
+                                {isExpired && <Badge bg="secondary" className="job-badge">Expired</Badge>}
                               </div>
 
-                              <h5 className="fw-bold mb-2">{title}</h5>
+                              <h6 className="fw-bold mb-1 job-title">{title}</h6>
                               
-                              <div className="mb-3">
-                                <small className="text-muted d-flex align-items-center mb-1">
+                              <div className="mb-2">
+                                <small className="text-muted d-flex align-items-center mb-1 job-meta">
                                   <FaMapMarkerAlt className="me-1" /> {job.location}
                                 </small>
-                                <small className="text-muted d-flex align-items-center mb-1">
+                                <small className="text-muted d-flex align-items-center mb-1 job-meta">
                                   <FaClock className="me-1" /> {job.experience_required}
                                 </small>
-                                <small className="text-muted d-flex align-items-center">
+                                <small className="text-muted d-flex align-items-center job-meta">
                                   <FaMoneyBillWave className="me-1" /> {job.salary}
                                 </small>
                               </div>
 
                               {job.qualifications_required && job.qualifications_required.length > 0 && (
-                                <div className="mb-3">
-                                  <small className="text-muted fw-semibold d-block mb-1">
+                                <div className="mb-2">
+                                  <small className="text-muted fw-semibold d-block mb-1 job-meta">
                                     <FaGraduationCap className="me-1" />
                                     {isLanguageHindi ? 'योग्यता:' : 'Qualifications:'}
                                   </small>
                                   <div className="d-flex flex-wrap gap-1">
                                     {job.qualifications_required.map((qual, i) => (
-                                      <Badge key={i} bg="info" text="white" className="fw-normal">{qual}</Badge>
+                                      <Badge key={i} bg="info" text="white" className="fw-normal job-badge">{qual}</Badge>
                                     ))}
                                   </div>
                                 </div>
                               )}
 
-                              <div className="mt-auto pt-3 border-top">
+                              <div className="mt-auto pt-2 border-top">
                                 <div className="d-flex justify-content-between align-items-center">
-                                  <small className="text-muted">
+                                  <small className="text-muted job-meta">
                                     {job.last_date_to_apply && (
                                       <>
                                         <FaClock className="me-1" />
-                                        {isLanguageHindi ? 'अंतिम तिथि: ' : 'Apply by: '} 
+                                        {isLanguageHindi ? 'अंतिम: ' : 'Apply: '} 
                                         {formatDate(job.last_date_to_apply)}
                                       </>
                                     )}
                                   </small>
-                                  <div className="d-flex gap-2">
-                                    <Button variant="outline-primary" size="sm" onClick={() => handleViewDetails(job)}>
+                                  <div className="d-flex gap-1">
+                                    <Button variant="outline-primary" size="sm" onClick={() => handleViewDetails(job)} className="job-btn">
                                       <FaInfoCircle className="me-1" />
                                       {isLanguageHindi ? 'अधिक' : 'More'}
                                     </Button>
@@ -533,9 +535,11 @@ const JobOpenings = () => {
                                       size="sm"
                                       onClick={() => handleApplyClick(job.apply_link)}
                                       disabled={isExpired || !job.apply_link}
+                                      className="job-btn"
+                                      style={{ background: isExpired ? undefined : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: isExpired ? undefined : 'none' }}
                                     >
                                       <FaExternalLinkAlt className="me-1" />
-                                      {isLanguageHindi ? 'आवेदन करें' : 'Apply'}
+                                      {isLanguageHindi ? 'आवेदन' : 'Apply'}
                                     </Button>
                                   </div>
                                 </div>
@@ -785,7 +789,7 @@ const JobOpenings = () => {
       
       {/* Job Modal */}
       <Modal show={showJobModal} onHide={closeModal} size="lg" centered>
-        <Modal.Header closeButton style={{ backgroundColor: '#0d6efd', color: 'white' }}>
+        <Modal.Header closeButton className="job-modal-header">
           <Modal.Title>
             {selectedJob && (isLanguageHindi && selectedJob.title_hindi ? selectedJob.title_hindi : selectedJob?.title)}
           </Modal.Title>
@@ -844,10 +848,10 @@ const JobOpenings = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>{isLanguageHindi ? 'बंद करें' : 'Close'}</Button>
+          <Button variant="secondary" onClick={closeModal} className="job-btn">{isLanguageHindi ? 'बंद करें' : 'Close'}</Button>
           {selectedJob && !isJobExpired(selectedJob.last_date_to_apply) && selectedJob.apply_link && (
-            <Button variant="primary" onClick={() => handleApplyClick(selectedJob.apply_link)}>
-              <FaExternalLinkAlt className="me-2" />{isLanguageHindi ? 'अभी आवेदन करें' : 'Apply Now'}
+            <Button variant="primary" onClick={() => handleApplyClick(selectedJob.apply_link)} className="job-btn" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}>
+              <FaExternalLinkAlt className="me-1" />{isLanguageHindi ? 'अभी आवेदन करें' : 'Apply Now'}
             </Button>
           )}
         </Modal.Footer>
@@ -855,7 +859,7 @@ const JobOpenings = () => {
 
       {/* Seminar Modal */}
       <Modal show={showSeminarModal} onHide={closeSeminarModal} size="lg" centered>
-        <Modal.Header closeButton style={{ backgroundColor: '#198754', color: 'white' }}>
+        <Modal.Header closeButton className="job-modal-header-success">
           <Modal.Title>
             {selectedSeminar && (isLanguageHindi && selectedSeminar.title_hindi ? selectedSeminar.title_hindi : selectedSeminar?.title)}
           </Modal.Title>
@@ -911,7 +915,7 @@ const JobOpenings = () => {
 
       {/* Workshop Modal */}
       <Modal show={showWorkshopModal} onHide={closeWorkshopModal} size="lg" centered key={language}>
-        <Modal.Header closeButton style={{ backgroundColor: '#ffc107', color: 'black' }}>
+        <Modal.Header closeButton className="job-modal-header-warning">
           <Modal.Title>
             {selectedWorkshop && (isLanguageHindi && selectedWorkshop.title_hindi ? selectedWorkshop.title_hindi : selectedWorkshop?.title)}
           </Modal.Title>
