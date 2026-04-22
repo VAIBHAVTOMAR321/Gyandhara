@@ -68,7 +68,10 @@ body {
   --spi-space-1100: 44px;
   --spi-space-1200: 48px;
 }
+.card-body p {
 
+  font-size: 12px !important;
+}
 .start-2 {
   display: flex;
 }
