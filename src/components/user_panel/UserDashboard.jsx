@@ -1469,7 +1469,7 @@ const UserDashboard = () => {
                                       position: 'relative',
                                       background: isAllModulesCompleted(course) 
                                         ? 'linear-gradient(135deg, #10b981, #059669)'
-                                        : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))'
+                                        : 'linear-gradient(135deg, rgb(94 117 223), rgb(230, 101, 10))'
                                     }}>
                                       {isAllModulesCompleted(course) ? (
                                         <FaCertificate className="text-white" style={{ fontSize: '28px', animation: 'pulse 2s infinite' }} />
@@ -1622,7 +1622,7 @@ const UserDashboard = () => {
                                               onClick={() => handleViewCourse(course)}
                                               className="d-flex align-items-center btn-custom "
                                               style={{
-                                                background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))',
+                                             background: 'linear-gradient(135deg, rgb(94 117 223), #e6650a)',
                                                 border: 'none'
                                               }}
                                             >
@@ -1713,7 +1713,7 @@ const UserDashboard = () => {
                                         position: 'relative',
                                         background: isEnrolled 
                                           ? 'linear-gradient(135deg, #10b981, #059669)'
-                                          : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))'
+                                          : 'linear-gradient(135deg, rgb(94 117 223), #e6650a)'
                                       }}>
                                         {isEnrolled ? (
                                           <div className="text-center all-ready">
@@ -1805,7 +1805,7 @@ const UserDashboard = () => {
                                                 style={{
                                                   background: isCompleted 
                                                     ? 'linear-gradient(135deg, #10b981, #059669)'
-                                                    : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))',
+                                                    : 'linear-gradient(135deg, rgb(94 117 223), rgb(230, 101, 10));',
                                                   border: 'none'
                                                 }}
                                               >
@@ -1852,7 +1852,7 @@ const UserDashboard = () => {
         <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-              <div className="modal-header" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}>
+              <div className="modal-header" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(230, 101, 10));', border: 'none' }}>
                 <h5 className="modal-title text-white">
                   <FaStar className="me-2" />
                   Course Feedback
@@ -2025,7 +2025,7 @@ const UserDashboard = () => {
                   onClick={handleSubmitFeedback}
                   disabled={feedbackSubmitting || submittedFeedbackCourses.includes(feedbackCourse.course_id)}
                   style={{
-                    background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))',
+                    background: 'linear-gradient(135deg, rgb(94 117 223), rgb(230, 101, 10))',
                     border: 'none'
                   }}
                 >

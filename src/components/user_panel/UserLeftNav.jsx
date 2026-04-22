@@ -148,7 +148,7 @@ const menuItems = [
     <>
       {/* Desktop Sidebar */}
       <div
-        className={`user-Left ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
+        className={`user-left-nav ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
       >
         <div className="sidebar-header">
           {sidebarOpen ? (
