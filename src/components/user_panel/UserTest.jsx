@@ -25,9 +25,15 @@ const UserTest = () => {
 
   const location = useLocation()
   const navigate = useNavigate()
-  const { uniqueId, accessToken, userRoleType } = useAuth()
+  const { uniqueId, accessToken, isAuthenticated } = useAuth()
   
   const { course, moduleIndex, isLastModule, attemptCount } = location.state || {}
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: location } })
+    }
+  }, [isAuthenticated, navigate, location])
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,6 +49,12 @@ const UserTest = () => {
 
   useEffect(() => {
     const fetchTestQuestions = async () => {
+      if (!uniqueId || !accessToken) {
+        setLoading(false)
+        setTestLoading(false)
+        return
+      }
+
       try {
         setTestLoading(true)
         let moduleId = null
@@ -58,10 +70,12 @@ const UserTest = () => {
           return
         }
 
+        console.log('📝 Fetching test for module:', moduleId)
         const response = await axios.post(
-          'https://brjobsedu.com/girls_course/girls_course_backend/api/module-test/start/',
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-test/start/',
           {
-            module_id: moduleId
+            module_id: moduleId,
+            student_id: uniqueId
           },
           {
             headers: {
@@ -71,10 +85,12 @@ const UserTest = () => {
           }
         )
 
+        console.log('📝 Test API response:', response.data)
+
         if (response.data.success) {
-          setQuestions(response.data.questions)
-          setUserAnswers(new Array(response.data.questions.length).fill(null))
-          setTimer(response.data.questions.length * 30)
+          setQuestions(response.data.questions || [])
+          setUserAnswers(new Array(response.data.questions?.length || 0).fill(null))
+          setTimer((response.data.questions?.length || 0) * 30)
           if (response.data.attempt_count !== undefined) {
             setTestResult(prev => ({ ...prev, attempt_count: response.data.attempt_count }))
           }
@@ -85,16 +101,17 @@ const UserTest = () => {
           }
         }
       } catch (error) {
+        console.error('❌ Error fetching test:', error)
       } finally {
         setTestLoading(false)
         setLoading(false)
       }
     }
 
-    if (course && moduleIndex !== undefined) {
+    if (course && moduleIndex !== undefined && uniqueId && accessToken) {
       fetchTestQuestions()
     }
-  }, [course, moduleIndex, location.state, accessToken])
+  }, [course, moduleIndex, location.state, uniqueId, accessToken])
 
   useEffect(() => {
     if (timer > 0 && !testCompleted) {
@@ -205,15 +222,15 @@ const UserTest = () => {
     try {
       const submissionData = {
         module_id: location.state.moduleId,
+        student_id: uniqueId,
         answers: questions.map((question, index) => ({
           question_id: question.id,
           selected: userAnswers[index]
         }))
       }
 
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? 'https://brjobsedu.com/girls_course/girls_course_backend/api/submit-test-unpaid/'
-        : 'https://brjobsedu.com/girls_course/girls_course_backend/api/module-test/submit/'
+      console.log('📝 Submitting test:', submissionData)
+      const endpoint = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/submit-test-unpaid/'
         
       const response = await axios.post(
         endpoint,
@@ -226,6 +243,7 @@ const UserTest = () => {
         }
       )
 
+      console.log('📝 Submit response:', response.data)
       if (response.data.success) {
         setTestCompleted(true)
         setTestResult(response.data)
@@ -239,17 +257,18 @@ const UserTest = () => {
         if (response.data.test_status === 'passed' && isLastModule) {
           setShowCelebrationModal(true)
         }
+      } else {
+        alert(response.data.message || 'Failed to submit test')
       }
     } catch (error) {
+      console.error('❌ Submit error:', error.response?.data || error.message)
       alert('Failed to submit test. Please try again.')
     }
   }
 
   const generateCertificate = async () => {
     try {
-      const endpoint = userRoleType === 'student-unpaid' 
-        ? 'https://brjobsedu.com/girls_course/girls_course_backend/api/enrollment-unpaid/'
-        : 'https://brjobsedu.com/girls_course/girls_course_backend/api/student-entrollment/'
+      const endpoint = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/'
         
       const response = await axios.post(
         endpoint,
@@ -271,9 +290,7 @@ const UserTest = () => {
         if (response.data.data && response.data.data.certificate_file) {
           window.open(`https://brjobsedu.com/girls_course/girls_course_backend${response.data.data.certificate_file}`, '_blank')
         } else {
-          const coursesEndpoint = userRoleType === 'student-unpaid' 
-            ? `https://brjobsedu.com/girls_course/girls_course_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
-            : `https://brjobsedu.com/girls_course/girls_course_backend/api/student-entrollment/?student_id=${uniqueId}`
+          const coursesEndpoint = `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
             
           const coursesResponse = await axios.get(
             coursesEndpoint,

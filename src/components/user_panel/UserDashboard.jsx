@@ -111,11 +111,29 @@ const UserDashboard = () => {
       )
       
       if (response.data.success && Array.isArray(response.data.data)) {
-        const coursesData = response.data.data.map(course => ({
-          ...course,
-          start_date: course.start_date || null,
-          end_date: course.end_date || null
-        }))
+        let coursesData = response.data.data
+        
+        try {
+          const allCoursesResponse = await axios.get(
+            'https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/'
+          )
+          
+          if (allCoursesResponse.data.success && Array.isArray(allCoursesResponse.data.data)) {
+            coursesData = response.data.data.map(enrolledCourse => {
+              const courseDetails = allCoursesResponse.data.data.find(
+                c => c.course_id === enrolledCourse.course_id
+              )
+              return {
+                ...enrolledCourse,
+                start_date: courseDetails?.start_date || enrolledCourse.start_date || null,
+                end_date: courseDetails?.end_date || enrolledCourse.end_date || null
+              }
+            })
+          }
+        } catch (courseError) {
+          console.warn('Could not fetch course details for dates')
+        }
+        
         console.log('✅ Courses fetched successfully:', coursesData)
         setCourses(coursesData)
       } else {
@@ -1487,17 +1505,26 @@ const UserDashboard = () => {
                                             {course.enrolled_at ? new Date(course.enrolled_at).toLocaleDateString() : 'N/A'}
                                           </span>
                                         </div>
-                                        {course.start_date && course.end_date && (
-                                          <div className="d-flex justify-content-between align-items-center mb-2">
-                                            <span className="text-muted small">
-                                              <FaClock className="me-1" /> Time Remaining
-                                            </span>
-                                            <span className={`fw-semibold ${(() => {
-                                              const time = calculateTimeRemaining(course.start_date, course.end_date);
-                                              return time?.status === 'expired' ? 'text-danger' : time?.status === 'upcoming' ? 'text-info' : 'text-success';
-                                            })()}`}>
-                                              {calculateTimeRemaining(course.start_date, course.end_date)?.text || 'N/A'}
-                                            </span>
+                                        {(course.start_date || course.end_date) && (
+                                          <div className="d-flex flex-column">
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                              <span className="text-muted small">
+                                                <FaCalendarCheck className="me-1" /> Start Date
+                                              </span>
+                                              <span className="fw-semibold">
+                                                {course.start_date ? new Date(course.start_date).toLocaleDateString() : 'N/A'}
+                                              </span>
+                                            </div>
+                                            {course.end_date && (
+                                              <div className="d-flex justify-content-between align-items-center">
+                                                <span className="text-muted small">
+                                                  <FaClock className="me-1" /> End Date
+                                                </span>
+                                                <span className="fw-semibold">
+                                                  {new Date(course.end_date).toLocaleDateString()}
+                                                </span>
+                                              </div>
+                                            )}
                                           </div>
                                         )}
                                         {isAllModulesCompleted(course) && course.completed_at && (
@@ -1704,17 +1731,26 @@ const UserDashboard = () => {
                                           <h6 className="mb-2 course-title">{renderContentWithLineBreaks(course.course_name)}</h6>
                                         </div>
                                         
-                                        {course.start_date && course.end_date && (
-                                          <div className="mb-2 p-2 bg-light rounded d-flex justify-content-between align-items-center">
-                                            <span className="text-muted small">
-                                              <FaClock className="me-1" /> Duration
-                                            </span>
-                                            <span className={`fw-semibold ${(() => {
-                                              const time = calculateTimeRemaining(course.start_date, course.end_date);
-                                              return time?.status === 'expired' ? 'text-danger' : time?.status === 'upcoming' ? 'text-info' : 'text-success';
-                                            })()}`}>
-                                              {calculateTimeRemaining(course.start_date, course.end_date)?.text || 'N/A'}
-                                            </span>
+                                        {(course.start_date || course.end_date) && (
+                                          <div className="mb-2 p-2 bg-light rounded d-flex flex-column">
+                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                              <span className="text-muted small">
+                                                <FaCalendarCheck className="me-1" /> Start Date
+                                              </span>
+                                              <span className="fw-semibold">
+                                                {course.start_date ? new Date(course.start_date).toLocaleDateString() : 'N/A'}
+                                              </span>
+                                            </div>
+                                            {course.end_date && (
+                                              <div className="d-flex justify-content-between align-items-center">
+                                                <span className="text-muted small">
+                                                  <FaClock className="me-1" /> End Date
+                                                </span>
+                                                <span className="fw-semibold">
+                                                  {new Date(course.end_date).toLocaleDateString()}
+                                                </span>
+                                              </div>
+                                            )}
                                           </div>
                                         )}
                                         
