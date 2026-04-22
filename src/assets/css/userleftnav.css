@@ -239,7 +239,7 @@
 /* Sidebar Styles */
 .user-Left {
     width: 260px;
-    background-color: hsl(240deg 48.17% 70.51%);;
+    background: linear-gradient(135deg, #667eea, #667eea);
     color: white;
     transition: all 0.3s ease;
     position: fixed;
@@ -904,7 +904,7 @@ border: none !important;
 
 /* Mobile Sidebar */
 .mobile-sidebar-user {
-     background-color: hsl(240deg 48.17% 70.51%) !important;
+     background: linear-gradient(135deg, #667eea, #667eea) !important;
 }
 
 .mobile-sidebar-user .nav-item {

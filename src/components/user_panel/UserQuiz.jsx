@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { FaArrowLeft, FaClock, FaQuestion, FaTrophy, FaCheckCircle, FaTimesCircle, FaChevronRight, FaMedal, FaUsers } from 'react-icons/fa'
 import '../../assets/css/userleftnav.css'
+import '../../assets/css/UserQuiz.css'
 import UserLeftNav from './UserLeftNav'
 import UserHeader from './UserHeader'
 
@@ -899,14 +900,14 @@ const UserQuiz = () => {
                 <Button 
                   variant="outline-secondary" 
                   onClick={() => navigate('/UserDashboard')} 
-                  className="d-flex align-items-center"
+                  className="d-flex align-items-center quiz-btn-back"
                 >
-                  <FaArrowLeft className="me-2" />
-                  Back to Dashboard
+                  <FaArrowLeft className="me-1" />
+                  Back
                 </Button>
               </div>
 
-              <h3 className="mb-4">Quizzes</h3>
+              <h5 className="quiz-heading">Quizzes</h5>
 
               {loading ? (
                 <div className="text-center py-5">
@@ -921,25 +922,25 @@ const UserQuiz = () => {
 
                     return (
                       <Col md={6} lg={4} key={quiz.quiz_id} className="mb-4">
-                        <Card className="h-100 quiz-card shadow-sm" style={{ borderRadius: '12px', cursor: 'pointer' }}>
-                          <Card.Body className="d-flex flex-column">
-                            <div className="mb-3">
-                              <h5 className="mb-2">{quiz.title}</h5>
-                              <p className="text-muted small mb-2">{quiz.description}</p>
+                        <Card className="h-100 quiz-card shadow-sm">
+                          <Card.Body className="d-flex flex-column quiz-card-body">
+                            <div className="mb-2">
+                              <h6 className="quiz-card-title">{quiz.title}</h6>
+                              <p className="text-muted quiz-card-desc mb-1">{quiz.description}</p>
                             </div>
 
-                            <div className="mb-3">
-                              <div className="d-flex justify-content-between mb-2">
-                                <small className="text-muted">
+                            <div className="mb-2">
+                              <div className="d-flex justify-content-between mb-1">
+                                <small className="quiz-meta">
                                   <FaQuestion className="me-1" />
                                   Questions: 10
                                 </small>
-                                <Badge bg="info">{quiz.quiz_category}</Badge>
+                                <Badge bg="info quiz-badge">{quiz.quiz_category}</Badge>
                               </div>
-                              <small className="text-muted d-block mb-1">
+                              <small className="text-muted d-block mb-1 quiz-meta">
                                 Start: {formatDateDDMMYY(startTime)} {startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </small>
-                              <small className="text-muted d-block mb-1">
+                              <small className="text-muted d-block mb-1 quiz-meta">
                                 End: {formatDateDDMMYY(endTime)} {endTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </small>
                             </div>
@@ -948,23 +949,23 @@ const UserQuiz = () => {
                               {participatedQuizzes[quiz.quiz_id] ? (
                                 <div className="d-flex flex-column gap-2">
                                   <div className="d-flex justify-content-between gap-2">
-                                    <Badge bg="primary" className="flex-fill py-2" style={{ fontSize: '0.85rem' }}>
+                                    <Badge bg="primary" className="flex-fill py-2 quiz-badge-primary">
                                       Participants: {quizRanks[quiz.quiz_id]?.totalParticipants || 0}
                                     </Badge>
                                     {quizRanks[quiz.quiz_id]?.userRank && (
-                                      <Badge bg="warning" className="flex-fill py-2">
+                                      <Badge bg="warning" className="flex-fill py-2 quiz-badge-warning">
                                         Rank: #{quizRanks[quiz.quiz_id].userRank}
                                       </Badge>
                                     )}
                                     {quizRanks[quiz.quiz_id]?.userScore !== undefined && (
-                                      <Badge bg="success" className="flex-fill py-2">
+                                      <Badge bg="success" className="flex-fill py-2 quiz-badge-success">
                                         Score: {quizRanks[quiz.quiz_id].userScore}
                                       </Badge>
                                     )}
                                   </div>
                                   <Button
                                     variant="info"
-                                    className="w-100"
+                                    className="w-100 quiz-btn-view-rank"
                                     onClick={() => {
                                       setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizRanks[quiz.quiz_id] })
                                       setShowRankModal(true)
@@ -972,13 +973,14 @@ const UserQuiz = () => {
                                   >
                                     View Rank
                                   </Button>
-                                  <Button
-                                    variant="secondary"
-                                    className="w-100"
-                                    disabled
-                                  >
-                                    Already Attempted
-                                  </Button>
+<Button
+                                      variant="secondary"
+                                      className="w-100"
+                                      disabled
+                                      style={{ fontSize: '10px', padding: '6px 12px' }}
+                                    >
+                                      Attempted
+                                    </Button>
                                 </div>
                               ) : (
                                 <div className="d-flex flex-column gap-2">
@@ -990,18 +992,19 @@ const UserQuiz = () => {
                                         setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizRanks[quiz.quiz_id] })
                                         setShowRankModal(true)
                                       }}
+                                      style={{ fontSize: '10px', padding: '6px 12px' }}
                                     >
-                                      <FaUsers className="me-2" />
-                                      Participants: {quizRanks[quiz.quiz_id].totalParticipants}
+                                      <FaUsers className="me-1" />
+                                      {quizRanks[quiz.quiz_id].totalParticipants}
                                     </Button>
                                   )}
                                   <Button
                                     variant="primary"
-                                    className="w-100"
+                                    className="w-100 quiz-btn-start"
                                     onClick={() => startQuiz(quiz)}
                                   >
                                     Start Quiz
-                                    <FaChevronRight className="ms-2" />
+                                    <FaChevronRight className="ms-1" />
                                   </Button>
                                 </div>
                               )}
@@ -1020,29 +1023,29 @@ const UserQuiz = () => {
             </>
           ) : showResults ? (
             <>
-              <div className="text-center py-5">
-                <div className="mb-4">
-                  <FaTrophy className="text-warning" style={{ fontSize: '60px' }} />
+              <div className="text-center quiz-result-container">
+                <div className="mb-3">
+                  <FaTrophy className="text-warning quiz-result-icon" />
                 </div>
-                <h3 className="mb-2">Congratulations!</h3>
-                <p className="text-muted mb-4">Great job! Your score: {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}</p>
+                <h5 className="quiz-result-title">Congratulations!</h5>
+                <p className="text-muted quiz-result-score">Great job! Your score: {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}</p>
 
-                <Card className="shadow-sm mb-4" style={{ borderRadius: '12px', maxWidth: '500px', margin: '0 auto' }}>
+                <Card className="shadow-sm mb-3" style={{ maxWidth: '500px', margin: '0 auto' }}>
                   <Card.Body>
-                    <Row className="mb-4">
-                      <Col md={6} className="mb-3">
+                    <Row className="mb-3">
+                      <Col md={6} className="mb-2">
                         <div className="result-item">
-                          <h5 className="text-primary mb-2">{quizResults.correctAnswers}</h5>
-                          <small className="text-muted">
+                          <h5 className="quiz-result-correct">{quizResults.correctAnswers}</h5>
+                          <small className="text-muted quiz-result-label">
                             <FaCheckCircle className="me-1 text-success" />
                             Correct
                           </small>
                         </div>
                       </Col>
-                      <Col md={6} className="mb-3">
+                      <Col md={6} className="mb-2">
                         <div className="result-item">
-                          <h5 className="text-danger mb-2">{quizResults.wrongAnswers}</h5>
-                          <small className="text-muted">
+                          <h5 className="quiz-result-wrong">{quizResults.wrongAnswers}</h5>
+                          <small className="text-muted quiz-result-label">
                             <FaTimesCircle className="me-1 text-danger" />
                             Wrong
                           </small>
@@ -1050,11 +1053,11 @@ const UserQuiz = () => {
                       </Col>
                     </Row>
 
-                    <div className="mb-3">
-                      <small className="text-muted">Percentage</small>
-                      <h4 className="mb-2" style={{ color: quizResults.percentage >= 60 ? '#28a745' : '#dc3545' }}>
+                    <div className="mb-2">
+                      <small className="text-muted quiz-result-label">Percentage</small>
+                      <h5 className={`mb-1 ${quizResults.percentage >= 60 ? 'quiz-result-percentage-pass' : 'quiz-result-percentage-fail'}`}>
                         {quizResults.percentage}%
-                      </h4>
+                      </h5>
                       <ProgressBar 
                         now={quizResults.percentage} 
                         variant={quizResults.percentage >= 60 ? 'success' : 'danger'}
@@ -1064,15 +1067,15 @@ const UserQuiz = () => {
                   </Card.Body>
                 </Card>
 
-                 <div className="d-flex gap-2 justify-content-center mt-3 flex-wrap quiz-span-btn">
+                 <div className="d-flex gap-2 justify-content-center mt-2 flex-wrap">
                     {wrongAnswers.length > 0 && (
                       <Button
                         variant="warning"
                         onClick={() => setShowWrongAnswersModal(true)}
-                        className="d-flex align-items-center"
+                        className="d-flex align-items-center quiz-btn-view-wrong"
                       >
-                        <FaTimesCircle className="me-2" />
-                        View Wrong Answers
+                        <FaTimesCircle className="me-1" />
+                        View Wrong
                       </Button>
                     )}
                     <Button
@@ -1084,9 +1087,9 @@ const UserQuiz = () => {
                         setRefreshKey(prev => prev + 1)
                         navigate('/UserQuiz', { state: { fromQuiz: true } })
                       }}
-                      className="d-flex align-items-center"
+                      className="d-flex align-items-center quiz-btn-back-result"
                     >
-                      Back to Quizzes
+                      Back
                     </Button>
                  </div>
               </div>
@@ -1094,11 +1097,11 @@ const UserQuiz = () => {
           ) : (
             <>
               <div className="quiz-taking-container">
-                <div className="quiz-header mb-4">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h4 className="mb-0">{currentQuiz.title}</h4>
-                    <div className="timer" style={{ fontSize: '24px', fontWeight: 'bold', color: timeRemaining < 60 ? '#dc3545' : '#dc3545' }}>
-                      <FaClock className="me-2" />
+                <div className="quiz-header">
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <h6 className="mb-0 quiz-title">{currentQuiz.title}</h6>
+                    <div className={`timer ${timeRemaining < 60 ? 'quiz-timer-warning' : 'quiz-timer-active'} quiz-timer`}>
+                      <FaClock className="me-1" />
                       {formatTime(timeRemaining)}
                     </div>
                   </div>
@@ -1109,46 +1112,36 @@ const UserQuiz = () => {
                 </div>
 
                 {currentQuestion && (
-                  <Card className="shadow-sm mb-4" style={{ borderRadius: '12px' }}>
+                  <Card className="shadow-sm mb-3">
                     <Card.Body>
-                      <div className="mb-4">
-                        <h5 className="mb-3">
+                      <div className="mb-2">
+                        <h6 className="quiz-question-num mb-1">
                           Question {currentQuestionIndex + 1} of {currentQuiz.questions.length}
-                        </h5>
-                        <div className="mb-3">
+                        </h6>
+                        <div className="mb-1">
                           {currentQuestion.question_text && (
-                            <h6 className="mb-2" style={{ fontWeight: '500' }}>{currentQuestion.question_text}</h6>
+                            <p className="quiz-question-text mb-1">{currentQuestion.question_text}</p>
                           )}
                           {currentQuestion.question_text_hindi && (
-                            <h6 className="mb-0 text-muted" style={{ fontWeight: '400' }}>{currentQuestion.question_text_hindi}</h6>
+                            <p className="text-muted quiz-question-hindi mb-0">{currentQuestion.question_text_hindi}</p>
                           )}
                         </div>
                       </div>
 
-                      <div className="options mb-4">
+                      <div className="quiz-options">
                         {currentQuestion.options && currentQuestion.options.map((option, idx) => {
                           const isSelected = answers[currentQuestionIndex] === idx
                           const hindiOption = currentQuestion.options_hindi?.[idx]
                           return (
-                            <div key={idx} className="mb-2">
+                            <div key={idx} className="quiz-option-item">
                               <Button 
-                                className="w-100 text-start option-button"
+                                className={`w-100 text-start quiz-option-btn ${isSelected ? 'quiz-option-btn-selected' : 'quiz-option-btn-default'}`}
                                 onClick={() => handleAnswerSelect(idx)}
-                                style={{ 
-                                  backgroundColor: isSelected ? '#0d6efd' : '#ffffff',
-                                  borderColor: isSelected ? '#0d6efd' : '#dee2e6',
-                                  color: isSelected ? '#ffffff' : '#212529',
-                                  fontWeight: '500',
-                                  padding: '12px 16px',
-                                  borderRadius: '8px',
-                                  borderWidth: '1px',
-                                  boxShadow: 'none'
-                                }}
                               >
-                                <span className="option-letter me-2" style={{ fontWeight: '600' }}>{String.fromCharCode(65 + idx)}.</span>
+                                <span className="quiz-option-letter me-1">{String.fromCharCode(65 + idx)}.</span>
                                 {option}
                                 {hindiOption && (
-                                  <span className="ms-2" style={{ fontSize: '0.9em', color: isSelected ? '#ffffff' : '#212529' }}>({hindiOption})</span>
+                                  <span className="ms-1" style={{ fontSize: '0.9em' }}>({hindiOption})</span>
                                 )}
                               </Button>
                             </div>
@@ -1159,20 +1152,14 @@ const UserQuiz = () => {
                   </Card>
                 )}
 
-                <div className="d-flex justify-content-between gap-3 mb-4 mt-3">
+                <div className="d-flex justify-content-between gap-2 mb-3 quiz-nav-buttons">
                   <Button 
                     variant="outline-secondary" 
                     onClick={() => {
                       handlePreviousQuestion()
                     }}
                     disabled={currentQuestionIndex === 0}
-                    style={{ 
-                      minWidth: '120px', 
-                      fontWeight: '600', 
-                      padding: '12px 24px',
-                      cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
-                      fontSize: '16px'
-                    }}
+                    className="quiz-btn-prev"
                   >
                     Previous
                   </Button>
@@ -1185,12 +1172,7 @@ const UserQuiz = () => {
                       onClick={() => {
                         handleNextQuestion()
                       }}
-                      style={{ 
-                        minWidth: '120px', 
-                        fontWeight: '600', 
-                        padding: '12px 24px',
-                        fontSize: '16px'
-                      }}
+                      className="quiz-btn-next"
                     >
                       Next
                     </Button>
@@ -1200,12 +1182,7 @@ const UserQuiz = () => {
                       onClick={() => {
                         handleSubmitQuiz()
                       }}
-                      style={{ 
-                        minWidth: '120px', 
-                        fontWeight: '600', 
-                        padding: '12px 24px',
-                        fontSize: '16px'
-                      }}
+                      className="quiz-btn-submit"
                     >
                       Submit
                     </Button>

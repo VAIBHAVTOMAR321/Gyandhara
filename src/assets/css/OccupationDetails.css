@@ -302,9 +302,9 @@
 
 /* ========== Action Buttons ========== */
 .dashbord-btn .btn {
-  font-size: 1rem;
+  font-size: 12px;
   font-weight: 600;
-  padding: 0.75rem 1.5rem;
+
   border-radius: 8px;
   transition: all 0.3s ease;
 }
@@ -312,6 +312,8 @@
 .dashbord-btn .btn-primary {
   background: linear-gradient(135deg, #13539d 0%, #1d71ce 100%);
   border: none;
+
+  font-size: 12px !important;
 }
 
 .dashbord-btn .btn-primary:hover {

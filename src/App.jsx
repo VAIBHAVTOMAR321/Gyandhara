@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
+import './style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Home from './components/pages/Home';

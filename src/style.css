@@ -69,8 +69,20 @@ body {
   --spi-space-1200: 48px;
 }
 
-
-
+.start-2 {
+  display: flex;
+}
+.view-certificate-btn{
+  font-size: 10px !important;
+  padding: 6px !important;
+}
+.table-thead th {
+  background: linear-gradient(135deg, #667eea 0%, #667eea 100%);
+  color: white;
+}
+.table-thead th td {
+  font-size: 10px !important;
+}
 @media (max-width: 568px) {
  
 .submenu-arrow {

@@ -988,8 +988,8 @@ const UserDashboard = () => {
                                   <Row className="mb-4">
                                     <Col md={6}>
                                       <div className="p-3 bg-light rounded h-100">
-                                        <h6 className="mb-3 fw-semibold">
-                                          <FaPlay className="me-2 text-primary" /> Module Video
+                                        <h6 className="mb-2 fw-semibold" style={{ fontSize: '12px' }}>
+                                          <FaPlay className="me-1 text-primary" /> Module Video
                                         </h6>
                                         <div className="video-container">
                                           <iframe
@@ -1007,8 +1007,8 @@ const UserDashboard = () => {
 
                                     <Col md={6}>
                                       <div className="p-3 bg-light rounded h-100">
-                                        <h6 className="mb-3 fw-semibold">
-                                          <FaLayerGroup className="me-2 text-primary" /> Submodules
+                                        <h6 className="mb-2 fw-semibold" style={{ fontSize: '12px' }}>
+                                          <FaLayerGroup className="me-1 text-primary" /> Submodules
                                         </h6>
                                         {module.sub_modules && module.sub_modules.length > 0 ? (
                                           <div className="submodules-list">
@@ -1100,9 +1100,9 @@ const UserDashboard = () => {
                                                   <div className="content-wrapper">
                                                     {((courseLanguage === 'english' ? subModule.sub_mod : subModule.sub_mod_hindi) || []).length > 0 ? (
                                                       <div className="content-section">
-                                                        <div className="section-header d-flex align-items-center mb-3">
-                                                          <FaFileAlt className="me-2 text-primary" />
-                                                          <h6 className="mb-0 fw-semibold">Course Content</h6>
+                                                        <div className="section-header d-flex align-items-center mb-2">
+                                                          <FaFileAlt className="me-1 text-primary" />
+                                                          <h6 className="mb-0 fw-semibold" style={{ fontSize: '11px' }}>Course Content</h6>
                                                         </div>
                                                         <div className="content-items">
                                                           {(courseLanguage === 'english' ? subModule.sub_mod : subModule.sub_mod_hindi).map((item, itemIndex) => (
@@ -1417,7 +1417,7 @@ const UserDashboard = () => {
                       <Button 
                         variant={activeTab === 'my-courses' ? 'primary' : 'outline-primary'}
                         onClick={() => setActiveTab('my-courses')}
-                        className="fw-semibold"
+                        className="fw-semibold my-courses-btn"
                       >
                         <FaBook className="me-2" />
                         My Courses
@@ -1426,7 +1426,7 @@ const UserDashboard = () => {
                       <Button 
                         variant={activeTab === 'all-courses' ? 'primary' : 'outline-primary'}
                         onClick={() => setActiveTab('all-courses')}
-                        className="fw-semibold"
+                        className="fw-semibold my-courses-btn"
                       >
                         <FaGraduationCap className="me-2" />
                         All Courses
@@ -1435,7 +1435,7 @@ const UserDashboard = () => {
                     </div>
 
                     {activeTab === 'my-courses' && (
-                      <div>
+                      <div className='my-courses-btn'>
                         <h4 className="mb-3">My Courses</h4>
                         
                         {loading ? (
@@ -1469,7 +1469,7 @@ const UserDashboard = () => {
                                       position: 'relative',
                                       background: isAllModulesCompleted(course) 
                                         ? 'linear-gradient(135deg, #10b981, #059669)'
-                                        : 'linear-gradient(135deg, #667eea, #667eea)'
+                                        : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))'
                                     }}>
                                       {isAllModulesCompleted(course) ? (
                                         <FaCertificate className="text-white" style={{ fontSize: '28px', animation: 'pulse 2s infinite' }} />
@@ -1507,7 +1507,7 @@ const UserDashboard = () => {
                                         </div>
                                         {(course.start_date || course.end_date) && (
                                           <div className="d-flex flex-column">
-                                            <div className="d-flex justify-content-between align-items-center mb-1">
+                                            <div className="d-flex justify-content-between align-items-center mb-1 date-style">
                                               <span className="text-muted small">
                                                 <FaCalendarCheck className="me-1" /> Start Date
                                               </span>
@@ -1541,10 +1541,8 @@ const UserDashboard = () => {
                                       
                                       <div className="d-flex justify-content-between align-items-center">
                                         <div className="d-flex align-items-center">
-                                          <div className="bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center">
-                                            {course.student_name ? course.student_name.charAt(0) : 'S'}
-                                          </div>
-                                          <div>
+                                          
+                                          <div className='student-name'>
                                             <p className="mb-0 fw-semibold">{course.student_name || 'Student'}</p>
                                             <small className="text-muted">Learners</small>
                                           </div>
@@ -1622,9 +1620,9 @@ const UserDashboard = () => {
                                             <Button 
                                               variant={isAllModulesCompleted(course) ? "success" : "primary"} 
                                               onClick={() => handleViewCourse(course)}
-                                              className="d-flex align-items-center btn-custom"
+                                              className="d-flex align-items-center btn-custom "
                                               style={{
-                                                background: 'linear-gradient(135deg, #667eea, #667eea)',
+                                                background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))',
                                                 border: 'none'
                                               }}
                                             >
@@ -1675,7 +1673,7 @@ const UserDashboard = () => {
                     )}
 
                     {activeTab === 'all-courses' && (
-                      <div>
+                      <div className='my-courses-btn'>
                         <h4 className="mb-3">All Courses</h4>
                         
                         {allCoursesLoading ? (
@@ -1715,10 +1713,10 @@ const UserDashboard = () => {
                                         position: 'relative',
                                         background: isEnrolled 
                                           ? 'linear-gradient(135deg, #10b981, #059669)'
-                                          : 'linear-gradient(135deg, #667eea, #667eea)'
+                                          : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))'
                                       }}>
                                         {isEnrolled ? (
-                                          <div className="text-center">
+                                          <div className="text-center all-ready">
                                             <FaCheckCircle className="text-white" style={{ fontSize: '40px', marginBottom: '8px' }} />
                                             <p className="text-white fw-bold mb-0">{isCompleted ? 'Completed' : 'Already Enrolled'}</p>
                                           </div>
@@ -1732,7 +1730,7 @@ const UserDashboard = () => {
                                         </div>
                                         
                                         {(course.start_date || course.end_date) && (
-                                          <div className="mb-2 p-2 bg-light rounded d-flex flex-column">
+                                          <div className="mb-2 p-2 bg-light rounded d-flex flex-column date-style">
                                             <div className="d-flex justify-content-between align-items-center mb-1">
                                               <span className="text-muted small">
                                                 <FaCalendarCheck className="me-1" /> Start Date
@@ -1807,7 +1805,7 @@ const UserDashboard = () => {
                                                 style={{
                                                   background: isCompleted 
                                                     ? 'linear-gradient(135deg, #10b981, #059669)'
-                                                    : 'linear-gradient(135deg, #667eea, #667eea)',
+                                                    : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))',
                                                   border: 'none'
                                                 }}
                                               >
@@ -1854,7 +1852,7 @@ const UserDashboard = () => {
         <div className="modal fade show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content" style={{ borderRadius: '12px', overflow: 'hidden' }}>
-              <div className="modal-header" style={{ background: 'linear-gradient(135deg, #667eea, #667eea)', border: 'none' }}>
+              <div className="modal-header" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}>
                 <h5 className="modal-title text-white">
                   <FaStar className="me-2" />
                   Course Feedback
@@ -2027,7 +2025,7 @@ const UserDashboard = () => {
                   onClick={handleSubmitFeedback}
                   disabled={feedbackSubmitting || submittedFeedbackCourses.includes(feedbackCourse.course_id)}
                   style={{
-                    background: 'linear-gradient(135deg, #667eea, #667eea)',
+                    background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))',
                     border: 'none'
                   }}
                 >
