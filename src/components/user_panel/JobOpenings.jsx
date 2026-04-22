@@ -364,7 +364,7 @@ const JobOpenings = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={handleToggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           <Row className="mb-3">
             <Col xs={12} className="mt-3">
               <div className="d-flex align-items-center mb-2">
