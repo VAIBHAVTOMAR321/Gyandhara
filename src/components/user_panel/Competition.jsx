@@ -7,7 +7,8 @@ import { useNavigate } from 'react-router-dom'
 import { FaArrowLeft, FaClock, FaQuestion, FaTrophy, FaCheckCircle, FaTimesCircle, FaChevronRight, FaLock, FaSchool, FaUsers } from 'react-icons/fa'
 import '../../assets/css/userleftnav.css'
 import UserLeftNav from './UserLeftNav'
-import UserHeader from './UserHeader'
+import UserHeader from './UserHeader';
+import "../../assets/css/Competition.css"
 
 const Competition = () => {
   const { uniqueId, accessToken } = useAuth()
@@ -675,14 +676,14 @@ const Competition = () => {
                 <Button 
                   variant="outline-secondary" 
                   onClick={() => navigate('/UserDashboard')} 
-                  className="d-flex align-items-center"
+                  className="d-flex align-items-center competition-btn-back"
                 >
-                  <FaArrowLeft className="me-2" />
-                  Back to Dashboard
+                  <FaArrowLeft className="me-1" />
+                  Back
                 </Button>
               </div>
 
-              <h3 className="mb-4">Quiz Competition</h3>
+              <h5 className="competition-heading">Quiz Competition</h5>
 
               {loading ? (
                 <div className="text-center py-5">
@@ -697,46 +698,44 @@ const Competition = () => {
 
                     return (
                       <Col md={6} lg={4} key={quiz.quiz_id} className="mb-4">
-                        <Card className="h-100 quiz-card shadow-sm" style={{ borderRadius: '12px', cursor: 'pointer' }}>
-                          <Card.Body className="d-flex flex-column">
-                            <div className="mb-3">
-                              <h5 className="mb-2">{quiz.title}</h5>
-                              <p className="text-muted small mb-2">{quiz.description}</p>
+                        <Card className="h-100 competition-card shadow-sm">
+                          <Card.Body className="d-flex flex-column competition-card-body">
+                            <div className="mb-2">
+                              <h6 className="competition-card-title">{quiz.title}</h6>
+                              <p className="text-muted competition-card-desc mb-1">{quiz.description}</p>
                             </div>
 
-                            <div className="mb-3">
-                              <div className="d-flex justify-content-between mb-2">
-                                <small className="text-muted">
+                            <div className="mb-2">
+                              <div className="d-flex justify-content-between mb-1">
+                                <small className="competition-meta">
                                   <FaQuestion className="me-1" />
                                   Questions: {quiz.number_of_questions || quiz.questions?.length || 0}
                                 </small>
-                                <Badge bg="info">{quiz.quiz_category}</Badge>
+                                <Badge bg="info competition-badge">{quiz.quiz_category}</Badge>
                               </div>
-                              <small className="text-muted d-block mb-1">
+                              <small className="text-muted d-block mb-1 competition-meta">
                                 Start: {formatDateDDMMYY(startTime)} {startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </small>
-                              <small className="text-muted d-block mb-1">
+                              <small className="text-muted d-block mb-1 competition-meta">
                                 End: {formatDateDDMMYY(endTime)} {endTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </small>
                             </div>
 
-                            <div className="mb-2">
+                            <div className="mb-1">
                               <div className="d-flex justify-content-between">
                                 <small 
-                                  className="text-primary fw-bold"
+                                  className="text-primary competition-rank-link"
                                   onClick={() => fetchSchoolRanks(quiz.quiz_id)}
-                                  style={{ cursor: 'pointer' }}
                                 >
                                   <FaSchool className="me-1" />
                                   School Rankings
                                 </small>
                                 <small 
-                                  className="text-primary fw-bold"
+                                  className="text-primary competition-rank-link"
                                   onClick={() => fetchStudentRanks(quiz.quiz_id)}
-                                  style={{ cursor: 'pointer' }}
                                 >
                                   <FaUsers className="me-1" />
-                                  Top 10 Students
+                                  Top 10
                                 </small>
                               </div>
                             </div>
@@ -745,34 +744,34 @@ const Competition = () => {
                               {quizRanks[quiz.quiz_id]?.attempted ? (
                                 <Button
                                   variant="success"
-                                  className="w-100"
+                                  className="w-100 competition-btn-completed"
                                   disabled
                                 >
-                                  <FaCheckCircle className="me-2" />
-                                  Completed
+                                  <FaCheckCircle className="me-1" />
+                                  Done
                                   {quizRanks[quiz.quiz_id]?.score !== undefined && (
-                                    <span className="ms-2">| Score: {quizRanks[quiz.quiz_id].score}</span>
+                                    <span className="ms-1">| score : {quizRanks[quiz.quiz_id].score}</span>
                                   )}
                                   {quizRanks[quiz.quiz_id]?.rank && (
-                                    <span className="ms-1">| Rank: #{quizRanks[quiz.quiz_id].rank}</span>
+                                    <span className="ms-1">|Rank #{quizRanks[quiz.quiz_id].rank}</span>
                                   )}
                                 </Button>
                               ) : (
                                 <Button
                                   variant="primary"
-                                  className="w-100"
+                                  className="w-100 competition-btn-start"
                                   onClick={() => startQuiz(quiz)}
                                   disabled={quizStarting}
                                 >
                                   {quizStarting ? (
                                     <>
-                                      <Spinner animation="border" size="sm" className="me-2" />
-                                      Loading...
+                                      <Spinner animation="border" size="sm" className="me-1" />
+                                      Wait...
                                     </>
                                   ) : (
                                     <>
-                                      Start Quiz
-                                      <FaChevronRight className="ms-2" />
+                                      Start
+                                      <FaChevronRight className="ms-1" />
                                     </>
                                   )}
                                 </Button>
@@ -795,34 +794,34 @@ const Competition = () => {
             </>
           ) : showResults ? (
             <>
-              <div className="text-center py-5">
-                <div className="mb-4">
-                  <FaTrophy className="text-warning" style={{ fontSize: '60px' }} />
+              <div className="text-center competition-result-container">
+                <div className="mb-3">
+                  <FaTrophy className="text-warning competition-result-icon" />
                 </div>
-                <h3 className="mb-2">{quizResults.status === 'passed' ? 'Congratulations!' : 'Keep Trying!'}</h3>
-                <p className="text-muted mb-4">
-                  Your Score: {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}
+                <h5 className="competition-result-title">{quizResults.status === 'passed' ? 'Congratulations!' : 'Keep Trying!'}</h5>
+                <p className="text-muted competition-result-score">
+                  Score: {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}
                   {quizResults.rank && (
-                    <span className="ms-2">| Rank: #{quizResults.rank}</span>
+                    <span className="ms-1">| Rank: #{quizResults.rank}</span>
                   )}
                 </p>
 
-                <Card className="shadow-sm mb-4" style={{ borderRadius: '12px', maxWidth: '500px', margin: '0 auto' }}>
+                <Card className="shadow-sm mb-3" style={{ maxWidth: '500px', margin: '0 auto' }}>
                   <Card.Body>
-                    <Row className="mb-4">
-                      <Col md={6} className="mb-3">
+                    <Row className="mb-3">
+                      <Col md={6} className="mb-2">
                         <div className="result-item">
-                          <h5 className="text-primary mb-2">{quizResults.correctAnswers}</h5>
-                          <small className="text-muted">
+                          <h5 className="competition-result-correct">{quizResults.correctAnswers}</h5>
+                          <small className="text-muted competition-result-label">
                             <FaCheckCircle className="me-1 text-success" />
                             Correct
                           </small>
                         </div>
                       </Col>
-                      <Col md={6} className="mb-3">
+                      <Col md={6} className="mb-2">
                         <div className="result-item">
-                          <h5 className="text-danger mb-2">{quizResults.wrongAnswers}</h5>
-                          <small className="text-muted">
+                          <h5 className="competition-result-wrong">{quizResults.wrongAnswers}</h5>
+                          <small className="text-muted competition-result-label">
                             <FaTimesCircle className="me-1 text-danger" />
                             Wrong
                           </small>
@@ -830,11 +829,11 @@ const Competition = () => {
                       </Col>
                     </Row>
 
-                    <div className="mb-3">
-                      <small className="text-muted">Percentage</small>
-                      <h4 className="mb-2" style={{ color: quizResults.percentage >= 60 ? '#28a745' : '#dc3545' }}>
+                    <div className="mb-2">
+                      <small className="text-muted competition-result-label">Percentage</small>
+                      <h5 className={`mb-1 ${quizResults.percentage >= 60 ? 'competition-result-percentage-pass' : 'competition-result-percentage-fail'}`}>
                         {quizResults.percentage}%
-                      </h4>
+                      </h5>
                       <ProgressBar 
                         now={quizResults.percentage} 
                         variant={quizResults.percentage >= 60 ? 'success' : 'danger'}
@@ -844,7 +843,7 @@ const Competition = () => {
                   </Card.Body>
                 </Card>
 
-                 <div className="d-flex gap-2 justify-content-center mt-3 flex-wrap quiz-span-btn">
+                 <div className="d-flex gap-2 justify-content-center mt-2 flex-wrap">
                     <Button
                       variant="outline-secondary"
                       onClick={() => {
@@ -854,9 +853,9 @@ const Competition = () => {
                         setRefreshKey(prev => prev + 1)
                         navigate('/Competition', { state: { fromQuiz: true } })
                       }}
-                      className="d-flex align-items-center"
+                      className="d-flex align-items-center competition-btn-back-result"
                     >
-                      Back to Quizzes
+                      Back
                     </Button>
                  </div>
               </div>
@@ -864,11 +863,11 @@ const Competition = () => {
           ) : (
             <>
               <div className="quiz-taking-container">
-                <div className="quiz-header mb-4">
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h4 className="mb-0">{currentQuiz.title}</h4>
-                    <div className="timer" style={{ fontSize: '24px', fontWeight: 'bold', color: timeRemaining < 60 ? '#dc3545' : '#dc3545' }}>
-                      <FaClock className="me-2" />
+<div className="competition-header">
+                  <div className="d-flex justify-content-between align-items-center mb-2">
+                    <h6 className="mb-0 competition-title">{currentQuiz.title}</h6>
+                    <div className={`timer ${timeRemaining < 60 ? 'competition-timer-warning' : 'competition-timer-active'} competition-timer`}>
+                      <FaClock className="me-1" />
                       {formatTime(timeRemaining)}
                     </div>
                   </div>
@@ -879,51 +878,38 @@ const Competition = () => {
                 </div>
 
                 {currentQuestion && (
-                  <Card className="shadow-sm mb-4" style={{ borderRadius: '12px' }}>
+                  <Card className="shadow-sm mb-3">
                     <Card.Body>
-<div className="mb-4">
-                          <h5 className="mb-3">
+                      <div className="mb-2">
+                          <h6 className="competition-question-num mb-1">
                             Question {currentQuestionIndex + 1} of {currentQuiz.questions.length}
-                          </h5>
-                          <div className="mb-3">
+                          </h6>
+                          <div className="mb-1">
                             {currentQuestion.question && (
-                              <h6 className="mb-2" style={{ fontWeight: '500' }}>{currentQuestion.question}</h6>
+                              <p className="competition-question-text mb-1">{currentQuestion.question}</p>
                             )}
                             {currentQuestion.question_hindi && (
-                              <h6 className="mb-0 text-muted" style={{ fontWeight: '400' }}>{currentQuestion.question_hindi}</h6>
+                              <p className="text-muted competition-question-hindi mb-0">{currentQuestion.question_hindi}</p>
                             )}
                           </div>
                         </div>
 
-                      <div className="options mb-4">
+                      <div className="competition-options">
                         {currentQuestion.options && currentQuestion.options.map((option, idx) => {
                           const isSelected = answers[currentQuestionIndex] === idx
                           const hindiOption = currentQuestion.options_hindi?.[idx]
                           return (
-                            <div key={idx} className="mb-2">
+                            <div key={idx} className="competition-option-item">
                               <Button 
-                                className="w-100 text-start option-button"
+                                className={`w-100 text-start competition-option-btn ${isSelected ? 'competition-option-btn-selected' : 'competition-option-btn-default'}`}
                                 onClick={() => handleAnswerSelect(idx)}
-                                style={{ 
-                                  backgroundColor: isSelected ? '#0d6efd' : '#ffffff',
-                                  borderColor: isSelected ? '#0d6efd' : '#dee2e6',
-                                  color: isSelected ? '#ffffff' : '#212529',
-                                  fontWeight: '500',
-                                  padding: '12px 16px',
-                                  borderRadius: '8px',
-                                  borderWidth: '1px',
-                                  boxShadow: 'none',
-                                  display: 'flex',
-                                  flexDirection: 'column',
-                                  alignItems: 'flex-start'
-                                }}
                               >
                                 <div className="d-flex align-items-center">
-                                  <span className="option-letter me-2" style={{ fontWeight: '600' }}>{String.fromCharCode(65 + idx)}.</span>
+                                  <span className="competition-option-letter me-1">{String.fromCharCode(65 + idx)}.</span>
                                   <span>{option}</span>
                                 </div>
                                 {hindiOption && (
-                                  <span className="ms-4 mt-1" style={{ fontSize: '0.85em', color: isSelected ? '#e0e0e0' : '#6c757d' }}>({hindiOption})</span>
+                                  <span className="ms-2 mt-1" style={{ fontSize: '0.85em' }}>({hindiOption})</span>
                                 )}
                               </Button>
                             </div>
@@ -934,20 +920,14 @@ const Competition = () => {
                   </Card>
                 )}
 
-                <div className="d-flex justify-content-between gap-3 mb-4 mt-3">
+                <div className="d-flex justify-content-between gap-2 mb-3 competition-nav-buttons">
                   <Button 
                     variant="outline-secondary" 
                     onClick={() => {
                       handlePreviousQuestion()
                     }}
                     disabled={currentQuestionIndex === 0}
-                    style={{ 
-                      minWidth: '120px', 
-                      fontWeight: '600', 
-                      padding: '12px 24px',
-                      cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
-                      fontSize: '16px'
-                    }}
+                    className="competition-btn-prev"
                   >
                     Previous
                   </Button>
@@ -960,12 +940,7 @@ const Competition = () => {
                       onClick={() => {
                         handleNextQuestion()
                       }}
-                      style={{ 
-                        minWidth: '120px', 
-                        fontWeight: '600', 
-                        padding: '12px 24px',
-                        fontSize: '16px'
-                      }}
+                      className="competition-btn-next"
                     >
                       Next
                     </Button>
@@ -975,12 +950,7 @@ const Competition = () => {
                       onClick={() => {
                         handleSubmitQuiz()
                       }}
-                      style={{ 
-                        minWidth: '120px', 
-                        fontWeight: '600', 
-                        padding: '12px 24px',
-                        fontSize: '16px'
-                      }}
+                      className="competition-btn-submit"
                     >
                       Submit
                     </Button>
@@ -1005,7 +975,7 @@ const Competition = () => {
         <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {schoolRankData.length > 0 ? (
             schoolRankData.map((entry, idx) => (
-              <Card key={idx} className="mb-2" style={{ borderLeft: idx === 0 ? '4px solid #FFD700' : idx === 1 ? '4px solid #C0C0C0' : '4px solid #CD7F32' }}>
+              <Card key={idx} className={`mb-2 ${idx === 0 ? 'competition-school-rank-gold' : idx === 1 ? 'competition-school-rank-silver' : 'competition-school-rank-bronze'}`}>
                 <Card.Body className="py-2">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
@@ -1043,7 +1013,7 @@ const Competition = () => {
         <Modal.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
           {studentRankData.length > 0 ? (
             studentRankData.map((entry, idx) => (
-              <Card key={idx} className="mb-2" style={{ borderLeft: idx === 0 ? '4px solid #FFD700' : idx === 1 ? '4px solid #C0C0C0' : idx === 2 ? '4px solid #CD7F32' : '4px solid #dee2e6' }}>
+              <Card key={idx} className={`mb-2 ${idx === 0 ? 'competition-student-rank-gold' : idx === 1 ? 'competition-student-rank-silver' : idx === 2 ? 'competition-student-rank-bronze' : 'competition-student-rank-card'}`}>
                 <Card.Body className="py-2">
                   <div className="d-flex justify-content-between align-items-center">
                     <div>
