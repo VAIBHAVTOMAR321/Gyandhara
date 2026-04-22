@@ -15,6 +15,7 @@ import { AuthProvider, useAuth } from './components/all_login/AuthContext';
 import { LanguageProvider } from './components/all_login/LanguageContext';
 import UserDashboard from "./components/user_panel/UserDashboard";
 import UserProfile from "./components/user_panel/UserProfile";
+import UserTest from "./components/user_panel/UserTest";
 import StudentRegistration from './components/registration/Registration';
 import SchoolStudentRegistration from './components/school_panel/StudentRegistration';
 import SchoolQuizList from './components/school_panel/SchoolQuizList';
@@ -49,7 +50,7 @@ import UserEvents from "./components/user_panel/UserEvents";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -122,6 +123,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <UserProfile />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/UserTest" 
+          element={
+            <ProtectedRoute>
+              <UserTest />
             </ProtectedRoute>
           } 
         />
