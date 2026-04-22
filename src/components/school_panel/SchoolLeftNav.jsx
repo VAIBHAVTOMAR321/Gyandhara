@@ -32,6 +32,7 @@ import axios from "axios";
 
 import "../../assets/css/schoolleftnav.css";
 import { Link } from "react-router-dom";
+import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
 import {
   FaInfoCircle,
   FaBullseye,
@@ -134,16 +135,20 @@ const menuItems = [
       <div
         className={`school-Left ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
       >
-        {sidebarOpen && (
-          <div className="sidebar-header">
+        <div className="sidebar-header">
+          {sidebarOpen ? (
             <div className="logo-container">
               <div className="logo">
                 School DashBoard
-                {/* <span className="logo-text"><img src={BRLogo} alt="text"></img></span> */}
+                <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="logo-container logo-collapsed">
+              <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
+            </div>
+          )}
+        </div>
 
         <Nav className="sidebar-nav flex-column">
           
