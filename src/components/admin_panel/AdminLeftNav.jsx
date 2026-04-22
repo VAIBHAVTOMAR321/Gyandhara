@@ -41,6 +41,7 @@ import {
 import { useAuth } from "../all_login/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "../../assets/css/adminleftnav.css";
+import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
 
 
 
@@ -174,16 +175,20 @@ const menuItems = [
       <div
         className={`user-Left ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
       >
-        {sidebarOpen && (
-          <div className="sidebar-header">
+        <div className="sidebar-header">
+          {sidebarOpen ? (
             <div className="logo-container">
               <div className="logo">
                 Admin DashBoard
-                {/* <span className="logo-text"><img src={BRLogo} alt="text"></img></span> */}
+                <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
               </div>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="logo-container logo-collapsed">
+              <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
+            </div>
+          )}
+        </div>
 
         <Nav className="sidebar-nav flex-column">
           

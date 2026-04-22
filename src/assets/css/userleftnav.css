@@ -299,6 +299,25 @@
     align-items: center;
     font-size:14px !important; 
     font-weight: bold;
+    gap: 10px;
+}
+
+.logo .header-logo {
+    height: 28px;
+    width: auto;
+    margin-left: auto;
+}
+
+.logo-collapsed {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+}
+
+.logo-collapsed .header-logo {
+    height: 30px;
+    width: auto;
 }
 
 .logo-icon {
