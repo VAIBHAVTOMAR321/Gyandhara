@@ -117,6 +117,20 @@ const DashBord = () => {
 
   // State for Events
   const [eventsCount, setEventsCount] = useState(0)
+  const [events, setEvents] = useState([])
+  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState(null)
+  const [showEventModal, setShowEventModal] = useState(false)
+  const [eventFormData, setEventFormData] = useState({
+    event_name: '',
+    description: '',
+    event_date_time: '',
+    end_date_time: '',
+    venue: '',
+    event_type: ''
+  })
+  const [eventImage, setEventImage] = useState(null)
+  const [isEditingEvent, setIsEditingEvent] = useState(false)
 
   useEffect(() => {
     const handleResize = () => {
@@ -244,6 +258,117 @@ const DashBord = () => {
   }
   const handleEventsClick = () => {
     setCurrentView('events')
+    fetchEvents()
+  }
+
+  const fetchEvents = async () => {
+    setLoadingEvents(true)
+    try {
+      const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/event-item/')
+      if (response.data && response.data.success) {
+        setEvents(response.data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching events:', error)
+      setEvents([])
+    } finally {
+      setLoadingEvents(false)
+    }
+  }
+
+  const handleDeleteEvent = async (event) => {
+    if (window.confirm(`Are you sure you want to delete the event "${event.event_name}"?`)) {
+      try {
+        await axios.delete('https://brjobsedu.com/gyandhara/gyandhara_backend/api/event-item/', {
+          data: { event_id: event.event_id }
+        })
+        alert('Event deleted successfully!')
+        fetchEvents()
+        fetchData()
+      } catch (error) {
+        alert('Failed to delete event. Please check the console for details.')
+      }
+    }
+  }
+
+  const handleViewEvent = (event) => {
+    setSelectedEvent(event)
+    setShowEventModal(true)
+  }
+
+  const handleEditEvent = (event) => {
+    setEventFormData({
+      event_id: event.event_id,
+      event_name: event.event_name || '',
+      description: event.description || '',
+      event_date_time: event.event_date_time ? event.event_date_time.slice(0, 16) : '',
+      end_date_time: event.end_date_time ? event.end_date_time.slice(0, 16) : '',
+      venue: event.venue || '',
+      event_type: event.event_type || ''
+    })
+    setEventImage(null)
+    setSelectedEvent(event)
+    setIsEditingEvent(true)
+    setShowEventModal(false)
+  }
+
+  const handleEventSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const config = getAuthConfig()
+      const formData = new FormData()
+      formData.append('event_id', eventFormData.event_id)
+      formData.append('event_name', eventFormData.event_name)
+      formData.append('description', eventFormData.description)
+      formData.append('event_date_time', eventFormData.event_date_time)
+      formData.append('end_date_time', eventFormData.end_date_time)
+      formData.append('venue', eventFormData.venue)
+      formData.append('event_type', eventFormData.event_type)
+      if (eventImage) {
+        formData.append('event_image', eventImage)
+      }
+
+      await axios.put('https://brjobsedu.com/gyandhara/gyandhara_backend/api/event-item/', formData, {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      alert('Event updated successfully!')
+      setIsEditingEvent(false)
+      setEventFormData({
+        event_name: '',
+        description: '',
+        event_date_time: '',
+        end_date_time: '',
+        venue: '',
+        event_type: ''
+      })
+      setEventImage(null)
+      fetchEvents()
+      fetchData()
+    } catch (error) {
+      alert('Failed to update event. Please check the console for details.')
+    }
+  }
+
+  const handleEventImageChange = (e) => {
+    const file = e.target.files[0]
+    setEventImage(file)
+  }
+
+  const cancelEventEdit = () => {
+    setIsEditingEvent(false)
+    setEventFormData({
+      event_name: '',
+      description: '',
+      event_date_time: '',
+      end_date_time: '',
+      venue: '',
+      event_type: ''
+    })
+    setEventImage(null)
   }
 
   const handleViewCounseling = (counseling) => {
@@ -436,6 +561,7 @@ const DashBord = () => {
           module_id: moduleFormData.module_id
         }, config)
         alert('Module updated successfully!')
+        
       } else {
         // Create new module (POST request)
         await axios.post('https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-items/', dataToSend, config)
@@ -2176,6 +2302,200 @@ const DashBord = () => {
     )
   }
 
+  const renderEventsView = () => (
+    <div className="fade-in">
+      <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+        <Button variant="outline-secondary" size="sm" onClick={() => { cancelEventEdit(); handleBackToDashboard() }}>
+          <FaArrowLeft /> Dashboard
+        </Button>
+        <h4 className="mb-0">Events Management</h4>
+      </div>
+
+      {isEditingEvent && (
+        <Card className="shadow-sm border-0 mb-4">
+          <Card.Header className="bg-warning text-dark">
+            <FaEdit className="me-2" /> Edit Event
+          </Card.Header>
+          <Card.Body>
+            <Form onSubmit={handleEventSubmit}>
+              <Form.Group className="mb-3">
+                <Form.Label>Event Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={eventFormData.event_name}
+                  onChange={(e) => setEventFormData({ ...eventFormData, event_name: e.target.value })}
+                  placeholder="e.g. Tech Innovation Summit 2026"
+                  required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Event Type</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={eventFormData.event_type}
+                  onChange={(e) => setEventFormData({ ...eventFormData, event_type: e.target.value })}
+                  placeholder="e.g. Adventure Event, Technical Event"
+                />
+              </Form.Group>
+
+              <Row className="mb-3">
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label>Start Date & Time</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      value={eventFormData.event_date_time}
+                      onChange={(e) => setEventFormData({ ...eventFormData, event_date_time: e.target.value })}
+                      required
+                    />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label>End Date & Time</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      value={eventFormData.end_date_time}
+                      onChange={(e) => setEventFormData({ ...eventFormData, end_date_time: e.target.value })}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Venue</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={eventFormData.venue}
+                  onChange={(e) => setEventFormData({ ...eventFormData, venue: e.target.value })}
+                  placeholder="e.g. India Expo Centre, Greater Noida"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Description</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={4}
+                  value={eventFormData.description}
+                  onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })}
+                  placeholder="Enter event description"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Event Image</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEventImageChange}
+                />
+                {eventImage && (
+                  <div className="mt-2">
+                    <Image 
+                      src={URL.createObjectURL(eventImage)} 
+                      alt="Preview" 
+                      thumbnail 
+                      className="img-fluid" 
+                      style={{ maxWidth: '200px' }}
+                    />
+                  </div>
+                )}
+              </Form.Group>
+
+              <div className="d-flex gap-2">
+                <Button variant="warning" type="submit">
+                  <FaEdit className="me-2" /> Update Event
+                </Button>
+                <Button variant="secondary" onClick={cancelEventEdit}>
+                  Cancel
+                </Button>
+              </div>
+            </Form>
+          </Card.Body>
+        </Card>
+      )}
+
+      <Card className="shadow-sm border-0">
+        <Card.Header className="bg-info text-white d-flex justify-content-between align-items-center">
+          <div>
+            <FaCalendarAlt className="me-2" /> All Events
+          </div>
+          <Badge bg="light text-dark">{events.length} Events</Badge>
+        </Card.Header>
+        <Card.Body>
+          {loadingEvents ? (
+            <div className="text-center">
+              <Spinner animation="border" variant="primary" />
+              <p className="mt-2">Loading events...</p>
+            </div>
+          ) : events.length === 0 ? (
+            <div className="text-center text-muted">
+              <p>No events found</p>
+            </div>
+          ) : (
+            <Row className="g-4">
+              {events.map((event) => (
+                <Col key={event.event_id} xs={12} md={6} lg={4}>
+                  <Card className="h-100 shadow-sm border-0">
+                    {event.event_image && (
+                      <Card.Img 
+                        variant="top" 
+                        src={`https://brjobsedu.com/gyandhara/gyandhara_backend${event.event_image}`} 
+                        alt={event.event_name}
+                        style={{ height: '160px', objectFit: 'cover' }}
+                      />
+                    )}
+                    <Card.Body className="d-flex flex-column">
+                      <div className="mb-2">
+                        <Badge bg="primary" className="me-2">ID: {event.event_id}</Badge>
+                        {event.event_type && <Badge bg="info">{event.event_type}</Badge>}
+                      </div>
+                      <Card.Title className="fw-bold">{renderContentWithLineBreaks(event.event_name)}</Card.Title>
+                      {event.event_date_time && (
+                        <p className="small text-muted mb-1">
+                          <FaCalendarAlt className="me-1" />
+                          {new Date(event.event_date_time).toLocaleDateString('en-IN', { 
+                            day: 'numeric', 
+                            month: 'short', 
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </p>
+                      )}
+                      {event.venue && (
+                        <p className="small text-muted mb-2">
+                          <i className="fas fa-map-marker-alt me-1"></i>
+                          {event.venue}
+                        </p>
+                      )}
+                      {event.description && (
+                        <p className="small mb-3">{event.description.substring(0, 100)}{event.description.length > 100 ? '...' : ''}</p>
+                      )}
+                      <div className="mt-auto pt-3 border-top d-flex gap-2 flex-wrap">
+                        <Button variant="light" size="sm" className="text-primary" onClick={() => handleViewEvent(event)}>
+                          <FaEye className="me-1" /> View
+                        </Button>
+                        <Button variant="outline-warning" size="sm" onClick={() => handleEditEvent(event)}>
+                          <FaEdit className="me-1" /> Edit
+                        </Button>
+                        <Button variant="outline-danger" size="sm" onClick={() => handleDeleteEvent(event)}>
+                          <FaTrash className="me-1" /> Delete
+                        </Button>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+        </Card.Body>
+      </Card>
+    </div>
+  )
+
   return (
     <div className="dashboard-container">
       <AdminLeftNav
@@ -2196,7 +2516,7 @@ const DashBord = () => {
             {currentView === 'questions' && renderQuestionsView()}
             {currentView === 'exercises' && renderExercisesView()}
             {currentView === 'counseling' && renderCounselingView()}
-            {/* {currentView === 'events' && <EventsManagement onBack={handleBackToDashboard} />} */}
+            {currentView === 'events' && renderEventsView()}
           </Container>
         </div>
       </div>
@@ -2450,6 +2770,78 @@ const DashBord = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => { setShowNotificationsListModal(false); setAdminNotifications([]) }}>Close</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Event Details Modal */}
+      <Modal show={showEventModal} onHide={() => setShowEventModal(false)} size="lg" centered>
+        <Modal.Header closeButton className="bg-info text-white">
+          <Modal.Title><FaCalendarAlt className="me-2" /> Event Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedEvent && (
+            <div>
+              {selectedEvent.event_image && (
+                <div className="mb-3">
+                  <Image 
+                    src={`https://brjobsedu.com/gyandhara/gyandhara_backend${selectedEvent.event_image}`} 
+                    alt={selectedEvent.event_name}
+                    fluid
+                    className="rounded"
+                  />
+                </div>
+              )}
+              <div className="mb-3">
+                <Badge bg="primary" className="me-2">ID: {selectedEvent.event_id}</Badge>
+                {selectedEvent.event_type && <Badge bg="info">{selectedEvent.event_type}</Badge>}
+              </div>
+              <h4 className="mb-3">{renderContentWithLineBreaks(selectedEvent.event_name)}</h4>
+              {selectedEvent.event_date_time && (
+                <p className="mb-2">
+                  <strong><FaCalendarAlt className="me-2" />Start Date & Time:</strong>{' '}
+                  {new Date(selectedEvent.event_date_time).toLocaleDateString('en-IN', { 
+                    weekday: 'long',
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              )}
+              {selectedEvent.end_date_time && (
+                <p className="mb-2">
+                  <strong>End Date & Time:</strong>{' '}
+                  {new Date(selectedEvent.end_date_time).toLocaleDateString('en-IN', { 
+                    weekday: 'long',
+                    day: 'numeric', 
+                    month: 'long', 
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              )}
+              {selectedEvent.venue && (
+                <p className="mb-3">
+                  <strong><i className="fas fa-map-marker-alt me-2"></i>Venue:</strong>{' '}
+                  {selectedEvent.venue}
+                </p>
+              )}
+              {selectedEvent.description && (
+                <div className="mt-3">
+                  <strong>Description:</strong>
+                  <p className="mt-2">{selectedEvent.description}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowEventModal(false)}>Close</Button>
+          <Button variant="danger" onClick={() => { setShowEventModal(false); handleDeleteEvent(selectedEvent) }}>
+            <FaTrash className="me-1" /> Delete Event
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
