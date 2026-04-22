@@ -83,13 +83,13 @@
 
 /* Header Card */
 .notifications-header-card {
-    background-color: #fff;
+  background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10));
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
-    color: #000;
+    color: #fff !important;
 }
 
 .notifications-header-card h3 {
-    color: #000;
+    color: #fff !important;
 }
 
 .notifications-header-card p {

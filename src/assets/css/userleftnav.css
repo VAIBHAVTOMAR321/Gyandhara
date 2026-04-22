@@ -904,7 +904,7 @@ border: none !important;
 
 /* Mobile Sidebar */
 .mobile-sidebar-user {
-     background: linear-gradient(135deg, #667eea, #667eea) !important;
+   background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10)) !important;
 }
 
 .mobile-sidebar-user .nav-item {
@@ -921,7 +921,7 @@ border: none !important;
 }
 
 .mobile-sidebar-user .submenu-container-user {
-    background: hsl(240, 85%, 30%) !important;
+   background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10));
     padding-left: 2rem;
 }
 
