@@ -150,7 +150,7 @@ const GovernmentSchemes = () => {
 
     return apiCategories.map(category => {
       const iconPath = category.icon || ''
-      const fullPath = iconPath && !iconPath.startsWith('/media') ? iconPath : (iconPath ? `https://brjobsedu.com/girls_course/girls_course_backend${iconPath}` : '')
+      const fullPath = iconPath && !iconPath.startsWith('/media') ? iconPath : (iconPath ? `https://brjobsedu.com/gyandhara/gyandhara_backend${iconPath}` : '')
       
       return {
         id: category.scheme_category_id,
