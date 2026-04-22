@@ -34,7 +34,6 @@
 }
 
 .home-container {
-
   margin: 0 auto;
 }
 
@@ -157,6 +156,13 @@
   align-items: center;
   gap: 10px;
   letter-spacing: 0.3px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-gyandhara.btn-lg {
+  padding: 16px 42px;
+  font-size: 1.1rem;
 }
 
 .btn-primary-custom {
@@ -186,159 +192,36 @@
 }
 
 /* ==========================================
-   SECTION TITLES
+   ROLE SECTIONS (Students, Schools, Admins)
    ========================================== */
 
-.streams-title {
-  text-align: center;
-  color: var(--gd-blue-dark);
-  font-size: 2.4rem;
-  font-weight: 800;
-  margin-bottom: 12px;
-  letter-spacing: -0.5px;
-}
-
-.streams-title::after {
-  content: '';
-  display: block;
-  width: 80px;
-  height: 4px;
-  background: var(--gd-gradient-warm);
-  border-radius: 2px;
-  margin: 16px auto 50px;
-}
-
-/* ==========================================
-   STREAMS SECTION
-   ========================================== */
-
-.streams-section {
+.role-section {
   margin-top: 60px;
-}
-
-.streams-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 28px;
-}
-
-.stream-card {
+  padding: 55px 45px;
   background: var(--gd-white);
   border-radius: var(--gd-radius);
-  padding: 0;
-  text-align: center;
-  color: var(--gd-text);
-  transition: all 0.4s ease;
-  border: 1px solid var(--gd-border);
-  box-shadow: 0 4px 15px var(--gd-shadow-blue);
-  overflow: hidden;
-}
-
-.stream-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 45px rgba(14, 58, 107, 0.14);
-  border-color: var(--gd-blue-light);
-}
-
-.stream-img-wrapper {
-  width: 100%;
-  height: 190px;
-  overflow: hidden;
-  position: relative;
-}
-
-.stream-img-wrapper::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: linear-gradient(to top, var(--gd-white), transparent);
-  pointer-events: none;
-}
-
-.stream-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.stream-card:hover .stream-img {
-  transform: scale(1.1);
-}
-
-.stream-card-body {
-  padding: 20px 24px 28px;
-}
-
-.stream-card h3 {
-  font-size: 1.35rem;
-  margin-bottom: 10px;
-  font-weight: 700;
-  color: var(--gd-blue-dark);
-  position: relative;
-  display: inline-block;
-}
-
-.stream-card h3::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 3px;
-  background: var(--gd-orange);
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-.stream-card:hover h3::after {
-  width: 100%;
-  left: 0;
-  transform: none;
-}
-
-.stream-card p {
-  font-size: 0.95rem;
-  color: var(--gd-text-light);
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* ==========================================
-   SCHOOLS SECTION
-   ========================================== */
-
-.schools-section {
-  margin-top: 80px;
-  background: var(--gd-gradient-hero);
-  border-radius: var(--gd-radius);
-  padding: 55px 45px;
   border: 1px solid var(--gd-border);
   box-shadow: 0 8px 40px rgba(14, 58, 107, 0.06);
-  position: relative;
-  overflow: hidden;
 }
 
-.schools-section::before {
-  content: '🏫';
-  position: absolute;
-  top: -10px;
-  right: 40px;
-  font-size: 6rem;
-  opacity: 0.04;
-  pointer-events: none;
+.student-section {
+  background: linear-gradient(135deg, rgba(235, 242, 250, 0.8) 0%, rgba(255, 255, 255, 1) 100%);
 }
 
-.schools-header {
+.school-section {
+  background: linear-gradient(135deg, rgba(255, 243, 224, 0.8) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.admin-section {
+  background: linear-gradient(135deg, rgba(243, 244, 246, 0.8) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+.role-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 45px;
 }
 
-.schools-header h2 {
+.role-header h2 {
   color: var(--gd-blue-dark);
   font-size: 2.4rem;
   font-weight: 800;
@@ -346,7 +229,7 @@
   letter-spacing: -0.5px;
 }
 
-.schools-header h2::after {
+.role-header h2::after {
   content: '';
   display: block;
   width: 80px;
@@ -356,24 +239,24 @@
   margin: 14px auto 0;
 }
 
-.schools-header p {
+.role-header p {
   color: var(--gd-text-light);
   font-size: 1.05rem;
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 700px;
+  margin: 16px auto 0;
   line-height: 1.6;
 }
 
-.schools-features-grid {
+.role-features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 24px;
 }
 
-.school-feature-card {
+.role-feature-card {
   background: var(--gd-white);
   border-radius: 18px;
-  padding: 30px 24px;
+  padding: 28px 20px;
   text-align: center;
   color: var(--gd-text);
   transition: all 0.3s ease;
@@ -383,7 +266,7 @@
   overflow: hidden;
 }
 
-.school-feature-card::before {
+.role-feature-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -395,88 +278,96 @@
   transition: transform 0.3s ease;
 }
 
-.school-feature-card:hover::before {
+.role-feature-card:hover::before {
   transform: scaleX(1);
 }
 
-.school-feature-card:hover {
-  transform: translateY(-6px);
+.role-feature-card:hover {
+  transform: translateY(-8px);
   box-shadow: 0 18px 35px rgba(14, 58, 107, 0.12);
+  border-color: var(--gd-blue-light);
 }
 
-.school-feature-icon {
-  font-size: 2.8rem;
-  margin-bottom: 14px;
-  display: block;
+.role-feature-icon-wrapper {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, rgba(27, 79, 138, 0.1), rgba(230, 81, 0, 0.1));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  transition: all 0.3s ease;
+}
+
+.role-feature-card:hover .role-feature-icon-wrapper {
+  background: var(--gd-gradient-warm);
+}
+
+.role-feature-icon-wrapper i {
+  font-size: 2.2rem;
   color: var(--gd-orange);
-  transition: transform 0.3s ease;
+  transition: color 0.3s ease;
 }
 
-.school-feature-card:hover .school-feature-icon {
+.role-feature-card:hover .role-feature-icon-wrapper i {
+  color: var(--gd-white);
   transform: scale(1.15);
 }
 
-.school-feature-card h4 {
+.role-feature-card h4 {
   font-size: 1.15rem;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: 700;
   color: var(--gd-blue-dark);
 }
 
-.school-feature-card p {
+.role-feature-card p {
   font-size: 0.92rem;
   color: var(--gd-text-light);
   line-height: 1.55;
   margin: 0;
 }
 
-.schools-cta {
-  text-align: center;
-  margin-top: 40px;
-}
-
-.btn-school-register {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px 42px;
- background: linear-gradient(135deg, var(--gd-saffron) 0%, var(--gd-orange) 100%) !important;
-  color: var(--gd-white);
-  font-size: 1.1rem;
-  font-weight: 700;
-  border-radius: 50px;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: 0 8px 25px var(--gd-shadow-blue);
-  letter-spacing: 0.3px;
-}
-
-.btn-school-register:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(14, 58, 107, 0.3);
-  color: var(--gd-white);
-}
-
-.btn-school-register i {
-  font-size: 1.3rem;
-}
-
 /* ==========================================
-   FEATURES SECTION
+   BENEFITS SECTION
    ========================================== */
 
-.features-section {
+.benefits-section {
   margin-top: 80px;
-  padding-bottom: 40px;
+  padding: 55px 45px;
+  background: linear-gradient(135deg, var(--gd-gradient-hero) 0%, rgba(255, 255, 255, 1) 100%);
+  border-radius: var(--gd-radius);
+  border: 1px solid var(--gd-border);
+  box-shadow: 0 8px 40px rgba(14, 58, 107, 0.08);
 }
 
-.features-grid {
+.section-title {
+  text-align: center;
+  color: var(--gd-blue-dark);
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: var(--gd-gradient-warm);
+  border-radius: 2px;
+  margin: 16px auto 50px;
+}
+
+.benefits-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 24px;
+  gap: 28px;
 }
 
-.feature-item {
+.benefit-card {
   background: var(--gd-white);
   border-radius: 18px;
   padding: 32px 24px;
@@ -488,7 +379,7 @@
   position: relative;
 }
 
-.feature-item::after {
+.benefit-card::after {
   content: '';
   position: absolute;
   bottom: 0;
@@ -501,41 +392,113 @@
   transition: width 0.3s ease;
 }
 
-.feature-item:hover::after {
+.benefit-card:hover::after {
   width: 100%;
 }
 
-.feature-item:hover {
-  transform: translateY(-6px);
+.benefit-card:hover {
+  transform: translateY(-8px);
   box-shadow: 0 18px 35px rgba(14, 58, 107, 0.1);
   border-color: var(--gd-blue-light);
 }
 
-.feature-item i {
+.benefit-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, rgba(27, 79, 138, 0.15), rgba(230, 81, 0, 0.15));
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  transition: all 0.3s ease;
+}
+
+.benefit-card:hover .benefit-icon {
+  background: var(--gd-gradient-warm);
+}
+
+.benefit-icon i {
   font-size: 2.5rem;
-  margin-bottom: 16px;
-  display: block;
   color: var(--gd-blue);
   transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.feature-item:hover i {
-  color: var(--gd-orange);
-  transform: scale(1.1);
+.benefit-card:hover .benefit-icon i {
+  color: var(--gd-white);
+  transform: scale(1.15);
 }
 
-.feature-item h4 {
+.benefit-card h4 {
   font-size: 1.15rem;
   margin-bottom: 10px;
   font-weight: 700;
   color: var(--gd-blue-dark);
 }
 
-.feature-item p {
+.benefit-card p {
   font-size: 0.92rem;
   color: var(--gd-text-light);
   line-height: 1.55;
   margin: 0;
+}
+
+/* ==========================================
+   FINAL CTA SECTION
+   ========================================== */
+
+.final-cta-section {
+  margin-top: 80px;
+  padding: 60px 50px;
+  background: var(--gd-gradient-blue);
+  border-radius: var(--gd-radius);
+  text-align: center;
+  color: var(--gd-white);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 15px 50px rgba(14, 58, 107, 0.2);
+}
+
+.final-cta-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 143, 0, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.final-cta-section h2 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.final-cta-section p {
+  font-size: 1.15rem;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 2;
+  opacity: 0.95;
+}
+
+.cta-buttons {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+}
+
+.cta-buttons .btn-gyandhara {
+  padding: 16px 40px;
+  font-size: 1.1rem;
 }
 
 /* ==========================================
@@ -553,23 +516,21 @@
 .hero-buttons { animation: heroFadeUp 0.5s ease 0.4s both; }
 .hero-image { animation: heroFadeUp 0.6s ease 0.1s both; }
 
-.stream-card { animation: heroFadeUp 0.5s ease both; }
-.stream-card:nth-child(1) { animation-delay: 0.05s; }
-.stream-card:nth-child(2) { animation-delay: 0.1s; }
-.stream-card:nth-child(3) { animation-delay: 0.15s; }
-.stream-card:nth-child(4) { animation-delay: 0.2s; }
+.role-feature-card { animation: heroFadeUp 0.5s ease both; }
+.role-feature-card:nth-child(1) { animation-delay: 0.05s; }
+.role-feature-card:nth-child(2) { animation-delay: 0.1s; }
+.role-feature-card:nth-child(3) { animation-delay: 0.15s; }
+.role-feature-card:nth-child(4) { animation-delay: 0.2s; }
+.role-feature-card:nth-child(5) { animation-delay: 0.25s; }
+.role-feature-card:nth-child(6) { animation-delay: 0.3s; }
+.role-feature-card:nth-child(7) { animation-delay: 0.35s; }
+.role-feature-card:nth-child(8) { animation-delay: 0.4s; }
 
-.school-feature-card { animation: heroFadeUp 0.5s ease both; }
-.school-feature-card:nth-child(1) { animation-delay: 0.05s; }
-.school-feature-card:nth-child(2) { animation-delay: 0.1s; }
-.school-feature-card:nth-child(3) { animation-delay: 0.15s; }
-.school-feature-card:nth-child(4) { animation-delay: 0.2s; }
-
-.feature-item { animation: heroFadeUp 0.5s ease both; }
-.feature-item:nth-child(1) { animation-delay: 0.05s; }
-.feature-item:nth-child(2) { animation-delay: 0.1s; }
-.feature-item:nth-child(3) { animation-delay: 0.15s; }
-.feature-item:nth-child(4) { animation-delay: 0.2s; }
+.benefit-card { animation: heroFadeUp 0.5s ease both; }
+.benefit-card:nth-child(1) { animation-delay: 0.05s; }
+.benefit-card:nth-child(2) { animation-delay: 0.1s; }
+.benefit-card:nth-child(3) { animation-delay: 0.15s; }
+.benefit-card:nth-child(4) { animation-delay: 0.2s; }
 
 /* ==========================================
    RESPONSIVE
@@ -588,6 +549,14 @@
 
   .hero-section h1 {
     font-size: 2.8rem;
+  }
+
+  .role-section {
+    padding: 40px 30px;
+  }
+
+  .benefits-section {
+    padding: 40px 30px;
   }
 }
 
@@ -632,52 +601,80 @@
     font-size: 0.98rem;
   }
 
-  .streams-title {
+  .role-section {
+    padding: 35px 20px;
+    border-radius: 16px;
+  }
+
+  .role-header h2 {
     font-size: 1.9rem;
   }
 
-  .streams-grid {
+  .role-features-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
+    gap: 16px;
   }
 
-  .stream-img-wrapper {
-    height: 150px;
+  .role-feature-card {
+    padding: 20px 16px;
   }
 
-  .schools-section {
+  .role-feature-icon-wrapper {
+    width: 50px;
+    height: 50px;
+  }
+
+  .role-feature-icon-wrapper i {
+    font-size: 1.8rem;
+  }
+
+  .benefits-section {
+    padding: 35px 20px;
+    border-radius: 16px;
+  }
+
+  .section-title {
+    font-size: 1.9rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .benefit-card {
+    padding: 24px 16px;
+  }
+
+  .benefit-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .benefit-icon i {
+    font-size: 2rem;
+  }
+
+  .final-cta-section {
     padding: 40px 20px;
     border-radius: 16px;
   }
 
-  .schools-header h2 {
-    font-size: 1.9rem;
+  .final-cta-section h2 {
+    font-size: 2rem;
   }
 
-  .schools-features-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+  .final-cta-section p {
+    font-size: 1rem;
   }
 
-  .school-feature-card {
-    padding: 24px 18px;
+  .cta-buttons {
+    flex-direction: column;
   }
 
-  .school-feature-icon {
-    font-size: 2.2rem;
-  }
-
-  .features-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-
-  .feature-item {
-    padding: 24px 18px;
-  }
-
-  .feature-item i {
-    font-size: 2.2rem;
+  .cta-buttons .btn-gyandhara {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -707,35 +704,59 @@
     justify-content: center;
   }
 
-  .streams-grid {
-    grid-template-columns: 1fr;
+  .role-section {
+    padding: 25px 15px;
   }
 
-  .stream-img-wrapper {
-    height: 180px;
-  }
-
-  .schools-features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .features-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .btn-school-register {
-    width: 100%;
-    justify-content: center;
-    padding: 14px 30px;
-    font-size: 1rem;
-  }
-
-  .streams-title {
+  .role-header h2 {
     font-size: 1.6rem;
   }
 
-  .schools-header h2 {
+  .role-features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-feature-icon-wrapper {
+    width: 45px;
+    height: 45px;
+  }
+
+  .role-feature-icon-wrapper i {
     font-size: 1.6rem;
+  }
+
+  .benefits-section {
+    padding: 25px 15px;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-icon {
+    width: 55px;
+    height: 55px;
+  }
+
+  .benefit-icon i {
+    font-size: 1.8rem;
+  }
+
+  .final-cta-section {
+    padding: 30px 15px;
+  }
+
+  .final-cta-section h2 {
+    font-size: 1.6rem;
+  }
+
+  .final-cta-section p {
+    font-size: 0.95rem;
+    margin-bottom: 24px;
   }
 }
 
@@ -748,11 +769,19 @@
     height: 200px;
   }
 
-  .school-feature-icon {
-    font-size: 2rem;
+  .role-feature-card h4 {
+    font-size: 1rem;
   }
 
-  .feature-item i {
-    font-size: 2rem;
+  .role-feature-card p {
+    font-size: 0.85rem;
+  }
+
+  .benefit-card h4 {
+    font-size: 1rem;
+  }
+
+  .benefit-card p {
+    font-size: 0.85rem;
   }
 }

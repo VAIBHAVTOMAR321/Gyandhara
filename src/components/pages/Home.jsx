@@ -9,95 +9,95 @@ function Home() {
   const content = {
     en: {
       heroTitle: "Stream of Knowledge",
-      heroSubtitle: "Welcome to Gyandhara - Your gateway to unlimited learning. Explore diverse courses, connect with expert instructors, and transform your future.",
+      heroSubtitle: "Welcome to Gyandhara - Your comprehensive educational platform offering career guidance, skill development, and academic excellence for students, schools, and administrators.",
       heroImg: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=400&fit=crop",
-      exploreBtn: "Explore Courses",
-      joinBtn: "Join Now",
-      streamsTitle: "Our Knowledge Streams",
-      streams: [
-        {
-          img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=250&fit=crop",
-          title: "Academic Learning",
-          desc: "Structured courses covering fundamental to advanced concepts in various subjects."
-        },
-        {
-          img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&h=250&fit=crop",
-          title: "Technical Skills",
-          desc: "Master programming, web development, data science and emerging technologies."
-        },
-        {
-          img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop",
-          title: "Community Learning",
-          desc: "Join study groups, participate in discussions, and learn from peers worldwide."
-        },
-        {
-          img: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=250&fit=crop",
-          title: "Skill Development",
-          desc: "Practical workshops and hands-on projects to build real-world expertise."
-        }
+      exploreBtn: "Explore Now",
+      joinBtn: "Register Today",
+      
+      // For Students Section
+      studentTitle: "For Students 🎓",
+      studentSubtitle: "Empower your future with comprehensive career guidance and learning resources",
+      studentFeatures: [
+        { icon: "bi-briefcase-fill", title: "Job Openings", desc: "Discover career opportunities across various industries and sectors" },
+        { icon: "bi-book-fill", title: "10th & 12th Guidance", desc: "Expert guidance for board exams and stream selection" },
+        { icon: "bi-trophy-fill", title: "Competitions", desc: "Participate in competitions and showcase your talents" },
+        { icon: "bi-bookmark-check", title: "Government Schemes", desc: "Learn about educational schemes and benefits" },
+        { icon: "bi-star-fill", title: "Occupation Details", desc: "Explore different career paths and opportunities" },
+        { icon: "bi-chat-left-quote-fill", title: "Counseling", desc: "Get personalized career counseling from experts" },
+        { icon: "bi-graph-up", title: "Grooming Classes", desc: "Develop professional and soft skills" },
+        { icon: "bi-pencil-square", title: "Quizzes & Tests", desc: "Assess your knowledge with interactive quizzes" },
+        { icon: "bi-calendar-event", title: "Seminars & Workshops", desc: "Attend training events and skill development workshops" },
+        { icon: "bi-chat-dots-fill", title: "Support & Queries", desc: "Get support and raise your concerns to administrators" }
       ],
-      schoolsTitle: "Partner Schools",
-      schoolsSubtitle: "Join leading educational institutions that trust Gyandhara for their digital learning journey",
+
+      // For Schools Section
+      schoolTitle: "For Schools 🏫",
+      schoolSubtitle: "Transform your institution's learning experience with Gyandhara's comprehensive platform",
       schoolFeatures: [
-        { icon: "bi-school", title: "School Registration", desc: "Register your institution and get dedicated dashboard" },
-        { icon: "bi-journal-text", title: "Course Management", desc: "Create and manage courses for your students" },
-        { icon: "bi-people-fill", title: "Student Tracking", desc: "Monitor student progress and performance" },
-        { icon: "bi-bar-chart-line", title: "Analytics", desc: "Detailed reports on learning outcomes" }
+        { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard" },
+        { icon: "bi-people-fill", title: "Student Management", desc: "Efficiently manage student registrations and profiles" },
+        { icon: "bi-question-circle-fill", title: "Quiz Creation", desc: "Create and manage quizzes for your students" },
+        { icon: "bi-bar-chart-line-fill", title: "Performance Tracking", desc: "Monitor student progress and learning outcomes" }
       ],
-      registerSchoolBtn: "Register Your School",
-      featuresTitle: "Why Choose Gyandhara?",
-      features: [
-        { icon: "bi-collection-play", title: "Rich Content", desc: "Access thousands of quality learning resources" },
-        { icon: "bi-person-check", title: "Expert Instructors", desc: "Learn from industry professionals" },
-        { icon: "bi-globe", title: "Global Community", desc: "Connect with learners worldwide" },
-        { icon: "bi-award", title: "Certificates", desc: "Earn recognized certifications" }
-      ]
+      
+      // Platform Benefits
+      benefitsTitle: "Why Choose Gyandhara?",
+      benefits: [
+        { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, schools, and administrators" },
+        { icon: "bi-people-fill", title: "Comprehensive Services", desc: "Career guidance, academic support, and skill development" },
+        { icon: "bi-lightbulb", title: "Career Oriented", desc: "Focus on job opportunities and professional growth" },
+        { icon: "bi-shield-check", title: "Secure & Reliable", desc: "Safe platform for educational and career information" }
+      ],
+
+      // CTA
+      getStartedBtn: "Get Started Today",
+      learnMoreBtn: "Learn More"
     },
     hi: {
       heroTitle: "ज्ञान की धारा",
-      heroSubtitle: "Gyandhara में आपका स्वागत है - असीमित सीखने का द्वार। विविध पाठ्यक्रमों का अन्वेषण करें, विशेषज्ञ प्रशिक्षकों से जुड़ें, और अपना भविष्य बदलें।",
+      heroSubtitle: "Gyandhara में आपका स्वागत है - एक व्यापक शैक्षिक मंच जो छात्रों, स्कूलों और प्रशासकों के लिए करियर मार्गदर्शन, कौशल विकास और शैक्षणिक उत्कृष्टता प्रदान करता है।",
       heroImg: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=400&fit=crop",
-      exploreBtn: "पाठ्यक्रम देखें",
-      joinBtn: "अभी जुड़ें",
-      streamsTitle: "हमारी ज्ञान धाराएं",
-      streams: [
-        {
-          img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=250&fit=crop",
-          title: "शैक्षणिक अध्ययन",
-          desc: "विभिन्न विषयों में मूल से उन्नत अवधारणाओं को कवर करने वाले व्यवस्थित पाठ्यक्रम।"
-        },
-        {
-          img: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?w=400&h=250&fit=crop",
-          title: "तकनीकी कौशल",
-          desc: "प्रोग्रामिंग, वेब डेवलपमेंट, डेटा साइंस और उभरती तकनीकों में महारत हासिल करें।"
-        },
-        {
-          img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=250&fit=crop",
-          title: "सामुदायिक सीखना",
-          desc: "अध्ययन समूहों में शामिल हों, चर्चाओं में भाग लें, और दुनिया भर के साथियों से सीखें।"
-        },
-        {
-          img: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=250&fit=crop",
-          title: "कौशल विकास",
-          desc: "वास्तविक विशेषज्ञता बनाने के लिए व्यावहारिक कार्यशालाएं और परियोजनाएं।"
-        }
+      exploreBtn: "अब खोजें",
+      joinBtn: "आज पंजीकृत करें",
+      
+      // For Students Section
+      studentTitle: "छात्रों के लिए 🎓",
+      studentSubtitle: "व्यापक करियर मार्गदर्शन और सीखने के संसाधनों से अपने भविष्य को सशक्त बनाएं",
+      studentFeatures: [
+        { icon: "bi-briefcase-fill", title: "नौकरी के अवसर", desc: "विभिन्न उद्योगों में करियर के अवसर खोजें" },
+        { icon: "bi-book-fill", title: "10वीं और 12वीं मार्गदर्शन", desc: "बोर्ड परीक्षा और स्ट्रीम चयन में विशेषज्ञ मार्गदर्शन" },
+        { icon: "bi-trophy-fill", title: "प्रतियोगिताएं", desc: "प्रतियोगिताओं में भाग लें और प्रतिभा प्रदर्शन करें" },
+        { icon: "bi-bookmark-check", title: "सरकारी योजनाएं", desc: "शैक्षिक योजनाओं और लाभों के बारे में जानें" },
+        { icon: "bi-star-fill", title: "व्यावसायिक विवरण", desc: "विभिन्न करियर पथों का अन्वेषण करें" },
+        { icon: "bi-chat-left-quote-fill", title: "परामर्श", desc: "विशेषज्ञों से व्यक्तिगत करियर परामर्श प्राप्त करें" },
+        { icon: "bi-graph-up", title: "संवारने की कक्षाएं", desc: "व्यावसायिक और नरम कौशल विकसित करें" },
+        { icon: "bi-pencil-square", title: "क्विज और परीक्षा", desc: "इंटरैक्टिव क्विज के साथ अपना ज्ञान मूल्यांकन करें" },
+        { icon: "bi-calendar-event", title: "सेमिनार और कार्यशाला", desc: "प्रशिक्षण कार्यक्रमों में भाग लें" },
+        { icon: "bi-chat-dots-fill", title: "सहायता और प्रश्न", desc: "प्रशासकों से सहायता प्राप्त करें" }
       ],
-      schoolsTitle: "सहयोगी विद्यालय",
-      schoolsSubtitle: "उन प्रमुख शैक्षणिक संस्थानों से जुड़ें जो Gyandhara पर भरोसा करते हैं",
+
+      // For Schools Section
+      schoolTitle: "स्कूलों के लिए 🏫",
+      schoolSubtitle: "Gyandhara के व्यापक मंच के साथ अपने संस्थान के शिक्षण अनुभव को बदलें",
       schoolFeatures: [
-        { icon: "bi-school", title: "विद्यालय पंजीकरण", desc: "अपना संस्थान पंजीकृत करें और समर्पित डैशबोर्ड प्राप्त करें" },
-        { icon: "bi-journal-text", title: "पाठ्यक्रम प्रबंधन", desc: "अपने छात्रों के लिए पाठ्यक्रम बनाएं और प्रबंधित करें" },
-        { icon: "bi-people-fill", title: "छात्र ट्रैकिंग", desc: "छात्रों की प्रगति और प्रदर्शन की निगरानी करें" },
-        { icon: "bi-bar-chart-line", title: "विश्लेषण", desc: "सीखने के परिणामों पर विस्तृत रिपोर्ट" }
+        { icon: "bi-house-check", title: "स्कूल पंजीकरण", desc: "अपने संस्थान को पंजीकृत करें और समर्पित डैशबोर्ड प्राप्त करें" },
+        { icon: "bi-people-fill", title: "छात्र प्रबंधन", desc: "छात्र पंजीकरण और प्रोफाइल को कुशलतापूर्वक प्रबंधित करें" },
+        { icon: "bi-question-circle-fill", title: "क्विज निर्माण", desc: "अपने छात्रों के लिए क्विज बनाएं और प्रबंधित करें" },
+        { icon: "bi-bar-chart-line-fill", title: "प्रदर्शन ट्रैकिंग", desc: "छात्र की प्रगति और सीखने के परिणामों की निगरानी करें" }
       ],
-      registerSchoolBtn: "अपना विद्यालय पंजीकृत करें",
-      featuresTitle: "Gyandhara क्यों चुनें?",
-      features: [
-        { icon: "bi-collection-play", title: "समृद्ध सामग्री", desc: "हजारों गुणवत्ता सीखने के संसाधनों तक पहुंच" },
-        { icon: "bi-person-check", title: "विशेषज्ञ प्रशिक्षक", desc: "उद्योग पेशेवरों से सीखें" },
-        { icon: "bi-globe", title: "वैश्विक समुदाय", desc: "दुनिया भर के शिक्षार्थियों से जुड़ें" },
-        { icon: "bi-award", title: "प्रमाणपत्र", desc: "मान्यता प्राप्त प्रमाणपत्र अर्जित करें" }
-      ]
+      
+      // Platform Benefits
+      benefitsTitle: "Gyandhara को क्यों चुनें?",
+      benefits: [
+        { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, स्कूलों और प्रशासकों के लिए समर्पित इंटरफेस" },
+        { icon: "bi-people-fill", title: "व्यापक सेवाएं", desc: "करियर मार्गदर्शन, शैक्षणिक सहायता और कौशल विकास" },
+        { icon: "bi-lightbulb", title: "करियर केंद्रित", desc: "नौकरी के अवसरों और व्यावसायिक वृद्धि पर ध्यान केंद्रित" },
+        { icon: "bi-shield-check", title: "सुरक्षित और विश्वसनीय", desc: "शैक्षिक और करियर जानकारी के लिए सुरक्षित मंच" }
+      ],
+
+      // CTA
+      getStartedBtn: "आज शुरुआत करें",
+      learnMoreBtn: "अधिक जानें"
     }
   }
 
@@ -106,69 +106,89 @@ function Home() {
   return (
     <div className="home-wrapper">
       <div className="home-container">
+        {/* Hero Section */}
         <section className="hero-section">
           <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
           <div className="hero-content">
-            <div className="hero-badge">🎓 Gyandhara Education</div>
+            <div className="hero-badge">🎓 Gyandhara - Educational Platform</div>
             <h1>{t.heroTitle}</h1>
             <p>{t.heroSubtitle}</p>
             <div className="hero-buttons">
               <Link to="/register" className="btn-gyandhara btn-primary-custom">
                 <i className="bi bi-person-plus"></i> {t.joinBtn}
               </Link>
-              <Link to="/register" className="btn-gyandhara btn-outline-custom">
-                <i className="bi bi-compass"></i> {t.exploreBtn}
+              <Link to="/login" className="btn-gyandhara btn-outline-custom">
+                <i className="bi bi-box-arrow-in-right"></i> {t.learnMoreBtn}
               </Link>
             </div>
           </div>
         </section>
 
-        <section className="streams-section">
-          <h2 className="streams-title">{t.streamsTitle}</h2>
-          <div className="streams-grid">
-            {t.streams.map((stream, index) => (
-              <div className="stream-card" key={index}>
-                <div className="stream-img-wrapper">
-                  <img src={stream.img} alt={stream.title} className="stream-img" />
+        {/* For Students Section */}
+        <section className="role-section student-section">
+          <div className="role-header">
+            <h2>{t.studentTitle}</h2>
+            <p>{t.studentSubtitle}</p>
+          </div>
+          <div className="role-features-grid">
+            {t.studentFeatures.map((feature, index) => (
+              <div className="role-feature-card" key={index}>
+                <div className="role-feature-icon-wrapper">
+                  <i className={`bi ${feature.icon}`}></i>
                 </div>
-                <h3>{stream.title}</h3>
-                <p>{stream.desc}</p>
+                <h4>{feature.title}</h4>
+                <p>{feature.desc}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="schools-section">
-          <div className="schools-header">
-            <h2>{t.schoolsTitle}</h2>
-            <p>{t.schoolsSubtitle}</p>
+        {/* For Schools Section */}
+        <section className="role-section school-section">
+          <div className="role-header">
+            <h2>{t.schoolTitle}</h2>
+            <p>{t.schoolSubtitle}</p>
           </div>
-          <div className="schools-features-grid">
+          <div className="role-features-grid">
             {t.schoolFeatures.map((feature, index) => (
-              <div className="school-feature-card" key={index}>
-                <i className={`bi ${feature.icon} school-feature-icon`}></i>
+              <div className="role-feature-card" key={index}>
+                <div className="role-feature-icon-wrapper">
+                  <i className={`bi ${feature.icon}`}></i>
+                </div>
                 <h4>{feature.title}</h4>
                 <p>{feature.desc}</p>
               </div>
             ))}
-          </div>
-          <div className="schools-cta">
-            <Link to="/register" className="btn-school-register">
-              <i className="bi bi-building"></i> {t.registerSchoolBtn}
-            </Link>
           </div>
         </section>
 
-        <section className="features-section">
-          <h2 className="streams-title">{t.featuresTitle}</h2>
-          <div className="features-grid">
-            {t.features.map((feature, index) => (
-              <div className="feature-item" key={index}>
-                <i className={`bi ${feature.icon}`}></i>
-                <h4>{feature.title}</h4>
-                <p>{feature.desc}</p>
+        {/* Platform Benefits Section */}
+        <section className="benefits-section">
+          <h2 className="section-title">{t.benefitsTitle}</h2>
+          <div className="benefits-grid">
+            {t.benefits.map((benefit, index) => (
+              <div className="benefit-card" key={index}>
+                <div className="benefit-icon">
+                  <i className={`bi ${benefit.icon}`}></i>
+                </div>
+                <h4>{benefit.title}</h4>
+                <p>{benefit.desc}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="final-cta-section">
+          <h2>Ready to Join Gyandhara?</h2>
+          <p>Start your journey towards career excellence and academic success</p>
+          <div className="cta-buttons">
+            <Link to="/register" className="btn-gyandhara btn-primary-custom btn-lg">
+              <i className="bi bi-rocket-fill"></i> {t.getStartedBtn}
+            </Link>
+            <Link to="/login" className="btn-gyandhara btn-outline-custom btn-lg">
+              <i className="bi bi-box-arrow-in-right"></i> Sign In
+            </Link>
           </div>
         </section>
       </div>
