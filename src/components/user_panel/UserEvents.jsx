@@ -5,6 +5,7 @@ import { useAuth } from '../all_login/AuthContext'
 import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
 import '../../assets/css/userleftnav.css'
+import "../../assets/css/UserEvents.css";
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaEye } from 'react-icons/fa'
 
 const UserEvents = () => {
@@ -223,7 +224,7 @@ const UserEvents = () => {
                           }}>
                             {event.event_image ? (
                               <img 
-                                src={`https://brjobsedu.com/girls_course/girls_course_backend${event.event_image}`}
+                                src={`https://brjobsedu.com/gyandhara/gyandhara_backend${event.event_image}`}
                                 alt={event.event_name}
                                 style={{ 
                                   width: '100%',
@@ -366,7 +367,7 @@ const UserEvents = () => {
               {selectedEvent.event_image && (
                 <div className="mb-3">
                   <img 
-                    src={`https://brjobsedu.com/girls_course/girls_course_backend${selectedEvent.event_image}`}
+                    src={`https://brjobsedu.com/gyandhara/gyandhara_backend${selectedEvent.event_image}`}
                     alt={selectedEvent.event_name}
                     className="img-fluid rounded"
                     style={{ maxHeight: '300px', objectFit: 'cover' }}
