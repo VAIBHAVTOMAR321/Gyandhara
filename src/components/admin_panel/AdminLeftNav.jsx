@@ -63,7 +63,7 @@ const menuItems = [
       active: true,
     },
      {
-      icon: <FaTachometerAlt />,
+      icon: <FaBook />,
       label: "Course Dashboard",
       path: "/DashBord",
       active: true,
@@ -84,7 +84,7 @@ const menuItems = [
       path: "/SchoolQuiz",
     },
     {
-      icon: <FaTools />,
+      icon: <FaUsers />,
       label: " Students",
       submenu: [
         {
@@ -92,27 +92,27 @@ const menuItems = [
           path: "#",
           icon: <FaPlusSquare />,
         },
-         
+          
       ],
     },
 
 {
-       icon: <FaTools />,
-       label: " Govt schemes",
-       submenu: [
-       
-         {
-           label: "Manage Scheme",
-           path: "/ManageGovtSchemes",
-           icon: <FaPlusSquare />,
-         },
-           {
-           label: "Add Scheme",
-           path: "/AddGovtSchemes",
-           icon: <FaPlusSquare />,
-         },
-       ],
-     
+        icon: <FaBuilding />,
+        label: " Govt schemes",
+        submenu: [
+        
+          {
+            label: "Manage Scheme",
+            path: "/ManageGovtSchemes",
+            icon: <FaListUl />,
+          },
+            {
+            label: "Add Scheme",
+            path: "/AddGovtSchemes",
+            icon: <FaPlusSquare />,
+          },
+        ],
+      
     },
     {
       icon: <FaChalkboardTeacher />,
@@ -131,7 +131,7 @@ const menuItems = [
       ],
     },
     {
-      icon: <FaTools />,
+      icon: <FaCube />,
       label: "Test",
       submenu: [
         {

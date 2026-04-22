@@ -25,7 +25,8 @@ import {
   FaChalkboardTeacher,
   FaIndustry,
   FaQuestionCircle,
-  FaClipboardList
+  FaClipboardList,
+  FaGraduationCap
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -64,17 +65,17 @@ const menuItems = [
       path: "/UserProfile",
     },
     {
-      icon: <FaPlusSquare />,
+      icon: <FaUsers />,
       label: "ADD STUDENTS",
       path: "/SchoolStudentRegistration",
     },
     {
-      icon: <FaClipboardList />,
+      icon: <FaGraduationCap />,
       label: "QUIZ COMPETITIONS",
       path: "/SchoolQuizList",
     },
     {
-      icon: <FaTools />,
+      icon: <FaCube />,
       label: "Test",
       submenu: [
         {
@@ -90,7 +91,7 @@ const menuItems = [
       ],
     },
     {
-      icon: <FaTools />,
+      icon: <FaCube />,
       label: "Test",
       submenu: [
         {

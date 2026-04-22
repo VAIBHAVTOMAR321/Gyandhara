@@ -26,7 +26,8 @@ import {
   FaIndustry,
   FaQuestionCircle,
   FaTrophy,
-  FaBriefcase
+  FaBriefcase,
+  FaGraduationCap
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -63,13 +64,13 @@ const menuItems = [
     },
     
      {
-      icon: <FaTachometerAlt />,
+      icon: <FaComments />,
       label: "Send Query",
       path: "/SendQuery",
       active: true,
     },
     {
-      icon: <FaQuestionCircle />,
+      icon: <FaGraduationCap />,
       label: "Quiz",
       path: "/UserQuiz",
     },
@@ -94,7 +95,7 @@ const menuItems = [
       path: "/UserProfile",
     },
     {
-      icon: <FaTools />,
+      icon: <FaChalkboardTeacher />,
       label: "Career Guidance",
       submenu: [
         {
@@ -110,12 +111,12 @@ const menuItems = [
       ],
     },
      {
-      icon: <FaQuestionCircle />,
+      icon: <FaBuilding />,
       label: "Government Schemes",
       path: "/GovernmentSchemes",
     },
      {
-      icon: <FaQuestionCircle />,
+      icon: <FaChalkboardTeacher />,
       label: "Grooming Classes",
       path: "/GroomingClasses",
     },
