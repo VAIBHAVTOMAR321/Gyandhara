@@ -11,10 +11,12 @@ import { useNavigate } from 'react-router-dom'
 import '../../assets/css/AdminDashboard.css'
 import { renderContentWithLineBreaks } from '../../utils/contentRenderer'
 import { jsPDF } from 'jspdf'
+import 'jspdf-autotable'
 import * as XLSX from 'xlsx'
-import { 
-  FaPlus, FaArrowLeft, FaBook, FaUsers, FaLayerGroup, 
-  FaTrash, FaImage, FaList, FaEye, FaEdit, FaComments, FaQuestionCircle, FaBell, FaCalendarAlt, FaFilePdf, FaFileExcel, FaFilter
+import {
+  FaPlus, FaArrowLeft, FaBook, FaUsers, FaLayerGroup,
+  FaTrash, FaImage, FaList, FaEye, FaEdit, FaComments, FaQuestionCircle, FaBell, FaCalendarAlt, FaFilePdf, FaFileExcel, FaFilter, FaChartBar,
+  FaCheckCircle, FaClock, FaChartPie, FaSchool, FaBuilding, FaLightbulb, FaExclamationTriangle, FaChartLine
 } from 'react-icons/fa'
 import { useAuth } from '../all_login/AuthContext'
 
@@ -29,7 +31,39 @@ const DashBord = () => {
   
   const { accessToken } = useAuth()
   const authToken = accessToken
-  
+
+  // Analytics helper function
+  const getEnrollmentAnalytics = (enrollments) => {
+    if (!enrollments || enrollments.length === 0) return null
+
+    const total = enrollments.length
+    const completed = enrollments.filter(e => e.is_completed).length
+    const ongoing = total - completed
+
+    // Class distribution
+    const classCounts = {}
+    enrollments.forEach(e => {
+      const cls = String(e.class_name || 'Unknown')
+      classCounts[cls] = (classCounts[cls] || 0) + 1
+    })
+    const classDist = Object.entries(classCounts)
+      .sort(([,a], [,b]) => b - a)
+      .map(([cls, count]) => [cls, count])
+
+    // School distribution (top 10)
+    const schoolCounts = {}
+    enrollments.forEach(e => {
+      const school = e.school_name || 'Unknown'
+      schoolCounts[school] = (schoolCounts[school] || 0) + 1
+    })
+    const schoolDist = Object.entries(schoolCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 10)
+      .map(([school, count]) => [school, count])
+
+    return { total, completed, ongoing, classDist, schoolDist }
+  }
+
 // State for Data
     const [unpaidEnrollmentCount, setUnpaidEnrollmentCount] = useState(0)
     const [unpaidEnrollments, setUnpaidEnrollments] = useState([])
@@ -134,6 +168,8 @@ const DashBord = () => {
   const [selectedClasses, setSelectedClasses] = useState([])
   const [uniqueClasses, setUniqueClasses] = useState([])
   const [eventsCount, setEventsCount] = useState(0)
+  const [showGraphModal, setShowGraphModal] = useState(false)
+  const [analyticsStatusFilter, setAnalyticsStatusFilter] = useState('all') // 'all', 'completed', 'ongoing'
   const [events, setEvents] = useState([])
   const [loadingEvents, setLoadingEvents] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
@@ -1203,6 +1239,14 @@ const DashBord = () => {
         <Button variant="outline-secondary" size="sm" onClick={handleBackToDashboard}>
           <FaArrowLeft /> Dashboard
         </Button>
+        <div className="d-flex gap-2">
+          <Button variant="outline-secondary" size="sm" onClick={handleBackToDashboard}>
+            <FaArrowLeft /> Dashboard
+          </Button>
+          <Button variant="outline-primary" size="sm" onClick={() => setShowGraphModal(true)}>
+            <FaChartBar className="me-1" /> View Analytics
+          </Button>
+        </div>
         <h4 className="mb-0">Unpaid Enrollments</h4>
       </div>
 
@@ -3518,6 +3562,581 @@ const DashBord = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Analytics Graph Modal */}
+      {showGraphModal && (
+        <Modal show={showGraphModal} onHide={() => setShowGraphModal(false)} fullscreen={true}>
+          <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+            <Modal.Title><FaChartBar className="me-2" /> Enrollment Analytics Dashboard</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className="p-4">
+            {(() => {
+              const filteredData = unpaidEnrollments.filter(enrollment => {
+                const schoolMatch = enrollmentSelectedSchools.length === 0 || enrollmentSelectedSchools.includes(enrollment.school_name)
+                const classMatch = enrollmentSelectedClasses.length === 0 || enrollmentSelectedClasses.includes(String(enrollment.class_name))
+                const statusMatch = analyticsStatusFilter === 'all' ||
+                  (analyticsStatusFilter === 'completed' && enrollment.is_completed) ||
+                  (analyticsStatusFilter === 'ongoing' && !enrollment.is_completed)
+                return schoolMatch && classMatch && statusMatch
+              })
+               const stats = getEnrollmentAnalytics(filteredData)
+               if (!stats || stats.total === 0) return <p className="text-center text-muted py-5">No data available for analytics.</p>
+
+               const completionRate = stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0
+
+               // Export to PDF
+               const exportToPDF = () => {
+                 try {
+                   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm' })
+                   const pageWidth = doc.internal.pageSize.getWidth()
+
+                   // Title
+                   doc.setFontSize(18)
+                   doc.text('Enrollment Analytics Report', 14, 20)
+                   doc.setFontSize(11)
+                   doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28)
+                   doc.text(`Total Students: ${stats.total} | Completed: ${stats.completed} | Ongoing: ${stats.ongoing}`, 14, 36)
+
+                   let yPos = 42
+
+                   // Student Details Table
+                   doc.setFontSize(12)
+                   doc.text('Student Details', 14, yPos)
+                   yPos += 8
+
+                   const studentColumns = ['#', 'Student ID', 'Name', 'School', 'Class', 'Status', 'Enrolled Date']
+                   const studentRows = filteredData.map((e, idx) => [
+                     idx + 1,
+                     e.student_id?.substring(0, 12) || '-',
+                     e.student_name?.substring(0, 25) || '-',
+                     e.school_name?.substring(0, 20) || '-',
+                     e.class_name?.toString()?.substring(0, 8) || '-',
+                     e.is_completed ? 'Completed' : 'Ongoing',
+                     e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : '-'
+                   ])
+
+                   doc.autoTable({
+                     head: [studentColumns],
+                     body: studentRows,
+                     startY: yPos,
+                     margin: { left: 10, right: 10 },
+                     styles: { fontSize: 8, cellPadding: 0.5 },
+                     headStyles: { fillColor: [41, 128, 185], textColor: 255 }
+                   })
+
+                   yPos = (doc.lastAutoTable?.finalY || yPos) + 15
+
+                   // School-wise Grouped Data Table
+                   if (yPos > 180) {
+                     doc.addPage()
+                     yPos = 20
+                   }
+
+                   doc.setFontSize(12)
+                   doc.text('School-wise Student Distribution', 14, yPos)
+                   yPos += 8
+
+                   const schoolGroups = {}
+                   filteredData.forEach(e => {
+                     const school = e.school_name || 'Unknown School'
+                     const cls = String(e.class_name || 'Unknown')
+                     if (!schoolGroups[school]) schoolGroups[school] = {}
+                     if (!schoolGroups[school][cls]) schoolGroups[school][cls] = []
+                     schoolGroups[school][cls].push(e)
+                   })
+
+                   const schoolTableData = Object.entries(schoolGroups)
+                     .sort((a, b) => b[1][Object.keys(b[1])[0]]?.length - a[1][Object.keys(a[1])[0]]?.length)
+                     .map(([school, classes]) => {
+                       const total = Object.values(classes).flat().length
+                       return [
+                         school.substring(0, 25),
+                         Object.keys(classes).length.toString(),
+                         total.toString()
+                       ]
+                     })
+
+                   doc.autoTable({
+                     head: [['School Name', 'Classes', 'Students']],
+                     body: schoolTableData,
+                     startY: yPos,
+                     margin: { left: 10, right: 10 },
+                     styles: { fontSize: 8, cellPadding: 0.5 },
+                     headStyles: { fillColor: [108, 117, 125] }
+                   })
+
+                   doc.save(`enrollment-analytics-${new Date().toISOString().split('T')[0]}.pdf`)
+                 } catch (err) {
+                   console.error('PDF export error:', err)
+                   alert('Failed to export PDF. Check console for details.')
+                 }
+               }
+
+               // Export to Excel
+               const exportToExcel = () => {
+                 try {
+                   // Sheet 1: Student Details
+                   const studentData = [
+                     ['Student ID', 'Name', 'School', 'Class', 'Status', 'Enrolled Date'],
+                     ...filteredData.map(e => [
+                       e.student_id || '',
+                       e.student_name || '',
+                       e.school_name || '',
+                       e.class_name?.toString() || '',
+                       e.is_completed ? 'Completed' : 'Ongoing',
+                       e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : ''
+                     ])
+                   ]
+
+                   // Sheet 2: School-wise Breakdown
+                   const schoolGroups = {}
+                   filteredData.forEach(e => {
+                     const school = e.school_name || 'Unknown School'
+                     const cls = String(e.class_name || 'Unknown')
+                     if (!schoolGroups[school]) schoolGroups[school] = {}
+                     if (!schoolGroups[school][cls]) schoolGroups[school][cls] = { total: 0, completed: 0 }
+                     schoolGroups[school][cls].total++
+                     if (e.is_completed) schoolGroups[school][cls].completed++
+                   })
+
+                   const schoolData = [
+                     ['School Name', 'Class', 'Total', 'Completed', 'Ongoing'],
+                     ...Object.entries(schoolGroups)
+                       .sort((a, b) => {
+                         const totalA = Object.values(a[1]).reduce((sum, c) => sum + c.total, 0)
+                         const totalB = Object.values(b[1]).reduce((sum, c) => sum + c.total, 0)
+                         return totalB - totalA
+                       })
+                       .flatMap(([school, classes]) =>
+                         Object.entries(classes)
+                           .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
+                           .map(([cls, stats], idx, arr) => [
+                             idx === 0 ? school : '',
+                             `Class ${cls}`,
+                             stats.total,
+                             stats.completed,
+                             stats.total - stats.completed
+                           ])
+                       )
+                   ]
+
+                   const wsStudents = XLSX.utils.aoa_to_sheet(studentData)
+                   const wsSchools = XLSX.utils.aoa_to_sheet(schoolData)
+
+                   // Set column widths
+                   wsStudents['!cols'] = [
+                     { wch: 12 }, { wch: 25 }, { wch: 25 }, { wch: 8 }, { wch: 10 }, { wch: 14 }
+                   ]
+                   wsSchools['!cols'] = [
+                     { wch: 25 }, { wch: 10 }, { wch: 8 }, { wch: 10 }, { wch: 8 }
+                   ]
+
+                   const wb = XLSX.utils.book_new()
+                   XLSX.utils.book_append_sheet(wb, wsStudents, 'Student Details')
+                   XLSX.utils.book_append_sheet(wb, wsSchools, 'School-wise Summary')
+                   XLSX.writeFile(wb, `enrollment-analytics-${new Date().toISOString().split('T')[0]}.xlsx`)
+                 } catch (err) {
+                   console.error('Excel export error:', err)
+                   alert('Failed to export Excel. Check console for details.')
+                 }
+               }
+
+              return (
+                <div>
+                  {/* Header Actions */}
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                      <h4 className="mb-1 fw-bold text-primary">Analytics Overview</h4>
+                      <p className="text-muted small mb-0">Comprehensive enrollment progress and distribution analysis</p>
+                    </div>
+                    <div className="d-flex gap-2">
+                      <Button variant="outline-primary" size="sm" onClick={exportToPDF}>
+                        <FaFilePdf className="me-1" /> Export PDF
+                      </Button>
+                      <Button variant="outline-success" size="sm" onClick={exportToExcel}>
+                        <FaFileExcel className="me-1" /> Export Excel
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Status Filter */}
+                  <Row className="mb-4">
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label className="fw-bold"><FaFilter className="me-1" /> Filter by Status:</Form.Label>
+                        <Form.Select
+                          value={analyticsStatusFilter}
+                          onChange={(e) => setAnalyticsStatusFilter(e.target.value)}
+                          className="form-select-sm"
+                        >
+                          <option value="all">All Students</option>
+                          <option value="completed">Completed Only</option>
+                          <option value="ongoing">Ongoing Only</option>
+                        </Form.Select>
+                      </Form.Group>
+                    </Col>
+                    <Col md={4}>
+                      <Form.Group>
+                        <Form.Label className="fw-bold"><FaChartBar className="me-1" /> Completion Rate:</Form.Label>
+                        <div className="d-flex align-items-center gap-2">
+                          <div className="progress flex-grow-1" style={{ height: '24px', borderRadius: '12px' }}>
+                             <div
+                               className="progress-bar bg-success"
+                               role="progressbar"
+                               style={{ width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%` }}
+                             >
+                               {completionRate}%
+                            </div>
+                          </div>
+                          <Badge bg={completionRate >= 75 ? 'success' : completionRate >= 50 ? 'warning' : 'danger'} className="fs-6">
+                            {completionRate >= 75 ? 'Excellent' : completionRate >= 50 ? 'Good' : 'Needs Improvement'}
+                          </Badge>
+                        </div>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  {/* Summary Cards */}
+                  <Row className="g-3 mb-4">
+                    <Col xs={12} sm={4}>
+                      <Card className="shadow-sm border-0 h-100">
+                        <Card.Body className="text-center py-4">
+                          <div className="rounded-circle bg-primary bg-opacity-10 p-3 mb-2 d-inline-flex">
+                            <FaUsers className="text-primary fs-2" />
+                          </div>
+                          <h2 className="fw-bold text-primary mb-0">{stats.total}</h2>
+                          <p className="text-muted small mb-0 text-uppercase fw-bold">Total Students</p>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={4}>
+                      <Card className="shadow-sm border-0 h-100">
+                        <Card.Body className="text-center py-4">
+                          <div className="rounded-circle bg-success bg-opacity-10 p-3 mb-2 d-inline-flex">
+                            <FaCheckCircle className="text-success fs-2" />
+                          </div>
+                          <h2 className="fw-bold text-success mb-0">{stats.completed}</h2>
+                          <p className="text-muted small mb-0 text-uppercase fw-bold">Completed</p>
+                          <small className="text-success">{completionRate}% completion rate</small>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col xs={12} sm={4}>
+                      <Card className="shadow-sm border-0 h-100">
+                        <Card.Body className="text-center py-4">
+                          <div className="rounded-circle bg-warning bg-opacity-10 p-3 mb-2 d-inline-flex">
+                            <FaClock className="text-warning fs-2" />
+                          </div>
+                          <h2 className="fw-bold text-warning mb-0">{stats.ongoing}</h2>
+                          <p className="text-muted small mb-0 text-uppercase fw-bold">Ongoing</p>
+                          <small className="text-warning">{100 - completionRate}% still in progress</small>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+
+                  {/* Status Distribution Chart */}
+                  <Card className="shadow-sm border-0 mb-4">
+                    <Card.Header className="bg-light">
+                      <h6 className="mb-0 fw-bold"><FaChartPie className="me-2" /> Completion Status Distribution</h6>
+                    </Card.Header>
+                    <Card.Body>
+                      <div className="row align-items-center">
+                        <div className="col-md-6">
+                          <div className="d-flex justify-content-center position-relative" style={{ height: '200px' }}>
+                            {/* Simple CSS donut chart */}
+                            <svg width="200" height="200" viewBox="0 0 200 200" className="mx-auto">
+                              <circle cx="100" cy="100" r="80" fill="#e9ecef" />
+                              <circle
+                                cx="100" cy="100" r="80"
+                                fill="none"
+                                stroke="#28a745"
+                                strokeWidth="40"
+                                strokeDasharray={`${stats.total > 0 ? (stats.completed / stats.total) * 502.65 : 0} ${502.65}`}
+                                transform="rotate(-90 100 100)"
+                              />
+                              <circle
+                                cx="100" cy="100" r="80"
+                                fill="none"
+                                stroke="#ffc107"
+                                strokeWidth="40"
+                                strokeDasharray={`${stats.total > 0 ? (stats.ongoing / stats.total) * 502.65 : 0} ${502.65}`}
+                                transform="rotate(-90 100 100)"
+                                strokeDashoffset={`${stats.total > 0 ? -(stats.completed / stats.total) * 502.65 : 0}`}
+                              />
+                              <text x="100" y="100" textAnchor="middle" dominantBaseline="middle" fontSize="24" fontWeight="bold" fill="#333">
+                                {completionRate}%
+                              </text>
+                            </svg>
+                          </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="d-flex flex-column gap-3">
+                            <div className="d-flex align-items-center justify-content-between">
+                              <div className="d-flex align-items-center gap-2">
+                                <div className="rounded bg-success" style={{ width: '20px', height: '20px' }}></div>
+                                <span className="fw-bold">Completed</span>
+                              </div>
+                              <div className="text-end">
+                                <h4 className="fw-bold text-success mb-0">{stats.completed}</h4>
+                                 <small className="text-muted">{stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}% of total</small>
+                              </div>
+                            </div>
+                            <div className="d-flex align-items-center justify-content-between">
+                              <div className="d-flex align-items-center gap-2">
+                                <div className="rounded bg-warning" style={{ width: '20px', height: '20px' }}></div>
+                                <span className="fw-bold">Ongoing</span>
+                              </div>
+                              <div className="text-end">
+                                <h4 className="fw-bold text-warning mb-0">{stats.ongoing}</h4>
+                                 <small className="text-muted">{stats.total > 0 ? Math.round((stats.ongoing / stats.total) * 100) : 0}% of total</small>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card.Body>
+                  </Card>
+
+                  {/* Class & School Distribution */}
+                  <Row className="g-3 mb-4">
+                    <Col md={6}>
+                      <Card className="shadow-sm border-0 h-100">
+                        <Card.Header className="bg-info text-white">
+                          <h6 className="mb-0 fw-bold"><FaLayerGroup className="me-2" /> Distribution by Class</h6>
+                        </Card.Header>
+                        <Card.Body>
+                          {stats.classDist.length > 0 ? (
+                            <div className="d-flex flex-column gap-2">
+                              {stats.classDist.map(([cls, count]) => {
+                                const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0
+                                return (
+                                  <div key={cls} className="border-bottom pb-2">
+                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                      <Badge bg="info" className="fs-6">Class {cls}</Badge>
+                                      <span className="fw-bold">{count} students</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
+                                      <div className="progress-bar bg-info" style={{ width: `${percentage}%` }}></div>
+                                    </div>
+                                    <small className="text-muted">{percentage}% of total</small>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-muted text-center py-3 mb-0">No class data available</p>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                    <Col md={6}>
+                      <Card className="shadow-sm border-0 h-100">
+                        <Card.Header className="text-white" style={{ backgroundColor: '#6f42c1' }}>
+                          <h6 className="mb-0 fw-bold"><FaSchool className="me-2" /> Top 10 Schools</h6>
+                        </Card.Header>
+                        <Card.Body>
+                          {stats.schoolDist.length > 0 ? (
+                            <div className="d-flex flex-column gap-2">
+                              {stats.schoolDist.map(([school, count], idx) => {
+                                const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0
+                                return (
+                                  <div key={school} className="border-bottom pb-2">
+                                    <div className="d-flex justify-content-between align-items-center mb-1">
+                                      <span className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>
+                                        #{idx + 1} {school}
+                                      </span>
+                                      <span className="fw-bold">{count} students</span>
+                                    </div>
+                                    <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
+                                      <div
+                                        className="progress-bar"
+                                        style={{ width: `${percentage}%`, backgroundColor: '#6f42c1' }}
+                                      ></div>
+                                    </div>
+                                    <small className="text-muted">{percentage}% of total</small>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          ) : (
+                            <p className="text-muted text-center py-3 mb-0">No school data available</p>
+                          )}
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  </Row>
+
+                  {/* School-wise Detailed Breakdown */}
+                  {enrollmentSelectedSchools.length > 0 && filteredData.length > 0 && (
+                    <Card className="shadow-sm border-0 mb-4">
+                      <Card.Header className="bg-secondary text-white">
+                        <h6 className="mb-0 fw-bold"><FaBuilding className="me-2" /> School-wise Detailed Breakdown</h6>
+                      </Card.Header>
+                      <Card.Body>
+                        {(() => {
+                          // Group by school and class
+                          const schoolGroups = {}
+                          filteredData.forEach(enrollment => {
+                            const school = enrollment.school_name || 'Unknown School'
+                            const className = String(enrollment.class_name || 'Unknown')
+                            if (!schoolGroups[school]) schoolGroups[school] = {}
+                            if (!schoolGroups[school][className]) schoolGroups[school][className] = []
+                            schoolGroups[school][className].push(enrollment)
+                          })
+
+                          return Object.entries(schoolGroups).map(([schoolName, classes]) => (
+                            <div key={schoolName} className="mb-4 p-3 border rounded bg-light">
+                              <div className="d-flex justify-content-between align-items-center mb-3">
+                                <h6 className="fw-bold text-dark mb-0">
+                                  <FaSchool className="me-2 text-primary" /> {schoolName}
+                                </h6>
+                                <Badge bg="primary" className="fs-6">
+                                  {Object.values(classes).flat().length} students
+                                </Badge>
+                              </div>
+
+                              <Row className="g-2">
+                                {Object.entries(classes).map(([className, students]) => {
+                                  const completedCount = students.filter(s => s.is_completed).length
+                                  const ongoingCount = students.length - completedCount
+                                  return (
+                                    <Col md={6} lg={4} key={className} className="mb-2">
+                                      <div className="p-2 border rounded bg-white">
+                                        <div className="d-flex justify-content-between align-items-center mb-2">
+                                          <Badge bg="info" className="fs-6">Class {className}</Badge>
+                                          <span className="fw-bold small">{students.length} students</span>
+                                        </div>
+                                        <div className="d-flex justify-content-between small mb-1">
+                                          <span className="text-success"><FaCheckCircle className="me-1" /> {completedCount} Done</span>
+                                          <span className="text-warning"><FaClock className="me-1" /> {ongoingCount} Ongoing</span>
+                                        </div>
+                                         <div className="progress" style={{ height: '6px', borderRadius: '3px' }}>
+                                           <div className="bg-success" style={{ width: `${students.length > 0 ? (completedCount / students.length) * 100 : 0}%` }}></div>
+                                           <div className="bg-warning" style={{ width: `${students.length > 0 ? (ongoingCount / students.length) * 100 : 0}%` }}></div>
+                                         </div>
+                                      </div>
+                                    </Col>
+                                  )
+                                })}
+                              </Row>
+                            </div>
+                          ))
+                        })()}
+                      </Card.Body>
+                    </Card>
+                  )}
+
+                  {/* Student List Table when specific filters applied */}
+                  {(enrollmentSelectedSchools.length > 0 || enrollmentSelectedClasses.length > 0) && filteredData.length > 0 && (
+                    <Card className="shadow-sm border-0 mb-4">
+                      <Card.Header className="bg-light">
+                        <h6 className="mb-0 fw-bold"><FaList className="me-2" /> Student Details</h6>
+                      </Card.Header>
+                      <Card.Body className="p-0">
+                        <div className="table-responsive">
+                          <Table striped hover size="sm" className="mb-0">
+                            <thead className="table-light">
+                              <tr>
+                                <th>#</th>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>School</th>
+                                <th>Class</th>
+                                <th>Status</th>
+                                <th>Enrolled</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredData.slice(0, 50).map((enrollment, idx) => (
+                                <tr key={enrollment.id || idx}>
+                                  <td>{idx + 1}</td>
+                                  <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
+                                  <td className="fw-bold">{enrollment.student_name}</td>
+                                  <td>{enrollment.school_name || '-'}</td>
+                                  <td><Badge bg="info">{enrollment.class_name || '-'}</Badge></td>
+                                  <td>
+                                    <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
+                                      {enrollment.is_completed ? 'Completed' : 'Ongoing'}
+                                    </Badge>
+                                  </td>
+                                  <td className="small">
+                                    {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString() : '-'}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Table>
+                          {filteredData.length > 50 && (
+                            <div className="p-2 text-center text-muted small">
+                              Showing first 50 of {filteredData.length} students. Apply filters to narrow results.
+                            </div>
+                          )}
+                        </div>
+                      </Card.Body>
+                    </Card>
+                  )}
+
+                  {/* Insights Section */}
+                  <Card className="shadow-sm border-0 mb-4">
+                    <Card.Header className="bg-light">
+                      <h6 className="mb-0 fw-bold"><FaLightbulb className="me-2" /> Key Insights</h6>
+                    </Card.Header>
+                    <Card.Body>
+                      <Row className="g-3">
+                        <Col md={4}>
+                          <div className="d-flex align-items-start gap-2">
+                            <div className="bg-info bg-opacity-10 p-2 rounded">
+                              <FaChartLine className="text-info" />
+                            </div>
+                            <div>
+                              <h6 className="fw-bold mb-0">Completion Rate</h6>
+                              <p className="small text-muted mb-0">
+                                {completionRate >= 75 ? 'Excellent! Most students are completing their courses.' :
+                                 completionRate >= 50 ? 'Good progress, but room for improvement.' :
+                                 'Attention needed - many students are behind.'}
+                              </p>
+                            </div>
+                          </div>
+                        </Col>
+                        <Col md={4}>
+                          <div className="d-flex align-items-start gap-2">
+                            <div className="bg-success bg-opacity-10 p-2 rounded">
+                              <FaUsers className="text-success" />
+                            </div>
+                            <div>
+                              <h6 className="fw-bold mb-0">Total Enrollment</h6>
+                              <p className="small text-muted mb-0">
+                                {stats.total} students enrolled across {stats.classDist.length} classes and {stats.schoolDist.length} schools.
+                              </p>
+                            </div>
+                          </div>
+                        </Col>
+                        <Col md={4}>
+                          <div className="d-flex align-items-start gap-2">
+                            <div className="bg-warning bg-opacity-10 p-2 rounded">
+                              <FaExclamationTriangle className="text-warning" />
+                            </div>
+                            <div>
+                              <h6 className="fw-bold mb-0">Ongoing Students</h6>
+                              <p className="small text-muted mb-0">
+                                {stats.ongoing} students still in progress. Consider sending follow-up notifications.
+                              </p>
+                            </div>
+                          </div>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+                </div>
+              )
+            })()}
+          </Modal.Body>
+          <Modal.Footer className="bg-light">
+            <Button variant="secondary" onClick={() => setShowGraphModal(false)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      )}
     </div>
   )
 }
