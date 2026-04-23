@@ -66,6 +66,11 @@ const menuItems = [
       label: "ADD STUDENTS",
       path: "/SchoolStudentRegistration",
     },
+     {
+      icon: <FaUsers />,
+      label: "offline competition",
+      path: "/Offlinecompetition",
+    },
     {
       icon: <FaGraduationCap />,
       label: "QUIZ COMPETITIONS",
