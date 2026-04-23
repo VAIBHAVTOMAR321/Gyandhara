@@ -10,6 +10,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import '../../assets/css/AdminDashboard.css'
 import { renderContentWithLineBreaks } from '../../utils/contentRenderer'
+import { jsPDF } from 'jspdf'
 import * as XLSX from 'xlsx'
 import { 
   FaPlus, FaArrowLeft, FaBook, FaUsers, FaLayerGroup, 
@@ -2187,91 +2188,130 @@ const DashBord = () => {
       const endIndex = startIndex + counselingItemsPerPage
       const currentItems = filteredData.slice(startIndex, endIndex)
 
-      // Export to PDF
+      // Export to PDF - Manual table drawing (no plugin dependency)
       const exportToPDF = () => {
         try {
-          // Simple PDF generation without autoTable plugin
-          const doc = new jsPDF()
+          const doc = new jsPDF({ orientation: 'landscape' })
+          const pageWidth = doc.internal.pageSize.getWidth()
+          const pageHeight = doc.internal.pageSize.getHeight()
+          const margin = 8
+          const availableWidth = pageWidth - (margin * 2)
           
-          // Title section
-          doc.setFontSize(16)
-          doc.text('Counseling Requests Report', 14, 15)
-          doc.setFontSize(10)
-          doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22)
-          doc.text(`Total Records: ${filteredData.length}`, 14, 29)
+          // Title
+          doc.setFontSize(14)
+          doc.text('Counseling Requests Report', margin, 12)
+          doc.setFontSize(9)
+          doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, 18)
+          doc.text(`Total Records: ${filteredData.length}`, margin, 23)
           
-          // Table headers
-          const headers = ['#', 'ID', 'Name', 'School', 'Sch ID', 'Phone', 'District', 'Block', 'Class', 'Category', 'Status']
-          const colWidths = [8, 20, 30, 30, 22, 22, 22, 22, 12, 25, 18]
+          // Column definitions - optimized proportional widths for landscape
+          const headers = ['#', 'ID', 'Name', 'School', 'S.ID', 'Phone', 'Dist', 'Block', 'Class', 'Category', 'Status']
+          // Total = 280 units (fits better in landscape)
+          const colWidths = [8, 20, 35, 40, 25, 28, 22, 22, 12, 40, 28]
           const totalWidth = colWidths.reduce((a, b) => a + b, 0)
           
-          let y = 35
-          const startX = 10
+          // Scale columns to fit available width
+          const scaleFactor = availableWidth / totalWidth
+          const scaledColWidths = colWidths.map(w => w * scaleFactor)
           
-          // Print header row with background
-          doc.setFillColor(41, 128, 185)
-          doc.rect(startX, y, totalWidth, 7, 'F')
-          doc.setTextColor(255, 255, 255)
-          doc.setFontSize(7)
+          let y = 28
+          const startX = margin
+          const rowHeight = 5.5
+          const headerHeight = 6.5
           
-          let x = startX
-          headers.forEach((header, i) => {
-            doc.text(header, x + 1, y + 4.5)
-            x += colWidths[i]
-          })
+          // Function to draw a row
+          const drawRow = (cells, yPos, isHeader = false) => {
+            let x = startX
+            const rowHeightToUse = isHeader ? headerHeight : rowHeight
+            
+            if (isHeader) {
+              doc.setFillColor(41, 128, 185)
+              doc.rect(startX, yPos - 4, availableWidth, rowHeightToUse, 'F')
+              doc.setTextColor(255, 255, 255)
+              doc.setFontSize(7.5)
+            } else {
+              doc.setTextColor(0, 0, 0)
+              doc.setFontSize(6.5)
+              // Draw alternating row colors
+              if (cells[0] % 2 === 0) {
+                doc.setFillColor(240, 245, 250)
+                doc.rect(startX, yPos - 4, availableWidth, rowHeightToUse, 'F')
+              }
+            }
+            
+            cells.forEach((cell, i) => {
+              let text = typeof cell === 'string' ? cell : String(cell)
+              const colWidth = scaledColWidths[i]
+              
+              // Better text truncation based on column width
+              const maxChars = Math.floor(colWidth / 1.8)
+              if (text.length > maxChars) {
+                text = text.substring(0, maxChars - 1) + '..'
+              }
+              
+              // Draw cell border
+              doc.setDrawColor(200, 200, 200)
+              doc.rect(x, yPos - 4, colWidth, rowHeightToUse)
+              
+              // Add text with padding
+              doc.text(text, x + 1.5, yPos + (isHeader ? 0.5 : 0.3), { maxWidth: colWidth - 3 })
+              x += colWidth
+            })
+            
+            doc.setTextColor(0, 0, 0)
+            return yPos + rowHeightToUse
+          }
           
-          doc.setTextColor(0, 0, 0)
-          y += 7
+          // Draw header
+          y = drawRow(headers, y, true) + 1
           
-          // Print data rows
+          // Draw data rows
           filteredData.forEach((counseling, index) => {
             const student = counseling.student_details || {}
             
-            // Page break check
-            if (y > 270) {
+            // Check for page break (leave room for page number)
+            if (y > pageHeight - 15) {
               doc.addPage()
-              y = 15
-              
-              // Repeat headers on new page
-              doc.setFillColor(41, 128, 185)
-              doc.rect(startX, y, totalWidth, 7, 'F')
-              doc.setTextColor(255, 255, 255)
-              headers.forEach((header, i) => {
-                doc.text(header, startX + 1, y + 4.5)
-              })
-              doc.setTextColor(0, 0, 0)
-              y += 7
+              y = 12
+              y = drawRow(headers, y, true) + 1
             }
             
-            const row = [
-              (index + 1).toString(),
-              (student.student_id || counseling.student_id || '-').toString().substring(0, 10),
-              (student.full_name || student.candidate_name || '-').toString().substring(0, 18),
-              (student.school_name || '-').toString().substring(0, 18),
-              (student.school_uni_id || '-').toString().substring(0, 12),
-              (student.phone || student.mobile_no || '-').toString().substring(0, 10),
-              (student.district || '-').toString().substring(0, 10),
-              (student.block || '-').toString().substring(0, 10),
-              (student.class_name || '-').toString(),
+            const cells = [
+              index + 1,
+              (student.student_id || counseling.student_id || '-').substring(0, 8),
+              (student.full_name || student.candidate_name || '-').substring(0, 20),
+              (student.school_name || '-').substring(0, 15),
+              (student.school_uni_id || '-').substring(0, 10),
+              (student.phone || student.mobile_no || '-').substring(0, 10),
+              (student.district || '-').substring(0, 8),
+              (student.block || '-').substring(0, 8),
+              (student.class_name || '-').substring(0, 5),
               Array.isArray(counseling.category_consulting) 
-                ? counseling.category_consulting.join(', ').toString().substring(0, 12)
-                : (counseling.category_consulting || '-').toString().substring(0, 12),
-              (counseling.status || 'pending').toString()
+                ? counseling.category_consulting.join(', ').substring(0, 15)
+                : (counseling.category_consulting || '-').substring(0, 15),
+              (counseling.status || 'pending').substring(0, 8)
             ]
             
-            x = startX
-            row.forEach((cell, i) => {
-              doc.text(cell, x + 1, y + 4.5)
-              x += colWidths[i]
-            })
-            
-            y += 6.5
+            y = drawRow(cells, y)
           })
+          
+          // Add footer with page numbers
+          const totalPages = doc.internal.getNumberOfPages()
+          for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i)
+            doc.setFontSize(7)
+            doc.setTextColor(150, 150, 150)
+            doc.text(
+              `Page ${i} of ${totalPages}`,
+              pageWidth - margin - 20,
+              pageHeight - 5
+            )
+          }
           
           doc.save('counseling-requests.pdf')
         } catch (error) {
           console.error('PDF export error:', error)
-          alert('Failed to generate PDF. Please try again.')
+          alert('Failed to generate PDF. Error: ' + error.message)
         }
       }
 
