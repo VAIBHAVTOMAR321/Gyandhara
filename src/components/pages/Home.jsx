@@ -10,7 +10,7 @@ function Home() {
   const content = {
     en: {
     heroTitle: "Stream of Knowledge",
-  heroSubtitle: "Welcome to Gyandhara - Your educational platform for career guidance, skill development, and academic success.",
+  heroSubtitle: "Welcome to Gyandhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, Gyandhara provides the tools you need to succeed.",
   heroImg: heroImg,
   exploreBtn: "Explore Now",
   joinBtn: "Register Today",
