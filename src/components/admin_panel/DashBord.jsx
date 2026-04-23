@@ -10,9 +10,10 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import '../../assets/css/AdminDashboard.css'
 import { renderContentWithLineBreaks } from '../../utils/contentRenderer'
+import * as XLSX from 'xlsx'
 import { 
   FaPlus, FaArrowLeft, FaBook, FaUsers, FaLayerGroup, 
-  FaTrash, FaImage, FaList, FaEye, FaEdit, FaComments, FaQuestionCircle, FaBell, FaCalendarAlt
+  FaTrash, FaImage, FaList, FaEye, FaEdit, FaComments, FaQuestionCircle, FaBell, FaCalendarAlt, FaFilePdf, FaFileExcel, FaFilter
 } from 'react-icons/fa'
 import { useAuth } from '../all_login/AuthContext'
 
@@ -99,12 +100,16 @@ const DashBord = () => {
   })
   const [loadingExercises, setLoadingExercises] = useState(false)
 
-  // State for Counseling Management
-  const [counselingData, setCounselingData] = useState([])
-  const [selectedCounseling, setSelectedCounseling] = useState(null)
-  const [showCounselingModal, setShowCounselingModal] = useState(false)
-  const [counselingPage, setCounselingPage] = useState(1)
-  const counselingItemsPerPage = 10
+   // State for Counseling Management
+   const [counselingData, setCounselingData] = useState([])
+   const [selectedCounseling, setSelectedCounseling] = useState(null)
+   const [showCounselingModal, setShowCounselingModal] = useState(false)
+   const [counselingPage, setCounselingPage] = useState(1)
+   const counselingItemsPerPage = 100
+   const [selectedSchools, setSelectedSchools] = useState([])
+   const [uniqueSchools, setUniqueSchools] = useState([])
+   const [selectedClasses, setSelectedClasses] = useState([])
+   const [uniqueClasses, setUniqueClasses] = useState([])
 
   // State for Admin Notifications
   const [adminNotifications, setAdminNotifications] = useState([])
@@ -194,17 +199,36 @@ const DashBord = () => {
         setCourses([])
       }
 
-      // Fetch counseling data
-      try {
-        const counselingRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-cousult/', config)
-        if (counselingRes.data && counselingRes.data.status) {
-          setCounselingData(counselingRes.data.data)
+       // Fetch counseling data
+       try {
+         const counselingRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-cousult/', config)
+         if (counselingRes.data && counselingRes.data.status) {
+           const data = counselingRes.data.data
+           setCounselingData(data)
+           
+           // Extract unique school names
+           const schools = [...new Set(data
+             .map(item => item.student_details?.school_name)
+             .filter(name => name && name.trim() !== '')
+           )].sort()
+           setUniqueSchools(schools)
+           
+           // Extract unique classes
+           const classes = [...new Set(data
+             .map(item => item.student_details?.class_name)
+             .filter(cls => cls && cls.trim() !== '')
+           )].sort()
+           console.log('Extracted unique classes:', classes) // Debug log
+           setUniqueClasses(classes)
+         }
+        } catch (counselingError) {
+          console.error('Error fetching counseling data:', counselingError)
+          setCounselingData([])
+          setUniqueSchools([])
+          setUniqueClasses([])
         }
-      } catch (counselingError) {
-        setCounselingData([])
-      }
 
-      // Fetch admin notifications count
+       // Fetch admin notifications count
       try {
         const notifRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/admin-notifications/', config)
         if (notifRes.data && notifRes.data.status) {
@@ -2148,106 +2172,385 @@ const DashBord = () => {
     </div>
   )
 
-  const renderCounselingView = () => {
-    const totalPages = Math.ceil(counselingData.length / counselingItemsPerPage)
-    const startIndex = (counselingPage - 1) * counselingItemsPerPage
-    const endIndex = startIndex + counselingItemsPerPage
-    const currentItems = counselingData.slice(startIndex, endIndex)
+    const renderCounselingView = () => {
+      // Filter data based on selected schools and classes
+      const filteredData = counselingData.filter(item => {
+        const schoolMatch = selectedSchools.length === 0 || 
+          (item.student_details?.school_name && selectedSchools.includes(item.student_details.school_name))
+        const classMatch = selectedClasses.length === 0 || 
+          (item.student_details?.class_name && selectedClasses.includes(item.student_details.class_name))
+        return schoolMatch && classMatch
+      })
+      
+      const totalPages = Math.ceil(filteredData.length / counselingItemsPerPage)
+      const startIndex = (counselingPage - 1) * counselingItemsPerPage
+      const endIndex = startIndex + counselingItemsPerPage
+      const currentItems = filteredData.slice(startIndex, endIndex)
 
-    return (
-      <div className="fade-in">
-        <div className="d-flex justify-content-between align-items-center mb-4 page-header">
-          <Button variant="outline-secondary" size="sm" onClick={handleBackToDashboard}>
-            <FaArrowLeft /> Dashboard
-          </Button>
-          <h4 className="mb-0">Counseling Requests</h4>
-        </div>
+      // Export to PDF
+      const exportToPDF = () => {
+        try {
+          // Simple PDF generation without autoTable plugin
+          const doc = new jsPDF()
+          
+          // Title section
+          doc.setFontSize(16)
+          doc.text('Counseling Requests Report', 14, 15)
+          doc.setFontSize(10)
+          doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22)
+          doc.text(`Total Records: ${filteredData.length}`, 14, 29)
+          
+          // Table headers
+          const headers = ['#', 'ID', 'Name', 'School', 'Sch ID', 'Phone', 'District', 'Block', 'Class', 'Category', 'Status']
+          const colWidths = [8, 20, 30, 30, 22, 22, 22, 22, 12, 25, 18]
+          const totalWidth = colWidths.reduce((a, b) => a + b, 0)
+          
+          let y = 35
+          const startX = 10
+          
+          // Print header row with background
+          doc.setFillColor(41, 128, 185)
+          doc.rect(startX, y, totalWidth, 7, 'F')
+          doc.setTextColor(255, 255, 255)
+          doc.setFontSize(7)
+          
+          let x = startX
+          headers.forEach((header, i) => {
+            doc.text(header, x + 1, y + 4.5)
+            x += colWidths[i]
+          })
+          
+          doc.setTextColor(0, 0, 0)
+          y += 7
+          
+          // Print data rows
+          filteredData.forEach((counseling, index) => {
+            const student = counseling.student_details || {}
+            
+            // Page break check
+            if (y > 270) {
+              doc.addPage()
+              y = 15
+              
+              // Repeat headers on new page
+              doc.setFillColor(41, 128, 185)
+              doc.rect(startX, y, totalWidth, 7, 'F')
+              doc.setTextColor(255, 255, 255)
+              headers.forEach((header, i) => {
+                doc.text(header, startX + 1, y + 4.5)
+              })
+              doc.setTextColor(0, 0, 0)
+              y += 7
+            }
+            
+            const row = [
+              (index + 1).toString(),
+              (student.student_id || counseling.student_id || '-').toString().substring(0, 10),
+              (student.full_name || student.candidate_name || '-').toString().substring(0, 18),
+              (student.school_name || '-').toString().substring(0, 18),
+              (student.school_uni_id || '-').toString().substring(0, 12),
+              (student.phone || student.mobile_no || '-').toString().substring(0, 10),
+              (student.district || '-').toString().substring(0, 10),
+              (student.block || '-').toString().substring(0, 10),
+              (student.class_name || '-').toString(),
+              Array.isArray(counseling.category_consulting) 
+                ? counseling.category_consulting.join(', ').toString().substring(0, 12)
+                : (counseling.category_consulting || '-').toString().substring(0, 12),
+              (counseling.status || 'pending').toString()
+            ]
+            
+            x = startX
+            row.forEach((cell, i) => {
+              doc.text(cell, x + 1, y + 4.5)
+              x += colWidths[i]
+            })
+            
+            y += 6.5
+          })
+          
+          doc.save('counseling-requests.pdf')
+        } catch (error) {
+          console.error('PDF export error:', error)
+          alert('Failed to generate PDF. Please try again.')
+        }
+      }
 
-        <Card className="shadow-sm border-0">
-          <Card.Header className="bg-info text-white">
-            <FaComments className="me-2" /> Counseling Details
-          </Card.Header>
-          <Card.Body>
-            {loading ? (
-              <div className="text-center">
-                <Spinner animation="border" variant="primary" />
-                <p className="mt-2">Loading...</p>
-              </div>
-            ) : counselingData.length === 0 ? (
-              <p className="text-muted text-center mb-0">No counseling requests found</p>
-            ) : (
-              <>
-                <div className="table-responsive">
-                  <Table striped bordered hover responsive>
-                    <thead>
-                      <tr>
-                        <th>Student ID</th>
-                        <th>Full Name</th>
-                        <th>Phone</th>
-                        <th>District</th>
-                        <th>Block</th>
-                        <th>State</th>
-                        <th>Category</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((counseling) => (
-                        <tr key={counseling.id}>
-                          <td>{counseling.student_id}</td>
-                          <td>{counseling.full_name}</td>
-                          <td>{counseling.phone}</td>
-                          <td>{counseling.district}</td>
-                          <td>{counseling.block}</td>
-                          <td>{counseling.state}</td>
-                          <td>{Array.isArray(counseling.category_consulting) ? counseling.category_consulting.join(', ') : counseling.category_consulting}</td>
-                          <td>
-                            <Badge bg={counseling.status === 'pending' ? 'warning' : counseling.status === 'approved' ? 'success' : 'danger'}>
-                              {counseling.status}
-                            </Badge>
-                          </td>
-                          <td>
-                            <Button variant="info" size="sm" onClick={() => handleViewCounseling(counseling)}>
-                              <FaEye className="me-1" /> View
-                            </Button>
-                          </td>
-                        </tr>
+      // Export to Excel
+      const exportToExcel = () => {
+        const data = filteredData.map((counseling, index) => {
+          const student = counseling.student_details || {}
+          return {
+            '#': index + 1,
+            'Student ID': student.student_id || counseling.student_id || '-',
+            'Full Name': student.full_name || student.candidate_name || '-',
+            'School Name': student.school_name || '-',
+            'School ID': student.school_uni_id || '-',
+            'Phone': student.phone || student.mobile_no || '-',
+            'Email': student.email || 'N/A',
+            'District': student.district || '-',
+            'Block': student.block || '-',
+            'State': student.state || '-',
+            'Class': student.class_name || '-',
+            'Category': Array.isArray(counseling.category_consulting) 
+              ? counseling.category_consulting.join(', ') 
+              : (counseling.category_consulting || '-'),
+            'Status': counseling.status || 'pending',
+            'Requested At': new Date(counseling.created_at || student.created_at || Date.now()).toLocaleString()
+          }
+        })
+        
+        const ws = XLSX.utils.json_to_sheet(data)
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, 'Counseling Requests')
+        XLSX.writeFile(wb, 'counseling-requests.xlsx')
+      }
+
+      const handleSchoolFilterChange = (e) => {
+        const value = e.target.value
+        if (value) {
+          setSelectedSchools(prev => 
+            prev.includes(value) 
+              ? prev.filter(s => s !== value)
+              : [...prev, value]
+          )
+          setCounselingPage(1) // Reset to first page when filter changes
+        }
+      }
+
+      const handleClassFilterChange = (e) => {
+        const value = e.target.value
+        if (value) {
+          setSelectedClasses(prev => 
+            prev.includes(value) 
+              ? prev.filter(c => c !== value)
+              : [...prev, value]
+          )
+          setCounselingPage(1) // Reset to first page when filter changes
+        }
+      }
+
+      const clearSchoolFilter = () => {
+        setSelectedSchools([])
+        setCounselingPage(1) // Reset to first page when filter cleared
+      }
+
+      const clearClassFilter = () => {
+        setSelectedClasses([])
+        setCounselingPage(1) // Reset to first page when filter cleared
+      }
+
+      const clearAllFilters = () => {
+        setSelectedSchools([])
+        setSelectedClasses([])
+        setCounselingPage(1)
+      }
+
+     return (
+       <div className="fade-in">
+         <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+           <Button variant="outline-secondary" size="sm" onClick={handleBackToDashboard}>
+             <FaArrowLeft /> Dashboard
+           </Button>
+           <h4 className="mb-0">Counseling Requests</h4>
+         </div>
+
+          <Card className="shadow-sm border-0 mb-3">
+            <Card.Body>
+              <Row className="g-3 align-items-center">
+                <Col md={6}>
+                  <div className="d-flex flex-wrap gap-2 align-items-center">
+                    <FaFilter className="text-muted me-2" />
+                    <strong>Filter by Schools:</strong>
+                    <Form.Control
+                      as="select"
+                      size="sm"
+                      style={{ minWidth: '250px' }}
+                      onChange={handleSchoolFilterChange}
+                      value=""
+                    >
+                      <option value="">Select school to filter...</option>
+                      {uniqueSchools.map((school, index) => (
+                        <option key={index} value={school}>{school}</option>
                       ))}
-                    </tbody>
-                  </Table>
-                </div>
-                {totalPages > 1 && (
-                  <div className="d-flex justify-content-between align-items-center mt-3">
-                    <span className="text-muted small">
-                      Showing {startIndex + 1}-{Math.min(endIndex, counselingData.length)} of {counselingData.length}
-                    </span>
-                    <div className="d-flex gap-2">
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => setCounselingPage(prev => Math.max(1, prev - 1))}
-                        disabled={counselingPage === 1}
-                      >
-                        Previous
-                      </Button>
-                      <span className="d-flex align-items-center px-2">
-                        Page {counselingPage} of {totalPages}
-                      </span>
-                      <Button
-                        variant="outline-primary"
-                        size="sm"
-                        onClick={() => setCounselingPage(prev => Math.min(totalPages, prev + 1))}
-                        disabled={counselingPage === totalPages}
-                      >
-                        Next
-                      </Button>
-                    </div>
+                    </Form.Control>
+                    {selectedSchools.length > 0 && (
+                      <>
+                        <Button variant="outline-secondary" size="sm" onClick={clearSchoolFilter}>
+                          Clear
+                        </Button>
+                        <div className="d-flex flex-wrap gap-1">
+                          {selectedSchools.map(school => (
+                            <Badge key={school} bg="secondary" className="d-flex align-items-center">
+                              {school}
+                              <span 
+                                style={{ cursor: 'pointer', marginLeft: '5px' }}
+                                onClick={() => setSelectedSchools(prev => prev.filter(s => s !== school))}
+                              >
+                                ×
+                              </span>
+                            </Badge>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
+                </Col>
+                <Col md={6}>
+                  <div className="d-flex flex-wrap gap-2 align-items-center">
+                    <FaFilter className="text-muted me-2" />
+                    <strong>Filter by Class:</strong>
+                    <Form.Control
+                      as="select"
+                      size="sm"
+                      style={{ minWidth: '200px' }}
+                      onChange={handleClassFilterChange}
+                      value=""
+                    >
+                      <option value="">Select class to filter...</option>
+                      {uniqueClasses.map((cls, index) => (
+                        <option key={index} value={cls}>{cls}</option>
+                      ))}
+                    </Form.Control>
+                    {selectedClasses.length > 0 && (
+                      <>
+                        <Button variant="outline-secondary" size="sm" onClick={clearClassFilter}>
+                          Clear
+                        </Button>
+                        <div className="d-flex flex-wrap gap-1">
+                          {selectedClasses.map(cls => (
+                            <Badge key={cls} bg="secondary" className="d-flex align-items-center">
+                              {cls}
+                              <span 
+                                style={{ cursor: 'pointer', marginLeft: '5px' }}
+                                onClick={() => setSelectedClasses(prev => prev.filter(c => c !== cls))}
+                              >
+                                ×
+                              </span>
+                            </Badge>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </Col>
+                {(selectedSchools.length > 0 || selectedClasses.length > 0) && (
+                  <Col md={12} className="mt-2">
+                    <Button variant="outline-danger" size="sm" onClick={clearAllFilters}>
+                      Clear All Filters
+                    </Button>
+                  </Col>
                 )}
-              </>
-            )}
-          </Card.Body>
+              </Row>
+            </Card.Body>
+          </Card>
+
+         <Card className="shadow-sm border-0">
+           <Card.Header className="bg-info text-white d-flex justify-content-between align-items-center">
+             <span><FaComments className="me-2" /> Counseling Details</span>
+             <div className="d-flex gap-2">
+               <Button variant="light" size="sm" onClick={exportToPDF}>
+                 <FaFilePdf className="me-1" /> Export PDF
+               </Button>
+               <Button variant="success" size="sm" onClick={exportToExcel}>
+                 <FaFileExcel className="me-1" /> Export Excel
+               </Button>
+             </div>
+           </Card.Header>
+           <Card.Body>
+             {loading ? (
+               <div className="text-center">
+                 <Spinner animation="border" variant="primary" />
+                 <p className="mt-2">Loading...</p>
+               </div>
+             ) : filteredData.length === 0 ? (
+               <p className="text-muted text-center mb-0">No counseling requests found</p>
+             ) : (
+               <>
+                 <div className="table-responsive">
+                   <Table striped bordered hover responsive>
+                     <thead>
+                       <tr>
+                         <th>#</th>
+                         <th>Student ID</th>
+                         <th>Full Name</th>
+                         <th>School Name</th>
+                         <th>School ID</th>
+                         <th>Phone</th>
+                         <th>District</th>
+                         <th>Block</th>
+                         <th>Class</th>
+                         <th>Category</th>
+                         <th>Status</th>
+                         <th>Action</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {currentItems.map((counseling, index) => {
+                         const student = counseling.student_details || {}
+                         return (
+                           <tr key={counseling.id}>
+                             <td>{startIndex + index + 1}</td>
+                             <td>{student.student_id || counseling.student_id || '-'}</td>
+                             <td>{student.full_name || student.candidate_name || '-'}</td>
+                             <td>{student.school_name || '-'}</td>
+                             <td>{student.school_uni_id || '-'}</td>
+                             <td>{student.phone || student.mobile_no || '-'}</td>
+                             <td>{student.district || '-'}</td>
+                             <td>{student.block || '-'}</td>
+                             <td>{student.class_name || '-'}</td>
+                             <td>
+                               {Array.isArray(counseling.category_consulting) 
+                                 ? counseling.category_consulting.join(', ') 
+                                 : (counseling.category_consulting || '-')}
+                             </td>
+                             <td>
+                               <Badge bg={counseling.status === 'pending' ? 'warning' : counseling.status === 'approved' ? 'success' : 'danger'}>
+                                 {counseling.status || 'pending'}
+                               </Badge>
+                             </td>
+                             <td>
+                               <Button variant="info" size="sm" onClick={() => handleViewCounseling(counseling)}>
+                                 <FaEye className="me-1" /> View
+                               </Button>
+                             </td>
+                           </tr>
+                         )
+                       })}
+                     </tbody>
+                   </Table>
+                 </div>
+                 {totalPages > 1 && (
+                   <div className="d-flex justify-content-between align-items-center mt-3">
+                     <span className="text-muted small">
+                       Showing {startIndex + 1}-{Math.min(endIndex, filteredData.length)} of {filteredData.length} 
+                       {selectedSchools.length > 0 && ` (filtered from ${counselingData.length} total)`}
+                     </span>
+                     <div className="d-flex gap-2">
+                       <Button
+                         variant="outline-primary"
+                         size="sm"
+                         onClick={() => setCounselingPage(prev => Math.max(1, prev - 1))}
+                         disabled={counselingPage === 1}
+                       >
+                         Previous
+                       </Button>
+                       <span className="d-flex align-items-center px-2">
+                         Page {counselingPage} of {totalPages}
+                       </span>
+                       <Button
+                         variant="outline-primary"
+                         size="sm"
+                         onClick={() => setCounselingPage(prev => Math.min(totalPages, prev + 1))}
+                         disabled={counselingPage === totalPages}
+                       >
+                         Next
+                       </Button>
+                     </div>
+                   </div>
+                 )}
+               </>
+             )}
+           </Card.Body>
         </Card>
       </div>
     )
@@ -2587,65 +2890,67 @@ const DashBord = () => {
         </Modal.Body>
       </Modal>
 
-      <Modal show={showCounselingModal} onHide={handleCloseCounselingModal} size="lg" centered>
-        <Modal.Header closeButton className="bg-info text-white">
-          <Modal.Title>
-            <FaComments className="me-2" /> Counseling Details
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedCounseling && (
-            <div>
-              <Row className="g-3">
-                <Col md={6}>
-                  <Card className="h-100 shadow-sm border-0">
-                    <Card.Header className="bg-light">
-                      <h6 className="mb-0">Personal Information</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p><strong>ID:</strong> {selectedCounseling.id}</p>
-                      <p><strong>Student ID:</strong> {selectedCounseling.student_id}</p>
-                      <p><strong>Full Name:</strong> {selectedCounseling.full_name}</p>
-                      <p><strong>Aadhaar No:</strong> {selectedCounseling.aadhaar_no}</p>
-                      <p><strong>Phone:</strong> {selectedCounseling.phone}</p>
-                      <p><strong>Email:</strong> {selectedCounseling.email || 'N/A'}</p>
-                      <p><strong>Associate Wings:</strong> {selectedCounseling.associate_wings || 'N/A'}</p>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="h-100 shadow-sm border-0">
-                    <Card.Header className="bg-light">
-                      <h6 className="mb-0">Location Details</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p><strong>State:</strong> {selectedCounseling.state}</p>
-                      <p><strong>District:</strong> {selectedCounseling.district}</p>
-                      <p><strong>Block:</strong> {selectedCounseling.block}</p>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={12}>
-                  <Card className="shadow-sm border-0 mt-2">
-                    <Card.Header className="bg-light">
-                      <h6 className="mb-0">Counseling Information</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p><strong>Category Consulting:</strong> {Array.isArray(selectedCounseling.category_consulting) ? selectedCounseling.category_consulting.join(', ') : selectedCounseling.category_consulting}</p>
-                      <p><strong>Status:</strong> <Badge bg={selectedCounseling.status === 'pending' ? 'warning' : selectedCounseling.status === 'approved' ? 'success' : 'danger'}>{selectedCounseling.status}</Badge></p>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseCounselingModal}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+       <Modal show={showCounselingModal} onHide={handleCloseCounselingModal} size="lg" centered>
+         <Modal.Header closeButton className="bg-info text-white">
+           <Modal.Title>
+             <FaComments className="me-2" /> Counseling Details
+           </Modal.Title>
+         </Modal.Header>
+         <Modal.Body>
+           {selectedCounseling && (
+             <div>
+               <Row className="g-3">
+                 <Col md={6}>
+                   <Card className="h-100 shadow-sm border-0">
+                     <Card.Header className="bg-light">
+                       <h6 className="mb-0">Personal Information</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p><strong>Student ID:</strong> {selectedCounseling.student_details?.student_id || selectedCounseling.student_id || '-'}</p>
+                       <p><strong>Full Name:</strong> {selectedCounseling.student_details?.full_name || selectedCounseling.student_details?.candidate_name || '-'}</p>
+                       <p><strong>Aadhaar No:</strong> {selectedCounseling.student_details?.aadhaar_no ? `****${selectedCounseling.student_details.aadhaar_no.slice(-4)}` : '-'}</p>
+                       <p><strong>Phone:</strong> {selectedCounseling.student_details?.phone || selectedCounseling.student_details?.mobile_no || '-'}</p>
+                       <p><strong>Email:</strong> {selectedCounseling.student_details?.email || 'N/A'}</p>
+                       <p><strong>Class:</strong> {selectedCounseling.student_details?.class_name || '-'}</p>
+                       <p><strong>Status:</strong> <Badge bg={selectedCounseling.status === 'pending' ? 'warning' : selectedCounseling.status === 'approved' ? 'success' : 'danger'}>{selectedCounseling.status || 'pending'}</Badge></p>
+                     </Card.Body>
+                   </Card>
+                 </Col>
+                 <Col md={6}>
+                   <Card className="h-100 shadow-sm border-0">
+                     <Card.Header className="bg-light">
+                       <h6 className="mb-0">School & Location Details</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p><strong>School Name:</strong> {selectedCounseling.student_details?.school_name || '-'}</p>
+                       <p><strong>School ID:</strong> {selectedCounseling.student_details?.school_uni_id || '-'}</p>
+                       <p><strong>State:</strong> {selectedCounseling.student_details?.state || '-'}</p>
+                       <p><strong>District:</strong> {selectedCounseling.student_details?.district || '-'}</p>
+                       <p><strong>Block:</strong> {selectedCounseling.student_details?.block || '-'}</p>
+                     </Card.Body>
+                   </Card>
+                 </Col>
+                 <Col md={12}>
+                   <Card className="shadow-sm border-0 mt-2">
+                     <Card.Header className="bg-light">
+                       <h6 className="mb-0">Counseling Information</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p><strong>Category:</strong> {Array.isArray(selectedCounseling.category_consulting) ? selectedCounseling.category_consulting.join(', ') : selectedCounseling.category_consulting}</p>
+                       <p><strong>Requested At:</strong> {new Date(selectedCounseling.created_at || selectedCounseling.student_details?.created_at || Date.now()).toLocaleString()}</p>
+                     </Card.Body>
+                   </Card>
+                 </Col>
+               </Row>
+             </div>
+           )}
+         </Modal.Body>
+         <Modal.Footer>
+           <Button variant="secondary" onClick={handleCloseCounselingModal}>
+             Close
+           </Button>
+         </Modal.Footer>
+       </Modal>
 
       {/* Create Notification Modal */}
       <Modal show={showNotificationModal} onHide={() => setShowNotificationModal(false)} centered>
