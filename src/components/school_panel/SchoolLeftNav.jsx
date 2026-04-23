@@ -76,38 +76,7 @@ const menuItems = [
       label: "QUIZ COMPETITIONS",
       path: "/SchoolQuizList",
     },
-    {
-      icon: <FaCube />,
-      label: "Test",
-      submenu: [
-        {
-          label: "test1",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
-         {
-          label: "test1",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
-      ],
-    },
-    {
-      icon: <FaCube />,
-      label: "Test",
-      submenu: [
-        {
-          label: "test1",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
-         {
-          label: "test1",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
-      ],
-    },
+ 
 
     //   icon: <FaCalendarAlt />,
     //   label: "Event",

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../all_login/LanguageContext'
-import heroImg from "../../assets/images/CBSEimg.jpg";
+import heroImg from "../../assets/images/CBSEimg.png";
 import '../../assets/css/home.css'
 
 function Home() {
