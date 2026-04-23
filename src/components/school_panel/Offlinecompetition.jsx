@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Alert, Modal, ListGroup, Table, Form } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
+import SchoolHeader from "./SchoolHeader";
+import SchoolLeftNav from "./SchoolLeftNav";
+import "../../assets/css/userleftnav.css";
 
 const Offlinecompetition = () => {
   const [competitions, setCompetitions] = useState([]);
@@ -188,13 +191,27 @@ const Offlinecompetition = () => {
   };
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Offline Competitions</h4>
-        <Button variant="primary" onClick={() => setShowModal(true)}>
-          Add Competition
-        </Button>
-      </div>
+    <div className="dashboard-container">
+      <SchoolLeftNav
+        sidebarOpen={true}
+        setSidebarOpen={() => {}}
+        isMobile={false}
+        isTablet={false}
+      />
+      <div className="main-content-dash">
+        <SchoolHeader toggleSidebar={() => {}} />
+
+        <Container className="dashboard-box mt-3">
+          <Row>
+            <Col>
+              <Card className="shadow-box">
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h4>Offline Competitions</h4>
+                    <Button variant="primary" onClick={() => setShowModal(true)}>
+                      Add Competition
+                    </Button>
+                  </div>
 
       {error && <Alert variant="danger">{error}</Alert>}
 
@@ -369,6 +386,12 @@ const Offlinecompetition = () => {
           )}
         </Modal.Footer>
       </Modal>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+      </div>
     </div>
   );
 };
