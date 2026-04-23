@@ -57,7 +57,7 @@ const createAxiosInstance = (accessToken, refreshToken, logout) => {
         isRefreshing = true;
 
         try {
-          const response = await axios.post(`${API_URL}/token/refresh/`, {
+          const response = await axios.post(`${API_URL}/refresh-token/`, {
             refresh: refreshToken,
           });
 
@@ -147,7 +147,7 @@ export function AuthProvider({ children }) {
     if (!refreshToken) return null;
     
     try {
-      const response = await axios.post(`${API_URL}/token/refresh/`, {
+      const response = await axios.post(`${API_URL}/refresh-token/`, {
         refresh: refreshToken,
       });
       const { access } = response.data;
