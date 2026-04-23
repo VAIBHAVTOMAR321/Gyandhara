@@ -117,7 +117,7 @@ function Home() {
               <Link to="/register" className="btn-gyandhara btn-primary-custom">
                 <i className="bi bi-person-plus"></i> {t.joinBtn}
               </Link>
-              <Link to="/login" className="btn-gyandhara btn-outline-custom">
+              <Link to="/login" className="btn-gyandhara btn-outline-custom-btn">
                 <i className="bi bi-box-arrow-in-right"></i> {t.learnMoreBtn}
               </Link>
             </div>

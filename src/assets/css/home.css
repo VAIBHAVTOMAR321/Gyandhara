@@ -180,7 +180,19 @@
 .btn-outline-custom {
   background: transparent;
   border: 2.5px solid var(--gd-blue);
-  color: var(--gd-blue);
+ color: #fff;
+}
+.btn-outline-custom-btn {
+  background: transparent;
+  border: 2.5px solid var(--gd-blue);
+ color: #2E6DB4;
+}
+.btn-outline-custom-btn:hover {
+  background: var(--gd-gradient-blue);
+  color: var(--gd-white);
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px var(--gd-shadow-blue);
 }
 
 .btn-outline-custom:hover {
@@ -196,7 +208,7 @@
    ========================================== */
 
 .role-section {
-  margin-top: 60px;
+  margin-top: 12px;
   padding: 55px 45px;
   background: var(--gd-white);
   border-radius: var(--gd-radius);
@@ -334,7 +346,7 @@
    ========================================== */
 
 .benefits-section {
-  margin-top: 80px;
+  margin-top: 12px;
   padding: 55px 45px;
   background: linear-gradient(135deg, var(--gd-gradient-hero) 0%, rgba(255, 255, 255, 1) 100%);
   border-radius: var(--gd-radius);
@@ -477,6 +489,7 @@
   margin-bottom: 12px;
   position: relative;
   z-index: 2;
+  color: #fff;
 }
 
 .final-cta-section p {

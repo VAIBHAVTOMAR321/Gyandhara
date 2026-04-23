@@ -3,6 +3,10 @@ import { Link } from "react-router-dom";
 import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
 import "../../assets/css/footer.css";
 
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
 function Footer() {
   return (
     <footer className="footer">
@@ -25,9 +29,9 @@ function Footer() {
           <div className="footer-links-section">
             <h4 className="footer-section-title">Quick Links</h4>
             <ul className="footer-links">
-              <li><Link to="/" className="footer-link">Home</Link></li>
-              <li><Link to="/login" className="footer-link">Login</Link></li>
-              <li><Link to="/StudentRegistration" className="footer-link">Register</Link></li>
+              <li><Link to="/" className="footer-link" onClick={scrollToTop}>Home</Link></li>
+              <li><Link to="/login" className="footer-link" onClick={scrollToTop}>Login</Link></li>
+              <li><Link to="/StudentRegistration" className="footer-link" onClick={scrollToTop}>Register</Link></li>
             </ul>
           </div>
 
@@ -35,11 +39,11 @@ function Footer() {
           <div className="footer-services-section">
             <h4 className="footer-section-title">Services</h4>
             <ul className="footer-links">
-              <li><span className="footer-link-text">Career Guidance</span></li>
-              <li><span className="footer-link-text">Government Schemes</span></li>
-              <li><span className="footer-link-text">Grooming Classes</span></li>
-              <li><span className="footer-link-text">Competitions</span></li>
-              <li><span className="footer-link-text">Job Openings</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Career Guidance</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Government Schemes</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Grooming Classes</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Competitions</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Job Openings</span></li>
             </ul>
           </div>
 
@@ -60,8 +64,10 @@ function Footer() {
           <div className="footer-copyright">
             © 2026 Gyandhara. All rights reserved. | Designed by BrainRock.
           </div>
-          <div className="footer-social">
-            {/* Add social media icons if needed */}
+          <div className="footer-bottom-links">
+            <span className="footer-scroll-top" onClick={scrollToTop}>
+              <i className="bi bi-arrow-up-circle"></i> Back to Top
+            </span>
           </div>
         </div>
       </div>

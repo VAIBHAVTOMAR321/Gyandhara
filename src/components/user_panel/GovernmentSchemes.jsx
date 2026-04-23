@@ -299,7 +299,7 @@ const GovernmentSchemes = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {/* Back Button */}
           <div className="mb-4">
             <Button 
