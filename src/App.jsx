@@ -12,6 +12,7 @@ import './style.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import Home from './components/pages/Home';
+import Footer from './components/footer/Footer';
 import { AuthProvider, useAuth } from './components/all_login/AuthContext';
 import { LanguageProvider } from './components/all_login/LanguageContext';
 import UserDashboard from "./components/user_panel/UserDashboard";
@@ -63,6 +64,22 @@ function NavBarWrapper() {
 }
 
 
+// Footer Wrapper (Hide on specific routes)
+function FooterWrapper() {
+  const location = useLocation();
+
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents'];
+
+  const shouldHide = hideOnRoutes.some(route =>
+    location.pathname.startsWith(route)
+  );
+
+  if (shouldHide) return null;
+
+  return <Footer />;
+}
+
+
 // Protected Route
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isReady } = useAuth();
@@ -86,6 +103,7 @@ function AppContent() {
       {/* Navbar conditionally visible */}
       <NavBarWrapper />
 
+
       <Routes>
         <Route path="/" element={<Home />} />
 
@@ -93,73 +111,73 @@ function AppContent() {
         <Route path="/register" element={<StudentRegistration />} />
         <Route path="/login" element={<Login />} />
 
-        <Route 
-          path="/UserDashboard" 
+        <Route
+          path="/UserDashboard"
           element={
             <ProtectedRoute>
               <UserDashboard />
             </ProtectedRoute>
-          } 
+          }
         />
-         <Route 
-          path="/TwelfthGuidance" 
-          element={
-            <ProtectedRoute>
-              <TwelfthGuidance />
-            </ProtectedRoute>
-          } 
-        />
-        
-         <Route 
-          path="/GovernmentSchemes" 
-          element={
-            <ProtectedRoute>
-              <GovernmentSchemes />
-            </ProtectedRoute>
-          } 
-        />
+         <Route
+           path="/TwelfthGuidance"
+           element={
+             <ProtectedRoute>
+               <TwelfthGuidance />
+             </ProtectedRoute>
+           }
+         />
 
-        <Route 
-          path="/UserProfile" 
+          <Route
+           path="/GovernmentSchemes"
+           element={
+             <ProtectedRoute>
+               <GovernmentSchemes />
+             </ProtectedRoute>
+           }
+         />
+
+        <Route
+          path="/UserProfile"
           element={
             <ProtectedRoute>
               <UserProfile />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/UserTest" 
+        <Route
+          path="/UserTest"
           element={
             <ProtectedRoute>
               <UserTest />
             </ProtectedRoute>
-          } 
+          }
         />
-       
-        <Route 
-          path="/JobOpenings" 
+
+        <Route
+          path="/JobOpenings"
           element={
             <ProtectedRoute>
               <JobOpenings />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/UserEvents" 
+        <Route
+          path="/UserEvents"
           element={
             <ProtectedRoute>
               <UserEvents />
             </ProtectedRoute>
-          } 
+          }
         />
-         <Route 
-          path="/GroomingClasses" 
-          element={
-            <ProtectedRoute>
-              <GroomingClasses />
-            </ProtectedRoute>
-          } 
-        />
+         <Route
+           path="/GroomingClasses"
+           element={
+             <ProtectedRoute>
+               <GroomingClasses />
+             </ProtectedRoute>
+           }
+         />
         <Route
           path="/Competition"
           element={
@@ -208,45 +226,45 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-          <Route 
-          path="/StudentIssue" 
+          <Route
+          path="/StudentIssue"
           element={
             <ProtectedRoute>
               <StudentIssue />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/QuizManagement" 
+        <Route
+          path="/QuizManagement"
           element={
             <ProtectedRoute>
               <QuizManageMent />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/SchoolQuiz" 
+        <Route
+          path="/SchoolQuiz"
           element={
             <ProtectedRoute>
               <SchoolQuiz />
             </ProtectedRoute>
-          } 
+          }
         />
-<Route 
-          path="/AdminDashboard" 
+<Route
+          path="/AdminDashboard"
           element={
             <ProtectedRoute>
               <AdminDashBoard />
             </ProtectedRoute>
-          } 
+          }
         />
-        <Route 
-          path="/DashBord" 
+        <Route
+          path="/DashBord"
           element={
             <ProtectedRoute>
               <DashBord />
             </ProtectedRoute>
-          } 
+          }
         />
         <Route
           path="/SchoolDashBoard"
@@ -272,40 +290,43 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        
-        <Route 
-          path="/UserQuiz" 
+
+        <Route
+          path="/UserQuiz"
           element={
             <ProtectedRoute>
               <UserQuiz />
             </ProtectedRoute>
-          } 
+          }
         />
-         <Route 
-           path="/TenthGuidance" 
+         <Route
+           path="/TenthGuidance"
            element={
              <ProtectedRoute>
                <TenthGuidance />
              </ProtectedRoute>
-           } 
+           }
          />
-         <Route 
-           path="/OccupationDetails" 
+         <Route
+           path="/OccupationDetails"
            element={
              <ProtectedRoute>
                <OccupationDetails />
              </ProtectedRoute>
-           } 
+           }
          />
-          {/* <Route 
-          path="/TwelfthGuidance" 
+          {/* <Route
+          path="/TwelfthGuidance"
           element={
             <ProtectedRoute>
               <TwelfthGuidance />
             </ProtectedRoute>
-          } 
+          }
         /> */}
       </Routes>
+
+      {/* Footer conditionally visible */}
+      <FooterWrapper />
     </>
   );
 }
