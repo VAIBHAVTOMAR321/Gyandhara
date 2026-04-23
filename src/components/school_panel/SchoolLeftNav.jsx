@@ -139,8 +139,8 @@ const menuItems = [
           {sidebarOpen ? (
             <div className="logo-container">
               <div className="logo">
-                School DashBoard
                 <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
+                <div className="logo-text">School Dashboard</div>
               </div>
             </div>
           ) : (

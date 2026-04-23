@@ -287,11 +287,20 @@
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-    font-size:14px !important; 
+    text-align: center;
+    font-size:14px !important;
     font-weight: bold;
-    gap: 10px;
+}
+
+.logo .header-logo {
+    display: block;
+    margin: 0 auto 10px;
+    height: 48px;
+    width: auto;
+}
+
+.logo-text {
+    color: white;
 }
 
 .logo .header-logo {
@@ -301,13 +310,13 @@
 }
 
 .logo-collapsed {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
     padding: 10px 0;
 }
 
 .logo-collapsed .header-logo {
+    display: block;
+    margin: 0 auto;
     height: 30px;
     width: auto;
 }
