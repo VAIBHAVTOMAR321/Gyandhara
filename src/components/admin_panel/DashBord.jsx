@@ -16,7 +16,7 @@ import * as XLSX from 'xlsx'
 import {
   FaPlus, FaArrowLeft, FaBook, FaUsers, FaLayerGroup,
   FaTrash, FaImage, FaList, FaEye, FaEdit, FaComments, FaQuestionCircle, FaBell, FaCalendarAlt, FaFilePdf, FaFileExcel, FaFilter, FaChartBar,
-  FaCheckCircle, FaClock, FaChartPie, FaSchool, FaBuilding, FaLightbulb, FaExclamationTriangle, FaChartLine
+  FaCheckCircle, FaClock, FaChartPie, FaSchool, FaBuilding, FaLightbulb, FaExclamationTriangle, FaChartLine, FaTrophy, FaInfoCircle, FaCalculator
 } from 'react-icons/fa'
 import { useAuth } from '../all_login/AuthContext'
 
@@ -182,10 +182,67 @@ const DashBord = () => {
     venue: '',
     event_type: ''
   })
-  const [eventImage, setEventImage] = useState(null)
-  const [isEditingEvent, setIsEditingEvent] = useState(false)
+   const [eventImage, setEventImage] = useState(null)
+   const [isEditingEvent, setIsEditingEvent] = useState(false)
 
-  useEffect(() => {
+   // State for Performance Score
+   const [showPerformanceModal, setShowPerformanceModal] = useState(false)
+   const [showPerformanceHelpModal, setShowPerformanceHelpModal] = useState(false)
+
+   // Calculate School Performance Scores from existing data
+   const calculateSchoolPerformance = (enrollments) => {
+     if (!enrollments || enrollments.length === 0) return []
+
+     // Group by school
+     const schoolGroups = {}
+     enrollments.forEach(e => {
+       const school = e.school_name || 'Unknown School'
+       if (!schoolGroups[school]) {
+         schoolGroups[school] = { enrolled: 0, completed: 0 }
+       }
+       schoolGroups[school].enrolled++
+       if (e.is_completed) {
+         schoolGroups[school].completed++
+       }
+     })
+
+     // Find MaxCompleted across all schools
+     const maxCompleted = Math.max(...Object.values(schoolGroups).map(s => s.completed))
+
+     // Calculate scores, sort by score
+     const rankedSchools = Object.entries(schoolGroups)
+       .map(([schoolName, stats], index) => {
+         const enrolled = stats.enrolled
+         const completed = stats.completed
+         const completionRate = enrolled > 0 ? ((completed / enrolled) * 100) : 0
+
+         // Balanced Performance Score formula
+         let balancedScore = 0
+         if (enrolled > 0) {
+           const component1 = maxCompleted > 0 ? (completed / maxCompleted) * 100 : 0
+           const component2 = (completed / enrolled) * 100
+           balancedScore = (0.6 * component1 + 0.4 * component2)
+         }
+         balancedScore = Math.round(balancedScore * 100) / 100
+
+         return {
+           schoolName,
+           enrolled,
+           completed,
+           completionRate: Math.round(completionRate * 100) / 100,
+           balancedScore
+         }
+       })
+       .sort((a, b) => b.balancedScore - a.balancedScore)
+       .map((school, index) => ({
+         ...school,
+         rank: index + 1
+       }))
+
+     return rankedSchools
+   }
+
+   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
       setIsMobile(width < 768)
@@ -3563,12 +3620,22 @@ const DashBord = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Analytics Graph Modal */}
-      {showGraphModal && (
-        <Modal show={showGraphModal} onHide={() => setShowGraphModal(false)} fullscreen={true}>
-          <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            <Modal.Title><FaChartBar className="me-2" /> Enrollment Analytics Dashboard</Modal.Title>
-          </Modal.Header>
+       {/* Analytics Graph Modal */}
+       {showGraphModal && (
+         <Modal show={showGraphModal} onHide={() => setShowGraphModal(false)} fullscreen={true}>
+           <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+             <Modal.Title className="d-flex align-items-center gap-3">
+               <FaChartBar className="me-2" /> Enrollment Analytics Dashboard
+             </Modal.Title>
+             <div className="d-flex gap-2">
+               <Button variant="light" size="sm" onClick={() => setShowPerformanceModal(true)}>
+                 <FaTrophy className="me-1" /> Performance Ranking
+               </Button>
+               <Button variant="outline-light" size="sm" onClick={() => setShowPerformanceHelpModal(true)} title="How is performance calculated?">
+                 ?
+               </Button>
+             </div>
+           </Modal.Header>
           <Modal.Body className="p-4">
             {(() => {
               const filteredData = unpaidEnrollments.filter(enrollment => {
@@ -4137,6 +4204,294 @@ const DashBord = () => {
           </Modal.Footer>
         </Modal>
       )}
+
+      {/* Performance Ranking Modal */}
+      {showPerformanceModal && (
+        <Modal show={showPerformanceModal} onHide={() => setShowPerformanceModal(false)} fullscreen={true}>
+          <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)' }}>
+            <Modal.Title><FaTrophy className="me-2" /> School Performance Ranking</Modal.Title>
+            <div className="d-flex gap-2">
+              <Button variant="light" size="sm" onClick={exportPerformancePDF}>
+                <FaFilePdf className="me-1" /> Export PDF
+              </Button>
+              <Button variant="light" size="sm" onClick={exportPerformanceExcel}>
+                <FaFileExcel className="me-1" /> Export Excel
+              </Button>
+              <Button variant="outline-light" size="sm" onClick={() => setShowPerformanceHelpModal(true)} title="How is performance calculated?">
+                <FaQuestionCircle />
+              </Button>
+            </div>
+          </Modal.Header>
+          <Modal.Body className="p-4">
+            {(() => {
+              const rankedSchools = calculateSchoolPerformance(unpaidEnrollments)
+
+              // Export to PDF
+              const exportPerformancePDF = () => {
+                try {
+                  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm' })
+                  const pageWidth = doc.internal.pageSize.getWidth()
+                  const margin = 14
+
+                  // Title
+                  doc.setFontSize(18)
+                  doc.text('School Performance Ranking Report', margin, 20)
+                  doc.setFontSize(11)
+                  doc.text(`Generated: ${new Date().toLocaleString()}`, margin, 28)
+                  doc.text(`Total Schools: ${rankedSchools.length}`, margin, 36)
+
+                  let yPos = 44
+
+                  // Performance Table
+                  const columns = ['Rank', 'School Name', 'Enrolled', 'Completed', 'Completion %', 'Balanced Score']
+                  const rows = rankedSchools.map(s => [
+                    `#${s.rank}`,
+                    s.schoolName.substring(0, 30),
+                    s.enrolled,
+                    s.completed,
+                    `${s.completionRate}%`,
+                    s.balancedScore.toFixed(2)
+                  ])
+
+                  doc.autoTable({
+                    head: [columns],
+                    body: rows,
+                    startY: yPos,
+                    margin: { left: margin, right: margin },
+                    styles: { fontSize: 8, cellPadding: 0.5 },
+                    headStyles: { fillColor: [40, 167, 69], textColor: 255 }
+                  })
+
+                  doc.save(`school-performance-ranking-${new Date().toISOString().split('T')[0]}.pdf`)
+                } catch (err) {
+                  console.error('Performance PDF export error:', err)
+                  alert('Failed to export PDF')
+                }
+              }
+
+              // Export to Excel
+              const exportPerformanceExcel = () => {
+                try {
+                  const wsData = [
+                    ['Rank', 'School Name', 'Enrolled', 'Completed', 'Completion Rate (%)', 'Balanced Score'],
+                    ...rankedSchools.map(s => [
+                      s.rank,
+                      s.schoolName,
+                      s.enrolled,
+                      s.completed,
+                      s.completionRate,
+                      s.balancedScore
+                    ])
+                  ]
+
+                  const ws = XLSX.utils.aoa_to_sheet(wsData)
+                  ws['!cols'] = [
+                    { wch: 6 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 14 }, { wch: 14 }
+                  ]
+
+                  const wb = XLSX.utils.book_new()
+                  XLSX.utils.book_append_sheet(wb, ws, 'Performance Ranking')
+                  XLSX.writeFile(wb, `school-performance-ranking-${new Date().toISOString().split('T')[0]}.xlsx`)
+                } catch (err) {
+                  console.error('Performance Excel export error:', err)
+                  alert('Failed to export Excel')
+                }
+              }
+
+              if (rankedSchools.length === 0) {
+                return <p className="text-center text-muted py-5">No performance data available.</p>
+              }
+
+              return (
+                <div>
+                  <Card className="shadow-sm border-0 mb-4">
+                    <Card.Body>
+                      <p className="text-muted small mb-0">
+                        Schools ranked by Balanced Performance Score (0.6 × relative completion + 0.4 × absolute completion).
+                        Higher score indicates better overall performance.
+                      </p>
+                    </Card.Body>
+                  </Card>
+
+                  <Row className="g-3 mb-4">
+                    {rankedSchools.slice(0, 3).map((school, idx) => (
+                      <Col md={4} key={school.schoolName}>
+                        <Card className={`shadow-sm border-0 h-100 ${idx === 0 ? 'border-warning' : idx === 1 ? 'border-secondary' : 'border-success'}`}>
+                          <Card.Body className="text-center py-4">
+                            <div className={`rounded-circle p-3 mb-2 d-inline-flex ${idx === 0 ? 'bg-warning bg-opacity-10' : idx === 1 ? 'bg-secondary bg-opacity-10' : 'bg-success bg-opacity-10'}`}>
+                              <FaTrophy className={`fs-2 ${idx === 0 ? 'text-warning' : idx === 1 ? 'text-secondary' : 'text-success'}`} />
+                            </div>
+                            <Badge bg={idx === 0 ? 'warning' : idx === 1 ? 'secondary' : 'success'} className="mb-2">Rank #{school.rank}</Badge>
+                            <h5 className="fw-bold mb-1 text-truncate" title={school.schoolName}>{school.schoolName}</h5>
+                            <p className="text-muted small mb-2">
+                              {school.enrolled} enrolled | {school.completed} completed
+                            </p>
+                            <h3 className="fw-bold text-success">{school.balancedScore}</h3>
+                            <small className="text-muted">Performance Score</small>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <Card className="shadow-sm border-0">
+                    <Card.Header className="bg-light">
+                      <h6 className="mb-0 fw-bold"><FaTrophy className="me-2" /> Complete Performance Ranking</h6>
+                    </Card.Header>
+                    <Card.Body className="p-0">
+                      <div className="table-responsive">
+                        <Table striped bordered hover responsive size="sm">
+                          <thead className="table-light">
+                            <tr>
+                              <th>Rank</th>
+                              <th>School Name</th>
+                              <th>Enrolled</th>
+                              <th>Completed</th>
+                              <th>Completion Rate</th>
+                              <th>Balanced Score</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {rankedSchools.map((school) => (
+                              <tr key={school.schoolName}>
+                                <td>
+                                  <Badge bg={school.rank <= 3 ? 'success' : 'secondary'}>#{school.rank}</Badge>
+                                </td>
+                                <td className="fw-bold">{school.schoolName}</td>
+                                <td>{school.enrolled}</td>
+                                <td>{school.completed}</td>
+                                <td>
+                                  <div className="d-flex align-items-center gap-2">
+                                    <div className="progress flex-grow-1" style={{ height: '6px', borderRadius: '3px' }}>
+                                      <div className="bg-success" style={{ width: `${school.completionRate}%` }}></div>
+                                    </div>
+                                    <span className="small">{school.completionRate}%</span>
+                                  </div>
+                                </td>
+                                <td>
+                                  <span className="fw-bold text-success">{school.balancedScore}</span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </Table>
+                      </div>
+                    </Card.Body>
+                  </Card>
+                </div>
+              )
+            })()}
+          </Modal.Body>
+          <Modal.Footer className="bg-light">
+            <Button variant="secondary" onClick={() => setShowPerformanceModal(false)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+
+      {/* Performance Calculation Help Modal */}
+      {showPerformanceHelpModal && (
+        <Modal show={showPerformanceHelpModal} onHide={() => setShowPerformanceHelpModal(false)} centered>
+          <Modal.Header closeButton className="bg-info text-white">
+            <Modal.Title><FaInfoCircle className="me-2" /> How Performance Score is Calculated</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="py-2">
+              <h6 className="fw-bold mb-3">Balanced Performance Score Formula</h6>
+
+              <Card className="bg-light border-0 mb-4">
+                <Card.Body>
+                  <p className="fw-bold text-center mb-0" style={{ fontSize: '1.1em' }}>
+                    Score = 0.6 × ((Completed / MaxCompleted) × 100) + 0.4 × ((Completed / Enrolled) × 100)
+                  </p>
+                </Card.Body>
+              </Card>
+
+              <Row className="g-3 mb-4">
+                <Col md={6}>
+                  <Card className="border-0 shadow-sm h-100">
+                    <Card.Header className="bg-primary text-white">
+                      <h6 className="mb-0 fw-bold">Component 1 (Weight: 60%)</h6>
+                    </Card.Header>
+                    <Card.Body>
+                      <p className="mb-1"><strong>Relative Completion:</strong></p>
+                      <code className="d-block mb-2 p-2 bg-light rounded">
+                        (Completed / MaxCompleted) × 100
+                      </code>
+                      <p className="small text-muted mb-0">
+                        Compares the school's completed count <strong>against the highest completed count across all schools</strong>.
+                        This ensures the best-performing school gets a relative score of 100.
+                      </p>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col md={6}>
+                  <Card className="border-0 shadow-sm h-100">
+                    <Card.Header className="bg-success text-white">
+                      <h6 className="mb-0 fw-bold">Component 2 (Weight: 40%)</h6>
+                    </Card.Header>
+                    <Card.Body>
+                      <p className="mb-1"><strong>Absolute Completion:</strong></p>
+                      <code className="d-block mb-2 p-2 bg-light rounded">
+                        (Completed / Enrolled) × 100
+                      </code>
+                      <p className="small text-muted mb-0">
+                        Measures the <strong>actual completion percentage</strong> of students at each school.
+                        This rewards schools for high completion rates regardless of size.
+                      </p>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+
+              <Card className="border-0 shadow-sm mb-4">
+                <Card.Header className="bg-warning">
+                  <h6 className="mb-0 fw-bold"><FaLightbulb className="me-2" /> Why This Formula?</h6>
+                </Card.Header>
+                <Card.Body>
+                  <ul className="mb-0">
+                    <li><strong>60% weight on relative performance</strong> compares schools against the top performer, encouraging competition.</li>
+                    <li><strong>40% weight on absolute completion</strong> ensures schools are also rewarded for their actual completion rate (quality), not just relative ranking.</li>
+                    <li>This <strong>balanced approach</strong> prevents a school with high enrollment but low completion from ranking too high, while also rewarding smaller schools with good completion rates.</li>
+                  </ul>
+                </Card.Body>
+              </Card>
+
+              <Card className="border-0 shadow-sm">
+                <Card.Header className="bg-light">
+                  <h6 className="mb-0 fw-bold"><FaCalculator className="me-2" /> Example Calculation</h6>
+                </Card.Header>
+                <Card.Body>
+                  <p className="small mb-2">
+                    <strong>Scenario:</strong> School A: 75 enrolled, 60 completed. MaxCompleted (across all schools) = 120.
+                  </p>
+                  <div className="small">
+                    <ul className="mb-1">
+                      <li>Component 1: (60 / 120) × 100 = 50 → 0.6 × 50 = <strong>30</strong></li>
+                      <li>Component 2: (60 / 75) × 100 = 80 → 0.4 × 80 = <strong>32</strong></li>
+                    </ul>
+                    <p className="fw-bold text-success border-top pt-2 mt-2">
+                      Total Balanced Score = 30 + 32 = 62.00
+                    </p>
+                  </div>
+                </Card.Body>
+              </Card>
+
+              <div className="mt-4">
+                <h6 className="fw-bold mb-2">Rules</h6>
+                <ul className="small text-muted mb-0">
+                  <li>If a school has 0 enrolled students, its balanced score is 0.</li>
+                  <li>Scores are rounded to 2 decimal places.</li>
+                  <li>Schools are ranked from highest to lowest score.</li>
+                </ul>
+              </div>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowPerformanceHelpModal(false)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+      )}
+
     </div>
   )
 }
