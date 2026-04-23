@@ -51,16 +51,27 @@ const AdminDashBoard = () => {
     setLoading(true);
     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
     try {
-      const studentsRes = await axios.get(
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      const [studentsRes, schoolsRes] = await Promise.all([
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        )
+      ]);
 
       console.log('Students Response:', studentsRes.data);
+      console.log('Schools Response:', schoolsRes.data);
 
       let studentData = [];
       if (studentsRes.data && studentsRes.data.data) {
@@ -69,16 +80,25 @@ const AdminDashBoard = () => {
         studentData = studentsRes.data;
       }
       
+      let schoolData = [];
+      if (schoolsRes.data && schoolsRes.data.data) {
+        schoolData = schoolsRes.data.data;
+      } else if (schoolsRes.data && Array.isArray(schoolsRes.data)) {
+        schoolData = schoolsRes.data;
+      }
+      
       setStudents(studentData);
+      setSchools(schoolData);
       setStats({
         totalStudents: studentData.length,
-        totalSchools: 0
+        totalSchools: schoolData.length
       });
     } catch (err) {
       console.error("Error fetching data:", err);
       console.error("Error response:", err.response);
       console.error("Error status:", err.response?.status);
       setStudents([]);
+      setSchools([]);
     } finally {
       setLoading(false);
     }
@@ -86,6 +106,43 @@ const AdminDashBoard = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleStatusChange = async (schoolId, newStatus) => {
+    if (!accessToken) {
+      alert('Authentication token not available');
+      return;
+    }
+
+    try {
+      await axios.put(
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
+        {
+          school_uni_id: schoolId,
+          status: newStatus
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      setSchools(prevSchools =>
+        prevSchools.map(school =>
+          school.school_uni_id === schoolId ? { ...school, status: newStatus } : school
+        )
+      );
+
+      setStats(prevStats => ({
+        ...prevStats,
+        totalSchools: schools.length
+      }));
+    } catch (err) {
+      console.error("Error updating school status:", err);
+      alert('Failed to update school status');
+    }
   };
 
   const statCards = [
@@ -225,6 +282,7 @@ const AdminDashBoard = () => {
                 <th>District</th>
                 <th>State</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -236,15 +294,29 @@ const AdminDashBoard = () => {
                     <td>{school.school_name || "-"}</td>
                     <td>{school.district || "-"}</td>
                     <td>{school.state || "Uttarakhand"}</td>
-                    <td>
-                      <Badge bg="success">Active</Badge>
-                    </td>
+                       <td>
+                         <Badge bg={school.status === "approved" ? "success" : school.status === "rejected" ? "danger" : "warning"}>
+                           {school.status || "pending"}
+                         </Badge>
+                       </td>
+                       <td>
+                         <select
+                           className="status-select form-select form-select-sm"
+                           value={school.status || "pending"}
+                           onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
+                           style={{ cursor: 'pointer', minWidth: '120px' }}
+                         >
+                           <option value="pending">Pending</option>
+                           <option value="approved">Approved</option>
+                           <option value="rejected">Rejected</option>
+                         </select>
+                       </td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan="6" className="text-center">No schools found</td>
-                </tr>
+                 <tr>
+                   <td colSpan="7" className="text-center">No schools found</td>
+                 </tr>
               )}
             </tbody>
           </Table>
@@ -344,7 +416,21 @@ const AdminDashBoard = () => {
                     <div key={index} className="mobile-card">
                       <div className="mobile-card-header">
                         <span className="mobile-card-id">{school.school_uni_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
-                        <span className="mobile-status approved">Active</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className={`mobile-status ${school.status || 'pending'}`}>
+                            {school.status || "pending"}
+                          </span>
+                          <select
+                            className="status-select-mobile form-select form-select-sm"
+                            value={school.status || "pending"}
+                            onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
+                            style={{ cursor: 'pointer', padding: '2px 4px', fontSize: '12px', minWidth: '80px' }}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                          </select>
+                        </div>
                       </div>
                       <div className="mobile-card-row">
                         <span className="mobile-card-label">School Name</span>

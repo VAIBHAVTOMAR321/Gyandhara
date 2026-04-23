@@ -28,12 +28,11 @@ const DashBord = () => {
   const { accessToken } = useAuth()
   const authToken = accessToken
   
-  // State for Data
-  const [paidEnrollmentCount, setPaidEnrollmentCount] = useState(0)
-  const [unpaidEnrollmentCount, setUnpaidEnrollmentCount] = useState(0)
-  const [courses, setCourses] = useState([])
-  const [courseType, setCourseType] = useState('paid') // 'paid' or 'unpaid'
-  const [loading, setLoading] = useState(true)
+   // State for Data
+   const [unpaidEnrollmentCount, setUnpaidEnrollmentCount] = useState(0)
+   const [courses, setCourses] = useState([])
+   const [courseType, setCourseType] = useState('unpaid') // 'paid' or 'unpaid'
+   const [loading, setLoading] = useState(true)
   
   // State for Views
   const [currentView, setCurrentView] = useState('dashboard')
@@ -175,32 +174,18 @@ const DashBord = () => {
     try {
       const config = getAuthConfig()
       
-       // Fetch paid enrollment count (same endpoint as Enrollments.jsx)
+       // Fetch unpaid enrollment count
        try {
-         const paidEnrollRes = await axios.get('https://brainrock.in/brainrock/backend/api/course-registration/', config)
-         if (paidEnrollRes.data && paidEnrollRes.data.success) {
-           setPaidEnrollmentCount(paidEnrollRes.data.data.length)
+         const unpaidEnrollRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/', config)
+         if (unpaidEnrollRes.data && unpaidEnrollRes.data.success) {
+           setUnpaidEnrollmentCount(unpaidEnrollRes.data.data.length)
          }
-       } catch (paidEnrollError) {
-         // Fallback to girls_course API if payment API fails (same as Enrollments.jsx)
-         const fallbackRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/all-registration/', config)
-         if (fallbackRes.data && fallbackRes.data.success) {
-           setPaidEnrollmentCount(fallbackRes.data.data.length)
-         }
-       }
-      
-      // Fetch unpaid enrollment count
-      try {
-        const unpaidEnrollRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/', config)
-        if (unpaidEnrollRes.data && unpaidEnrollRes.data.success) {
-          setUnpaidEnrollmentCount(unpaidEnrollRes.data.data.length)
-        }
-      } catch (unpaidEnrollError) {
-        setUnpaidEnrollmentCount(0)
-      }
+       } catch (unpaidEnrollError) {
+       setUnpaidEnrollmentCount(0)
+     }
 
-      // Fetch courses data from new endpoint
-      try {
+     // Fetch courses data from new endpoint
+     try {
         const courseRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/', config)
         if (courseRes.data && courseRes.data.success) {
           setCourses(courseRes.data.data)
@@ -241,7 +226,6 @@ const DashBord = () => {
 
     } catch (error) {
       // Fallback data in case of error
-      setPaidEnrollmentCount(0)
       setUnpaidEnrollmentCount(0)
       setCourses([])
       setCounselingData([])
@@ -250,12 +234,12 @@ const DashBord = () => {
     }
   }
 
-  // --- Navigation Handlers ---
-  const handleEnrollmentsClick = (type = 'paid') => navigate('/Enrollments', { state: { enrollmentType: type } })
-  const handleCounselingClick = () => {
-    setCounselingPage(1)
-    setCurrentView('counseling')
-  }
+   // --- Navigation Handlers ---
+   const handleEnrollmentsClick = () => navigate('/Enrollments')
+   const handleCounselingClick = () => {
+     setCounselingPage(1)
+     setCurrentView('counseling')
+   }
   const handleEventsClick = () => {
     setCurrentView('events')
     fetchEvents()
@@ -459,10 +443,10 @@ const DashBord = () => {
       return timeStr
     }
   }
-  const handleCoursesClick = (type = 'paid') => {
-    setCourseType(type)
-    setCurrentView('list')
-  }
+   const handleCoursesClick = () => {
+     setCourseType('unpaid')
+     setCurrentView('list')
+   }
   const handleBackToDashboard = () => {
     setCurrentView('dashboard')
     fetchData() // Refresh data when returning to dashboard
@@ -1085,21 +1069,8 @@ const DashBord = () => {
     <div className="fade-in">
       <Row className="g-4 mob-top-view">
         <Col xs={12} sm={6} md={3} lg={3}>
-          <Card className="stat-card h-100 shadow-sm border-0" onClick={() => handleEnrollmentsClick('paid')}>
+          <Card className="stat-card h-100 shadow-sm border-0" onClick={handleEnrollmentsClick}>
             <Card.Body className="d-flex align-items-center card-box-mob" >
-              <div className="stat-icon-wrapper users me-3">
-                <FaUsers className="stat-icon" />
-              </div>
-              <div>
-                <h6 className="stat-label text-muted mb-1">Paid Enrollments</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : paidEnrollmentCount}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6} md={3} lg={3}>
-          <Card className="stat-card h-100 shadow-sm border-0" onClick={() => handleEnrollmentsClick('unpaid')}>
-            <Card.Body className="d-flex align-items-center">
               <div className="stat-icon-wrapper users me-3">
                 <FaUsers className="stat-icon" />
               </div>
@@ -1111,20 +1082,7 @@ const DashBord = () => {
           </Card>
         </Col>
         <Col xs={12} sm={6} md={3} lg={3}>
-          <Card className="stat-card h-100 shadow-sm border-0" onClick={() => handleCoursesClick('paid')}>
-            <Card.Body className="d-flex align-items-center">
-              <div className="stat-icon-wrapper courses me-3">
-                <FaBook className="stat-icon" />
-              </div>
-              <div>
-                <h6 className="stat-label text-muted mb-1">Paid Courses</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : courses.filter(c => c.course_status === 'paid').length}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col xs={12} sm={6} md={3} lg={3}>
-          <Card className="stat-card h-100 shadow-sm border-0" onClick={() => handleCoursesClick('unpaid')}>
+          <Card className="stat-card h-100 shadow-sm border-0" onClick={handleCoursesClick}>
             <Card.Body className="d-flex align-items-center">
               <div className="stat-icon-wrapper courses me-3">
                 <FaBook className="stat-icon" />
@@ -1136,8 +1094,6 @@ const DashBord = () => {
             </Card.Body>
           </Card>
         </Col>
-      </Row>
-      <Row className="g-4 mt-2">
         <Col xs={12} sm={6} md={3} lg={3}>
           <Card className="stat-card h-100 shadow-sm border-0" onClick={handleCounselingClick} style={{ cursor: 'pointer' }}>
             <Card.Body className="d-flex align-items-center">
@@ -1205,13 +1161,8 @@ const DashBord = () => {
         <Card.Header className="bg-light border-bottom py-2 px-3">
           <Nav variant="tabs" activeKey={courseType} onSelect={(eventKey) => setCourseType(eventKey)}>
             <Nav.Item>
-              <Nav.Link eventKey="paid">
-                <FaBook className="me-2" /> Paid Courses
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
               <Nav.Link eventKey="unpaid">
-                <FaBook className="me-2" /> Unpaid Courses
+                <FaBook className="me-2" /> Courses
               </Nav.Link>
             </Nav.Item>
           </Nav>
