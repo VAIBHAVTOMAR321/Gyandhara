@@ -30,11 +30,12 @@ const DashBord = () => {
   const { accessToken } = useAuth()
   const authToken = accessToken
   
-   // State for Data
-   const [unpaidEnrollmentCount, setUnpaidEnrollmentCount] = useState(0)
-   const [courses, setCourses] = useState([])
-   const [courseType, setCourseType] = useState('unpaid') // 'paid' or 'unpaid'
-   const [loading, setLoading] = useState(true)
+// State for Data
+    const [unpaidEnrollmentCount, setUnpaidEnrollmentCount] = useState(0)
+    const [unpaidEnrollments, setUnpaidEnrollments] = useState([])
+    const [courses, setCourses] = useState([])
+    const [courseType, setCourseType] = useState('unpaid') // 'paid' or 'unpaid'
+    const [loading, setLoading] = useState(true)
   
   // State for Views
   const [currentView, setCurrentView] = useState('dashboard')
@@ -180,15 +181,17 @@ const DashBord = () => {
     try {
       const config = getAuthConfig()
       
-       // Fetch unpaid enrollment count
-       try {
-         const unpaidEnrollRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/', config)
-         if (unpaidEnrollRes.data && unpaidEnrollRes.data.success) {
-           setUnpaidEnrollmentCount(unpaidEnrollRes.data.data.length)
-         }
-       } catch (unpaidEnrollError) {
-       setUnpaidEnrollmentCount(0)
-     }
+      // Fetch unpaid enrollment data
+        try {
+          const unpaidEnrollRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/', config)
+          if (unpaidEnrollRes.data && unpaidEnrollRes.data.success) {
+            setUnpaidEnrollmentCount(unpaidEnrollRes.data.data.length)
+            setUnpaidEnrollments(unpaidEnrollRes.data.data)
+          }
+        } catch (unpaidEnrollError) {
+          setUnpaidEnrollmentCount(0)
+          setUnpaidEnrollments([])
+        }
 
      // Fetch courses data from new endpoint
      try {
@@ -260,7 +263,9 @@ const DashBord = () => {
   }
 
    // --- Navigation Handlers ---
-   const handleEnrollmentsClick = () => navigate('/Enrollments')
+    const handleEnrollmentsClick = () => {
+      setCurrentView('unpaidEnrollments')
+    }
    const handleCounselingClick = () => {
      setCounselingPage(1)
      setCurrentView('counseling')
@@ -1089,6 +1094,71 @@ const DashBord = () => {
   }
 
   // --- Render Helpers ---
+
+  const renderUnpaidEnrollmentsView = () => (
+    <div className="fade-in">
+      <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+        <Button variant="outline-secondary" size="sm" onClick={handleBackToDashboard}>
+          <FaArrowLeft /> Dashboard
+        </Button>
+        <h4 className="mb-0">Unpaid Enrollments</h4>
+      </div>
+
+      <Card className="shadow-sm border-0">
+        <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
+          <span><FaUsers className="me-2" /> Enrollment Details</span>
+          <Badge bg="light" text="dark">{unpaidEnrollments.length} Records</Badge>
+        </Card.Header>
+        <Card.Body>
+          {loading ? (
+            <div className="text-center py-4">
+              <Spinner animation="border" variant="primary" />
+              <p className="mt-2">Loading enrollments...</p>
+            </div>
+          ) : unpaidEnrollments.length === 0 ? (
+            <p className="text-muted text-center mb-0">No enrollments found</p>
+          ) : (
+            <div className="table-responsive">
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Course ID</th>
+                    <th>Course Name</th>
+                    <th>Enrolled At</th>
+                    <th>Status</th>
+                    <th>Certificate ID</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {unpaidEnrollments.map((enrollment, index) => (
+                    <tr key={enrollment.id || index}>
+                      <td>{index + 1}</td>
+                      <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
+                      <td className="fw-bold">{enrollment.student_name}</td>
+                      <td><Badge bg="info">{enrollment.course_id}</Badge></td>
+                      <td>{enrollment.course_name}</td>
+                      <td className="small">
+                        {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-'}
+                      </td>
+                      <td>
+                        <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
+                          {enrollment.is_completed ? 'Completed' : 'Ongoing'}
+                        </Badge>
+                      </td>
+                      <td>{enrollment.certificate_id || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+          )}
+        </Card.Body>
+      </Card>
+    </div>
+  )
 
   const renderDashboardView = () => (
     <div className="fade-in">
@@ -2803,6 +2873,7 @@ const DashBord = () => {
         <div className="dashboard-content">
           <Container className="dashboard-box">
             {currentView === 'dashboard' && renderDashboardView()}
+            {currentView === 'unpaidEnrollments' && renderUnpaidEnrollmentsView()}
             {currentView === 'list' && renderCoursesListView()}
             {currentView === 'form' && renderCourseForm()}
             {currentView === 'modules' && renderModulesView()}
