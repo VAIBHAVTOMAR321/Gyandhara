@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '../all_login/LanguageContext'
+import heroImg from "../../assets/images/CBSEimg.jpg";
 import '../../assets/css/home.css'
 
 function Home() {
@@ -8,11 +9,11 @@ function Home() {
 
   const content = {
     en: {
-      heroTitle: "Stream of Knowledge",
-      heroSubtitle: "Welcome to Gyandhara - Your comprehensive educational platform offering career guidance, skill development, and academic excellence for students, schools, and administrators.",
-      heroImg: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=400&fit=crop",
-      exploreBtn: "Explore Now",
-      joinBtn: "Register Today",
+    heroTitle: "Stream of Knowledge",
+  heroSubtitle: "Welcome to Gyandhara - Your educational platform for career guidance, skill development, and academic success.",
+  heroImg: heroImg,
+  exploreBtn: "Explore Now",
+  joinBtn: "Register Today",
       
       // For Students Section
       studentTitle: "For Students 🎓",
@@ -55,8 +56,8 @@ function Home() {
     },
     hi: {
       heroTitle: "ज्ञान की धारा",
-      heroSubtitle: "Gyandhara में आपका स्वागत है - एक व्यापक शैक्षिक मंच जो छात्रों, स्कूलों और प्रशासकों के लिए करियर मार्गदर्शन, कौशल विकास और शैक्षणिक उत्कृष्टता प्रदान करता है।",
-      heroImg: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&h=400&fit=crop",
+      heroSubtitle: "Gyandhara में आपका स्वागत है - छात्रों, स्कूलों और प्रशासकों के लिए करियर मार्गदर्शन, कौशल विकास और शैक्षणिक सफलता का शैक्षिक मंच।",
+      heroImg: "https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=800&h=400&fit=crop",
       exploreBtn: "अब खोजें",
       joinBtn: "आज पंजीकृत करें",
       
