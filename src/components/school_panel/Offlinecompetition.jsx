@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Card, Button, Spinner, Alert, Modal, ListGroup, Table, Form } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Spinner, Alert, Modal, Table, Form } from "react-bootstrap";
 import axios from "axios";
+import "../../assets/css/userleftnav.css";
+
 import { useAuth } from "../all_login/AuthContext";
+import SchoolHeader from "./SchoolHeader";
+import SchoolLeftNav from "./SchoolLeftNav";
 
 const Offlinecompetition = () => {
+  // --- Layout & Device State ---
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // --- Auth Context ---
+  const { accessToken, uniqueId } = useAuth();
+
+  // --- Competition Logic State ---
   const [competitions, setCompetitions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // SEPARATED LOADING STATES TO FIX BLANK PAGE ISSUE
+  const [listLoading, setListLoading] = useState(true);   // Only for fetching list
+  const [formLoading, setFormLoading] = useState(false);  // Only for Create/Update forms
+  
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedCompetition, setSelectedCompetition] = useState(null);
@@ -15,25 +32,37 @@ const Offlinecompetition = () => {
     title_hindi: "",
     description_hindi: "",
     location: "",
-    school_uni_id: "",
+    school_uni_id: uniqueId || "",
     comp_date_time: "",
   });
 
-  const { accessToken, uniqueId } = useAuth();
+  // --- Effects ---
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     fetchCompetitions();
-  }, []);
+  }, [accessToken]);
 
+  // --- API Functions ---
   const fetchCompetitions = async () => {
     if (!accessToken) {
       setError("No authentication token found.");
-      setLoading(false);
+      setListLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
+      setListLoading(true); // Use listLoading here
       setError("");
       const response = await axios.get(
         "https://brjobsedu.com/gyandhara/gyandhara_backend/api/offline-competition/",
@@ -53,7 +82,7 @@ const Offlinecompetition = () => {
       console.error("Competition API Error:", err);
       setError("Failed to fetch competitions: " + err.message);
     } finally {
-      setLoading(false);
+      setListLoading(false); // Use listLoading here
     }
   };
 
@@ -64,11 +93,15 @@ const Offlinecompetition = () => {
     }
 
     try {
-      setLoading(true);
+      setFormLoading(true); // Use formLoading here
       setError("");
+      const payload = {
+        ...formData,
+        school_uni_id: uniqueId,
+      };
       const response = await axios.post(
         "https://brjobsedu.com/gyandhara/gyandhara_backend/api/offline-competition/",
-        formData,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -77,18 +110,11 @@ const Offlinecompetition = () => {
       );
 
       if (response.data.success) {
+        alert("Created successfully");
         setCompetitions([...competitions, response.data.data]);
         setShowModal(false);
-        setFormData({
-          title: "",
-          description: "",
-          title_hindi: "",
-          description_hindi: "",
-          location: "",
-          school_uni_id: "",
-          comp_date_time: "",
-        });
-        fetchCompetitions();
+        resetForm();
+        fetchCompetitions(); // Refresh list
       } else {
         setError("API returned success: false");
       }
@@ -96,7 +122,7 @@ const Offlinecompetition = () => {
       console.error("Create Competition API Error:", err);
       setError("Failed to create competition: " + err.message);
     } finally {
-      setLoading(false);
+      setFormLoading(false); // Use formLoading here
     }
   };
 
@@ -107,11 +133,15 @@ const Offlinecompetition = () => {
     }
 
     try {
-      setLoading(true);
+      setFormLoading(true); // Use formLoading here (This prevents the blank background issue)
       setError("");
+      const payload = {
+        ...selectedCompetition,
+        school_uni_id: uniqueId,
+      };
       const response = await axios.put(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/offline-competition/${selectedCompetition.completion_id}/`,
-        selectedCompetition,
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/offline-competition/`,
+        payload,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -120,6 +150,7 @@ const Offlinecompetition = () => {
       );
 
       if (response.data.success) {
+        alert("Update successfully");
         setCompetitions(
           competitions.map((comp) =>
             comp.completion_id === selectedCompetition.completion_id
@@ -129,7 +160,7 @@ const Offlinecompetition = () => {
         );
         setShowModal(false);
         setSelectedCompetition(null);
-        fetchCompetitions();
+        fetchCompetitions(); // Refresh list
       } else {
         setError("API returned success: false");
       }
@@ -137,46 +168,13 @@ const Offlinecompetition = () => {
       console.error("Update Competition API Error:", err);
       setError("Failed to update competition: " + err.message);
     } finally {
-      setLoading(false);
+      setFormLoading(false); // Use formLoading here
     }
   };
 
-  const handleDelete = async (completionId) => {
-    if (!accessToken) {
-      setError("No authentication token found.");
-      return;
-    }
-
-    if (!window.confirm("Are you sure you want to delete this competition?")) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      setError("");
-      const response = await axios.delete(
-        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/offline-competition/${completionId}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (response.data.success) {
-        setCompetitions(
-          competitions.filter((comp) => comp.completion_id !== completionId)
-        );
-        fetchCompetitions();
-      } else {
-        setError("API returned success: false");
-      }
-    } catch (err) {
-      console.error("Delete Competition API Error:", err);
-      setError("Failed to delete competition: " + err.message);
-    } finally {
-      setLoading(false);
-    }
+  // --- Handlers ---
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
   };
 
   const handleInputChange = (e) => {
@@ -187,112 +185,164 @@ const Offlinecompetition = () => {
     }));
   };
 
+  const handleEditClick = (comp) => {
+    setSelectedCompetition(comp);
+    setFormData({
+      title: comp.title || "",
+      description: comp.description || "",
+      title_hindi: comp.title_hindi || "",
+      description_hindi: comp.description_hindi || "",
+      location: comp.location || "",
+      school_uni_id: comp.school_uni_id || uniqueId,
+      comp_date_time: comp.comp_date_time || "",
+    });
+    setShowModal(true);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      description: "",
+      title_hindi: "",
+      description_hindi: "",
+      location: "",
+      school_uni_id: uniqueId || "",
+      comp_date_time: "",
+    });
+    setSelectedCompetition(null);
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
+    resetForm();
+  };
+
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>Offline Competitions</h4>
-        <Button variant="primary" onClick={() => setShowModal(true)}>
-          Add Competition
-        </Button>
+    <div className="dashboard-container">
+      <SchoolLeftNav
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <SchoolHeader toggleSidebar={toggleSidebar} />
+
+        <Container className="dashboard-box mt-3">
+          {/* Page Header */}
+          <Row className="mb-4 align-items-center">
+            <Col>
+              <h4 className="font-weight-bold">Offline Competitions</h4>
+              <p className="text-muted mb-0">Manage school offline events and competitions</p>
+            </Col>
+            <Col className="text-end">
+              <Button variant="primary" onClick={() => { resetForm(); setShowModal(true); }}>
+                + Add Competition
+              </Button>
+            </Col>
+          </Row>
+
+          {/* Error Alert */}
+          {error && <Alert variant="danger" dismissible onClose={() => setError("")}>{error}</Alert>}
+
+          {/* Content Card */}
+          <Card className="shadow-sm">
+            <Card.Body>
+              {/* Changed compLoading to listLoading here */}
+              {listLoading ? (
+                <div className="text-center py-5">
+                  <Spinner animation="border" variant="primary" />
+                  <p className="mt-2 text-muted">Loading competitions...</p>
+                </div>
+              ) : competitions.length > 0 ? (
+                <Table striped bordered hover responsive>
+                  <thead className="table-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Title</th>
+                      <th>Location</th>
+                      <th>Date & Time</th>
+                      <th>School ID</th>
+                      <th className="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {competitions.map((comp, index) => (
+                      <tr key={comp.completion_id}>
+                        <td>{index + 1}</td>
+                        <td>
+                          <strong>{comp.title}</strong>
+                          <br/>
+                          {comp.title_hindi && <small className="text-muted">{comp.title_hindi}</small>}
+                        </td>
+                        <td>{comp.location}</td>
+                        <td>{comp.comp_date_time ? new Date(comp.comp_date_time).toLocaleString() : '-'}</td>
+                        <td>{comp.school_uni_id}</td>
+                        <td className="text-center">
+                          <Button
+                            variant="outline-warning"
+                            size="sm"
+                            className="me-2"
+                            onClick={() => handleEditClick(comp)}
+                          >
+                            Edit
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              ) : (
+                <div className="text-center py-5 text-muted">
+                  <p>No competitions found. Click "Add Competition" to create one.</p>
+                </div>
+              )}
+            </Card.Body>
+          </Card>
+        </Container>
       </div>
 
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      {loading ? (
-        <div className="text-center my-5">
-          <Spinner animation="border" />
-        </div>
-      ) : (
-        <Table striped bordered hover responsive>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Title</th>
-              <th>Location</th>
-              <th>Date & Time</th>
-              <th>School ID</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {competitions.map((comp, index) => (
-              <tr key={comp.completion_id}>
-                <td>{index + 1}</td>
-                <td>{comp.title}</td>
-                <td>{comp.location}</td>
-                <td>{new Date(comp.comp_date_time).toLocaleString()}</td>
-                <td>{comp.school_uni_id}</td>
-                <td>
-                  <Button
-                    variant="warning"
-                    size="sm"
-                    className="me-2"
-                    onClick={() => {
-                      setSelectedCompetition(comp);
-                      setShowModal(true);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={() => handleDelete(comp.completion_id)}
-                  >
-                    Delete
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
-
       {/* Modal for Add/Edit */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-        <Modal.Header>
+      <Modal show={showModal} onHide={handleModalClose} size="lg" centered>
+        <Modal.Header closeButton>
           <Modal.Title>
-            {selectedCompetition ? "Edit Competition" : "Add Competition"}
+            {selectedCompetition ? "Edit Competition" : "Add New Competition"}
           </Modal.Title>
-          <Button
-            variant="light"
-            className="close-btn-custom"
-            onClick={() => setShowModal(false)}
-          >
-            <span aria-hidden="true">&times;</span>
-          </Button>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Row>
               <Col md={6}>
-                <Form.Group controlId="title">
-                  <Form.Label>Title</Form.Label>
+                <Form.Group controlId="title" className="mb-3">
+                  <Form.Label>Title (English)</Form.Label>
                   <Form.Control
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
+                    placeholder="Enter competition title"
                     required
                   />
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group controlId="title_hindi">
+                <Form.Group controlId="title_hindi" className="mb-3">
                   <Form.Label>Title (Hindi)</Form.Label>
                   <Form.Control
                     type="text"
                     name="title_hindi"
                     value={formData.title_hindi}
                     onChange={handleInputChange}
+                    placeholder="हिंदी में शीर्षक दर्ज करें"
                   />
                 </Form.Group>
               </Col>
             </Row>
+            
             <Row>
               <Col md={6}>
-                <Form.Group controlId="description">
-                  <Form.Label>Description</Form.Label>
+                <Form.Group controlId="description" className="mb-3">
+                  <Form.Label>Description (English)</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
@@ -303,7 +353,7 @@ const Offlinecompetition = () => {
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group controlId="description_hindi">
+                <Form.Group controlId="description_hindi" className="mb-3">
                   <Form.Label>Description (Hindi)</Form.Label>
                   <Form.Control
                     as="textarea"
@@ -315,34 +365,23 @@ const Offlinecompetition = () => {
                 </Form.Group>
               </Col>
             </Row>
+
             <Row>
               <Col md={6}>
-                <Form.Group controlId="location">
+                <Form.Group controlId="location" className="mb-3">
                   <Form.Label>Location</Form.Label>
                   <Form.Control
                     type="text"
                     name="location"
                     value={formData.location}
                     onChange={handleInputChange}
+                    placeholder="e.g. School Auditorium"
                   />
                 </Form.Group>
               </Col>
               <Col md={6}>
-                <Form.Group controlId="school_uni_id">
-                  <Form.Label>School Uni ID</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="school_uni_id"
-                    value={formData.school_uni_id}
-                    onChange={handleInputChange}
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-            <Row>
-              <Col md={6}>
-                <Form.Group controlId="comp_date_time">
-                  <Form.Label>Competition Date & Time</Form.Label>
+                <Form.Group controlId="comp_date_time" className="mb-3">
+                  <Form.Label>Date & Time</Form.Label>
                   <Form.Control
                     type="datetime-local"
                     name="comp_date_time"
@@ -352,21 +391,33 @@ const Offlinecompetition = () => {
                 </Form.Group>
               </Col>
             </Row>
+            
+            <Form.Group controlId="school_uni_id" className="mb-3">
+              <Form.Label>School Uni ID</Form.Label>
+              <Form.Control
+                type="text"
+                name="school_uni_id"
+                value={formData.school_uni_id}
+                onChange={handleInputChange}
+                disabled
+              />
+              <Form.Text className="text-muted">Auto-filled from your profile.</Form.Text>
+            </Form.Group>
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={handleModalClose}>
             Close
           </Button>
-          {selectedCompetition ? (
-            <Button variant="primary" onClick={handleUpdate}>
-              Update Competition
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={handleCreate}>
-              Create Competition
-            </Button>
-          )}
+          <Button 
+            variant="primary" 
+            onClick={selectedCompetition ? handleUpdate : handleCreate}
+            // Changed to use formLoading here
+            disabled={formLoading}
+          >
+            {/* Changed to use formLoading here */}
+            {formLoading ? <Spinner animation="border" size="sm" /> : (selectedCompetition ? "Update Competition" : "Create Competition")}
+          </Button>
         </Modal.Footer>
       </Modal>
     </div>
