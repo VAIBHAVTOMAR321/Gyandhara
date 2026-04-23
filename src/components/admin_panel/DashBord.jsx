@@ -36,6 +36,8 @@ const DashBord = () => {
   const getEnrollmentAnalytics = (enrollments) => {
     if (!enrollments || enrollments.length === 0) return null
 
+    // Count unique students
+    const uniqueStudents = new Set(enrollments.filter(e => e.student_id).map(e => e.student_id)).size
     const total = enrollments.length
     const completed = enrollments.filter(e => e.is_completed).length
     const ongoing = total - completed
@@ -61,7 +63,7 @@ const DashBord = () => {
       .slice(0, 10)
       .map(([school, count]) => [school, count])
 
-    return { total, completed, ongoing, classDist, schoolDist }
+    return { total, uniqueStudents, completed, ongoing, classDist, schoolDist }
   }
 
 // State for Data
@@ -189,58 +191,100 @@ const DashBord = () => {
    const [showPerformanceModal, setShowPerformanceModal] = useState(false)
    const [showPerformanceHelpModal, setShowPerformanceHelpModal] = useState(false)
 
-   // Calculate School Performance Scores from existing data
-   const calculateSchoolPerformance = (enrollments) => {
-     if (!enrollments || enrollments.length === 0) return []
+    // Calculate School Performance Scores from existing data
+    const calculateSchoolPerformance = (enrollments) => {
+      if (!enrollments || enrollments.length === 0) return []
 
-     // Group by school
-     const schoolGroups = {}
-     enrollments.forEach(e => {
-       const school = e.school_name || 'Unknown School'
-       if (!schoolGroups[school]) {
-         schoolGroups[school] = { enrolled: 0, completed: 0 }
-       }
-       schoolGroups[school].enrolled++
-       if (e.is_completed) {
-         schoolGroups[school].completed++
-       }
-     })
+      // Group by school and track unique students with their course participation
+      const schoolGroups = {}
+      enrollments.forEach(e => {
+        const school = e.school_name || 'Unknown School'
+        const studentId = e.student_id
 
-     // Find MaxCompleted across all schools
-     const maxCompleted = Math.max(...Object.values(schoolGroups).map(s => s.completed))
+        // Skip enrollments without valid student_id
+        if (!studentId) return
 
-     // Calculate scores, sort by score
-     const rankedSchools = Object.entries(schoolGroups)
-       .map(([schoolName, stats], index) => {
-         const enrolled = stats.enrolled
-         const completed = stats.completed
-         const completionRate = enrolled > 0 ? ((completed / enrolled) * 100) : 0
+        if (!schoolGroups[school]) {
+          schoolGroups[school] = {
+            students: new Map(), // student_id -> { courses: Set, completedCourses: Set }
+            totalStudents: 0,
+            totalCompletedCourses: 0
+          }
+        }
 
-         // Balanced Performance Score formula
-         let balancedScore = 0
-         if (enrolled > 0) {
-           const component1 = maxCompleted > 0 ? (completed / maxCompleted) * 100 : 0
-           const component2 = (completed / enrolled) * 100
-           balancedScore = (0.6 * component1 + 0.4 * component2)
-         }
-         balancedScore = Math.round(balancedScore * 100) / 100
+        if (!schoolGroups[school].students.has(studentId)) {
+          schoolGroups[school].students.set(studentId, {
+            courses: new Set(),
+            completedCourses: new Set()
+          })
+          schoolGroups[school].totalStudents++
+        }
 
-         return {
-           schoolName,
-           enrolled,
-           completed,
-           completionRate: Math.round(completionRate * 100) / 100,
-           balancedScore
-         }
-       })
-       .sort((a, b) => b.balancedScore - a.balancedScore)
-       .map((school, index) => ({
-         ...school,
-         rank: index + 1
-       }))
+        // Track course participation for this student
+        schoolGroups[school].students.get(studentId).courses.add(e.course_id)
+        if (e.is_completed) {
+          schoolGroups[school].students.get(studentId).completedCourses.add(e.course_id)
+          schoolGroups[school].totalCompletedCourses++
+        }
+      })
 
-     return rankedSchools
-   }
+      // Calculate metrics for each school
+      const schoolStats = Object.entries(schoolGroups).map(([schoolName, data]) => {
+        const uniqueStudents = data.totalStudents
+        const totalCoursesParticipated = Array.from(data.students.values())
+          .reduce((sum, student) => sum + student.courses.size, 0)
+        const totalCompletedCourses = data.totalCompletedCourses
+
+        // Average courses per student
+        const avgCoursesPerStudent = uniqueStudents > 0 ? totalCoursesParticipated / uniqueStudents : 0
+
+        // Completion rate based on course participations
+        const completionRate = totalCoursesParticipated > 0 ? (totalCompletedCourses / totalCoursesParticipated) * 100 : 0
+
+        return {
+          schoolName,
+          uniqueStudents,
+          totalCoursesParticipated,
+          totalCompletedCourses,
+          avgCoursesPerStudent: Math.round(avgCoursesPerStudent * 100) / 100,
+          completionRate: Math.round(completionRate * 100) / 100
+        }
+      })
+
+      // Find max values for normalization
+      const maxAvgCourses = Math.max(...schoolStats.map(s => s.avgCoursesPerStudent))
+
+      // Calculate balanced performance scores
+      const rankedSchools = schoolStats
+        .map(stats => {
+          // Balanced Performance Score formula considering unique students and course participation
+          let balancedScore = 0
+          if (stats.uniqueStudents > 0) {
+            const component1 = maxAvgCourses > 0 ? (stats.avgCoursesPerStudent / maxAvgCourses) * 100 : 0
+            const component2 = stats.completionRate
+            const component3 = Math.min(stats.uniqueStudents / 10, 1) * 100 // Bonus for student engagement (capped at 100 for 10+ students)
+            balancedScore = (0.4 * component1 + 0.4 * component2 + 0.2 * component3)
+          }
+          balancedScore = Math.round(balancedScore * 100) / 100
+
+          return {
+            schoolName: stats.schoolName,
+            uniqueStudents: stats.uniqueStudents,
+            totalCoursesParticipated: stats.totalCoursesParticipated,
+            totalCompletedCourses: stats.totalCompletedCourses,
+            avgCoursesPerStudent: stats.avgCoursesPerStudent,
+            completionRate: stats.completionRate,
+            balancedScore
+          }
+        })
+        .sort((a, b) => b.balancedScore - a.balancedScore)
+        .map((school, index) => ({
+          ...school,
+          rank: index + 1
+        }))
+
+      return rankedSchools
+    }
 
    useEffect(() => {
     const handleResize = () => {
@@ -3662,7 +3706,7 @@ const DashBord = () => {
                    doc.text('Enrollment Analytics Report', 14, 20)
                    doc.setFontSize(11)
                    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28)
-                   doc.text(`Total Students: ${stats.total} | Completed: ${stats.completed} | Ongoing: ${stats.ongoing}`, 14, 36)
+                    doc.text(`Unique Students: ${stats.uniqueStudents} | Total Enrollments: ${stats.total} | Completed: ${stats.completed} | Ongoing: ${stats.ongoing}`, 14, 36)
 
                    let yPos = 42
 
@@ -3847,13 +3891,13 @@ const DashBord = () => {
                         <Form.Label className="fw-bold"><FaChartBar className="me-1" /> Completion Rate:</Form.Label>
                         <div className="d-flex align-items-center gap-2">
                           <div className="progress flex-grow-1" style={{ height: '24px', borderRadius: '12px' }}>
-                             <div
-                               className="progress-bar bg-success"
-                               role="progressbar"
-                               style={{ width: `${stats.total > 0 ? (stats.completed / stats.total) * 100 : 0}%` }}
-                             >
-                               {completionRate}%
-                            </div>
+                              <div
+                                className="progress-bar bg-success"
+                                role="progressbar"
+                                style={{ width: `${completionRate}%` }}
+                              >
+                                {completionRate}%
+                             </div>
                           </div>
                           <Badge bg={completionRate >= 75 ? 'success' : completionRate >= 50 ? 'warning' : 'danger'} className="fs-6">
                             {completionRate >= 75 ? 'Excellent' : completionRate >= 50 ? 'Good' : 'Needs Improvement'}
@@ -3871,8 +3915,8 @@ const DashBord = () => {
                           <div className="rounded-circle bg-primary bg-opacity-10 p-3 mb-2 d-inline-flex">
                             <FaUsers className="text-primary fs-2" />
                           </div>
-                          <h2 className="fw-bold text-primary mb-0">{stats.total}</h2>
-                          <p className="text-muted small mb-0 text-uppercase fw-bold">Total Students</p>
+                          <h2 className="fw-bold text-primary mb-0">{stats.uniqueStudents}</h2>
+                          <p className="text-muted small mb-0 text-uppercase fw-bold">Unique Students</p>
                         </Card.Body>
                       </Card>
                     </Col>
@@ -3884,7 +3928,7 @@ const DashBord = () => {
                           </div>
                           <h2 className="fw-bold text-success mb-0">{stats.completed}</h2>
                           <p className="text-muted small mb-0 text-uppercase fw-bold">Completed</p>
-                          <small className="text-success">{completionRate}% completion rate</small>
+                           <small className="text-success">{completionRate}% enrollment completion rate</small>
                         </Card.Body>
                       </Card>
                     </Col>
@@ -3896,7 +3940,7 @@ const DashBord = () => {
                           </div>
                           <h2 className="fw-bold text-warning mb-0">{stats.ongoing}</h2>
                           <p className="text-muted small mb-0 text-uppercase fw-bold">Ongoing</p>
-                          <small className="text-warning">{100 - completionRate}% still in progress</small>
+                           <small className="text-warning">{100 - completionRate}% enrollments still in progress</small>
                         </Card.Body>
                       </Card>
                     </Col>
@@ -3919,7 +3963,7 @@ const DashBord = () => {
                                 fill="none"
                                 stroke="#28a745"
                                 strokeWidth="40"
-                                strokeDasharray={`${stats.total > 0 ? (stats.completed / stats.total) * 502.65 : 0} ${502.65}`}
+                                strokeDasharray={`${completionRate / 100 * 502.65} ${502.65}`}
                                 transform="rotate(-90 100 100)"
                               />
                               <circle
@@ -3927,9 +3971,9 @@ const DashBord = () => {
                                 fill="none"
                                 stroke="#ffc107"
                                 strokeWidth="40"
-                                strokeDasharray={`${stats.total > 0 ? (stats.ongoing / stats.total) * 502.65 : 0} ${502.65}`}
+                                strokeDasharray={`${(100 - completionRate) / 100 * 502.65} ${502.65}`}
                                 transform="rotate(-90 100 100)"
-                                strokeDashoffset={`${stats.total > 0 ? -(stats.completed / stats.total) * 502.65 : 0}`}
+                                strokeDashoffset={`-${completionRate / 100 * 502.65}`}
                               />
                               <text x="100" y="100" textAnchor="middle" dominantBaseline="middle" fontSize="24" fontWeight="bold" fill="#333">
                                 {completionRate}%
@@ -3944,20 +3988,20 @@ const DashBord = () => {
                                 <div className="rounded bg-success" style={{ width: '20px', height: '20px' }}></div>
                                 <span className="fw-bold">Completed</span>
                               </div>
-                              <div className="text-end">
-                                <h4 className="fw-bold text-success mb-0">{stats.completed}</h4>
-                                 <small className="text-muted">{stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}% of total</small>
-                              </div>
+                               <div className="text-end">
+                                 <h4 className="fw-bold text-success mb-0">{stats.completed}</h4>
+                                  <small className="text-muted">{stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0}% of enrollments</small>
+                               </div>
                             </div>
                             <div className="d-flex align-items-center justify-content-between">
                               <div className="d-flex align-items-center gap-2">
                                 <div className="rounded bg-warning" style={{ width: '20px', height: '20px' }}></div>
                                 <span className="fw-bold">Ongoing</span>
                               </div>
-                              <div className="text-end">
-                                <h4 className="fw-bold text-warning mb-0">{stats.ongoing}</h4>
-                                 <small className="text-muted">{stats.total > 0 ? Math.round((stats.ongoing / stats.total) * 100) : 0}% of total</small>
-                              </div>
+                               <div className="text-end">
+                                 <h4 className="fw-bold text-warning mb-0">{stats.ongoing}</h4>
+                                  <small className="text-muted">{stats.total > 0 ? Math.round((stats.ongoing / stats.total) * 100) : 0}% of enrollments</small>
+                               </div>
                             </div>
                           </div>
                         </div>
@@ -4000,35 +4044,35 @@ const DashBord = () => {
                     <Col md={6}>
                       <Card className="shadow-sm border-0 h-100">
                         <Card.Header className="text-white" style={{ backgroundColor: '#6f42c1' }}>
-                          <h6 className="mb-0 fw-bold"><FaSchool className="me-2" /> Top 10 Schools</h6>
+                          <h6 className="mb-0 fw-bold"><FaSchool className="me-2" /> Top 10 Performing Schools</h6>
                         </Card.Header>
                         <Card.Body>
-                          {stats.schoolDist.length > 0 ? (
-                            <div className="d-flex flex-column gap-2">
-                              {stats.schoolDist.map(([school, count], idx) => {
-                                const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0
-                                return (
-                                  <div key={school} className="border-bottom pb-2">
+                          {(() => {
+                            const performanceRanked = calculateSchoolPerformance(filteredData)
+                            return performanceRanked.slice(0, 10).length > 0 ? (
+                              <div className="d-flex flex-column gap-2">
+                                {performanceRanked.slice(0, 10).map((school, idx) => (
+                                  <div key={school.schoolName} className="border-bottom pb-2">
                                     <div className="d-flex justify-content-between align-items-center mb-1">
-                                      <span className="fw-bold small text-truncate" style={{ maxWidth: '150px' }}>
-                                        #{idx + 1} {school}
+                                      <span className="fw-bold small text-truncate" style={{ maxWidth: '120px' }}>
+                                        #{school.rank} {school.schoolName}
                                       </span>
-                                      <span className="fw-bold">{count} students</span>
+                                      <span className="fw-bold">{school.balancedScore}</span>
                                     </div>
                                     <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
                                       <div
                                         className="progress-bar"
-                                        style={{ width: `${percentage}%`, backgroundColor: '#6f42c1' }}
+                                        style={{ width: `${school.balancedScore}%`, backgroundColor: '#6f42c1' }}
                                       ></div>
                                     </div>
-                                    <small className="text-muted">{percentage}% of total</small>
+                                    <small className="text-muted">{school.uniqueStudents} students, {school.avgCoursesPerStudent} avg courses</small>
                                   </div>
-                                )
-                              })}
-                            </div>
-                          ) : (
-                            <p className="text-muted text-center py-3 mb-0">No school data available</p>
-                          )}
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-muted text-center py-3 mb-0">No performance data available</p>
+                            )
+                          })()}
                         </Card.Body>
                       </Card>
                     </Col>
@@ -4243,15 +4287,16 @@ const DashBord = () => {
                   let yPos = 44
 
                   // Performance Table
-                  const columns = ['Rank', 'School Name', 'Enrolled', 'Completed', 'Completion %', 'Balanced Score']
+                  const columns = ['Rank', 'School Name', 'Unique Students', 'Total Courses', 'Avg Courses/Student', 'Completion %', 'Balanced Score']
                   const rows = rankedSchools.map(s => [
-                    `#${s.rank}`,
-                    s.schoolName.substring(0, 30),
-                    s.enrolled,
-                    s.completed,
-                    `${s.completionRate}%`,
-                    s.balancedScore.toFixed(2)
-                  ])
+                     `#${s.rank}`,
+                     s.schoolName.substring(0, 25),
+                     s.uniqueStudents,
+                     s.totalCoursesParticipated,
+                     s.avgCoursesPerStudent.toFixed(2),
+                     `${s.completionRate}%`,
+                     s.balancedScore.toFixed(2)
+                   ])
 
                   doc.autoTable({
                     head: [columns],
@@ -4273,21 +4318,22 @@ const DashBord = () => {
               const exportPerformanceExcel = () => {
                 try {
                   const wsData = [
-                    ['Rank', 'School Name', 'Enrolled', 'Completed', 'Completion Rate (%)', 'Balanced Score'],
-                    ...rankedSchools.map(s => [
-                      s.rank,
-                      s.schoolName,
-                      s.enrolled,
-                      s.completed,
-                      s.completionRate,
-                      s.balancedScore
-                    ])
-                  ]
+                     ['Rank', 'School Name', 'Unique Students', 'Total Courses', 'Avg Courses/Student', 'Completion Rate (%)', 'Balanced Score'],
+                     ...rankedSchools.map(s => [
+                       s.rank,
+                       s.schoolName,
+                       s.uniqueStudents,
+                       s.totalCoursesParticipated,
+                       s.avgCoursesPerStudent,
+                       s.completionRate,
+                       s.balancedScore
+                     ])
+                   ]
 
                   const ws = XLSX.utils.aoa_to_sheet(wsData)
                   ws['!cols'] = [
-                    { wch: 6 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 14 }, { wch: 14 }
-                  ]
+                     { wch: 6 }, { wch: 30 }, { wch: 12 }, { wch: 12 }, { wch: 16 }, { wch: 14 }, { wch: 14 }
+                   ]
 
                   const wb = XLSX.utils.book_new()
                   XLSX.utils.book_append_sheet(wb, ws, 'Performance Ranking')
@@ -4307,32 +4353,33 @@ const DashBord = () => {
                   <Card className="shadow-sm border-0 mb-4">
                     <Card.Body>
                       <p className="text-muted small mb-0">
-                        Schools ranked by Balanced Performance Score (0.6 × relative completion + 0.4 × absolute completion).
+                        Schools ranked by Balanced Performance Score considering unique students and course participation.
+                        Score = 0.4 × (avg courses/student relative) + 0.4 × completion rate + 0.2 × student engagement.
                         Higher score indicates better overall performance.
                       </p>
                     </Card.Body>
                   </Card>
 
-                  <Row className="g-3 mb-4">
-                    {rankedSchools.slice(0, 3).map((school, idx) => (
-                      <Col md={4} key={school.schoolName}>
-                        <Card className={`shadow-sm border-0 h-100 ${idx === 0 ? 'border-warning' : idx === 1 ? 'border-secondary' : 'border-success'}`}>
-                          <Card.Body className="text-center py-4">
-                            <div className={`rounded-circle p-3 mb-2 d-inline-flex ${idx === 0 ? 'bg-warning bg-opacity-10' : idx === 1 ? 'bg-secondary bg-opacity-10' : 'bg-success bg-opacity-10'}`}>
-                              <FaTrophy className={`fs-2 ${idx === 0 ? 'text-warning' : idx === 1 ? 'text-secondary' : 'text-success'}`} />
-                            </div>
-                            <Badge bg={idx === 0 ? 'warning' : idx === 1 ? 'secondary' : 'success'} className="mb-2">Rank #{school.rank}</Badge>
-                            <h5 className="fw-bold mb-1 text-truncate" title={school.schoolName}>{school.schoolName}</h5>
-                            <p className="text-muted small mb-2">
-                              {school.enrolled} enrolled | {school.completed} completed
-                            </p>
-                            <h3 className="fw-bold text-success">{school.balancedScore}</h3>
-                            <small className="text-muted">Performance Score</small>
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    ))}
-                  </Row>
+                   <Row className="g-3 mb-4">
+                     {rankedSchools.slice(0, 3).map((school, idx) => (
+                       <Col md={4} key={school.schoolName}>
+                         <Card className={`shadow-sm border-0 h-100 ${idx === 0 ? 'border-warning' : idx === 1 ? 'border-secondary' : 'border-success'}`}>
+                           <Card.Body className="text-center py-4">
+                             <div className={`rounded-circle p-3 mb-2 d-inline-flex ${idx === 0 ? 'bg-warning bg-opacity-10' : idx === 1 ? 'bg-secondary bg-opacity-10' : 'bg-success bg-opacity-10'}`}>
+                               <FaTrophy className={`fs-2 ${idx === 0 ? 'text-warning' : idx === 1 ? 'text-secondary' : 'text-success'}`} />
+                             </div>
+                             <Badge bg={idx === 0 ? 'warning' : idx === 1 ? 'secondary' : 'success'} className="mb-2">Rank #{school.rank}</Badge>
+                             <h5 className="fw-bold mb-1 text-truncate" title={school.schoolName}>{school.schoolName}</h5>
+                             <p className="text-muted small mb-2">
+                               {school.uniqueStudents} students | {school.avgCoursesPerStudent} avg courses
+                             </p>
+                             <h3 className="fw-bold text-success">{school.balancedScore}</h3>
+                             <small className="text-muted">Performance Score</small>
+                           </Card.Body>
+                         </Card>
+                       </Col>
+                     ))}
+                   </Row>
 
                   <Card className="shadow-sm border-0">
                     <Card.Header className="bg-light">
@@ -4341,40 +4388,42 @@ const DashBord = () => {
                     <Card.Body className="p-0">
                       <div className="table-responsive">
                         <Table striped bordered hover responsive size="sm">
-                          <thead className="table-light">
-                            <tr>
-                              <th>Rank</th>
-                              <th>School Name</th>
-                              <th>Enrolled</th>
-                              <th>Completed</th>
-                              <th>Completion Rate</th>
-                              <th>Balanced Score</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {rankedSchools.map((school) => (
-                              <tr key={school.schoolName}>
-                                <td>
-                                  <Badge bg={school.rank <= 3 ? 'success' : 'secondary'}>#{school.rank}</Badge>
-                                </td>
-                                <td className="fw-bold">{school.schoolName}</td>
-                                <td>{school.enrolled}</td>
-                                <td>{school.completed}</td>
-                                <td>
-                                  <div className="d-flex align-items-center gap-2">
-                                    <div className="progress flex-grow-1" style={{ height: '6px', borderRadius: '3px' }}>
-                                      <div className="bg-success" style={{ width: `${school.completionRate}%` }}></div>
-                                    </div>
-                                    <span className="small">{school.completionRate}%</span>
-                                  </div>
-                                </td>
-                                <td>
-                                  <span className="fw-bold text-success">{school.balancedScore}</span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
+                           <thead className="table-light">
+                             <tr>
+                               <th>Rank</th>
+                               <th>School Name</th>
+                               <th>Unique Students</th>
+                               <th>Total Courses</th>
+                               <th>Avg Courses/Student</th>
+                               <th>Completion Rate</th>
+                               <th>Balanced Score</th>
+                             </tr>
+                           </thead>
+                           <tbody>
+                             {rankedSchools.map((school) => (
+                               <tr key={school.schoolName}>
+                                 <td>
+                                   <Badge bg={school.rank <= 3 ? 'success' : 'secondary'}>#{school.rank}</Badge>
+                                 </td>
+                                 <td className="fw-bold">{school.schoolName}</td>
+                                 <td>{school.uniqueStudents}</td>
+                                 <td>{school.totalCoursesParticipated}</td>
+                                 <td>{school.avgCoursesPerStudent}</td>
+                                 <td>
+                                   <div className="d-flex align-items-center gap-2">
+                                     <div className="progress flex-grow-1" style={{ height: '6px', borderRadius: '3px' }}>
+                                       <div className="bg-success" style={{ width: `${school.completionRate}%` }}></div>
+                                     </div>
+                                     <span className="small">{school.completionRate}%</span>
+                                   </div>
+                                 </td>
+                                 <td>
+                                   <span className="fw-bold text-success">{school.balancedScore}</span>
+                                 </td>
+                               </tr>
+                             ))}
+                           </tbody>
+                         </Table>
                       </div>
                     </Card.Body>
                   </Card>
@@ -4398,83 +4447,102 @@ const DashBord = () => {
             <div className="py-2">
               <h6 className="fw-bold mb-3">Balanced Performance Score Formula</h6>
 
-              <Card className="bg-light border-0 mb-4">
-                <Card.Body>
-                  <p className="fw-bold text-center mb-0" style={{ fontSize: '1.1em' }}>
-                    Score = 0.6 × ((Completed / MaxCompleted) × 100) + 0.4 × ((Completed / Enrolled) × 100)
-                  </p>
-                </Card.Body>
-              </Card>
+               <Card className="bg-light border-0 mb-4">
+                 <Card.Body>
+                   <p className="fw-bold text-center mb-0" style={{ fontSize: '1.1em' }}>
+                     Score = 0.4 × ((AvgCourses/Student / MaxAvgCourses) × 100) + 0.4 × (CompletionRate) + 0.2 × (StudentEngagement × 100)
+                   </p>
+                 </Card.Body>
+               </Card>
 
-              <Row className="g-3 mb-4">
-                <Col md={6}>
-                  <Card className="border-0 shadow-sm h-100">
-                    <Card.Header className="bg-primary text-white">
-                      <h6 className="mb-0 fw-bold">Component 1 (Weight: 60%)</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p className="mb-1"><strong>Relative Completion:</strong></p>
-                      <code className="d-block mb-2 p-2 bg-light rounded">
-                        (Completed / MaxCompleted) × 100
-                      </code>
-                      <p className="small text-muted mb-0">
-                        Compares the school's completed count <strong>against the highest completed count across all schools</strong>.
-                        This ensures the best-performing school gets a relative score of 100.
-                      </p>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 shadow-sm h-100">
-                    <Card.Header className="bg-success text-white">
-                      <h6 className="mb-0 fw-bold">Component 2 (Weight: 40%)</h6>
-                    </Card.Header>
-                    <Card.Body>
-                      <p className="mb-1"><strong>Absolute Completion:</strong></p>
-                      <code className="d-block mb-2 p-2 bg-light rounded">
-                        (Completed / Enrolled) × 100
-                      </code>
-                      <p className="small text-muted mb-0">
-                        Measures the <strong>actual completion percentage</strong> of students at each school.
-                        This rewards schools for high completion rates regardless of size.
-                      </p>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
+               <Row className="g-3 mb-4">
+                 <Col md={4}>
+                   <Card className="border-0 shadow-sm h-100">
+                     <Card.Header className="bg-primary text-white">
+                       <h6 className="mb-0 fw-bold">Component 1 (Weight: 40%)</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p className="mb-1"><strong>Course Participation:</strong></p>
+                       <code className="d-block mb-2 p-2 bg-light rounded small">
+                         (AvgCourses/Student / MaxAvgCourses) × 100
+                       </code>
+                       <p className="small text-muted mb-0">
+                         Compares the school's average courses per student <strong>against the highest average across all schools</strong>.
+                         Rewards schools encouraging more course participation.
+                       </p>
+                     </Card.Body>
+                   </Card>
+                 </Col>
+                 <Col md={4}>
+                   <Card className="border-0 shadow-sm h-100">
+                     <Card.Header className="bg-success text-white">
+                       <h6 className="mb-0 fw-bold">Component 2 (Weight: 40%)</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p className="mb-1"><strong>Completion Rate:</strong></p>
+                       <code className="d-block mb-2 p-2 bg-light rounded small">
+                         (CompletedCourses / TotalCoursesParticipated) × 100
+                       </code>
+                       <p className="small text-muted mb-0">
+                         Measures the <strong>actual completion percentage</strong> of courses participated by students.
+                         Rewards schools for high completion rates.
+                       </p>
+                     </Card.Body>
+                   </Card>
+                 </Col>
+                 <Col md={4}>
+                   <Card className="border-0 shadow-sm h-100">
+                     <Card.Header className="bg-warning text-white">
+                       <h6 className="mb-0 fw-bold">Component 3 (Weight: 20%)</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <p className="mb-1"><strong>Student Engagement:</strong></p>
+                       <code className="d-block mb-2 p-2 bg-light rounded small">
+                         min(UniqueStudents / 10, 1) × 100
+                       </code>
+                       <p className="small text-muted mb-0">
+                         Rewards schools for having more <strong>unique participating students</strong>.
+                         Capped at 100 points for 10+ students.
+                       </p>
+                     </Card.Body>
+                   </Card>
+                 </Col>
+               </Row>
 
-              <Card className="border-0 shadow-sm mb-4">
-                <Card.Header className="bg-warning">
-                  <h6 className="mb-0 fw-bold"><FaLightbulb className="me-2" /> Why This Formula?</h6>
-                </Card.Header>
-                <Card.Body>
-                  <ul className="mb-0">
-                    <li><strong>60% weight on relative performance</strong> compares schools against the top performer, encouraging competition.</li>
-                    <li><strong>40% weight on absolute completion</strong> ensures schools are also rewarded for their actual completion rate (quality), not just relative ranking.</li>
-                    <li>This <strong>balanced approach</strong> prevents a school with high enrollment but low completion from ranking too high, while also rewarding smaller schools with good completion rates.</li>
-                  </ul>
-                </Card.Body>
-              </Card>
+               <Card className="border-0 shadow-sm mb-4">
+                 <Card.Header className="bg-warning">
+                   <h6 className="mb-0 fw-bold"><FaLightbulb className="me-2" /> Why This Formula?</h6>
+                 </Card.Header>
+                 <Card.Body>
+                   <ul className="mb-0">
+                     <li><strong>40% weight on course participation</strong> rewards schools that encourage students to take multiple courses.</li>
+                     <li><strong>40% weight on completion rate</strong> ensures schools are rewarded for actual course completion and learning outcomes.</li>
+                     <li><strong>20% weight on student engagement</strong> gives bonus points for having more unique participating students.</li>
+                     <li>This <strong>balanced approach</strong> considers both quantity (participation) and quality (completion) of education delivery.</li>
+                   </ul>
+                 </Card.Body>
+               </Card>
 
-              <Card className="border-0 shadow-sm">
-                <Card.Header className="bg-light">
-                  <h6 className="mb-0 fw-bold"><FaCalculator className="me-2" /> Example Calculation</h6>
-                </Card.Header>
-                <Card.Body>
-                  <p className="small mb-2">
-                    <strong>Scenario:</strong> School A: 75 enrolled, 60 completed. MaxCompleted (across all schools) = 120.
-                  </p>
-                  <div className="small">
-                    <ul className="mb-1">
-                      <li>Component 1: (60 / 120) × 100 = 50 → 0.6 × 50 = <strong>30</strong></li>
-                      <li>Component 2: (60 / 75) × 100 = 80 → 0.4 × 80 = <strong>32</strong></li>
-                    </ul>
-                    <p className="fw-bold text-success border-top pt-2 mt-2">
-                      Total Balanced Score = 30 + 32 = 62.00
-                    </p>
-                  </div>
-                </Card.Body>
-              </Card>
+               <Card className="border-0 shadow-sm">
+                 <Card.Header className="bg-light">
+                   <h6 className="mb-0 fw-bold"><FaCalculator className="me-2" /> Example Calculation</h6>
+                 </Card.Header>
+                 <Card.Body>
+                   <p className="small mb-2">
+                     <strong>Scenario:</strong> School A: 25 unique students, total 75 course participations (avg 3 courses/student), 60 courses completed. MaxAvgCourses = 4.2, StudentEngagement = min(25/10, 1) = 1.0.
+                   </p>
+                   <div className="small">
+                     <ul className="mb-1">
+                       <li>Component 1: (3.0 / 4.2) × 100 = 71.43 → 0.4 × 71.43 = <strong>28.57</strong></li>
+                       <li>Component 2: (60 / 75) × 100 = 80.0 → 0.4 × 80.0 = <strong>32.00</strong></li>
+                       <li>Component 3: 1.0 × 100 = 100 → 0.2 × 100 = <strong>20.00</strong></li>
+                     </ul>
+                     <p className="fw-bold text-success border-top pt-2 mt-2">
+                       Total Balanced Score = 28.57 + 32.00 + 20.00 = 80.57
+                     </p>
+                   </div>
+                 </Card.Body>
+               </Card>
 
               <div className="mt-4">
                 <h6 className="fw-bold mb-2">Rules</h6>
