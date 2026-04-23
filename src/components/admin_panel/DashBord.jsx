@@ -40,9 +40,14 @@ const DashBord = () => {
   // State for Views
   const [currentView, setCurrentView] = useState('dashboard')
   
-  // State for Course Detail Modal
-  const [selectedCourse, setSelectedCourse] = useState(null)
-  const [showModal, setShowModal] = useState(false)
+   // State for Course Detail Modal
+   const [selectedCourse, setSelectedCourse] = useState(null)
+   const [showModal, setShowModal] = useState(false)
+
+   // State for Module Progress Modal
+   const [selectedProgress, setSelectedProgress] = useState(null)
+   const [showProgressModal, setShowProgressModal] = useState(false)
+   const [progressLoading, setProgressLoading] = useState(false)
 
   // State for Simple Course Form
   const [courseFormData, setCourseFormData] = useState({
@@ -108,20 +113,26 @@ const DashBord = () => {
    const [showCounselingModal, setShowCounselingModal] = useState(false)
    const [counselingPage, setCounselingPage] = useState(1)
    const counselingItemsPerPage = 100
-   const [selectedSchools, setSelectedSchools] = useState([])
-   const [uniqueSchools, setUniqueSchools] = useState([])
-   const [selectedClasses, setSelectedClasses] = useState([])
-   const [uniqueClasses, setUniqueClasses] = useState([])
 
-  // State for Admin Notifications
-  const [adminNotifications, setAdminNotifications] = useState([])
-  const [adminNotificationCount, setAdminNotificationCount] = useState(0)
-  const [showNotificationModal, setShowNotificationModal] = useState(false)
-  const [notificationFormData, setNotificationFormData] = useState({ title: '', message: '' })
-  const [submittingNotification, setSubmittingNotification] = useState(false)
-  const [showNotificationsListModal, setShowNotificationsListModal] = useState(false)
+   // State for Enrollment Filters
+   const [enrollmentSelectedSchools, setEnrollmentSelectedSchools] = useState([])
+   const [enrollmentUniqueSchools, setEnrollmentUniqueSchools] = useState([])
+   const [enrollmentSelectedClasses, setEnrollmentSelectedClasses] = useState([])
+   const [enrollmentUniqueClasses, setEnrollmentUniqueClasses] = useState([])
 
-  // State for Events
+   // State for Admin Notifications
+   const [adminNotifications, setAdminNotifications] = useState([])
+   const [adminNotificationCount, setAdminNotificationCount] = useState(0)
+   const [showNotificationModal, setShowNotificationModal] = useState(false)
+   const [notificationFormData, setNotificationFormData] = useState({ title: '', message: '' })
+   const [submittingNotification, setSubmittingNotification] = useState(false)
+   const [showNotificationsListModal, setShowNotificationsListModal] = useState(false)
+
+   // State for Enrollment Filters
+  const [selectedSchools, setSelectedSchools] = useState([])
+  const [uniqueSchools, setUniqueSchools] = useState([])
+  const [selectedClasses, setSelectedClasses] = useState([])
+  const [uniqueClasses, setUniqueClasses] = useState([])
   const [eventsCount, setEventsCount] = useState(0)
   const [events, setEvents] = useState([])
   const [loadingEvents, setLoadingEvents] = useState(false)
@@ -181,17 +192,35 @@ const DashBord = () => {
     try {
       const config = getAuthConfig()
       
-      // Fetch unpaid enrollment data
-        try {
-          const unpaidEnrollRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/', config)
-          if (unpaidEnrollRes.data && unpaidEnrollRes.data.success) {
-            setUnpaidEnrollmentCount(unpaidEnrollRes.data.data.length)
-            setUnpaidEnrollments(unpaidEnrollRes.data.data)
-          }
-        } catch (unpaidEnrollError) {
-          setUnpaidEnrollmentCount(0)
-          setUnpaidEnrollments([])
-        }
+       // Fetch unpaid enrollment data
+         try {
+           const unpaidEnrollRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/', config)
+           if (unpaidEnrollRes.data && unpaidEnrollRes.data.success) {
+             const enrollments = unpaidEnrollRes.data.data
+             setUnpaidEnrollmentCount(enrollments.length)
+             setUnpaidEnrollments(enrollments)
+             
+             // Extract unique school names
+             const schools = [...new Set(enrollments
+               .map(item => item.school_name)
+               .filter(name => name && name.trim() !== '')
+             )].sort()
+             setEnrollmentUniqueSchools(schools)
+             
+             // Extract unique class names (as strings to handle both string and number types)
+             const classes = [...new Set(enrollments
+               .map(item => String(item.class_name))
+               .filter(cls => cls && cls.trim() !== '')
+             )].sort((a, b) => parseInt(a) - parseInt(b))
+             console.log('Extracted unique classes:', classes)
+             setEnrollmentUniqueClasses(classes)
+           }
+         } catch (unpaidEnrollError) {
+           setUnpaidEnrollmentCount(0)
+           setUnpaidEnrollments([])
+           setEnrollmentUniqueSchools([])
+           setEnrollmentUniqueClasses([])
+         }
 
      // Fetch courses data from new endpoint
      try {
@@ -263,9 +292,12 @@ const DashBord = () => {
   }
 
    // --- Navigation Handlers ---
-    const handleEnrollmentsClick = () => {
-      setCurrentView('unpaidEnrollments')
-    }
+   const handleEnrollmentsClick = () => {
+     setCurrentView('unpaidEnrollments')
+     // Clear filters when navigating to enrollments
+     setEnrollmentSelectedSchools([])
+     setEnrollmentSelectedClasses([])
+   }
    const handleCounselingClick = () => {
      setCounselingPage(1)
      setCurrentView('counseling')
@@ -485,18 +517,42 @@ const DashBord = () => {
     setCourseFormData({ course_name: '', start_date: '', end_date: '' })
     setCurrentView('form')
   }
-  const handleViewCourse = async (course) => {
-    try {
-      const config = getAuthConfig()
-      const response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-module/?course_id=${course.course_id}`, config)
-      if (response.data && response.data.success) {
-        setSelectedCourse(response.data.data)
-      }
-    } catch (error) {
-      alert('Failed to fetch course details. Please check the console for details.')
-    }
-    setShowModal(true)
-  }
+   const handleViewCourse = async (course) => {
+     try {
+       const config = getAuthConfig()
+       const response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-module/?course_id=${course.course_id}`, config)
+       if (response.data && response.data.success) {
+         setSelectedCourse(response.data.data)
+       }
+     } catch (error) {
+       alert('Failed to fetch course details. Please check the console for details.')
+     }
+     setShowModal(true)
+   }
+
+   const fetchModuleProgress = async (studentId) => {
+     setProgressLoading(true)
+     try {
+       const config = getAuthConfig()
+       const response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/?student_id=${studentId}`, config)
+       if (response.data && response.data.success) {
+         return response.data.data
+       }
+       return []
+     } catch (error) {
+       console.error('Error fetching module progress:', error)
+       return []
+     } finally {
+       setProgressLoading(false)
+     }
+   }
+
+   const handleViewProgress = async (studentId, studentName) => {
+     setSelectedProgress({ studentId, studentName, modules: [] })
+     setShowProgressModal(true)
+     const progressData = await fetchModuleProgress(studentId)
+     setSelectedProgress(prev => ({ ...prev, modules: progressData }))
+   }
 
   const handleEditCourse = (course) => {
     setCourseFormData({
@@ -1095,7 +1151,53 @@ const DashBord = () => {
 
   // --- Render Helpers ---
 
-  const renderUnpaidEnrollmentsView = () => (
+  const renderUnpaidEnrollmentsView = () => {
+    // Filter enrollments based on selected filters
+    const filteredEnrollments = unpaidEnrollments.filter(enrollment => {
+      const schoolMatch = enrollmentSelectedSchools.length === 0 || 
+        enrollmentSelectedSchools.includes(enrollment.school_name)
+      const classMatch = enrollmentSelectedClasses.length === 0 || 
+        enrollmentSelectedClasses.includes(String(enrollment.class_name))
+      return schoolMatch && classMatch
+    })
+
+    // Handle school filter change
+    const handleSchoolFilterChange = (e) => {
+      const school = e.target.value
+      if (school && !enrollmentSelectedSchools.includes(school)) {
+        setEnrollmentSelectedSchools(prev => [...prev, school])
+      }
+      // Reset select to placeholder
+      e.target.value = ''
+    }
+
+    // Handle class filter change
+    const handleClassFilterChange = (e) => {
+      const cls = e.target.value
+      if (cls && !enrollmentSelectedClasses.includes(cls)) {
+        setEnrollmentSelectedClasses(prev => [...prev, cls])
+      }
+      // Reset select to placeholder
+      e.target.value = ''
+    }
+
+    // Clear school filter
+    const clearSchoolFilter = (school) => {
+      setEnrollmentSelectedSchools(prev => prev.filter(s => s !== school))
+    }
+
+    // Clear class filter
+    const clearClassFilter = (cls) => {
+      setEnrollmentSelectedClasses(prev => prev.filter(c => c !== cls))
+    }
+
+    // Clear all filters
+    const clearAllFilters = () => {
+      setEnrollmentSelectedSchools([])
+      setEnrollmentSelectedClasses([])
+    }
+
+    return (
     <div className="fade-in">
       <div className="d-flex justify-content-between align-items-center mb-4 page-header">
         <Button variant="outline-secondary" size="sm" onClick={handleBackToDashboard}>
@@ -1104,61 +1206,170 @@ const DashBord = () => {
         <h4 className="mb-0">Unpaid Enrollments</h4>
       </div>
 
-      <Card className="shadow-sm border-0">
-        <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
-          <span><FaUsers className="me-2" /> Enrollment Details</span>
-          <Badge bg="light" text="dark">{unpaidEnrollments.length} Records</Badge>
-        </Card.Header>
+      {/* Filter Card - Matching Counseling Style */}
+      <Card className="shadow-sm border-0 mb-4">
         <Card.Body>
-          {loading ? (
-            <div className="text-center py-4">
-              <Spinner animation="border" variant="primary" />
-              <p className="mt-2">Loading enrollments...</p>
-            </div>
-          ) : unpaidEnrollments.length === 0 ? (
-            <p className="text-muted text-center mb-0">No enrollments found</p>
-          ) : (
-            <div className="table-responsive">
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Student ID</th>
-                    <th>Student Name</th>
-                    <th>Course ID</th>
-                    <th>Course Name</th>
-                    <th>Enrolled At</th>
-                    <th>Status</th>
-                    <th>Certificate ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {unpaidEnrollments.map((enrollment, index) => (
-                    <tr key={enrollment.id || index}>
-                      <td>{index + 1}</td>
-                      <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
-                      <td className="fw-bold">{enrollment.student_name}</td>
-                      <td><Badge bg="info">{enrollment.course_id}</Badge></td>
-                      <td>{enrollment.course_name}</td>
-                      <td className="small">
-                        {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-'}
-                      </td>
-                      <td>
-                        <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
-                          {enrollment.is_completed ? 'Completed' : 'Ongoing'}
-                        </Badge>
-                      </td>
-                      <td>{enrollment.certificate_id || '-'}</td>
-                    </tr>
+          <Row className="g-3">
+            <Col md={6}>
+              <div className="d-flex flex-wrap gap-2 align-items-center">
+                <FaFilter className="text-muted me-2" />
+                <strong>Filter by Schools:</strong>
+                <Form.Control
+                  as="select"
+                  size="sm"
+                  style={{ minWidth: '250px' }}
+                  onChange={handleSchoolFilterChange}
+                  value=""
+                >
+                  <option value="">Select school to filter...</option>
+                  {enrollmentUniqueSchools.map((school, index) => (
+                    <option key={index} value={school}>{school}</option>
                   ))}
-                </tbody>
-              </Table>
-            </div>
-          )}
+                </Form.Control>
+                {enrollmentSelectedSchools.length > 0 && (
+                  <>
+                    <Button variant="outline-secondary" size="sm" onClick={() => setEnrollmentSelectedSchools([])}>
+                      Clear
+                    </Button>
+                    <div className="d-flex flex-wrap gap-1">
+                      {enrollmentSelectedSchools.map(school => (
+                        <Badge key={school} bg="secondary" className="d-flex align-items-center">
+                          {school}
+                          <span 
+                            style={{ cursor: 'pointer', marginLeft: '5px' }}
+                            onClick={() => clearSchoolFilter(school)}
+                          >
+                            ×
+                          </span>
+                        </Badge>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </Col>
+            <Col md={6}>
+              <div className="d-flex flex-wrap gap-2 align-items-center">
+                <FaFilter className="text-muted me-2" />
+                <strong>Filter by Class:</strong>
+                <Form.Control
+                  as="select"
+                  size="sm"
+                  style={{ minWidth: '200px' }}
+                  onChange={handleClassFilterChange}
+                  value=""
+                >
+                  <option value="">Select class to filter...</option>
+                  {enrollmentUniqueClasses.map((cls, index) => (
+                    <option key={index} value={cls}>{cls}</option>
+                  ))}
+                </Form.Control>
+                {enrollmentSelectedClasses.length > 0 && (
+                  <>
+                    <Button variant="outline-secondary" size="sm" onClick={() => setEnrollmentSelectedClasses([])}>
+                      Clear
+                    </Button>
+                    <div className="d-flex flex-wrap gap-1">
+                      {enrollmentSelectedClasses.map(cls => (
+                        <Badge key={cls} bg="secondary" className="d-flex align-items-center">
+                          {cls}
+                          <span 
+                            style={{ cursor: 'pointer', marginLeft: '5px' }}
+                            onClick={() => clearClassFilter(cls)}
+                          >
+                            ×
+                          </span>
+                        </Badge>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </Col>
+            {(enrollmentSelectedSchools.length > 0 || enrollmentSelectedClasses.length > 0) && (
+              <Col md={12} className="mt-2">
+                <Button variant="outline-danger" size="sm" onClick={clearAllFilters}>
+                  Clear All Filters
+                </Button>
+                <span className="text-muted ms-2 small">
+                  Showing {filteredEnrollments.length} of {unpaidEnrollments.length} records
+                </span>
+              </Col>
+            )}
+          </Row>
         </Card.Body>
       </Card>
-    </div>
-  )
+
+       <Card className="shadow-sm border-0">
+         <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
+           <span><FaUsers className="me-2" /> Enrollment Details</span>
+           <Badge bg="light" text="dark">{filteredEnrollments.length} Records</Badge>
+         </Card.Header>
+         <Card.Body>
+           {loading ? (
+             <div className="text-center py-4">
+               <Spinner animation="border" variant="primary" />
+               <p className="mt-2">Loading enrollments...</p>
+             </div>
+           ) : filteredEnrollments.length === 0 ? (
+             <p className="text-muted text-center mb-0">No enrollments found</p>
+           ) : (
+             <div className="table-responsive">
+               <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Student ID</th>
+                      <th>Student Name</th>
+                      <th>School Name</th>
+                      <th>Class</th>
+                      <th>Course ID</th>
+                      <th>Course Name</th>
+                      <th>Enrolled At</th>
+                      <th>Status</th>
+                      <th>Certificate ID</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                 <tbody>
+                   {filteredEnrollments.map((enrollment, index) => (
+                     <tr key={enrollment.id || index}>
+                       <td>{index + 1}</td>
+                       <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
+                       <td className="fw-bold">{enrollment.student_name}</td>
+                       <td>{enrollment.school_name || '-'}</td>
+                       <td><Badge bg="info">{enrollment.class_name || '-'}</Badge></td>
+                       <td><Badge bg="info">{enrollment.course_id}</Badge></td>
+                       <td>{enrollment.course_name}</td>
+                       <td className="small">
+                         {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-'}
+                       </td>
+                       <td>
+                         <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
+                           {enrollment.is_completed ? 'Completed' : 'Ongoing'}
+                         </Badge>
+                       </td>
+                        <td>{enrollment.certificate_id || '-'}</td>
+                        <td>
+                          <Button
+                            variant="info"
+                            size="sm"
+                            onClick={() => handleViewProgress(enrollment.student_id, enrollment.student_name)}
+                          >
+                            <FaEye className="me-1" /> View Progress
+                          </Button>
+                        </td>
+                      </tr>
+                   ))}
+                 </tbody>
+               </Table>
+             </div>
+           )}
+         </Card.Body>
+       </Card>
+     </div>
+   )
+ }
 
   const renderDashboardView = () => (
     <div className="fade-in">
@@ -2886,120 +3097,216 @@ const DashBord = () => {
         </div>
       </div>
 
-      {/* Course Details Modal */}
-<Modal
-  show={showModal}
-  onHide={() => setShowModal(false)}
-  fullscreen
-  style={{
-    padding: 0
-  }}
-  contentClassName="border-0"
-  dialogClassName="m-0"
->        <Modal.Header closeButton className="border-bottom py-2">
-          <Modal.Title className="fw-bold fs-5">{renderContentWithLineBreaks(selectedCourse?.course_name)}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="">
-          {selectedCourse && (
-            <div>
-              <p><strong>Course ID:</strong> {selectedCourse.course_id}</p>
-              <p><strong>Course Name:</strong> {renderContentWithLineBreaks(selectedCourse.course_name)}</p>
-              {selectedCourse.modules && selectedCourse.modules.length > 0 && (
-                <div className="mt-4">
-                  <h5>Modules ({selectedCourse.modules.length})</h5>
-                  <div className="modules-list">
-                    {selectedCourse.modules.map((mod, index) => (
-                      <div key={index} className="module-item mb-4 p-3 border rounded">
-                        <h6 className="fw-bold mb-1">
-                          Module {mod.order}: {renderContentWithLineBreaks(mod.mod_title)}
-                          <Badge bg="secondary" className="ms-2">ID: {mod.module_id}</Badge>
-                        </h6>
-                        {mod.mod_title_hindi && (
-                          <p className="small text-muted mb-2 fst-italic">{renderContentWithLineBreaks(mod.mod_title_hindi)}</p>
-                        )}
-                        
-                        {mod.sub_modules && mod.sub_modules.length > 0 && (
-                          <div className="mt-3">
-                            <h7 className="fw-bold text-muted">Sub-modules ({mod.sub_modules.length})</h7>
-                            <div className="submodules-list mt-2">
-                              {mod.sub_modules.map((subMod, subIndex) => (
-                                <div key={subIndex} className="submodule-item mb-3 p-2 border rounded bg-light">
-                                  <h7 className="fw-bold mb-1">
-                                    {renderContentWithLineBreaks(subMod.sub_modu_title)}
-                                    <Badge bg="secondary" className="ms-2">ID: {subMod.sub_module_id}</Badge>
-                                  </h7>
-                                  {subMod.sub_modu_title_hindi && (
-                                    <p className="small text-muted mb-1 fst-italic">{renderContentWithLineBreaks(subMod.sub_modu_title_hindi)}</p>
-                                  )}
-                                  
-                                  {subMod.sub_modu_description && (
-                                    <p className="small mt-1">{renderContentWithLineBreaks(subMod.sub_modu_description)}</p>
-                                  )}
-                                  {subMod.sub_modu_description_hindi && (
-                                    <p className="small text-muted fst-italic mt-1">{renderContentWithLineBreaks(subMod.sub_modu_description_hindi)}</p>
-                                  )}
-                                  
-                                  {subMod.image && (
-                                    <div className="mt-2">
-                                      <Image 
-                                        src={`https://brjobsedu.com/gyandhara/gyandhara_backend${subMod.image}`} 
-                                        alt={subMod.sub_modu_title} 
-                                        thumbnail 
-                                        className="img-fluid"
-                                        style={{ maxWidth: '200px' }}
-                                      />
-                                    </div>
-                                  )}
-                                  
-                                  {subMod.sub_mod && subMod.sub_mod.length > 0 && (
-                                    <div className="mt-2">
-                                      <h8 className="fw-bold text-muted small">Sections (English):</h8>
-                                      <div className="sections-list mt-1">
-                                        {subMod.sub_mod.map((section, sectionIndex) => (
-                                          <div key={sectionIndex} className="section-item mb-2 p-1 border rounded">
-                                            <h8 className="fw-bold small">
-                                              {renderContentWithLineBreaks(section.title || 'Untitled Section')}
-                                            </h8>
-                                            {section.description && (
-                                              <p className="small mt-1">{renderContentWithLineBreaks(section.description)}</p>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
+       {/* Course Details Modal */}
+       <Modal
+         show={showModal}
+         onHide={() => setShowModal(false)}
+         fullscreen
+         style={{
+           padding: 0
+         }}
+         contentClassName="border-0"
+         dialogClassName="m-0"
+       >        <Modal.Header closeButton className="border-bottom py-2">
+           <Modal.Title className="fw-bold fs-5">{renderContentWithLineBreaks(selectedCourse?.course_name)}</Modal.Title>
+         </Modal.Header>
+         <Modal.Body className="">
+           {selectedCourse && (
+             <div>
+               <p><strong>Course ID:</strong> {selectedCourse.course_id}</p>
+               <p><strong>Course Name:</strong> {renderContentWithLineBreaks(selectedCourse.course_name)}</p>
+               {selectedCourse.modules && selectedCourse.modules.length > 0 && (
+                 <div className="mt-4">
+                   <h5>Modules ({selectedCourse.modules.length})</h5>
+                   <div className="modules-list">
+                     {selectedCourse.modules.map((mod, index) => (
+                       <div key={index} className="module-item mb-4 p-3 border rounded">
+                         <h6 className="fw-bold mb-1">
+                           Module {mod.order}: {renderContentWithLineBreaks(mod.mod_title)}
+                           <Badge bg="secondary" className="ms-2">ID: {mod.module_id}</Badge>
+                         </h6>
+                         {mod.mod_title_hindi && (
+                           <p className="small text-muted mb-2 fst-italic">{renderContentWithLineBreaks(mod.mod_title_hindi)}</p>
+                         )}
+                         
+                         {mod.sub_modules && mod.sub_modules.length > 0 && (
+                           <div className="mt-3">
+                             <h7 className="fw-bold text-muted">Sub-modules ({mod.sub_modules.length})</h7>
+                             <div className="submodules-list mt-2">
+                               {mod.sub_modules.map((subMod, subIndex) => (
+                                 <div key={subIndex} className="submodule-item mb-3 p-2 border rounded bg-light">
+                                   <h7 className="fw-bold mb-1">
+                                     {renderContentWithLineBreaks(subMod.sub_modu_title)}
+                                     <Badge bg="secondary" className="ms-2">ID: {subMod.sub_module_id}</Badge>
+                                   </h7>
+                                   {subMod.sub_modu_title_hindi && (
+                                     <p className="small text-muted mb-1 fst-italic">{renderContentWithLineBreaks(subMod.sub_modu_title_hindi)}</p>
+                                   )}
+                                   
+                                   {subMod.sub_modu_description && (
+                                     <p className="small mt-1">{renderContentWithLineBreaks(subMod.sub_modu_description)}</p>
+                                   )}
+                                   {subMod.sub_modu_description_hindi && (
+                                     <p className="small text-muted fst-italic mt-1">{renderContentWithLineBreaks(subMod.sub_modu_description_hindi)}</p>
+                                   )}
+                                   
+                                   {subMod.image && (
+                                     <div className="mt-2">
+                                       <Image 
+                                         src={`https://brjobsedu.com/gyandhara/gyandhara_backend${subMod.image}`} 
+                                         alt={subMod.sub_modu_title} 
+                                         thumbnail 
+                                         className="img-fluid"
+                                         style={{ maxWidth: '200px' }}
+                                       />
+                                     </div>
+                                   )}
+                                   
+                                   {subMod.sub_mod && subMod.sub_mod.length > 0 && (
+                                     <div className="mt-2">
+                                       <h8 className="fw-bold text-muted small">Sections (English):</h8>
+                                       <div className="sections-list mt-1">
+                                         {subMod.sub_mod.map((section, sectionIndex) => (
+                                           <div key={sectionIndex} className="section-item mb-2 p-1 border rounded">
+                                             <h8 className="fw-bold small">
+                                               {renderContentWithLineBreaks(section.title || 'Untitled Section')}
+                                             </h8>
+                                             {section.description && (
+                                               <p className="small mt-1">{renderContentWithLineBreaks(section.description)}</p>
+                                             )}
+                                           </div>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
 
-                                  {subMod.sub_mod_hindi && subMod.sub_mod_hindi.length > 0 && (
-                                    <div className="mt-2">
-                                      <h8 className="fw-bold text-muted small">Sections (हिंदी):</h8>
-                                      <div className="sections-list mt-1">
-                                        {subMod.sub_mod_hindi.map((section, sectionIndex) => (
-                                          <div key={sectionIndex} className="section-item mb-2 p-1 border rounded">
-                                            <h8 className="fw-bold small">
-                                              {renderContentWithLineBreaks(section.title || 'Untitled Section')}
-                                            </h8>
-                                            {section.description && (
-                                              <p className="small mt-1">{renderContentWithLineBreaks(section.description)}</p>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-        </Modal.Body>
-      </Modal>
+                                   {subMod.sub_mod_hindi && subMod.sub_mod_hindi.length > 0 && (
+                                     <div className="mt-2">
+                                       <h8 className="fw-bold text-muted small">Sections (हिंदी):</h8>
+                                       <div className="sections-list mt-1">
+                                         {subMod.sub_mod_hindi.map((section, sectionIndex) => (
+                                           <div key={sectionIndex} className="section-item mb-2 p-1 border rounded">
+                                             <h8 className="fw-bold small">
+                                               {renderContentWithLineBreaks(section.title || 'Untitled Section')}
+                                             </h8>
+                                             {section.description && (
+                                               <p className="small mt-1">{renderContentWithLineBreaks(section.description)}</p>
+                                             )}
+                                           </div>
+                                         ))}
+                                       </div>
+                                     </div>
+                                   )}
+                                 </div>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+               )}
+             </div>
+           )}
+         </Modal.Body>
+       </Modal>
+
+        {/* Student Module Progress Modal */}
+        <Modal show={showProgressModal} onHide={() => setShowProgressModal(false)} size="lg" centered>
+          <Modal.Header className="bg-info text-white">
+            <Modal.Title className="w-100 d-flex justify-content-between align-items-center">
+              <span><FaEye className="me-2" /> Student Progress Details</span>
+              <Button variant="light" size="sm" onClick={() => setShowProgressModal(false)} className="rounded-circle" style={{ width: '32px', height: '32px', padding: 0, lineHeight: 1 }}>
+                &times;
+              </Button>
+            </Modal.Title>
+          </Modal.Header>
+         <Modal.Body>
+           {selectedProgress && (
+             <div>
+               <Card className="mb-3">
+                 <Card.Body>
+                   <Row>
+                     <Col md={6}>
+                       <p><strong>Student ID:</strong> {selectedProgress.studentId}</p>
+                       <p><strong>Student Name:</strong> {selectedProgress.studentName}</p>
+                     </Col>
+                     <Col md={6} className="text-end">
+                       <Badge bg="primary">Total Modules: {selectedProgress.modules.length}</Badge>
+                     </Col>
+                   </Row>
+                 </Card.Body>
+               </Card>
+
+               {progressLoading ? (
+                 <div className="text-center py-4">
+                   <Spinner animation="border" variant="primary" />
+                   <p className="mt-2">Loading progress...</p>
+                 </div>
+               ) : selectedProgress.modules.length === 0 ? (
+                 <p className="text-muted text-center">No progress data available for this student.</p>
+               ) : (
+                 <div className="table-responsive">
+                   <Table striped bordered hover responsive>
+                     <thead className="table-light">
+                       <tr>
+                         <th>#</th>
+                         <th>Module ID</th>
+                         <th>Module Status</th>
+                         <th>Test Status</th>
+                         <th>Test Score</th>
+                         <th>Attempts</th>
+                         <th>Completed At</th>
+                       </tr>
+                     </thead>
+                     <tbody>
+                       {selectedProgress.modules.map((progress, index) => (
+                         <tr key={progress.id || index}>
+                           <td>{index + 1}</td>
+                           <td><Badge bg="secondary">{progress.module}</Badge></td>
+                           <td>
+                             <Badge bg={progress.module_status === 'completed' ? 'success' : progress.module_status === 'in_progress' ? 'warning' : 'secondary'}>
+                               {progress.module_status || 'not_started'}
+                             </Badge>
+                           </td>
+                           <td>
+                             <Badge bg={
+                               progress.test_status === 'passed' ? 'success' :
+                               progress.test_status === 'failed' ? 'danger' :
+                               progress.test_status === 'attempted' ? 'warning' : 'secondary'
+                             }>
+                               {progress.test_status || 'not_attempted'}
+                             </Badge>
+                           </td>
+                           <td>
+                             {progress.test_score !== null && progress.test_score !== undefined
+                               ? `${progress.test_score}%`
+                               : '-'
+                             }
+                           </td>
+                           <td>{progress.attempt_count || 0}</td>
+                           <td className="small">
+                             {progress.completed_at
+                               ? new Date(progress.completed_at).toLocaleString()
+                               : '-'
+                             }
+                           </td>
+                         </tr>
+                       ))}
+                     </tbody>
+                   </Table>
+                 </div>
+               )}
+             </div>
+           )}
+         </Modal.Body>
+         <Modal.Footer>
+           <Button variant="secondary" onClick={() => setShowProgressModal(false)}>
+             Close
+           </Button>
+         </Modal.Footer>
+       </Modal>
 
        <Modal show={showCounselingModal} onHide={handleCloseCounselingModal} size="lg" centered>
          <Modal.Header closeButton className="bg-info text-white">
