@@ -1789,3 +1789,68 @@ img {
     .gap-3 { gap: 6px; }
     .gap-4 { gap: 8px; }
 }
+
+/* Bar Chart Styles */
+.bar-chart {
+  display: flex;
+  align-items: end;
+  justify-content: space-around;
+  height: 150px;
+  margin-bottom: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 40px;
+}
+
+.bar-container {
+  width: 100%;
+  height: 100px;
+  display: flex;
+  align-items: end;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 4px;
+  position: relative;
+}
+
+.bar {
+  width: 80%;
+  background: linear-gradient(180deg, #3b82f6 0%, #1e40af 100%);
+  border-radius: 4px 4px 0 0;
+  min-height: 5px;
+  transition: height 0.3s ease;
+}
+
+.bar-item small {
+  margin-top: 5px;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+/* Custom Close Button */
+.close-btn-custom {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 50% !important;
+  width: 30px !important;
+  height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  margin-left: auto !important;
+}
+
+.close-btn-custom:hover {
+  background-color: #c82333 !important;
+}

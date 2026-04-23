@@ -60,11 +60,7 @@ const menuItems = [
       path: "/SchoolDashBoard",
       active: true,
     },
-    {
-      icon: <FaUserCircle />,
-      label: "PROFILE",
-      path: "/UserProfile",
-    },
+   
     {
       icon: <FaUsers />,
       label: "ADD STUDENTS",
