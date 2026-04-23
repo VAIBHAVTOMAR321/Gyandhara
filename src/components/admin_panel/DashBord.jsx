@@ -1529,7 +1529,7 @@ const DashBord = () => {
               <div className="stat-icon-wrapper users me-3">
                 <FaUsers className="stat-icon" />
               </div>
-              <div>
+              <div className="card-content-mob-box">
                 <h6 className="stat-label text-muted mb-1">Unpaid Enrollments</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : unpaidEnrollmentCount}</h2>
               </div>
@@ -1542,7 +1542,7 @@ const DashBord = () => {
               <div className="stat-icon-wrapper courses me-3">
                 <FaBook className="stat-icon" />
               </div>
-              <div>
+              <div className="card-content-mob-box">
                 <h6 className="stat-label text-muted mb-1">Unpaid Courses</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : courses.filter(c => c.course_status === 'unpaid').length}</h2>
               </div>
@@ -1555,7 +1555,7 @@ const DashBord = () => {
               <div className="stat-icon-wrapper courses me-3">
                 <FaComments className="stat-icon" />
               </div>
-              <div>
+              <div className="card-content-mob-box">
                 <h6 className="stat-label text-muted mb-1">Counseling Requests</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : counselingData.length}</h2>
               </div>
@@ -1568,7 +1568,7 @@ const DashBord = () => {
               <div className="stat-icon-wrapper courses me-3" style={{ backgroundColor: '#17a2b8' }}>
                 <FaBell className="stat-icon" />
               </div>
-              <div>
+              <div className="card-content-mob-box">
                 <h6 className="stat-label text-muted mb-1">Notifications</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : adminNotificationCount}</h2>
               </div>
@@ -1581,7 +1581,7 @@ const DashBord = () => {
               <div className="stat-icon-wrapper courses me-3" style={{ backgroundColor: '#6f42c1' }}>
                 <FaCalendarAlt className="stat-icon" />
               </div>
-              <div>
+              <div className="card-content-mob-box">
                 <h6 className="stat-label text-muted mb-1">Events</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : eventsCount}</h2>
               </div>

@@ -71,6 +71,13 @@ body {
 .tab-btn{
   font-size: 12px !important;
 }
+.card-content-mob-box h2{
+  color: #fff !important;
+}
+
+.card-content-mob-box h6{
+  color: #fff !important;
+}
 .card-body p {
 
   font-size: 12px !important;

@@ -357,9 +357,9 @@ const AdminDashBoard = () => {
                     <div className="stat-icon">
                       <i className={`bi ${stat.icon}`}></i>
                     </div>
-                    <div className="stat-content">
-                      <div className="stat-number">{stat.number}</div>
-                      <div className="stat-label">{stat.label}</div>
+                    <div className="stat-content card-content-mob-box ">
+                      <h2>{stat.number}</h2>
+                      <h6>{stat.label}</h6>
                     </div>
                   </div>
                 ))}
