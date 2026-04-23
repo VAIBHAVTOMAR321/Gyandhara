@@ -42,23 +42,27 @@ const DashBord = () => {
     const completed = enrollments.filter(e => e.is_completed).length
     const ongoing = total - completed
 
-    // Class distribution
-    const classCounts = {}
+    // Class distribution - count UNIQUE students per class
+    const classStudents = {}
     enrollments.forEach(e => {
       const cls = String(e.class_name || 'Unknown')
-      classCounts[cls] = (classCounts[cls] || 0) + 1
+      if (!classStudents[cls]) classStudents[cls] = new Set()
+      if (e.student_id) classStudents[cls].add(e.student_id)
     })
-    const classDist = Object.entries(classCounts)
+    const classDist = Object.entries(classStudents)
+      .map(([cls, studentSet]) => [cls, studentSet.size])
       .sort(([,a], [,b]) => b - a)
       .map(([cls, count]) => [cls, count])
 
-    // School distribution (top 10)
-    const schoolCounts = {}
+    // School distribution (top 10) - count UNIQUE students per school
+    const schoolStudents = {}
     enrollments.forEach(e => {
       const school = e.school_name || 'Unknown'
-      schoolCounts[school] = (schoolCounts[school] || 0) + 1
+      if (!schoolStudents[school]) schoolStudents[school] = new Set()
+      if (e.student_id) schoolStudents[school].add(e.student_id)
     })
-    const schoolDist = Object.entries(schoolCounts)
+    const schoolDist = Object.entries(schoolStudents)
+      .map(([school, studentSet]) => [school, studentSet.size])
       .sort(([,a], [,b]) => b - a)
       .slice(0, 10)
       .map(([school, count]) => [school, count])
@@ -4020,17 +4024,17 @@ const DashBord = () => {
                           {stats.classDist.length > 0 ? (
                             <div className="d-flex flex-column gap-2">
                               {stats.classDist.map(([cls, count]) => {
-                                const percentage = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0
+                                const percentage = stats.uniqueStudents > 0 ? Math.round((count / stats.uniqueStudents) * 100) : 0
                                 return (
                                   <div key={cls} className="border-bottom pb-2">
                                     <div className="d-flex justify-content-between align-items-center mb-1">
                                       <Badge bg="info" className="fs-6">Class {cls}</Badge>
-                                      <span className="fw-bold">{count} students</span>
+                                      <span className="fw-bold">{count} unique students</span>
                                     </div>
                                     <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
                                       <div className="progress-bar bg-info" style={{ width: `${percentage}%` }}></div>
                                     </div>
-                                    <small className="text-muted">{percentage}% of total</small>
+                                    <small className="text-muted">{percentage}% of unique students</small>
                                   </div>
                                 )
                               })}
@@ -4086,53 +4090,77 @@ const DashBord = () => {
                       </Card.Header>
                       <Card.Body>
                         {(() => {
-                          // Group by school and class
+                          // Group by school and class with unique students
                           const schoolGroups = {}
                           filteredData.forEach(enrollment => {
                             const school = enrollment.school_name || 'Unknown School'
                             const className = String(enrollment.class_name || 'Unknown')
+                            const studentId = enrollment.student_id
+                            
                             if (!schoolGroups[school]) schoolGroups[school] = {}
-                            if (!schoolGroups[school][className]) schoolGroups[school][className] = []
-                            schoolGroups[school][className].push(enrollment)
+                            if (!schoolGroups[school][className]) {
+                              schoolGroups[school][className] = {
+                                students: new Set(),
+                                completed: new Set(),
+                                enrollments: []
+                              }
+                            }
+                            
+                            if (studentId) {
+                              schoolGroups[school][className].students.add(studentId)
+                              if (enrollment.is_completed) {
+                                schoolGroups[school][className].completed.add(studentId)
+                              }
+                            }
+                            schoolGroups[school][className].enrollments.push(enrollment)
                           })
 
-                          return Object.entries(schoolGroups).map(([schoolName, classes]) => (
-                            <div key={schoolName} className="mb-4 p-3 border rounded bg-light">
-                              <div className="d-flex justify-content-between align-items-center mb-3">
-                                <h6 className="fw-bold text-dark mb-0">
-                                  <FaSchool className="me-2 text-primary" /> {schoolName}
-                                </h6>
-                                <Badge bg="primary" className="fs-6">
-                                  {Object.values(classes).flat().length} students
-                                </Badge>
-                              </div>
+                          return Object.entries(schoolGroups).map(([schoolName, classes]) => {
+                            // Calculate total unique students in school
+                            const schoolUniqueStudents = new Set()
+                            Object.values(classes).forEach(classData => {
+                              classData.students.forEach(sid => schoolUniqueStudents.add(sid))
+                            })
+                            
+                            return (
+                              <div key={schoolName} className="mb-4 p-3 border rounded bg-light">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                  <h6 className="fw-bold text-dark mb-0">
+                                    <FaSchool className="me-2 text-primary" /> {schoolName}
+                                  </h6>
+                                  <Badge bg="primary" className="fs-6">
+                                    {schoolUniqueStudents.size} unique students
+                                  </Badge>
+                                </div>
 
-                              <Row className="g-2">
-                                {Object.entries(classes).map(([className, students]) => {
-                                  const completedCount = students.filter(s => s.is_completed).length
-                                  const ongoingCount = students.length - completedCount
-                                  return (
-                                    <Col md={6} lg={4} key={className} className="mb-2">
-                                      <div className="p-2 border rounded bg-white">
-                                        <div className="d-flex justify-content-between align-items-center mb-2">
-                                          <Badge bg="info" className="fs-6">Class {className}</Badge>
-                                          <span className="fw-bold small">{students.length} students</span>
+                                <Row className="g-2">
+                                  {Object.entries(classes).map(([className, classData]) => {
+                                    const uniqueCount = classData.students.size
+                                    const completedCount = classData.completed.size
+                                    const ongoingCount = uniqueCount - completedCount
+                                    return (
+                                      <Col md={6} lg={4} key={className} className="mb-2">
+                                        <div className="p-2 border rounded bg-white">
+                                          <div className="d-flex justify-content-between align-items-center mb-2">
+                                            <Badge bg="info" className="fs-6">Class {className}</Badge>
+                                            <span className="fw-bold small">{uniqueCount} unique students</span>
+                                          </div>
+                                          <div className="d-flex justify-content-between small mb-1">
+                                            <span className="text-success"><FaCheckCircle className="me-1" /> {completedCount} Done</span>
+                                            <span className="text-warning"><FaClock className="me-1" /> {ongoingCount} Ongoing</span>
+                                          </div>
+                                           <div className="progress" style={{ height: '6px', borderRadius: '3px' }}>
+                                             <div className="bg-success" style={{ width: `${uniqueCount > 0 ? (completedCount / uniqueCount) * 100 : 0}%` }}></div>
+                                             <div className="bg-warning" style={{ width: `${uniqueCount > 0 ? (ongoingCount / uniqueCount) * 100 : 0}%` }}></div>
+                                           </div>
                                         </div>
-                                        <div className="d-flex justify-content-between small mb-1">
-                                          <span className="text-success"><FaCheckCircle className="me-1" /> {completedCount} Done</span>
-                                          <span className="text-warning"><FaClock className="me-1" /> {ongoingCount} Ongoing</span>
-                                        </div>
-                                         <div className="progress" style={{ height: '6px', borderRadius: '3px' }}>
-                                           <div className="bg-success" style={{ width: `${students.length > 0 ? (completedCount / students.length) * 100 : 0}%` }}></div>
-                                           <div className="bg-warning" style={{ width: `${students.length > 0 ? (ongoingCount / students.length) * 100 : 0}%` }}></div>
-                                         </div>
-                                      </div>
-                                    </Col>
-                                  )
-                                })}
-                              </Row>
-                            </div>
-                          ))
+                                      </Col>
+                                    )
+                                  })}
+                                </Row>
+                              </div>
+                            )
+                          })
                         })()}
                       </Card.Body>
                     </Card>
