@@ -182,6 +182,18 @@
   border: 2.5px solid var(--gd-blue);
  color: #fff;
 }
+.btn-outline-custom-btn {
+  background: transparent;
+  border: 2.5px solid var(--gd-blue);
+ color: #2E6DB4;
+}
+.btn-outline-custom-btn:hover {
+  background: var(--gd-gradient-blue);
+  color: var(--gd-white);
+  border-color: transparent;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px var(--gd-shadow-blue);
+}
 
 .btn-outline-custom:hover {
   background: var(--gd-gradient-blue);
