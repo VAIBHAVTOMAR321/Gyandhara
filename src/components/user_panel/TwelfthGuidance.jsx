@@ -4,7 +4,7 @@ import axios from 'axios'
 
 import { useNavigate } from 'react-router-dom'
 
-// import CounselingForm from './CounselingForm'
+import CounselingForm from './CounselingForm'
 
 import { FaArrowLeft, FaGraduationCap, FaChartLine, FaLightbulb, FaRocket, FaBook, FaCode, FaPalette, FaCalculator, FaLanguage, FaMusic, FaHeartbeat, FaBusinessTime, FaPercentage, FaUniversity, FaTools, FaLaptopMedical, FaBriefcase, FaCog, FaFlask, FaBalanceScale, FaNewspaper, FaChalkboardTeacher, FaUserTie, FaPaintBrush, FaGuitar, FaRunning, FaHome, FaWrench, FaIndustry, FaPlane, FaCar, FaBuilding, FaHospital, FaSeedling, FaMicrochip, FaNetworkWired, FaDatabase, FaShieldAlt, FaRobot, FaBrain, FaChartBar, FaProjectDiagram, FaBookOpen, FaBolt, FaDna, FaCheckCircle, FaInfoCircle, FaTrain, FaLandmark, FaMoneyBillWave, FaUserShield, FaFlag } from 'react-icons/fa'
 import '../../assets/css/12thclass.css'
@@ -113,6 +113,38 @@ const TwelfthGuidance = () => {
       fetchUserData()
     }
   }, [uniqueId, userRoleType, accessToken])
+
+  // Handle Counseling Form Submission
+  const handleCounselingSubmit = async (formData) => {
+    try {
+      const payload = {
+        student_id: uniqueId,
+        category_consulting: formData.category_consulting
+      }
+
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const response = await axios.post(
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-cousult/',
+        payload,
+        config
+      )
+
+      if (response.data.success || response.status === 200 || response.status === 201) {
+        return response.data
+      } else {
+        throw new Error(response.data.message || 'Failed to submit counseling request')
+      }
+    } catch (error) {
+      console.error('Counseling submission error:', error)
+      throw error
+    }
+  }
 
   // Simulate loading
   useEffect(() => {
@@ -635,46 +667,9 @@ const TwelfthGuidance = () => {
     if (perc >= 75) return { levelKey: 'Excellent', color: 'success', icon: <FaCheckCircle /> }
     if (perc >= 60) return { levelKey: 'Good', color: 'warning', icon: <FaInfoCircle /> }
     return { levelKey: 'Average', color: 'danger', icon: <FaInfoCircle /> }
-  }
+   }
 
-  // Handle counseling form submission
-  const handleCounselingSubmit = async (counselingData) => {
-    try {
-      console.log('Counseling data submitted:', counselingData)
-
-      const response = await axios.post(
-        'https://brjobsedu.com/girls_course/girls_course_backend/api/student-cousult/',
-        {
-          ...counselingData,
-          student_id: uniqueId,
-          mobile: counselingData.phone,
-          other_category: counselingData.otherCategory || '',
-          category: counselingData.category_consulting.join(', '),
-          message: `Career counseling request from student dashboard - Category: ${counselingData.category_consulting.join(', ')}`,
-          student_name: userData?.full_name || userData?.candidate_name || 'Student',
-          stream: selectedStream || 'Not specified',
-          percentage: percentage || 'Not specified'
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      )
-
-      if (response.data.success) {
-        return true
-      } else {
-        throw new Error(response.data.message || 'Failed to submit counseling request')
-      }
-    } catch (error) {
-      console.error('Counseling submission error:', error)
-      throw error
-    }
-  }
-
-  const courses = showResults ? getCoursesByStreamAndPercentage(selectedStream, percentage) : []
+   const courses = showResults ? getCoursesByStreamAndPercentage(selectedStream, percentage) : []
   const performance = showResults ? getPerformanceLevel() : null
   const allCourses = showResults ? getAllCoursesForStream(selectedStream) : []
 
@@ -729,14 +724,13 @@ const TwelfthGuidance = () => {
                     </div>
                   </div>
                 </Card.Body>
-                {/* <CounselingForm
-                  onSubmit={handleCounselingSubmit}
-                  showForm={showCounseling}
-                  onToggle={setShowCounseling}
-                  initialData={userData}
-                  userRoleType={userRoleType}
-                /> */}
-              </Card>
+              <CounselingForm
+                onSubmit={handleCounselingSubmit}
+                showForm={showCounseling}
+                onToggle={setShowCounseling}
+                studentId={uniqueId}
+              />
+            </Card>
 
               {/* Step 1: Select Stream */}
               <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { Card, Button, Form, Row, Col } from 'react-bootstrap'
+import { Card, Button, Form, Row, Col, Modal } from 'react-bootstrap'
 import { FaLightbulb } from 'react-icons/fa'
 
-const CounselingForm = ({ onSubmit, initialData = {}, showForm: propShowForm, onToggle, userRoleType }) => {
+const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onToggle }) => {
   const [internalShowForm, setInternalShowForm] = useState(false)
   const showForm = propShowForm !== undefined ? propShowForm : internalShowForm
   const setShowForm = (value) => {
@@ -14,40 +14,31 @@ const CounselingForm = ({ onSubmit, initialData = {}, showForm: propShowForm, on
   }
   
   const [formData, setFormData] = useState({
-    student_id: initialData.student_id || initialData.student_id || '',
-    full_name: initialData.full_name || initialData.candidate_name || '',
-    aadhaar_no: initialData.aadhaar_no || '',
-    associate_wings: initialData.associate_wings || '',
-    phone: initialData.phone || initialData.mobile_no || '',
-    email: initialData.email || '',
-    district: initialData.district || '',
-    block: initialData.block || '',
-    state: initialData.state || '',
-    guardian_name: initialData.guardian_name || '',
-    date_of_birth: initialData.date_of_birth || '',
-    highest_education: initialData.highest_education || '',
-    address: initialData.address || '',
-    created_at: initialData.created_at || '',
-    category_consulting: initialData.category_consulting || [],
-    otherCategory: initialData.otherCategory || '',
-    status: 'pending'
+    student_id: studentId,
+    category_consulting: 'Career Guidance'
   })
   
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
+  const counselingCategories = [
+    'Career Guidance',
+    'Course Selection',
+    'Admission Process',
+    'Financial Aid',
+    'Study Abroad',
+    'Job Placement',
+    'Skill Development',
+    'Personal Counseling',
+    'Health',
+    'Domestic'
+  ]
+
   const handleChange = (field, value) => {
-    if (field === 'category_consulting') {
-      setFormData(prev => ({
-        ...prev,
-        [field]: Array.isArray(value) ? value : [value]
-      }))
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }))
-    }
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   const handleSubmit = async (e) => {
@@ -60,79 +51,37 @@ const CounselingForm = ({ onSubmit, initialData = {}, showForm: propShowForm, on
       return
     }
     
-    if (!formData.full_name) {
-      alert('Full Name is required')
-      return
-    }
-
-    if (formData.aadhaar_no && !/^\d{12}$/.test(formData.aadhaar_no.replace(/\s+/g, ''))) {
-      alert('Please enter a valid 12-digit Aadhaar number')
-      return
-    }
-
-    if (!formData.category_consulting.length) {
-      alert('Please select at least one category')
-      return
-    }
-
-    if (formData.category_consulting.includes('other') && !formData.otherCategory.trim()) {
-      alert('Please specify the other category')
+    if (!formData.category_consulting) {
+      alert('Please select a counseling category')
       return
     }
 
     setSubmitting(true)
 
     try {
-      const cleanData = {
-        ...formData,
-        phone: formData.phone.replace(/\s+/g, ''),
-        aadhaar_no: formData.aadhaar_no ? formData.aadhaar_no.replace(/\s+/g, '') : null,
-        category_consulting: formData.category_consulting,
-        otherCategory: formData.otherCategory.trim()
+      const payload = {
+        student_id: formData.student_id,
+        category_consulting: [formData.category_consulting]
       }
 
-      await onSubmit(cleanData)
+      await onSubmit(payload)
 
-      alert('Your counselling request has been submitted')
+      alert('Your counselling request has been submitted successfully!')
       setFormData({
-        student_id: initialData.student_id || initialData.student_id || '',
-        full_name: initialData.full_name || initialData.candidate_name || '',
-        aadhaar_no: initialData.aadhaar_no || '',
-        associate_wings: initialData.associate_wings || '',
-        phone: initialData.phone || initialData.mobile_no || '',
-        email: initialData.email || '',
-        district: initialData.district || '',
-        block: initialData.block || '',
-        state: initialData.state || '',
-        guardian_name: initialData.guardian_name || '',
-        date_of_birth: initialData.date_of_birth || '',
-        highest_education: initialData.highest_education || '',
-        address: initialData.address || '',
-        created_at: initialData.created_at || '',
-        category_consulting: [],
-        otherCategory: '',
-        status: 'pending'
+        student_id: studentId,
+        category_consulting: 'Career Guidance'
       })
+      setSubmitted(true)
+      setTimeout(() => {
+        setShowForm(false)
+        setSubmitted(false)
+      }, 1000)
     } catch (error) {
       alert(error.message || 'An error occurred. Please try again.')
     } finally {
       setSubmitting(false)
     }
   }
-
-  const categoryOptions = [
-    { value: 'career-guidance', label: 'Career Guidance' },
-    { value: 'course-selection', label: 'Course Selection' },
-    { value: 'admission-process', label: 'Admission Process' },
-    { value: 'financial-aid', label: 'Financial Aid' },
-    { value: 'study-abroad', label: 'Study Abroad' },
-    { value: 'job-placement', label: 'Job Placement' },
-    { value: 'skill-development', label: 'Skill Development' },
-    { value: 'personal-counseling', label: 'Personal Counseling' },
-    { value: 'health', label: 'Health' },
-    { value: 'domestic', label: 'Domestic' },
-    { value: 'other', label: 'Other' }
-  ]
 
   return (
     <>
@@ -142,15 +91,16 @@ const CounselingForm = ({ onSubmit, initialData = {}, showForm: propShowForm, on
             <div>
               <h5 className="mb-0">
                 <FaLightbulb className="me-2 text-warning" />
-                Career Counseling
+                Request Career Counseling
               </h5>
               <small className="text-muted">Get expert guidance for your career</small>
             </div>
             <Button
               variant="outline-primary"
               onClick={() => setShowForm(!showForm)}
+              size="sm"
             >
-              {showForm ? 'Hide Form' : 'Get Counseling'}
+              {showForm ? 'Cancel' : 'Request Counseling'}
             </Button>
           </div>
 
@@ -159,49 +109,37 @@ const CounselingForm = ({ onSubmit, initialData = {}, showForm: propShowForm, on
               <Row className="g-3">
                 <Col md={12}>
                   <Form.Group>
-                    <Form.Label>Select Categories</Form.Label>
-                    <div className="row">
-                      {categoryOptions.map((option) => (
-                        <Col key={option.value} md={4} className="mb-2">
-                          <Form.Check
-                            type="checkbox"
-                            id={option.value}
-                            label={option.label}
-                            checked={formData.category_consulting.includes(option.value)}
-                            onChange={(e) => {
-                              const checked = e.target.checked
-                              const currentCategories = formData.category_consulting
-                              if (checked) {
-                                handleChange('category_consulting', [...currentCategories, option.value])
-                              } else {
-                                handleChange('category_consulting', currentCategories.filter(cat => cat !== option.value))
-                              }
-                            }}
-                          />
-                        </Col>
-                      ))}
-                    </div>
+                    <Form.Label className="fw-bold">Student ID</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={formData.student_id}
+                      disabled
+                      className="bg-light"
+                    />
                   </Form.Group>
                 </Col>
-                {formData.category_consulting.includes('other') && (
-                  <Col md={12}>
-                    <Form.Group>
-                      <Form.Label>Specify Other Category</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={formData.otherCategory}
-                        onChange={(e) => handleChange('otherCategory', e.target.value)}
-                        placeholder="Please specify"
-                        required
-                      />
-                    </Form.Group>
-                  </Col>
-                )}
+                <Col md={12}>
+                  <Form.Group>
+                    <Form.Label className="fw-bold">Select Counseling Category <span className="text-danger">*</span></Form.Label>
+                    <Form.Select
+                      value={formData.category_consulting}
+                      onChange={(e) => handleChange('category_consulting', e.target.value)}
+                      required
+                    >
+                      <option value="">-- Select Category --</option>
+                      {counselingCategories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
                 <Col xs={12}>
                   <Button
                     variant={submitted ? "success" : "primary"}
                     type="submit"
-                    className=""
+                    className="w-100"
                     disabled={submitting || submitted}
                   >
                     {submitting ? (
@@ -210,7 +148,7 @@ const CounselingForm = ({ onSubmit, initialData = {}, showForm: propShowForm, on
                         Submitting...
                       </>
                     ) : submitted ? (
-                      'Submitted'
+                      <>✓ Submitted Successfully</>
                     ) : (
                       'Submit Request'
                     )}

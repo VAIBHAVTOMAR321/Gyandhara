@@ -2,13 +2,17 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Container, Card, Button, Row, Col, Badge, Form, ProgressBar, Modal, Alert, Tab, Nav } from 'react-bootstrap'
 import { FaGraduationCap, FaLightbulb, FaArrowLeft, FaFlask, FaCalculator, FaBook, FaBalanceScale, FaBrain, FaUserTie, FaWrench, FaCog, FaCertificate, FaCheckCircle, FaInfoCircle, FaUniversity, FaBusinessTime, FaCode, FaDna, FaBookOpen } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
+import CounselingForm from './CounselingForm'
+import { useAuth } from '../all_login/AuthContext'
 import '../../assets/css/10thclass.css'
 import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
 
 const TenthGuidance = () => {
   const navigate = useNavigate()
+  const { uniqueId, accessToken } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
@@ -19,6 +23,7 @@ const TenthGuidance = () => {
   const [selectedCourse, setSelectedCourse] = useState(null)
   const [selectedCareerPath, setSelectedCareerPath] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showCounseling, setShowCounseling] = useState(false)
   const resultsRef = useRef()
 
   // Simulate loading
@@ -42,6 +47,38 @@ const TenthGuidance = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
+  }
+
+  // Handle Counseling Form Submission
+  const handleCounselingSubmit = async (formData) => {
+    try {
+      const payload = {
+        student_id: uniqueId,
+        category_consulting: formData.category_consulting
+      }
+
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
+
+      const response = await axios.post(
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-cousult/',
+        payload,
+        config
+      )
+
+      if (response.data.success || response.status === 200 || response.status === 201) {
+        return response.data
+      } else {
+        throw new Error(response.data.message || 'Failed to submit counseling request')
+      }
+    } catch (error) {
+      console.error('Counseling submission error:', error)
+      throw error
+    }
   }
 
   const streams = [
@@ -531,6 +568,13 @@ const getStreamDisplayName = (streamId) => {
                   </div>
                 </Card.Body>
               </Card>
+
+              <CounselingForm
+                onSubmit={handleCounselingSubmit}
+                showForm={showCounseling}
+                onToggle={setShowCounseling}
+                studentId={uniqueId}
+              />
 
               {/* Step 1: Select Stream */}
               <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
