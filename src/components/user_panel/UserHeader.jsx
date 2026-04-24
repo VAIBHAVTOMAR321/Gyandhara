@@ -312,8 +312,15 @@ function UserHeader({ toggleSidebar }) {
           </Col>
           
           <Col xs="auto">
-            <div className="header-actions">
-              {/* Notifications Dropdown */}
+             <div className="header-actions">
+               <Button
+                  style={{ background: "#383be8", borderColor: "#383be8", color: "#fff" }}
+                  className="me-2"
+                  onClick={() => navigate("/GroomingClasses")}
+                >
+                  Grooming Class
+                </Button>
+               {/* Notifications Dropdown */}
               <Dropdown
                 show={showNotificationDropdown}
                 onToggle={(isOpen) => setShowNotificationDropdown(isOpen)}
