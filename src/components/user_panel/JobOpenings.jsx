@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { Container, Row, Col, Card, Spinner, Badge, Button, Form, Modal, Nav, Tab, Alert } from 'react-bootstrap'
 import axios from 'axios'
 import { useAuth } from '../all_login/AuthContext'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
 import { 
@@ -15,6 +15,7 @@ import '../../assets/css/JobOpenings.css'
 const JobOpenings = () => {
   const { accessToken, uniqueId } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
   
   // --- Layout & Sidebar State ---
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -37,6 +38,16 @@ const JobOpenings = () => {
   // --- Language State ---
   const [language, setLanguage] = useState('en')
   const isLanguageHindi = language === 'hi'
+
+  // --- Tab State ---
+  const [activeTab, setActiveTab] = useState('jobs')
+  
+  // Update active tab whenever location.state changes
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab)
+    }
+  }, [location.key])  // location.key changes on every navigation
 
   // --- Filter State ---
   const [selectedQualification, setSelectedQualification] = useState('')
@@ -80,12 +91,19 @@ const JobOpenings = () => {
     setLanguage(getLanguage())
   }, [])
 
-  // Auth Check - redirect if not authenticated
+   // Auth Check - redirect if not authenticated
   useEffect(() => {
     if (!uniqueId) {
       navigate('/login', { state: { from: '/JobOpenings' } })
     }
   }, [uniqueId, navigate])
+
+  // Update active tab from navigation state
+  useEffect(() => {
+    if (location.state?.activeTab) {
+      setActiveTab(location.state.activeTab)
+    }
+  }, [location.key])
 
    // Fetch Data - aligned with UserProfile pattern
    useEffect(() => {
@@ -381,7 +399,7 @@ const JobOpenings = () => {
             </Col>
           </Row>
 
-          <Tab.Container id="jobs-seminars-tabs" defaultActiveKey="jobs">
+          <Tab.Container id="jobs-seminars-tabs" activeKey={activeTab} onSelect={(key) => setActiveTab(key)}>
             <Nav variant="tabs" className="mb-3 job-tabs">
               <Nav.Item>
                 <Nav.Link eventKey="jobs" className="job-tab-link">

@@ -151,6 +151,12 @@ function UserHeader({ toggleSidebar }) {
       case "issue_reply":
         path = "/SendQuery";
         break;
+      case "school-competition":
+        path = "/SchoolCompetitions";
+        break;
+      case "quiz-competition":
+        path = "/Competition";
+        break;
       default:
         // If admin or unknown, do nothing
         return;
