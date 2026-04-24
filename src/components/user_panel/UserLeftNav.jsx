@@ -18,7 +18,6 @@ import {
   FaUserCircle,
   FaCalendarAlt,
   FaPlusSquare,
-  FaListUl,
   FaEdit,
   FaMusic,
   FaGlassCheers,
@@ -27,7 +26,8 @@ import {
   FaQuestionCircle,
   FaTrophy,
   FaBriefcase,
-  FaGraduationCap
+  FaGraduationCap,
+  FaTasks
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -37,7 +37,7 @@ import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
 import {
   FaInfoCircle,
   FaBullseye,
-  FaTasks
+  
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
@@ -57,80 +57,80 @@ const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   };
 
 const menuItems = [
-    {
-      icon: <FaTachometerAlt />,
-      label: "DASHBOARD",
-      path: "/UserDashboard",
-      active: true,
-    },
-    
      {
-      icon: <FaComments />,
-      label: "Send Query",
-      path: "/SendQuery",
-      active: true,
-    },
-    {
-      icon: <FaGraduationCap />,
-      label: "Quiz",
-      path: "/UserQuiz",
-    },
-    {
-      icon: <FaTrophy />,
-      label: "Competition",
-      path: "/Competition",
-    },
-    {
-      icon: <FaBriefcase />,
-      label: "Jobs & Seminars",
-      path: "/JobOpenings",
-    },
-    {
-      icon: <FaCalendarAlt />,
-      label: "Events",
-      path: "/UserEvents",
-    },
-    {
-      icon: <FaUserCircle />,
-      label: "PROFILE",
-      path: "/UserProfile",
-    },
-    {
-      icon: <FaChalkboardTeacher />,
-      label: "Career Guidance",
-      submenu: [
-        {
-          label: "12th Guidance",
-          path: "/TwelfthGuidance",
-          icon: <FaPlusSquare />,
-        },
+       icon: <FaTachometerAlt />,
+       label: "DASHBOARD",
+       path: "/UserDashboard",
+       active: true,
+     },
+     {
+       icon: <FaUserCircle />,
+       label: "PROFILE",
+       path: "/UserProfile",
+     },
+     {
+       icon: <FaGraduationCap />,
+       label: "Quiz",
+       path: "/UserQuiz",
+     },
+     {
+       icon: <FaTrophy />,
+       label: "Competition",
+       path: "/Competition",
+     },
+     {
+       icon: <FaUsers />,
+       label: "School Competitions",
+       path: "/SchoolCompetitions",
+     },
+     {
+       icon: <FaChalkboardTeacher />,
+       label: "Career Guidance",
+       submenu: [
          {
-          label: "10th Guidance",
-          path: "/TenthGuidance",
-          icon: <FaPlusSquare />,
-        },
-      ],
-    },
+           label: "12th Guidance",
+           path: "/TwelfthGuidance",
+           icon: <FaPlusSquare />,
+         },
+          {
+           label: "10th Guidance",
+           path: "/TenthGuidance",
+           icon: <FaPlusSquare />,
+         },
+       ],
+     },
      {
-      icon: <FaBuilding />,
-      label: "Government Schemes",
-      path: "/GovernmentSchemes",
-    },
+       icon: <FaBuilding />,
+       label: "Government Schemes",
+       path: "/GovernmentSchemes",
+     },
+      {
+       icon: <FaTasks />,
+       label: "Grooming Classes",
+       path: "/GroomingClasses",
+     },
      {
-      icon: <FaChalkboardTeacher />,
-      label: "Grooming Classes",
-      path: "/GroomingClasses",
-    },
-    {
-      icon: <FaUsers />,
-      label: "School Competitions",
-      path: "/SchoolCompetitions",
-    },
-   
-   
+       icon: <FaBriefcase />,
+       label: "Jobs & Seminars",
+       path: "/JobOpenings",
+     },
+     {
+       icon: <FaCalendarAlt />,
+       label: "Events",
+       path: "/UserEvents",
+     },
+     {
+       icon: <FaComments />,
+       label: "Send Query",
+       path: "/SendQuery",
+     },
      
      
-   ];
+     
+      
+     
+     
+    ];
 
   //  Auto-close sidebar when switching to mobile or tablet
 

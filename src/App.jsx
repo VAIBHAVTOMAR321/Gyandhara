@@ -356,7 +356,7 @@ function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <Router>
+        <Router basename="/gyandhara">
           <AppContent />
         </Router>
       </LanguageProvider>
