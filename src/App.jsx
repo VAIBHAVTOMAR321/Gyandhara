@@ -24,6 +24,7 @@ import SchoolStudentRegistration from './components/school_panel/StudentRegistra
 import SchoolQuizList from './components/school_panel/SchoolQuizList';
 import Login from './components/all_login/Login';
 import NavBar from "./components/nav_bar/NavBar";
+import SchoolCompetitions from "./components/user_panel/SchoolCompetitions";
 
 import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
 import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
@@ -54,7 +55,7 @@ import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -70,7 +71,7 @@ function NavBarWrapper() {
 function FooterWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -193,6 +194,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <Competition />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/SchoolCompetitions"
+          element={
+            <ProtectedRoute>
+              <SchoolCompetitions />
             </ProtectedRoute>
           }
         />

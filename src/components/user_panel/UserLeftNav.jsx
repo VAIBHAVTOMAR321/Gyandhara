@@ -47,10 +47,10 @@ import { useNavigate } from "react-router-dom";
 
 
 const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
-    const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState(user ? user.role : null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const toggleSubmenu = (index) => {
     setOpenSubmenu(openSubmenu === index ? null : index);
@@ -121,26 +121,16 @@ const menuItems = [
       label: "Grooming Classes",
       path: "/GroomingClasses",
     },
-  
-
-    //   icon: <FaCalendarAlt />,
-    //   label: "Event",
-    //   submenu: [
-    //     {
-    //       label: "Add Event",
-    //       path: "/AddEvent",
-    //       icon: <FaPlusSquare />,
-    //     },
-    //     {
-    //       label: "Manage Event",
-    //       path: "/ManageEvent",
-    //       icon: <FaListUl />,
-    //     },
-    //   ],
-    // },
-
-    
-  ];
+    {
+      icon: <FaUsers />,
+      label: "School Competitions",
+      path: "/SchoolCompetitions",
+    },
+   
+   
+     
+     
+   ];
 
   //  Auto-close sidebar when switching to mobile or tablet
 

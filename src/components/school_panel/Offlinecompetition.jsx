@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Alert, Modal, Table, Form } from "react-bootstrap";
 import axios from "axios";
 import "../../assets/css/userleftnav.css";
@@ -36,7 +36,7 @@ const Offlinecompetition = () => {
     comp_date_time: "",
   });
 
-  // --- Effects ---
+  // --- Layout Effects ---
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -49,20 +49,24 @@ const Offlinecompetition = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // --- Data Fetching Effects ---
   useEffect(() => {
-    fetchCompetitions();
+    if (accessToken) {
+      fetchCompetitions();
+    } else {
+      setListLoading(false);
+    }
   }, [accessToken]);
 
   // --- API Functions ---
-  const fetchCompetitions = async () => {
+  const fetchCompetitions = useCallback(async () => {
     if (!accessToken) {
-      setError("No authentication token found.");
       setListLoading(false);
       return;
     }
 
     try {
-      setListLoading(true); // Use listLoading here
+      setListLoading(true);
       setError("");
       const response = await axios.get(
         "https://brjobsedu.com/gyandhara/gyandhara_backend/api/offline-competition/",
@@ -82,11 +86,11 @@ const Offlinecompetition = () => {
       console.error("Competition API Error:", err);
       setError("Failed to fetch competitions: " + err.message);
     } finally {
-      setListLoading(false); // Use listLoading here
+      setListLoading(false);
     }
-  };
+  }, [accessToken]);
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
     if (!accessToken) {
       setError("No authentication token found.");
       return;
@@ -111,7 +115,7 @@ const Offlinecompetition = () => {
 
       if (response.data.success) {
         alert("Created successfully");
-        setCompetitions([...competitions, response.data.data]);
+        setCompetitions((prev) => [...prev, response.data.data]);
         setShowModal(false);
         resetForm();
         fetchCompetitions(); // Refresh list
@@ -124,9 +128,9 @@ const Offlinecompetition = () => {
     } finally {
       setFormLoading(false); // Use formLoading here
     }
-  };
+  }, [accessToken, formData, uniqueId, fetchCompetitions]);
 
-  const handleUpdate = async () => {
+  const handleUpdate = useCallback(async () => {
     if (!accessToken || !selectedCompetition) {
       setError("No authentication token or competition selected.");
       return;
@@ -151,8 +155,8 @@ const Offlinecompetition = () => {
 
       if (response.data.success) {
         alert("Update successfully");
-        setCompetitions(
-          competitions.map((comp) =>
+        setCompetitions((prev) =>
+          prev.map((comp) =>
             comp.completion_id === selectedCompetition.completion_id
               ? response.data.data
               : comp
@@ -168,9 +172,9 @@ const Offlinecompetition = () => {
       console.error("Update Competition API Error:", err);
       setError("Failed to update competition: " + err.message);
     } finally {
-      setFormLoading(false); // Use formLoading here
+      setFormLoading(false); // Use formLoading here (This prevents the blank background issue)
     }
-  };
+  }, [accessToken, selectedCompetition, uniqueId, fetchCompetitions]);
 
   // --- Handlers ---
   const toggleSidebar = () => {
@@ -217,7 +221,7 @@ const Offlinecompetition = () => {
     resetForm();
   };
 
-  return (
+return (
     <div className="dashboard-container">
       <SchoolLeftNav
         sidebarOpen={sidebarOpen}
@@ -228,7 +232,7 @@ const Offlinecompetition = () => {
       <div className="main-content-dash">
         <SchoolHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {/* Page Header */}
           <Row className="mb-4 align-items-center">
             <Col>
@@ -248,7 +252,6 @@ const Offlinecompetition = () => {
           {/* Content Card */}
           <Card className="shadow-sm">
             <Card.Body>
-              {/* Changed compLoading to listLoading here */}
               {listLoading ? (
                 <div className="text-center py-5">
                   <Spinner animation="border" variant="primary" />
@@ -412,10 +415,8 @@ const Offlinecompetition = () => {
           <Button 
             variant="primary" 
             onClick={selectedCompetition ? handleUpdate : handleCreate}
-            // Changed to use formLoading here
             disabled={formLoading}
           >
-            {/* Changed to use formLoading here */}
             {formLoading ? <Spinner animation="border" size="sm" /> : (selectedCompetition ? "Update Competition" : "Create Competition")}
           </Button>
         </Modal.Footer>
