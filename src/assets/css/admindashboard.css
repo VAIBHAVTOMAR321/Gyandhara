@@ -433,3 +433,325 @@
   }
 }
 
+/* Enhanced Modal Styles */
+.bg-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+/* Module Progress Bar Chart Styles */
+.bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0;
+  min-height: 120px;
+}
+
+.bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bar-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 100px;
+  width: 40px;
+}
+
+.bar {
+  width: 100%;
+  background: linear-gradient(to top, #667eea, #764ba2);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.3s ease;
+  min-height: 4px;
+  position: relative;
+}
+
+.bar:hover {
+  background: linear-gradient(to top, #764ba2, #667eea);
+  transform: scaleY(1.05);
+  transform-origin: bottom;
+}
+
+.bar-item small {
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Modal Custom Close Button */
+.close-btn-custom {
+  border: none;
+  background: transparent;
+  font-size: 1.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.close-btn-custom:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Enhanced Badge Styles */
+.badge-custom {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Circular Progress Ring */
+.circular-progress {
+  transform: rotate(-90deg);
+}
+
+.circular-progress-bg {
+  fill: none;
+  stroke: #e9ecef;
+}
+
+.circular-progress-fill {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.5s ease;
+}
+
+/* Score Tag */
+.score-tag {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.score-tag.excellent {
+  background: #d4edda;
+  color: #155724;
+}
+
+.score-tag.good {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.score-tag.needs-improvement {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Module Status Badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-badge.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.active {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.pending {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* Animated Number Counter */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.count-up {
+  animation: countUp 0.5s ease-out;
+}
+
+/* Responsive Modal Adjustments */
+@media (max-width: 768px) {
+  .modal-xl {
+    max-width: 95vw;
+  }
+  
+  .modal-lg {
+    max-width: 95vw;
+  }
+  
+  .bar-chart {
+    gap: 6px;
+  }
+  
+  .bar-container {
+    width: 28px;
+    height: 80px;
+  }
+  
+  .bar {
+    width: 100%;
+  }
+  
+  .bar small {
+    font-size: 10px;
+  }
+}
+
+/* Scrollbar Styling for Modal Body */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+/* Info Cards */
+.info-card {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Student Avatar */
+.student-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 28px;
+  color: white;
+  margin: 0 auto 10px;
+}
+
+/* Progress Ring Container */
+.progress-ring-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-ring-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Status Indicator */
+.status-indicator {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-indicator.completed {
+  background: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.status-indicator.active {
+  background: #ffc107;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.2);
+}
+
+.status-indicator.failed {
+  background: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+}
+
+/* Module Detail Row */
+.module-detail-row {
+  transition: background-color 0.2s;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.module-detail-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* Stats Card Hover */
+.stats-card-hover {
+  transition: all 0.3s;
+}
+
+.stats-card-hover:hover {
+  transform: translateY(-3px);
+}
+
+/* Tooltip */
+.tooltip-text {
+  position: relative;
+}
+
+.tooltip-text:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: #333;
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 100;
+}
+
+/* Module Score Bar */
+.module-score-bar {
+  border-radius: 4px;
+  transition: width 0.6s ease, background-color 0.3s;
+}
+
+.module-score-bar:hover {
+  filter: brightness(1.1);
+}

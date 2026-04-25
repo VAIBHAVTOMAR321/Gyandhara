@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Container,
   Row,
@@ -12,12 +12,15 @@ import {
   Table,
   Badge,
   Form,
+  ProgressBar,
+  Dropdown,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import "../../assets/css/userleftnav.css";
 import {
   FaUsers,
+  FaUser,
   FaCheckCircle,
   FaClock,
   FaLayerGroup,
@@ -27,6 +30,11 @@ import {
   FaFilter,
   FaEye,
   FaLightbulb,
+  FaSortAmountDown,
+  FaSortAmountDownAlt,
+  FaGraduationCap,
+  FaTasks,
+  FaCalendarCheck,
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
@@ -393,83 +401,119 @@ const SchoolDashBoard = () => {
               setSelectedStudentId(null);
               setSelectedEnrollment(null);
             }}
-            size="lg"
+            size="xl"
+            centered
+            className="progress-analysis-modal"
           >
-            <Modal.Header>
-              <Modal.Title>Student Details & Progress</Modal.Title>
-              <Button
-                variant="light"
-                className="close-btn-custom"
-                onClick={() => {
-                  setShowModuleModal(false);
-                  setSelectedStudentId(null);
-                  setSelectedEnrollment(null);
-                }}
-              >
-                <span aria-hidden="true">&times;</span>
-              </Button>
+            <Modal.Header
+              closeButton
+              className="bg-gradient text-white py-1 px-3"
+              style={{
+                background:
+                  "linear-gradient(135deg, #2c3e50 0%, #000000 100%)",
+              }}
+            >
+              <Modal.Title className="d-flex align-items-center gap-2 fs-6">
+                <FaGraduationCap className="me-2" />
+                Student Details & Progress Analysis
+              </Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="p-2">
               {selectedEnrollment && (
-                <div className="mb-4">
-                  <h5>Student Information</h5>
-                  <Table striped bordered hover size="sm">
-                    <tbody>
-                      <tr>
-                        <td>
-                          <strong>Student ID:</strong>
-                        </td>
-                        <td>{selectedEnrollment.student_id}</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <strong>Student Name:</strong>
-                        </td>
-                        <td>{selectedEnrollment.student_name}</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <strong>Course:</strong>
-                        </td>
-                        <td>{selectedEnrollment.course_name}</td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <strong>Enrolled Date:</strong>
-                        </td>
-                        <td>
-                          {new Date(
-                            selectedEnrollment.enrolled_at,
-                          ).toLocaleDateString()}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <strong>Status:</strong>
-                        </td>
-                        <td>
-                          {selectedEnrollment.is_completed ? (
-                            <span className="text-success">
-                              Completed on{" "}
-                              {new Date(
-                                selectedEnrollment.completed_at,
-                              ).toLocaleDateString()}
-                            </span>
-                          ) : (
-                            <span className="text-warning">In Progress</span>
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </Table>
+                <div
+                  className="mb-2 p-2 rounded"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #667eea15 0%, #764ba215 100%)",
+                    border: "1px solid rgba(102, 126, 234, 0.2)",
+                  }}
+                >
+                  <div className="d-flex align-items-center justify-content-between mb-2">
+                    <h6 className="fw-bold text-primary mb-0 d-flex align-items-center gap-2 small">
+                      <FaUser className="text-info" />
+                      Student Profile
+                    </h6>
+                    <Badge
+                      bg={
+                        selectedEnrollment.is_completed ? "success" : "warning"
+                      }
+                      className="py-1 px-2"
+                      style={{ fontSize: '9px' }}
+                    >
+                      {selectedEnrollment.is_completed
+                        ? "COMPLETED"
+                        : "IN PROGRESS"}
+                    </Badge>
+                  </div>
+                  <Row className="g-3 align-items-center">
+                    <Col md={1} className="text-center">
+                      <div
+                        className="rounded-circle mx-auto"
+                        style={{
+                          width: "45px",
+                          height: "45px",
+                          background:
+                            "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "white",
+                          fontSize: "16px",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {selectedEnrollment.student_name
+                          ?.split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase() || "S"}
+                      </div>
+                    </Col>
+                    <Col md={3}>
+                      <div className="text-muted extra-small text-uppercase fw-bold mb-0">Name</div>
+                      <div className="fw-bold mb-0 text-dark extra-small">{selectedEnrollment.student_name}</div>
+                      <div className="text-muted extra-small mt-1">ID: <span className="text-primary fw-bold">{selectedEnrollment.student_id}</span></div>
+                    </Col>
+                    <Col md={4}>
+                      <div className="text-muted extra-small text-uppercase fw-bold mb-0">Enrolled Course</div>
+                      <div className="fw-bold mb-0 text-info extra-small"><FaBook className="me-1" />{selectedEnrollment.course_name}</div>
+                      <div className="text-muted extra-small mt-1">Date: {new Date(selectedEnrollment.enrolled_at).toLocaleDateString()}</div>
+                    </Col>
+                    <Col md={4} className="text-md-end">
+                      <div className="d-inline-block text-start">
+                        <div className="text-muted extra-small text-uppercase fw-bold">Completion</div>
+                        <div className="d-flex align-items-center gap-2">
+                          <ProgressBar 
+                            now={selectedEnrollment.is_completed ? 100 : 50} 
+                            variant={selectedEnrollment.is_completed ? "success" : "warning"}
+                            style={{ height: '6px', width: '80px' }}
+                          />
+                          <span className="fw-bold extra-small">{selectedEnrollment.is_completed ? '100%' : '50%'}</span>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
                 </div>
               )}
 
-              <h5>Module Progress</h5>
+              <h6 className="fw-bold text-primary d-flex align-items-center gap-2 mb-0 extra-small">
+                <FaChartBar className="text-info" size={12} />
+                Module Progress Analytics
+              </h6>
+              <p className="text-muted extra-small mb-2">
+                Detailed breakdown of all module performance and completion
+                metrics
+              </p>
+
               {moduleLoading ? (
-                <Spinner animation="border" />
+                <div className="text-center py-5">
+                  <Spinner animation="border" variant="primary" />
+                  <p className="text-muted mt-3">
+                    Loading module progress data...
+                  </p>
+                </div>
               ) : moduleError ? (
-                <p className="text-danger">{moduleError}</p>
+                <Alert variant="danger">{moduleError}</Alert>
               ) : (
                 (() => {
                   const filteredProgress = selectedStudentId
@@ -478,44 +522,618 @@ const SchoolDashBoard = () => {
                       )
                     : moduleProgress;
 
-                  return filteredProgress.length > 0 ? (
+                  if (!filteredProgress || filteredProgress.length === 0) {
+                    return (
+                      <Alert variant="info" className="text-center py-4">
+                        <FaLightbulb className="me-2" />
+                        No module progress found for this student.
+                      </Alert>
+                    );
+                  }
+
+                  // Calculate statistics
+                  const totalModules = filteredProgress.length;
+                  const completedModules = filteredProgress.filter(
+                    (p) => p.module_status === "completed",
+                  ).length;
+                  const inProgressModules = totalModules - completedModules;
+                  
+                  const scoredModules = filteredProgress.filter(p => p.test_score !== null && p.test_score !== undefined);
+                  const avgScore =
+                    scoredModules.length > 0 
+                    ? Math.round(
+                      scoredModules.reduce(
+                        (sum, m) => sum + (m.test_score || 0),
+                        0,
+                      ) / scoredModules.length,
+                    ) : 0;
+                    
+                  const passedModules = filteredProgress.filter(
+                    (p) => p.test_status === "passed",
+                  ).length;
+                  const passRate =
+                    Math.round((passedModules / totalModules) * 100) || 0;
+                  
+                  const maxScore = scoredModules.length > 0 
+                    ? Math.max(...scoredModules.map((p) => p.test_score)) : 0;
+                  
+                  const minScore = scoredModules.length > 0 
+                    ? Math.min(...scoredModules.map((p) => p.test_score)) : 0;
+
+                  // Sort by score for better visualization
+                  const sortedProgress = [...filteredProgress].sort(
+                    (a, b) => (b.test_score || 0) - (a.test_score || 0),
+                  );
+
+                  return (
                     <>
-                      <div className="bar-chart mb-4">
-                        {filteredProgress.map((progress, index) => (
-                          <div key={index} className="bar-item">
-                            <div className="bar-container">
+                      {/* Statistics Cards */}
+                      <Row className="g-1 mb-2">
+                        <Col xs={6} sm={3}>
+                          <Card className="shadow-sm border-0 h-100">
+                            <Card.Body className="text-center py-2">
+                              <div className="rounded-circle bg-primary bg-opacity-10 p-1 mb-1 d-inline-flex">
+                                <FaBook className="text-primary" size={12} />
+                              </div>
+                              <h5 className="fw-bold text-primary mb-0 small">
+                                {totalModules}
+                              </h5>
+                              <div className="text-muted extra-small">
+                                Total Modules
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col xs={6} sm={3}>
+                          <Card className="shadow-sm border-0 h-100">
+                            <Card.Body className="text-center py-2">
+                              <div className="rounded-circle bg-success bg-opacity-10 p-1 mb-1 d-inline-flex">
+                                <FaCheckCircle className="text-success" size={12} />
+                              </div>
+                              <h5 className="fw-bold text-success mb-0 small">
+                                {completedModules}
+                              </h5>
+                              <div className="text-muted extra-small">
+                                Completed
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col xs={6} sm={3}>
+                          <Card className="shadow-sm border-0 h-100">
+                            <Card.Body className="text-center py-2">
+                              <div className="rounded-circle bg-success bg-opacity-10 p-1 mb-1 d-inline-flex">
+                                <FaGraduationCap className="text-success" size={12} />
+                              </div>
+                              <h5 className="fw-bold text-success mb-0 small">
+                                {passRate}%
+                              </h5>
+                              <div className="text-muted extra-small">Pass Rate</div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col xs={6} sm={3}>
+                          <Card className="shadow-sm border-0 h-100">
+                            <Card.Body className="text-center py-2">
+                              <div className="rounded-circle bg-info bg-opacity-10 p-1 mb-1 d-inline-flex">
+                                <FaTasks className="text-info" size={12} />
+                              </div>
+                              <h5 className="fw-bold text-info mb-0 small">
+                                {inProgressModules}
+                              </h5>
+                              <div className="text-muted extra-small">
+                                In Progress
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      </Row>
+
+                      {/* Overall Progress & Score Analysis */}
+                      <Row className="g-2 mb-2">
+                        <Col md={7}>
+                          <Card className="shadow-sm border-0 h-100">
+                            <Card.Header className="bg-light py-1">
+                              <h6 className="mb-0 fw-bold extra-small">
+                                <FaCalendarCheck className="me-1" size={10} />
+                                Completion Progress
+                              </h6>
+                            </Card.Header>
+                            <Card.Body className="py-1">
+                              <div className="text-center mb-2">
+                                <div
+                                  className="position-relative d-inline-block"
+                                  style={{ width: "65px", height: "65px" }}
+                                >
+                                  <svg
+                                    width="65"
+                                    height="65"
+                                    viewBox="0 0 120 120"
+                                  >
+                                    <circle
+                                      cx="60"
+                                      cy="60"
+                                      r="50"
+                                      fill="none"
+                                      stroke="#e9ecef"
+                                      strokeWidth="12"
+                                    />
+                                    <circle
+                                      cx="60"
+                                      cy="60"
+                                      r="50"
+                                      fill="none"
+                                      stroke={
+                                        passRate >= 75
+                                          ? "#28a745"
+                                          : passRate >= 50
+                                          ? "#ffc107"
+                                          : "#dc3545"
+                                      }
+                                      strokeWidth="12"
+                                      strokeDasharray={`${
+                                        (passRate / 100) * 314.16
+                                      } ${314.16}`}
+                                      transform="rotate(-90 60 60)"
+                                      style={{
+                                        transition: "stroke-dasharray 0.5s",
+                                      }}
+                                    />
+                                    <text
+                                      x="60"
+                                      y="60"
+                                      textAnchor="middle"
+                                      dominantBaseline="middle"
+                                      fontSize="20"
+                                      fontWeight="bold"
+                                      fill="#333"
+                                    >
+                                      {passRate}%
+                                    </text>
+                                  </svg>
+                                </div>
+                                <div className="mt-1">
+                                  <div className="fw-bold text-primary mb-0 extra-small">
+                                    Module Pass Rate
+                                  </div>
+                                  <p className="text-muted extra-small mb-0">
+                                    {passedModules} of {totalModules} modules
+                                    passed
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="row align-items-center mt-3">
+                                <div className="col-8">
+                                  <div className="d-flex justify-content-between mb-1">
+                                    <span className="extra-small text-muted">
+                                      Avg. Score
+                                    </span>
+                                    <span className="fw-bold extra-small">
+                                      {avgScore}%
+                                    </span>
+                                  </div>
+                                  <ProgressBar
+                                    now={avgScore}
+                                    variant={
+                                      avgScore >= 75
+                                        ? "success"
+                                        : avgScore >= 50
+                                        ? "warning"
+                                        : "danger"
+                                    }
+                                    className="rounded-pill"
+                                    style={{ height: "6px" }}
+                                  />
+                                </div>
+                                <Col className="mt-3 mt-md-0">
+                                  <div className="d-flex gap-3">
+                                    <div className="text-center">
+                                      <div className="fw-bold text-success small">
+                                        {maxScore}%
+                                      </div>
+                                      <div className="extra-small text-muted">
+                                        Best Score
+                                      </div>
+                                    </div>
+                                    <div className="text-center">
+                                      <div className="fw-bold text-danger small">
+                                        {minScore}%
+                                      </div>
+                                      <div className="extra-small text-muted">
+                                        Lowest Score
+                                      </div>
+                                    </div>
+                                  </div>
+                                </Col>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                        <Col md={5}>
+                          <Card className="shadow-sm border-0 h-100">
+                            <Card.Header className="bg-light py-1">
+                              <h6 className="mb-0 fw-bold extra-small">Status Split</h6>
+                            </Card.Header>
+                            <Card.Body className="py-1">
                               <div
-                                className="bar"
-                                style={{ height: `${progress.test_score}%` }}
-                              ></div>
-                            </div>
-                            <small>Mod {index + 1}</small>
+                                className="d-flex justify-content-center"
+                                style={{ height: "80px" }}
+                              >
+                                <svg
+                                  width="80"
+                                  height="80"
+                                  viewBox="0 0 140 140"
+                                >
+                                  <circle
+                                    cx="70"
+                                    cy="70"
+                                    r="55"
+                                    fill="none"
+                                    stroke="#e9ecef"
+                                    strokeWidth="20"
+                                  />
+                                  {completedModules > 0 && (
+                                    <circle
+                                      cx="70"
+                                      cy="70"
+                                      r="55"
+                                      fill="none"
+                                      stroke="#28a745"
+                                      strokeWidth="20"
+                                      strokeDasharray={`${
+                                        (completedModules / totalModules) * 345.58
+                                      } 345.58`}
+                                      transform="rotate(-90 70 70)"
+                                    />
+                                  )}
+                                  {inProgressModules > 0 && (
+                                    <circle
+                                      cx="70"
+                                      cy="70"
+                                      r="55"
+                                      fill="none"
+                                      stroke="#ffc107"
+                                      strokeWidth="20"
+                                      strokeDasharray={`${
+                                        (inProgressModules / totalModules) *
+                                        345.58
+                                      } 345.58`}
+                                      transform="rotate(-90 70 70)"
+                                      strokeDashoffset={
+                                        -(completedModules / totalModules) *
+                                        345.58
+                                      }
+                                    />
+                                  )}
+                                  <text
+                                    x="70"
+                                    y="70"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
+                                    fontSize="12"
+                                    fontWeight="bold"
+                                    fill="#333"
+                                  >
+                                    {totalModules}
+                                    <tspan
+                                      x="70"
+                                      dy="14"
+                                      fontSize="10"
+                                      fill="#6c757d"
+                                    >
+                                      modules
+                                    </tspan>
+                                  </text>
+                                </svg>
+                              </div>
+                              <div className="d-flex gap-2 justify-content-center mt-2">
+                                <div className="d-flex align-items-center gap-1">
+                                  <span
+                                    className="rounded"
+                                    style={{ width: "6px", height: "6px", background: "#28a745" }}
+                                  ></span>
+                                  <small className="extra-small text-muted">
+                                    {completedModules} Completed
+                                  </small>
+                                </div>
+                                <div className="d-flex align-items-center gap-1">
+                                  <span
+                                    className="rounded"
+                                    style={{ width: "6px", height: "6px", background: "#ffc107" }}
+                                  ></span>
+                                  <small className="extra-small text-muted">
+                                    {inProgressModules} In Progress
+                                  </small>
+                                </div>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      </Row>
+
+                      {/* Module Score Bar Chart */}
+                      <Card className="shadow-sm border-0 mb-2">
+                        <Card.Header className="bg-light py-1">
+                          <h6 className="mb-0 fw-bold extra-small">
+                            <FaChartBar className="me-1" size={10} />
+                            Module Score Overview
+                          </h6>
+                        </Card.Header>
+                        <Card.Body className="py-1">
+                          <div
+                            className="d-flex align-items-end justify-content-center gap-1"
+                            style={{
+                              height: "100px",
+                              paddingBottom: "10px",
+                              flexWrap: "wrap",
+                            }}
+                          >
+                            {sortedProgress.map((progress, index) => {
+                              const barColor =
+                                progress.test_status === "passed"
+                                  ? progress.test_score >= 80
+                                    ? "#28a745"
+                                    : "#ffc107"
+                                  : "#dc3545";
+                              return (
+                                <div
+                                  key={index}
+                                  className="d-flex flex-column align-items-center"
+                                  style={{ flex: "1 1 40px", minWidth: "36px" }}
+                                >
+                                  <div
+                                    className="text-end w-100 pr-1 mb-1"
+                                    style={{ fontSize: "9px" }}
+                                  >
+                                    <strong>{progress.test_score}%</strong>
+                                  </div>
+                                  <div
+                                    className="rounded-top"
+                                    title={`Module ${progress.module} - ${progress.module_status} - ${progress.test_score}%${
+                                      progress.attempt_count > 1
+                                        ? ` (${progress.attempt_count} attempts)`
+                                        : ""
+                                    }`}
+                                    style={{
+                                      height: `${Math.max(
+                                        20,
+                                        (progress.test_score * 180) / 100,
+                                      )}px`,
+                                      width: "100%",
+                                      background: barColor,
+                                      minHeight: "20px",
+                                      borderRadius: "4px 4px 0 0",
+                                      transition: "height 0.3s",
+                                      cursor: "pointer",
+                                    }}
+                                  ></div>
+                                  <small
+                                    className="text-muted mt-1 fw-bold"
+                                    style={{ fontSize: "9px" }}
+                                  >
+                                    M{progress.module}
+                                  </small>
+                                </div>
+                              );
+                            })}
                           </div>
-                        ))}
-                      </div>
-                      <ListGroup>
-                        {filteredProgress.map((progress, index) => (
-                          <ListGroup.Item key={index}>
-                            <strong>Module {progress.module}</strong> - Score:{" "}
-                            {progress.test_score}%
-                            <br />
-                            <small>
-                              Status: {progress.module_status} | Attempts:{" "}
-                              {progress.attempt_count}
-                            </small>
-                          </ListGroup.Item>
-                        ))}
-                      </ListGroup>
+                          <div className="d-flex justify-content-center gap-3 mt-1 flex-wrap">
+                            <div className="d-flex align-items-center gap-1">
+                              <span
+                                className="rounded"
+                                style={{
+                                  width: "8px",
+                                  height: "8px",
+                                  background: "#28a745",
+                                }}
+                              ></span>
+                              <small className="extra-small text-muted">
+                                High (&ge;80%)
+                              </small>
+                            </div>
+                            <div className="d-flex align-items-center gap-1">
+                              <span
+                                className="rounded"
+                                style={{
+                                  width: "8px",
+                                  height: "8px",
+                                  background: "#ffc107",
+                                }}
+                              ></span>
+                              <small className="extra-small text-muted">
+                                Passed (&lt;80%)
+                              </small>
+                            </div>
+                            <div className="d-flex align-items-center gap-1">
+                              <span
+                                className="rounded"
+                                style={{
+                                  width: "8px",
+                                  height: "8px",
+                                  background: "#dc3545",
+                                }}
+                              ></span>
+                              <small className="extra-small text-muted">
+                                Failed
+                              </small>
+                            </div>
+                          </div>
+                        </Card.Body>
+                      </Card>
+
+                      {/* Detailed Module List */}
+                      <Card className="shadow-sm border-0">
+                        <Card.Header className="d-flex justify-content-between align-items-center bg-light py-1">
+                          <h6 className="mb-0 fw-bold d-flex align-items-center gap-2 extra-small">
+                            <FaTasks className="text-info" size={10} />
+                            Module Details
+                            <Badge bg="secondary" style={{ fontSize: '8px' }}>{totalModules}</Badge>
+                          </h6>
+                          <Dropdown>
+                            <Dropdown.Toggle
+                              variant="outline-secondary"
+                              size="sm"
+                              id="sort-dropdown"
+                              style={{ fontSize: '10px' }}
+                            >
+                              <FaSortAmountDown className="me-1" />
+                              Sort
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                              <Dropdown.Item
+                                onClick={() =>
+                                  filteredProgress.sort(
+                                    (a, b) =>
+                                      (b.test_score || 0) - (a.test_score || 0),
+                                  )
+                                }
+                              >
+                                Score (High to Low)
+                              </Dropdown.Item>
+                              <Dropdown.Item
+                                onClick={() =>
+                                  filteredProgress.sort(
+                                    (a, b) =>
+                                      (a.test_score || 0) - (b.test_score || 0),
+                                  )
+                                }
+                              >
+                                Score (Low to High)
+                              </Dropdown.Item>
+                            </Dropdown.Menu>
+                          </Dropdown>
+                        </Card.Header>
+                        <ListGroup variant="flush">
+                          {sortedProgress.map((progress, index) => {
+                            const statusColor =
+                              progress.test_status === "passed"
+                                ? "success"
+                                : progress.test_status === "failed"
+                                ? "danger"
+                                : "warning";
+                            const scoreColor =
+                              progress.test_score >= 80
+                                ? "success"
+                                : progress.test_score >= 50
+                                ? "warning"
+                                : "danger";
+
+                            return (
+                              <ListGroup.Item
+                                key={index}
+                                className="border-0 border-bottom py-2"
+                              >
+                                <Row className="align-items-center">
+                                  <Col xs={12} md={5} className="mb-2 mb-md-0">
+                                    <div className="d-flex align-items-center gap-2">
+                                      <div
+                                        className="rounded-circle d-flex align-items-center justify-content-center"
+                                        style={{
+                                          width: "24px",
+                                          height: "24px",
+                                          background:
+                                            statusColor === "success"
+                                              ? "#d4edda"
+                                              : statusColor === "danger"
+                                              ? "#f8d7da"
+                                              : "#fff3cd",
+                                        }}
+                                      >
+                                        <strong
+                                          className="mb-0"
+                                          style={{
+                                            fontSize: '11px',
+                                            color:
+                                              statusColor === "success"
+                                                ? "#155724"
+                                                : statusColor === "danger"
+                                                ? "#721c24"
+                                                : "#856404",
+                                          }}
+                                        >
+                                          M{progress.module}
+                                        </strong>
+                                      </div>
+                                      <div className="ms-2">
+                                        <div className="fw-bold small">
+                                          Module {progress.module}
+                                        </div>
+                                        <div className="text-muted extra-small">
+                                          Status:{" "}
+                                          <Badge
+                                            bg={statusColor}
+                                            className="text-uppercase"
+                                            style={{ fontSize: '8px' }}
+                                          >
+                                            {progress.module_status}
+                                          </Badge>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </Col>
+                                  <Col xs={12} md={4} className="mb-2 mb-md-0">
+                                    <div className="d-flex align-items-center gap-2">
+                                      <div className="flex-grow-1">
+                                        <div className="d-flex justify-content-between mb-1">
+                                          <div className="extra-small text-muted">
+                                            Test Score
+                                          </div>
+                                          <strong
+                                            className={
+                                              scoreColor === "success"
+                                                ? "text-success"
+                                                : scoreColor === "danger"
+                                                ? "text-danger"
+                                                : "text-warning"
+                                            }
+                                            style={{ fontSize: '11px' }}
+                                          >
+                                            {progress.test_score}%
+                                          </strong>
+                                        </div>
+                                        <ProgressBar
+                                          now={progress.test_score}
+                                          variant={scoreColor}
+                                          className="rounded-pill"
+                                          style={{ height: "6px" }}
+                                        />
+                                      </div>
+                                    </div>
+                                     <div className="text-muted extra-small mt-1 d-block">
+                                       Attempts: {progress.attempt_count}
+                                     </div>
+                                  </Col>
+                                  <Col xs={12} md={3} className="text-md-end">
+                                    <div className="d-flex flex-column gap-1">
+                                      {progress.test_status === "passed" ? (
+                                        <span className="text-success extra-small fw-bold">
+                                          <FaCheckCircle className="me-1" /> Passed
+                                        </span>
+                                      ) : progress.test_status === "failed" ? (
+                                        <span className="text-danger extra-small fw-bold">
+                                          <FaTimesCircle className="me-1" /> Failed
+                                        </span>
+                                      ) : (
+                                        <span className="text-muted extra-small fw-bold">
+                                          <FaClock className="me-1" /> Pending
+                                        </span>
+                                      )}
+                                    </div>
+                                  </Col>
+                                </Row>
+                              </ListGroup.Item>
+                            );
+                          })}
+                        </ListGroup>
+                      </Card>
                     </>
-                  ) : (
-                    <p>No module progress found for this student.</p>
                   );
                 })()
               )}
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer className="bg-light">
               <Button
-                variant="secondary"
+                variant="outline-secondary"
                 onClick={() => {
                   setShowModuleModal(false);
                   setSelectedStudentId(null);
