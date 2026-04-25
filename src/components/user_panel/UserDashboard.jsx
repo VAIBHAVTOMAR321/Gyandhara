@@ -10,8 +10,10 @@ import { FaBook, FaCheckCircle, FaClock, FaEye, FaLock, FaUnlock, FaQuestionCirc
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import { useLanguage } from '../all_login/LanguageContext'
 
 const UserDashboard = () => {
+  const { language } = useLanguage()
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       const width = window.innerWidth;
@@ -830,13 +832,13 @@ const UserDashboard = () => {
                       className="mb-4 d-flex align-items-center back-btn"
                     >
                       <FaArrowLeft className="me-2" />
-                      Back
+                      {language === 'hi' ? "पीछे" : "Back"}
                     </Button>
                     
                     <div className="d-flex justify-content-between align-items-center title-h mb-3">
                       <h4 className="mb-0">
                         <FaBook className="me-2 text-primary" />
-                        {renderContentWithLineBreaks(selectedCourse.course_name)} - Modules
+                        {renderContentWithLineBreaks(selectedCourse.course_name)} - {language === 'hi' ? "मॉड्यूल्स" : "Modules"}
                       </h4>
                       
                       <div className="d-flex align-items-center gap-2">
@@ -868,7 +870,7 @@ const UserDashboard = () => {
                             className="d-flex align-items-center view-certificate-btn"
                           >
                             <FaCertificate className="me-2" />
-                            View Certificate
+                            {language === 'hi' ? "सर्टिफिकेट देखें" : "View Certificate"}
                           </Button>
                         ) : (
                           <Button 
@@ -878,7 +880,7 @@ const UserDashboard = () => {
                             className="d-flex align-items-center button-view"
                           >
                             <FaCertificate className="me-2" />
-                            Generate Certificate
+                            {language === 'hi' ? "सर्टिफिकेट प्राप्त करें" : "Generate Certificate"}
                           </Button>
                         )}
                       </div>
@@ -887,11 +889,11 @@ const UserDashboard = () => {
                     {areAllModulesCompleted() && (
                       <Alert variant="success" className="mb-4">
                         <FaCheckCircle className="me-2" />
-                        <strong>Congratulations!</strong> You have completed all modules in this course.
+                        <strong>{language === 'hi' ? "बधाई हो!" : "Congratulations!"}</strong> {language === 'hi' ? "आपने इस कोर्स के सभी मॉड्यूल्स पूरे कर लिए हैं।" : "You have completed all modules in this course."}
                         {isCertificateGenerated() ? (
-                          <span className="ms-2">Your certificate is ready to view.</span>
+                          <span className="ms-2">{language === 'hi' ? "आपका सर्टिफिकेट देखने के लिए तैयार है।" : "Your certificate is ready to view."}</span>
                         ) : (
-                          <span className="ms-2">Click the &quot;Generate Certificate&quot; button to get your certificate.</span>
+                          <span className="ms-2">{language === 'hi' ? "सर्टिफिकेट प्राप्त करने के लिए 'सर्टिफिकेट प्राप्त करें' बटन पर क्लिक करें।" : "Click the \"Generate Certificate\" button to get your certificate."}</span>
                         )}
                       </Alert>
                     )}
@@ -899,7 +901,7 @@ const UserDashboard = () => {
                     {modulesLoading ? (
                       <div className="text-center py-5">
                         <Spinner animation="border" variant="primary" style={{ width: '50px', height: '50px' }} />
-                        <p className="mt-3">Loading modules...</p>
+                        <p className="mt-3">{language === 'hi' ? "मॉड्यूल्स लोड हो रहे हैं..." : "Loading modules..."}</p>
                       </div>
                     ) : courseModules && courseModules.modules ? (
                       <div>
@@ -1000,7 +1002,7 @@ const UserDashboard = () => {
                                           : "text-white"
                                       }
                                     >
-                                      Module {module.order}:{" "}
+                                      {language === 'hi' ? "मॉड्यूल" : "Module"} {module.order}:{" "}
                                       {renderContentWithLineBreaks(
                                         courseLanguage === "english"
                                           ? module.mod_title
@@ -1010,7 +1012,7 @@ const UserDashboard = () => {
                                     </span>
                                     {!isAccessible && (
                                       <span className="ms-auto text-sm text-gray-300">
-                                        Complete previous module to unlock
+                                        {language === 'hi' ? "अनलॉक करने के लिए पिछला मॉड्यूल पूरा करें" : "Complete previous module to unlock"}
                                       </span>
                                     )}
                                   </div>
@@ -1024,7 +1026,7 @@ const UserDashboard = () => {
                                           style={{ fontSize: "12px" }}
                                         >
                                           <FaPlay className="me-1 text-primary" />{" "}
-                                          Module Video
+                                          {language === 'hi' ? "मॉड्यूल वीडियो" : "Module Video"}
                                         </h6>
                                         <div className="video-container">
                                           <iframe
@@ -1050,7 +1052,7 @@ const UserDashboard = () => {
                                           style={{ fontSize: "12px" }}
                                         >
                                           <FaLayerGroup className="me-1 text-primary" />{" "}
-                                          Submodules
+                                          {language === 'hi' ? "सब-मॉड्यूल्स" : "Submodules"}
                                         </h6>
                                         {module.sub_modules &&
                                         module.sub_modules.length > 0 ? (
@@ -1135,7 +1137,7 @@ const UserDashboard = () => {
                                               </div>
                                               <div className="book-title flex-grow-1">
                                                 <h5 className="mb-1 fw-bold text-primary">
-                                                  {subModule.order}:{" "}
+                                                  {language === 'hi' ? "सब-मॉड्यूल" : "Sub Module"} {subModule.order}:{" "}
                                                   {renderContentWithLineBreaks(
                                                     courseLanguage === "english"
                                                       ? subModule.sub_modu_title
@@ -1199,7 +1201,7 @@ const UserDashboard = () => {
                                                                   "11px",
                                                               }}
                                                             >
-                                                              Course Content
+                                                              {language === 'hi' ? "कोर्स कंटेंट" : "Course Content"}
                                                             </h6>
                                                           </div>
                                                           <div className="content-items">
@@ -1326,8 +1328,7 @@ const UserDashboard = () => {
                                                             }}
                                                           />
                                                           <p className="text-muted mb-0">
-                                                            No content available
-                                                            for this sub-module.
+                                                            {language === 'hi' ? "इस सब-मॉड्यूल के लिए कोई कंटेंट उपलब्ध नहीं है।" : "No content available for this sub-module."}
                                                           </p>
                                                         </div>
                                                       )}
@@ -1369,7 +1370,7 @@ const UserDashboard = () => {
                                                                 }}
                                                               />
                                                               <p className="text-white mb-0 small">
-                                                                Sub Module{" "}
+                                                                {language === 'hi' ? "सब-मॉड्यूल" : "Sub Module"}{" "}
                                                                 {
                                                                   subModule.order
                                                                 }
@@ -1425,9 +1426,7 @@ const UserDashboard = () => {
                                       <div className="mt-4 exercise-section">
                                         <div className="bg-light p-3 rounded-3 border border-primary">
                                           <h6 className="fw-bold text-primary mb-3">
-                                            <FaImage className="me-2" /> Module
-                                            Exercise: Match the Images to Their
-                                            Names
+                                            <FaImage className="me-2" /> {language === 'hi' ? "मॉड्यूल अभ्यास: चित्रों को उनके नामों से मिलाएँ" : "Module Exercise: Match the Images to Their Names"}
                                           </h6>
 
                                           {exerciseFeedback.message && (
@@ -1441,7 +1440,7 @@ const UserDashboard = () => {
                                           <div className="game-container">
                                             <div className="game-column images-column">
                                               <h6 className="mb-2 text-muted">
-                                                Images
+                                                {language === 'hi' ? "चित्र" : "Images"}
                                               </h6>
                                               {module.exercises.filter(
                                                 (exercise) =>
@@ -1454,7 +1453,7 @@ const UserDashboard = () => {
                                                 <div className="no-items text-center py-4">
                                                   <i className="bi bi-check-circle-fill text-success mb-2"></i>
                                                   <p className="mb-0 text-success">
-                                                    All exercises completed!
+                                                    {language === 'hi' ? "सभी अभ्यास पूरे हुए!" : "All exercises completed!"}
                                                   </p>
                                                   <Button
                                                     variant="outline-success"
@@ -1467,7 +1466,7 @@ const UserDashboard = () => {
                                                       });
                                                     }}
                                                   >
-                                                    Reset Exercise
+                                                    {language === 'hi' ? "अभ्यास रीसेट करें" : "Reset Exercise"}
                                                   </Button>
                                                 </div>
                                               ) : (
@@ -1536,7 +1535,7 @@ const UserDashboard = () => {
 
                                             <div className="game-column targets-column">
                                               <h6 className="mb-2 text-muted">
-                                                Names
+                                                {language === 'hi' ? "नाम" : "Names"}
                                               </h6>
                                               <div className="items-grid targets-grid">
                                                 {module.exercises.map(
@@ -1599,7 +1598,7 @@ const UserDashboard = () => {
                                         <div className="d-flex align-items-center text-success">
                                           <FaCheckCircle className="me-2" />
                                           <span className="fw-semibold">
-                                            Module Completed
+                                            {language === 'hi' ? "मॉड्यूल पूरा हुआ" : "Module Completed"}
                                           </span>
                                           {isTestPassed &&
                                             moduleProgressData?.test_score !==
@@ -1607,7 +1606,7 @@ const UserDashboard = () => {
                                             moduleProgressData?.test_score !==
                                               undefined && (
                                               <span className="ms-3 text-success">
-                                                Score:{" "}
+                                                {language === 'hi' ? "स्कोर:" : "Score:"}{" "}
                                                 {moduleProgressData.test_score}%
                                               </span>
                                             )}
@@ -1617,7 +1616,7 @@ const UserDashboard = () => {
                                           <div className="d-flex align-items-center text-warning">
                                             <FaClock className="me-2" />
                                             <span className="fw-semibold">
-                                              Module In Progress
+                                              {language === 'hi' ? "मॉड्यूल प्रगति पर" : "Module In Progress"}
                                             </span>
                                           </div>
                                         )
@@ -1637,7 +1636,7 @@ const UserDashboard = () => {
                                               size="sm"
                                             >
                                               <FaCheckCircle className="me-2" />
-                                              Complete
+                                              {language === 'hi' ? "पूरा करें" : "Complete"}
                                             </Button>
                                             <Button
                                               variant={testButtonVariant}
@@ -1651,7 +1650,7 @@ const UserDashboard = () => {
                                               size="sm"
                                             >
                                               <FaQuestionCircle className="me-2" />
-                                              {testButtonText}
+                                              {language === 'hi' ? (testButtonText === "Take Test" ? "टेस्ट दें" : testButtonText) : testButtonText}
                                             </Button>
                                           </>
                                         ) : (
@@ -1665,7 +1664,7 @@ const UserDashboard = () => {
                                             size="sm"
                                           >
                                             <FaCheckCircle className="me-2" />
-                                            {testButtonText}
+                                            {language === 'hi' ? (testButtonText === "Take Test" ? "टेस्ट दें" : testButtonText) : testButtonText}
                                           </Button>
                                         )}
                                       </div>
@@ -1677,7 +1676,7 @@ const UserDashboard = () => {
                                         size="sm"
                                       >
                                         <FaLock className="me-2" />
-                                        Locked
+                                        {language === 'hi' ? "लॉक है" : "Locked"}
                                       </Button>
                                     )}
                                   </div>
@@ -1690,7 +1689,7 @@ const UserDashboard = () => {
                     ) : (
                       <div className="text-center py-5">
                         <FaBook className="text-muted mb-3" style={{ fontSize: '48px' }} />
-                        <p className="text-muted fs-4">No modules available for this course</p>
+                        <p className="text-muted fs-4">{language === 'hi' ? "इस कोर्स के लिए कोई मॉड्यूल उपलब्ध नहीं है" : "No modules available for this course"}</p>
                       </div>
                     )}
                   </div>
@@ -1703,7 +1702,7 @@ const UserDashboard = () => {
                         className="fw-semibold my-courses-btn"
                       >
                         <FaBook className="me-2" />
-                        My Courses
+                        {language === 'hi' ? "मेरे कोर्सेज" : "My Courses"}
                         ({courses.length})
                       </Button>
                       <Button 
@@ -1712,14 +1711,14 @@ const UserDashboard = () => {
                         className="fw-semibold my-courses-btn"
                       >
                         <FaGraduationCap className="me-2" />
-                        All Courses
+                        {language === 'hi' ? "सभी कोर्सेज" : "All Courses"}
                         ({allCourses.filter(c => !isCourseExpired(c)).length})
                       </Button>
                     </div>
 
                     {activeTab === 'my-courses' && (
                       <div className='my-courses-btn'>
-                        <h4 className="mb-3">My Courses</h4>
+                        <h4 className="mb-3">{language === 'hi' ? "मेरे कोर्सेज" : "My Courses"}</h4>
                         
                         {loading ? (
                           <div className="text-center py-5">
@@ -1762,14 +1761,14 @@ const UserDashboard = () => {
                                       {isAllModulesCompleted(course) && (
                                         <div className="top-2 end-2">
                                           <Badge bg="success" className="p-2 badge-custom fs-7">
-                                            <FaCheckCircle className="me-1" /> Completed
+                                            <FaCheckCircle className="me-1" /> {language === 'hi' ? "पूरा हुआ" : "Completed"}
                                           </Badge>
                                         </div>
                                       )}
                                       {!isAllModulesCompleted(course) && (
                                         <div className="position-absolute top-2 start-2">
                                           <Badge bg="warning" className="p-2 badge-custom in-prohrace fs-7">
-                                            <FaClock className="me-1" /> In Progress
+                                            <FaClock className="me-1" /> {language === 'hi' ? "प्रगति पर" : "In Progress"}
                                           </Badge>
                                         </div>
                                       )}
@@ -1782,7 +1781,7 @@ const UserDashboard = () => {
                                       <div className="course-stats mb-4">
                                         <div className="d-flex justify-content-between align-items-center mb-2">
                                           <span className="text-muted small">
-                                            <FaCalendarCheck className="me-1" /> Enrolled
+                                            <FaCalendarCheck className="me-1" /> {language === 'hi' ? "नामांकित" : "Enrolled"}
                                           </span>
                                           <span className="fw-semibold">
                                             {course.enrolled_at ? new Date(course.enrolled_at).toLocaleDateString() : 'N/A'}
@@ -1792,7 +1791,7 @@ const UserDashboard = () => {
                                           <div className="d-flex flex-column">
                                             <div className="d-flex justify-content-between align-items-center mb-1 date-style">
                                               <span className="text-muted small">
-                                                <FaCalendarCheck className="me-1" /> Start Date
+                                                <FaCalendarCheck className="me-1" /> {language === 'hi' ? "प्रारंभ तिथि" : "Start Date"}
                                               </span>
                                               <span className="fw-semibold">
                                                 {course.start_date ? new Date(course.start_date).toLocaleDateString() : 'N/A'}
@@ -1801,7 +1800,7 @@ const UserDashboard = () => {
                                             {course.end_date && (
                                               <div className="d-flex justify-content-between align-items-center">
                                                 <span className="text-muted small">
-                                                  <FaClock className="me-1" /> End Date
+                                                  <FaClock className="me-1" /> {language === 'hi' ? "अंतिम तिथि" : "End Date"}
                                                 </span>
                                                 <span className="fw-semibold">
                                                   {new Date(course.end_date).toLocaleDateString()}
@@ -1813,7 +1812,7 @@ const UserDashboard = () => {
                                         {isAllModulesCompleted(course) && course.completed_at && (
                                           <div className="d-flex justify-content-between align-items-center mb-2">
                                             <span className="text-muted small">
-                                              <FaAward className="me-1" /> Completed
+                                              <FaAward className="me-1" /> {language === 'hi' ? "पूरा हुआ" : "Completed"}
                                             </span>
                                             <span className="fw-semibold text-success">
                                               {new Date(course.completed_at).toLocaleDateString()}
@@ -1827,7 +1826,7 @@ const UserDashboard = () => {
                                           
                                           <div className='student-name'>
                                             <p className="mb-0 fw-semibold">{course.student_name || 'Student'}</p>
-                                            <small className="text-muted">Learners</small>
+                                            <small className="text-muted">{language === 'hi' ? "शिक्षार्थी" : "Learners"}</small>
                                           </div>
                                         </div>
                                         <div className="d-flex gap-2">
@@ -1850,7 +1849,7 @@ const UserDashboard = () => {
                                                     }}
                                                   >
                                                     <FaCertificate className="me-2" />
-                                                    View Certificate
+                                                    {language === 'hi' ? "सर्टिफिकेट देखें" : "View Certificate"}
                                                   </Button>
                                                 )
                                               } else {
@@ -1867,7 +1866,7 @@ const UserDashboard = () => {
                                                     }}
                                                   >
                                                     <FaCertificate className="me-2" />
-                                                    Generate Certificate
+                                                    {language === 'hi' ? "सर्टिफिकेट प्राप्त करें" : "Generate Certificate"}
                                                   </Button>
                                                 )
                                               }
@@ -1888,7 +1887,7 @@ const UserDashboard = () => {
                                               }}
                                             >
                                               <FaCertificate className="me-2" />
-                                              View Certificate
+                                              {language === 'hi' ? "सर्टिफिकेट देखें" : "View Certificate"}
                                             </Button>
                                           ) : isAllModulesCompleted(course) ? (
                                             <Button 
@@ -1903,7 +1902,7 @@ const UserDashboard = () => {
                                               }}
                                             >
                                               <FaCertificate className="me-2" />
-                                              Generate Certificate
+                                              {language === 'hi' ? "सर्टिफिकेट प्राप्त करें" : "Generate Certificate"}
                                             </Button>
                                           ) : (
                                             <Button 
@@ -1918,12 +1917,12 @@ const UserDashboard = () => {
                                               {isAllModulesCompleted(course) ? (
                                                 <>
                                                   <FaCheckCircle className="me-2" />
-                                                  Completed
+                                                  {language === 'hi' ? "पूरा हुआ" : "Completed"}
                                                 </>
                                               ) : (
                                                 <>
                                                   <FaPlay className="me-2" />
-                                                  Start
+                                                  {language === 'hi' ? "शुरू करें" : "Start"}
                                                 </>
                                               )}
                                             </Button>
@@ -1936,11 +1935,11 @@ const UserDashboard = () => {
                                               disabled={submittedFeedbackCourses.includes(course.course_id)}
                                             >
                                               {submittedFeedbackCourses.includes(course.course_id) ? (
-                                                <>Feedback Submitted</>
+                                                <>{language === 'hi' ? "फीडबैक सबमिट किया गया" : "Feedback Submitted"}</>
                                               ) : (
                                                 <>
                                                   <FaStar className="me-2" />
-                                                  Feedback
+                                                  {language === 'hi' ? "फीडबैक" : "Feedback"}
                                                 </>
                                               )}
                                             </Button>
@@ -1955,7 +1954,7 @@ const UserDashboard = () => {
                         ) : (
                           <div className="text-center py-5">
                             <FaBook className="text-muted mb-3" style={{ fontSize: '48px' }} />
-                            <p className="text-muted fs-4">No courses enrolled yet</p>
+                            <p className="text-muted fs-4">{language === 'hi' ? "अभी तक कोई कोर्स नामांकित नहीं है" : "No courses enrolled yet"}</p>
                           </div>
                         )}
                       </div>
@@ -1963,7 +1962,7 @@ const UserDashboard = () => {
 
                     {activeTab === 'all-courses' && (
                       <div className='my-courses-btn'>
-                        <h4 className="mb-3">All Courses</h4>
+                        <h4 className="mb-3">{language === 'hi' ? "सभी कोर्सेज" : "All Courses"}</h4>
                         
                         {allCoursesLoading ? (
                           <div className="text-center py-5">
@@ -2007,7 +2006,7 @@ const UserDashboard = () => {
                                         {isEnrolled ? (
                                           <div className="text-center all-ready">
                                             <FaCheckCircle className="text-white" style={{ fontSize: '40px', marginBottom: '8px' }} />
-                                            <p className="text-white fw-bold mb-0">{isCompleted ? 'Completed' : 'Already Enrolled'}</p>
+                                            <p className="text-white fw-bold mb-0">{isCompleted ? (language === 'hi' ? 'पूरा हुआ' : 'Completed') : (language === 'hi' ? 'पहले से नामांकित' : 'Already Enrolled')}</p>
                                           </div>
                                         ) : (
                                           <FaBook className="text-white" style={{ fontSize: '48px' }} />
@@ -2022,7 +2021,7 @@ const UserDashboard = () => {
                                           <div className="mb-2 p-2 bg-light rounded d-flex flex-column date-style">
                                             <div className="d-flex justify-content-between align-items-center mb-1">
                                               <span className="text-muted small">
-                                                <FaCalendarCheck className="me-1" /> Start Date
+                                                <FaCalendarCheck className="me-1" /> {language === 'hi' ? "प्रारंभ तिथि" : "Start Date"}
                                               </span>
                                               <span className="fw-semibold">
                                                 {course.start_date ? new Date(course.start_date).toLocaleDateString() : 'N/A'}
@@ -2031,7 +2030,7 @@ const UserDashboard = () => {
                                             {course.end_date && (
                                               <div className="d-flex justify-content-between align-items-center">
                                                 <span className="text-muted small">
-                                                  <FaClock className="me-1" /> End Date
+                                                  <FaClock className="me-1" /> {language === 'hi' ? "अंतिम तिथि" : "End Date"}
                                                 </span>
                                                 <span className="fw-semibold">
                                                   {new Date(course.end_date).toLocaleDateString()}
@@ -2067,7 +2066,7 @@ const UserDashboard = () => {
                                                       }}
                                                     >
                                                       <FaCertificate className="me-2" />
-                                                      View Certificate
+                                                      {language === 'hi' ? "सर्टिफिकेट देखें" : "View Certificate"}
                                                     </Button>
                                                   )
                                                 } else {
@@ -2084,7 +2083,7 @@ const UserDashboard = () => {
                                                       }}
                                                     >
                                                       <FaCertificate className="me-2" />
-                                                      Generate Certificate
+                                                    {language === 'hi' ? "सर्टिफिकेट प्राप्त करें" : "Generate Certificate"}
                                                     </Button>
                                                   )
                                                 }
@@ -2102,7 +2101,7 @@ const UserDashboard = () => {
                                                 }}
                                               >
                                                 <FaPlay className="me-2" />
-                                                {isCompleted ? 'Completed' : 'Continue Learning'}
+                                                {isCompleted ? (language === 'hi' ? 'पूरा हुआ' : 'Completed') : (language === 'hi' ? 'सीखना जारी रखें' : 'Continue Learning')}
                                               </Button>
                                             )
                                           ) : (
@@ -2112,7 +2111,7 @@ const UserDashboard = () => {
                                               className="w-100 d-flex align-items-center justify-content-center"
                                             >
                                               <FaCheckCircle className="me-2" />
-                                              Enroll Now
+                                              {language === 'hi' ? "अभी नामांकन करें" : "Enroll Now"}
                                             </Button>
                                           )}
                                         </div>
@@ -2125,7 +2124,7 @@ const UserDashboard = () => {
                         ) : (
                           <div className="text-center py-5">
                             <FaGraduationCap className="text-muted mb-3" style={{ fontSize: '48px' }} />
-                            <p className="text-muted fs-4">No courses available</p>
+                            <p className="text-muted fs-4">{language === 'hi' ? "कोई कोर्स उपलब्ध नहीं है" : "No courses available"}</p>
                           </div>
                         )}
                       </div>
@@ -2147,7 +2146,7 @@ const UserDashboard = () => {
               <div className="modal-header" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(230, 101, 10));', border: 'none' }}>
                 <h5 className="modal-title text-white">
                   <FaStar className="me-2" />
-                  Course Feedback
+                  {language === 'hi' ? "कोर्स फीडबैक" : "Course Feedback"}
                 </h5>
                 <button 
                   type="button" 
@@ -2165,20 +2164,20 @@ const UserDashboard = () => {
                 
                 <div className="mb-4">
                   <h6 className="fw-bold text-primary mb-3">
-                    Course: {feedbackCourse.course_name}
+                    {language === 'hi' ? "कोर्स:" : "Course:"} {feedbackCourse.course_name}
                   </h6>
                   {submittedFeedbackCourses.includes(feedbackCourse.course_id) ? (
                     <Alert variant="success" className="mb-3">
                       <FaCheckCircle className="me-2" />
-                      <strong>Already Submitted</strong> You have already submitted feedback for this course
+                      <strong>{language === 'hi' ? "पहले ही सबमिट किया जा चुका है" : "Already Submitted"}</strong> {language === 'hi' ? "आपने इस कोर्स के लिए फीडबैक पहले ही सबमिट कर दिया है" : "You have already submitted feedback for this course"}
                     </Alert>
                   ) : (
-                    <p className="text-muted small">Please rate your experience with this course.</p>
+                    <p className="text-muted small">{language === 'hi' ? "कृपया इस कोर्स के साथ अपने अनुभव को आंकें।" : "Please rate your experience with this course."}</p>
                   )}
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">How would you rate the overall quality of the course?</label>
+                  <label className="form-label fw-semibold">{language === 'hi' ? "कोर्स की समग्र गुणवत्ता को आप कैसे आंकेंगे?" : "How would you rate the overall quality of the course?"}</label>
                   <div className="star-rating d-flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
@@ -2201,7 +2200,7 @@ const UserDashboard = () => {
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">How clear were the explanations in the course content?</label>
+                  <label className="form-label fw-semibold">{language === 'hi' ? "कोर्स कंटेंट में स्पष्टीकरण कितने स्पष्ट थे?" : "How clear were the explanations in the course content?"}</label>
                   <div className="star-rating d-flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
@@ -2224,7 +2223,7 @@ const UserDashboard = () => {
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">How relevant was the course material to your learning goals?</label>
+                  <label className="form-label fw-semibold">{language === 'hi' ? "कोर्स सामग्री आपके सीखने के लक्ष्यों के लिए कितनी प्रासंगिक थी?" : "How relevant was the course material to your learning goals?"}</label>
                   <div className="star-rating d-flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
@@ -2247,7 +2246,7 @@ const UserDashboard = () => {
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">How engaging did you find the course videos and exercises?</label>
+                  <label className="form-label fw-semibold">{language === 'hi' ? "कोर्स वीडियो और अभ्यास आपको कितने आकर्षक लगे?" : "How engaging did you find the course videos and exercises?"}</label>
                   <div className="star-rating d-flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
@@ -2270,7 +2269,7 @@ const UserDashboard = () => {
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">How likely are you to recommend this course to others?</label>
+                  <label className="form-label fw-semibold">{language === 'hi' ? "आप दूसरों को इस कोर्स की सिफारिश करने की कितनी संभावना रखते हैं?" : "How likely are you to recommend this course to others?"}</label>
                   <div className="star-rating d-flex gap-1">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <FaStar
@@ -2293,11 +2292,11 @@ const UserDashboard = () => {
                 </div>
                 
                 <div className="mb-3">
-                  <label className="form-label fw-semibold">Additional Comments</label>
+                  <label className="form-label fw-semibold">{language === 'hi' ? "अतिरिक्त टिप्पणियाँ" : "Additional Comments"}</label>
                   <textarea 
                     className="form-control" 
                     rows="4"
-                    placeholder="Share your thoughts about the course..."
+                    placeholder={language === 'hi' ? "कोर्स के बारे में अपने विचार साझा करें..." : "Share your thoughts about the course..."}
                     value={feedbackData.comment}
                     onChange={(e) => handleFeedbackChange('comment', e.target.value)}
                     disabled={feedbackSubmitting}
@@ -2310,7 +2309,7 @@ const UserDashboard = () => {
                   onClick={handleCloseFeedbackModal}
                   disabled={feedbackSubmitting}
                 >
-                  Cancel
+                  {language === 'hi' ? "रद्द करें" : "Cancel"}
                 </Button>
                 <Button 
                   variant="primary" 
@@ -2324,17 +2323,17 @@ const UserDashboard = () => {
                   {feedbackSubmitting ? (
                     <>
                       <Spinner animation="border" size="sm" className="me-2" />
-                      Submitting...
+                      {language === 'hi' ? "सबमिट हो रहा है..." : "Submitting..."}
                     </>
                   ) : submittedFeedbackCourses.includes(feedbackCourse.course_id) ? (
                     <>
                       <FaCheckCircle className="me-2" />
-                      Already Submitted
+                      {language === 'hi' ? "पहले ही सबमिट किया जा चुका है" : "Already Submitted"}
                     </>
                   ) : (
                     <>
                       <FaCheckCircle className="me-2" />
-                      Submit Feedback
+                      {language === 'hi' ? "फीडबैक सबमिट करें" : "Submit Feedback"}
                     </>
                   )}
                 </Button>
@@ -2363,7 +2362,7 @@ const UserDashboard = () => {
           >
             <FaArrowLeft /> Back to Module
           </Button>
-          <h4 className="mb-0">Exercise: Match the Images to Their Names</h4>
+          <h4 className="mb-0">{language === 'hi' ? "अभ्यास: चित्रों को उनके नामों से मिलाएँ" : "Exercise: Match the Images to Their Names"}</h4>
         </div>
 
         {exerciseFeedback.message && (
@@ -2374,11 +2373,11 @@ const UserDashboard = () => {
 
         <div className="game-container">
           <div className="game-column images-column">
-            <h3>Images</h3>
+            <h3>{language === 'hi' ? "चित्र" : "Images"}</h3>
             {remainingExercises.length === 0 ? (
               <div className="no-items">
                 <i className="bi bi-check-circle-fill"></i>
-                <p>All exercises completed!</p>
+                <p>{language === 'hi' ? "सभी अभ्यास पूरे हुए!" : "All exercises completed!"}</p>
                 <Button
                   className="reset-button"
                   onClick={() => {
@@ -2386,7 +2385,7 @@ const UserDashboard = () => {
                     setExerciseFeedback({ type: "", message: "" });
                   }}
                 >
-                  Reset Exercise
+                  {language === 'hi' ? "अभ्यास रीसेट करें" : "Reset Exercise"}
                 </Button>
               </div>
             ) : (
@@ -2411,7 +2410,7 @@ const UserDashboard = () => {
                       }}
                     />
                     <div className="no-image" style={{ display: "none" }}>
-                      No Image
+                      {language === 'hi' ? "चित्र नहीं है" : "No Image"}
                     </div>
                   </div>
                 ))}
@@ -2420,7 +2419,7 @@ const UserDashboard = () => {
           </div>
 
           <div className="game-column targets-column">
-            <h3>Names</h3>
+            <h3>{language === 'hi' ? "नाम" : "Names"}</h3>
             <div className="items-grid targets-grid">
               {currentExerciseModule.exercises.map((exercise, index) => {
                 const isMatched = correctMatches.some(

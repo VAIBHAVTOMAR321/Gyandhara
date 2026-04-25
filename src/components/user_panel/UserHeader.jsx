@@ -19,6 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
+import { useLanguage } from "../all_login/LanguageContext";
 
 function UserHeader({ toggleSidebar }) {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ function UserHeader({ toggleSidebar }) {
   // Access Auth Context similar to UserProfile
   const { accessToken, uniqueId, logout } = useAuth();
 
+  const { language, setLanguage } = useLanguage();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
@@ -271,7 +273,7 @@ function UserHeader({ toggleSidebar }) {
   }, [uniqueId, accessToken]);
 
   const getDisplayName = () => {
-    return userDetails.full_name || "User";
+    return userDetails.full_name || (language === 'hi' ? "यूजर" : "User");
   };
 
   const getUserPhotoUrl = () => {
@@ -319,12 +321,33 @@ function UserHeader({ toggleSidebar }) {
           
           <Col xs="auto">
              <div className="header-actions">
+               {/* Language Toggle */}
+               <div className="btn-group me-2" role="group">
+                 <Button
+                   variant={language === 'hi' ? "dark" : "outline-dark"}
+                   size="sm"
+                   onClick={() => setLanguage('hi')}
+                   className="fw-semibold"
+                   style={language === 'hi' ? { backgroundColor: 'black', borderColor: 'black', color: 'white' } : {}}
+                 >
+                   हिन्दी
+                 </Button>
+                 <Button
+                   variant={language === 'en' ? "dark" : "outline-dark"}
+                   size="sm"
+                   onClick={() => setLanguage('en')}
+                   className="fw-semibold"
+                   style={language === 'en' ? { backgroundColor: 'black', borderColor: 'black', color: 'white' } : {}}
+                 >
+                   EN
+                 </Button>
+               </div>
                <Button
                   style={{ background: "#383be8", borderColor: "#383be8", color: "#fff" }}
                   className="me-2"
                   onClick={() => navigate("/GroomingClasses")}
                 >
-                  Grooming Class
+                  {language === 'hi' ? "ग्रूमिंग क्लास" : "Grooming Class"}
                 </Button>
                {/* Notifications Dropdown */}
               <Dropdown
@@ -355,7 +378,7 @@ function UserHeader({ toggleSidebar }) {
                     }}
                   >
                     <span style={{ fontWeight: "600", color: "#333" }}>
-                      Notifications
+                      {language === 'hi' ? "सूचनाएं" : "Notifications"}
                     </span>
                     {unreadCount > 0 && (
                       <Button
@@ -364,7 +387,7 @@ function UserHeader({ toggleSidebar }) {
                         onClick={handleMarkAllSeen}
                         style={{ padding: "0", fontSize: "0.8rem", color: "#007bff" }}
                       >
-                        Mark all read
+                        {language === 'hi' ? "सब पढ़ा हुआ" : "Mark all read"}
                       </Button>
                     )}
                   </div>
@@ -379,7 +402,7 @@ function UserHeader({ toggleSidebar }) {
                     </div>
                   ) : notifications.length === 0 ? (
                     <div className="p-4 text-center text-muted">
-                      <small>No notifications found</small>
+                      <small>{language === 'hi' ? "कोई सूचना नहीं मिली" : "No notifications found"}</small>
                     </div>
                   ) : (
                     notifications.slice(0, 10).map((notification) => (
@@ -433,7 +456,7 @@ function UserHeader({ toggleSidebar }) {
                                 color: notification.seen ? "#555" : "#000",
                               }}
                             >
-                              {notification.title || "Notification"}
+                              {notification.title || (language === 'hi' ? "सूचना" : "Notification")}
                             </div>
                             <div
                               className="text-muted"
@@ -442,7 +465,7 @@ function UserHeader({ toggleSidebar }) {
                                 marginBottom: "2px",
                               }}
                             >
-                              {notification.message || "No details available."}
+                              {notification.message || (language === 'hi' ? "कोई विवरण उपलब्ध नहीं है।" : "No details available.")}
                             </div>
                             <div
                               className="text-muted"
@@ -509,7 +532,7 @@ function UserHeader({ toggleSidebar }) {
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
                   <Dropdown.Item onClick={handleLogout}>
-                    <FaSignOutAlt className="me-2" /> Logout
+                    <FaSignOutAlt className="me-2" /> {language === 'hi' ? "लॉगआउट" : "Logout"}
                   </Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>

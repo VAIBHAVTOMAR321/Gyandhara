@@ -41,12 +41,14 @@ import {
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
+import { useLanguage } from "../all_login/LanguageContext";
 
 
 const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { language } = useLanguage();
 
   const [userRole, setUserRole] = useState(user ? user.role : null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
@@ -64,41 +66,41 @@ const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
 const menuItems = [
      {
        icon: <FaTachometerAlt />,
-       label: "DASHBOARD",
+       label: language === 'hi' ? "डैशबोर्ड" : "DASHBOARD",
        path: "/UserDashboard",
        active: true,
      },
      {
        icon: <FaUserCircle />,
-       label: "PROFILE",
+       label: language === 'hi' ? "प्रोफाइल" : "PROFILE",
        path: "/UserProfile",
      },
      {
        icon: <FaGraduationCap />,
-       label: "Quiz",
+       label: language === 'hi' ? "क्विज़" : "Quiz",
        path: "/UserQuiz",
      },
      {
        icon: <FaTrophy />,
-       label: "Competition",
+       label: language === 'hi' ? "प्रतियोगिता" : "Competition",
        path: "/Competition",
      },
      {
        icon: <FaUsers />,
-       label: "School Competitions",
+       label: language === 'hi' ? "स्कूल प्रतियोगिताएं" : "School Competitions",
        path: "/SchoolCompetitions",
      },
      {
        icon: <FaChalkboardTeacher />,
-       label: "Career Guidance",
+       label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
        submenu: [
          {
-           label: "12th Guidance",
+           label: language === 'hi' ? "12वीं मार्गदर्शन" : "12th Guidance",
            path: "/TwelfthGuidance",
            icon: <FaPlusSquare />,
          },
           {
-           label: "10th Guidance",
+           label: language === 'hi' ? "10वीं मार्गदर्शन" : "10th Guidance",
            path: "/TenthGuidance",
            icon: <FaPlusSquare />,
          },
@@ -106,27 +108,27 @@ const menuItems = [
      },
      {
        icon: <FaBuilding />,
-       label: "Government Schemes",
+       label: language === 'hi' ? "सरकारी योजनाएं" : "Government Schemes",
        path: "/GovernmentSchemes",
      },
       {
        icon: <FaTasks />,
-       label: "Grooming Classes",
+       label: language === 'hi' ? "ग्रूमिंग क्लासेस" : "Grooming Classes",
        path: "/GroomingClasses",
      },
      {
        icon: <FaBriefcase />,
-       label: "Jobs & Seminars",
+       label: language === 'hi' ? "नौकरियां और सेमिनार" : "Jobs & Seminars",
        path: "/JobOpenings",
      },
      {
        icon: <FaCalendarAlt />,
-       label: "Events",
+       label: language === 'hi' ? "कार्यक्रम" : "Events",
        path: "/UserEvents",
      },
      {
        icon: <FaComments />,
-       label: "Send Query",
+       label: language === 'hi' ? "प्रश्न भेजें" : "Send Query",
        path: "/SendQuery",
      },
      
@@ -149,7 +151,7 @@ const menuItems = [
           {sidebarOpen ? (
             <div className="logo-container">
               <div className="logo">
-                User DashBoard
+                {language === 'hi' ? "यूजर डैशबोर्ड" : "User DashBoard"}
                 <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
               </div>
             </div>
@@ -227,7 +229,7 @@ const menuItems = [
             <span className="nav-icon">
               <FaSignOutAlt />
             </span>
-            <span className="nav-text">Logout</span>
+            <span className="nav-text">{language === 'hi' ? "लॉगआउट" : "Logout"}</span>
           </Nav.Link>
         </div>
       </div>
@@ -243,7 +245,7 @@ const menuItems = [
   enforceFocus={false} //  ADD THIS LINE — fixes close button focus issue
 >
   <Offcanvas.Header closeButton className="br-offcanvas-header">
-    <Offcanvas.Title className="br-off-title">Menu</Offcanvas.Title>
+    <Offcanvas.Title className="br-off-title">{language === 'hi' ? "मेनू" : "Menu"}</Offcanvas.Title>
   </Offcanvas.Header>
 
   <Offcanvas.Body className="br-offcanvas">
