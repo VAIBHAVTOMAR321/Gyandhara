@@ -333,7 +333,9 @@ const SchoolQuiz = () => {
     }
 
     if (!quizForm.title || !quizForm.quiz_category || quizForm.questions.length === 0) {
-      alert('Please fill in required fields (title, category, at least one question)')
+      alert(
+        "Please fill in required fields (title, Activity Type, at least one question)",
+      );
       return
     }
 
@@ -455,40 +457,47 @@ const SchoolQuiz = () => {
 
   return (
     <>
-    <div className="dashboard-container">
-      <AdminLeftNav
-        sidebarOpen={sidebarOpen}
-        setSidebarOpen={setSidebarOpen}
-        isMobile={isMobile}
-        isTablet={isTablet}
-      />
-      <div className="main-content-dash">
-        <AdminHeader toggleSidebar={toggleSidebar} />
-        <div className="dashboard-content">
-          <Container fluid className="dashboard-box">
-            <div className="d-flex justify-content-between align-items-center mb-4 page-header">
-              <div className="d-flex align-items-center all-en-box gap-3">
-                <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
-                  <FaArrowLeft /> Dashboard
+      <div className="dashboard-container">
+        <AdminLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+        <div className="main-content-dash">
+          <AdminHeader toggleSidebar={toggleSidebar} />
+          <div className="dashboard-content">
+            <Container fluid className="dashboard-box">
+              <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+                <div className="d-flex align-items-center all-en-box gap-3">
+                  <Button
+                    variant="outline-secondary"
+                    size="sm"
+                    onClick={() => navigate("/AdminDashboard")}
+                    className="me-2"
+                  >
+                    <FaArrowLeft /> Dashboard
+                  </Button>
+                  <h4 className="mb-0">School Quiz Competition</h4>
+                </div>
+                <Button variant="primary" onClick={handleAddQuiz}>
+                  <FaPlus className="me-1" /> Add New Quiz
                 </Button>
-                <h4 className="mb-0">School Quiz Competition</h4>
               </div>
-              <Button variant="primary" onClick={handleAddQuiz}>
-                <FaPlus className="me-1" /> Add New Quiz
-              </Button>
-            </div>
 
-            <Row>
-              <Col xs={12}>
+              <Row>
+                <Col xs={12}>
                   <Card className="mb-4">
                     <Card.Body className="py-3">
                       <Row className="g-3 align-items-end">
                         <Col md={4} xs={12}>
                           <Form.Group controlId="searchTerm">
-                            <Form.Label className="small fw-medium mb-1">Search</Form.Label>
+                            <Form.Label className="small fw-medium mb-1">
+                              Search
+                            </Form.Label>
                             <Form.Control
                               type="text"
-                              placeholder="Search by title, category..."
+                              placeholder="Search by title, activity type..."
                               value={searchTerm}
                               onChange={(e) => setSearchTerm(e.target.value)}
                               size="sm"
@@ -497,7 +506,9 @@ const SchoolQuiz = () => {
                         </Col>
                         <Col md={4} xs={6}>
                           <Form.Group controlId="filterStatus">
-                            <Form.Label className="small fw-medium mb-1">Status</Form.Label>
+                            <Form.Label className="small fw-medium mb-1">
+                              Status
+                            </Form.Label>
                             <Form.Select
                               value={filterStatus}
                               onChange={(e) => setFilterStatus(e.target.value)}
@@ -526,56 +537,79 @@ const SchoolQuiz = () => {
                   <Card className="table-card border">
                     <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
                       <div className="d-flex align-items-center paid-btn gap-2">
-                        <h5 className="mb-0 fw-semibold">
-                          All Quizzes
-                        </h5>
+                        <h5 className="mb-0 fw-semibold">All Quizzes</h5>
                       </div>
                       <span className="text-muted small">
-                        Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredQuizzes.length)} of {filteredQuizzes.length} records
+                        Showing {indexOfFirstRecord + 1} to{" "}
+                        {Math.min(indexOfLastRecord, filteredQuizzes.length)} of{" "}
+                        {filteredQuizzes.length} records
                       </span>
                     </Card.Header>
                     <Card.Body className="p-0">
                       <div className="table-responsive d-none d-lg-block">
                         <table className="table table-striped table-bordered table-hover mb-0">
-<thead className="bg-primary text-white">
-                              <tr>
-                                <th className="py-3 px-2">Title</th>
-                                <th className="py-3 px-2">Category</th>
-                                <th className="py-3 px-2">Classes</th>
-                                <th className="py-3 px-2">Schools</th>
-                                <th className="py-3 px-2">Participants</th>
-                                <th className="py-3 px-2">Questions</th>
-                                <th className="py-3 px-2">Start Date</th>
-                                <th className="py-3 px-2">End Date</th>
-                                <th className="py-3 px-2">Status</th>
-                                <th className="py-3 px-2 text-end">Actions</th>
-                              </tr>
-                            </thead>
+                          <thead className="bg-primary text-white">
+                            <tr>
+                              <th className="py-3 px-2">Title</th>
+                              <th className="py-3 px-2">Activity Type</th>
+                              <th className="py-3 px-2">Classes</th>
+                              <th className="py-3 px-2">Schools</th>
+                              <th className="py-3 px-2">Participants</th>
+                              <th className="py-3 px-2">Questions</th>
+                              <th className="py-3 px-2">Start Date</th>
+                              <th className="py-3 px-2">End Date</th>
+                              <th className="py-3 px-2">Status</th>
+                              <th className="py-3 px-2 text-end">Actions</th>
+                            </tr>
+                          </thead>
                           <tbody>
                             {currentRecords.length === 0 ? (
                               <tr>
-                                <td colSpan="10" className="text-center py-4 text-muted">
+                                <td
+                                  colSpan="10"
+                                  className="text-center py-4 text-muted"
+                                >
                                   No quizzes found
                                 </td>
                               </tr>
                             ) : (
                               currentRecords.map((quiz) => (
                                 <tr key={quiz.id}>
-                                  <td className="py-3 px-2 fw-medium text-dark">{quiz.title}</td>
-                                  <td className="py-3 px-2 small">{quiz.quiz_category}</td>
+                                  <td className="py-3 px-2 fw-medium text-dark">
+                                    {quiz.title}
+                                  </td>
                                   <td className="py-3 px-2 small">
-                                    {quiz.class_allowed?.map(c => (
-                                      <Badge key={c} bg="info" className="me-1">{c}</Badge>
+                                    {quiz.quiz_category}
+                                  </td>
+                                  <td className="py-3 px-2 small">
+                                    {quiz.class_allowed?.map((c) => (
+                                      <Badge key={c} bg="info" className="me-1">
+                                        {c}
+                                      </Badge>
                                     ))}
                                   </td>
-                                  <td className="py-3 px-2 small">{quiz.school_allowed?.length || 0}</td>
-                                  <td className="py-3 px-2 small">{quiz.total_participants || 0}</td>
-                                  <td className="py-3 px-2 small">{quiz.questions?.length || 0}</td>
-                                  <td className="py-3 px-2 small">{formatDate(quiz.start_date_time)}</td>
-                                  <td className="py-3 px-2 small">{formatDate(quiz.end_date_time)}</td>
                                   <td className="py-3 px-2 small">
-                                    <Badge bg={quiz.is_active ? 'success' : 'secondary'}>
-                                      {quiz.is_active ? 'Active' : 'Inactive'}
+                                    {quiz.school_allowed?.length || 0}
+                                  </td>
+                                  <td className="py-3 px-2 small">
+                                    {quiz.total_participants || 0}
+                                  </td>
+                                  <td className="py-3 px-2 small">
+                                    {quiz.questions?.length || 0}
+                                  </td>
+                                  <td className="py-3 px-2 small">
+                                    {formatDate(quiz.start_date_time)}
+                                  </td>
+                                  <td className="py-3 px-2 small">
+                                    {formatDate(quiz.end_date_time)}
+                                  </td>
+                                  <td className="py-3 px-2 small">
+                                    <Badge
+                                      bg={
+                                        quiz.is_active ? "success" : "secondary"
+                                      }
+                                    >
+                                      {quiz.is_active ? "Active" : "Inactive"}
                                     </Badge>
                                   </td>
                                   <td className="py-3 px-2 text-end">
@@ -584,7 +618,7 @@ const SchoolQuiz = () => {
                                         variant="info"
                                         size="sm"
                                         className="text-white"
-                                        style={{ padding: '4px 10px' }}
+                                        style={{ padding: "4px 10px" }}
                                         onClick={() => handleEditQuiz(quiz)}
                                         title="Edit Quiz"
                                       >
@@ -594,7 +628,7 @@ const SchoolQuiz = () => {
                                         variant="danger"
                                         size="sm"
                                         className="text-white"
-                                        style={{ padding: '4px 10px' }}
+                                        style={{ padding: "4px 10px" }}
                                         onClick={() => handleDelete(quiz)}
                                         title="Delete Quiz"
                                       >
@@ -620,41 +654,69 @@ const SchoolQuiz = () => {
                               <Card.Body className="p-3">
                                 <div className="d-flex justify-content-between align-items-start mb-2">
                                   <div>
-                                    <h6 className="mb-1 fw-semibold">{quiz.title}</h6>
-                                    <small className="text-muted">{quiz.quiz_category}</small>
+                                    <h6 className="mb-1 fw-semibold">
+                                      {quiz.title}
+                                    </h6>
+                                    <small className="text-muted">
+                                      {quiz.quiz_category}
+                                    </small>
                                   </div>
-                                  <Badge bg={quiz.is_active ? 'success' : 'secondary'}>
-                                    {quiz.is_active ? 'Active' : 'Inactive'}
+                                  <Badge
+                                    bg={
+                                      quiz.is_active ? "success" : "secondary"
+                                    }
+                                  >
+                                    {quiz.is_active ? "Active" : "Inactive"}
                                   </Badge>
                                 </div>
-                                
-<div className="mb-2">
-                                   <small className="text-muted d-block">Classes:</small>
-                                   <div>
-                                     {quiz.class_allowed?.map(c => (
-                                       <Badge key={c} bg="info" className="me-1">{c}</Badge>
-                                     ))}
-                                   </div>
-                                 </div>
-
-                                 <div className="mb-2">
-                                   <small className="text-muted d-block">Schools:</small>
-                                   <span className="small fw-medium">{quiz.school_allowed?.length || 0}</span>
-                                 </div>
-
-                                 <div className="mb-2">
-                                   <small className="text-muted d-block">Participants:</small>
-                                   <span className="small fw-medium">{quiz.total_participants || 0}</span>
-                                 </div>
-
-                                 <div className="mb-2">
-                                   <small className="text-muted d-block">Questions:</small>
-                                   <span className="small fw-medium">{quiz.questions?.length || 0}</span>
-                                 </div>
 
                                 <div className="mb-2">
-                                  <small className="text-muted d-block">Start Date:</small>
-                                  <span className="small">{formatDate(quiz.start_date_time)}</span>
+                                  <small className="text-muted d-block">
+                                    Classes:
+                                  </small>
+                                  <div>
+                                    {quiz.class_allowed?.map((c) => (
+                                      <Badge key={c} bg="info" className="me-1">
+                                        {c}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div className="mb-2">
+                                  <small className="text-muted d-block">
+                                    Schools:
+                                  </small>
+                                  <span className="small fw-medium">
+                                    {quiz.school_allowed?.length || 0}
+                                  </span>
+                                </div>
+
+                                <div className="mb-2">
+                                  <small className="text-muted d-block">
+                                    Participants:
+                                  </small>
+                                  <span className="small fw-medium">
+                                    {quiz.total_participants || 0}
+                                  </span>
+                                </div>
+
+                                <div className="mb-2">
+                                  <small className="text-muted d-block">
+                                    Questions:
+                                  </small>
+                                  <span className="small fw-medium">
+                                    {quiz.questions?.length || 0}
+                                  </span>
+                                </div>
+
+                                <div className="mb-2">
+                                  <small className="text-muted d-block">
+                                    Start Date:
+                                  </small>
+                                  <span className="small">
+                                    {formatDate(quiz.start_date_time)}
+                                  </span>
                                 </div>
 
                                 <div className="d-flex gap-2 mt-3 pt-3 border-top">
@@ -685,24 +747,47 @@ const SchoolQuiz = () => {
                       <Card.Footer className="bg-light border-top py-2 px-3">
                         <nav aria-label="Quizzes pagination">
                           <ul className="pagination justify-content-center pagination-sm mb-0">
-                            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                              <button className="page-link" onClick={handlePreviousPage}>
+                            <li
+                              className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={handlePreviousPage}
+                              >
                                 <i className="fas fa-chevron-left"></i>
                               </button>
                             </li>
 
-                            {Array.from({ length: totalPages }, (_, i) => i + 1).filter(page => {
-                              return page >= currentPage - 1 && page <= currentPage + 1 && page <= totalPages && page >= 1
-                            }).map(page => (
-                              <li key={page} className={`page-item ${page === currentPage ? 'active' : ''}`}>
-                                <button className="page-link" onClick={() => handlePageChange(page)}>
-                                  {page}
-                                </button>
-                              </li>
-                            ))}
+                            {Array.from({ length: totalPages }, (_, i) => i + 1)
+                              .filter((page) => {
+                                return (
+                                  page >= currentPage - 1 &&
+                                  page <= currentPage + 1 &&
+                                  page <= totalPages &&
+                                  page >= 1
+                                );
+                              })
+                              .map((page) => (
+                                <li
+                                  key={page}
+                                  className={`page-item ${page === currentPage ? "active" : ""}`}
+                                >
+                                  <button
+                                    className="page-link"
+                                    onClick={() => handlePageChange(page)}
+                                  >
+                                    {page}
+                                  </button>
+                                </li>
+                              ))}
 
-                            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                              <button className="page-link" onClick={handleNextPage}>
+                            <li
+                              className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={handleNextPage}
+                              >
                                 <i className="fas fa-chevron-right"></i>
                               </button>
                             </li>
@@ -719,10 +804,15 @@ const SchoolQuiz = () => {
       </div>
 
       {/* Add/Edit Quiz Modal */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered size="xl">
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        centered
+        size="xl"
+      >
         <Modal.Header closeButton className="border-bottom py-2 px-3">
           <Modal.Title className="fw-semibold fs-6">
-            {isEditing ? 'Edit Quiz' : 'Add New Quiz'}
+            {isEditing ? "Edit Quiz" : "Add New Quiz"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="">
@@ -786,7 +876,7 @@ const SchoolQuiz = () => {
             <Row className="mb-3">
               <Col md={4} xs={12}>
                 <Form.Group>
-                  <Form.Label>Category *</Form.Label>
+                  <Form.Label>Activity Type *</Form.Label>
                   <Form.Control
                     type="text"
                     name="quiz_category"
@@ -823,9 +913,9 @@ const SchoolQuiz = () => {
             <Row className="mb-3">
               <Col md={4} xs={12}>
                 <Form.Group>
-                  <Form.Label>Classes Allowed</Form.Label>
+                  <Form.Label>Enrolled Classes</Form.Label>
                   <div className="d-flex flex-wrap gap-2">
-                    {classOptions.map(cls => (
+                    {classOptions.map((cls) => (
                       <Form.Check
                         key={cls}
                         type="checkbox"
@@ -840,22 +930,31 @@ const SchoolQuiz = () => {
               </Col>
               <Col md={4} xs={12}>
                 <Form.Group>
-                  <Form.Label>Schools Allowed</Form.Label>
+                  <Form.Label>Enrolled Schools</Form.Label>
                   {schoolsLoading ? (
                     <Spinner animation="border" size="sm" />
                   ) : schools.length === 0 ? (
-                    <Button variant="outline-secondary" size="sm" onClick={fetchSchools}>
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      onClick={fetchSchools}
+                    >
                       Load Schools
                     </Button>
                   ) : (
-                    <div className="d-flex flex-wrap gap-2" style={{ maxHeight: '100px', overflowY: 'auto' }}>
-                      {schools.map(school => (
+                    <div
+                      className="d-flex flex-wrap gap-2"
+                      style={{ maxHeight: "100px", overflowY: "auto" }}
+                    >
+                      {schools.map((school) => (
                         <Form.Check
                           key={school.school_uni_id}
                           type="checkbox"
                           label={school.school_name}
                           value={school.school_uni_id}
-                          checked={quizForm.school_allowed.includes(school.school_uni_id)}
+                          checked={quizForm.school_allowed.includes(
+                            school.school_uni_id,
+                          )}
                           onChange={handleSchoolChange}
                         />
                       ))}
@@ -879,7 +978,7 @@ const SchoolQuiz = () => {
                   <Form.Check
                     type="switch"
                     name="is_active"
-                    label={quizForm.is_active ? 'Active' : 'Inactive'}
+                    label={quizForm.is_active ? "Active" : "Inactive"}
                     checked={quizForm.is_active}
                     onChange={handleInputChange}
                   />
@@ -899,7 +998,9 @@ const SchoolQuiz = () => {
                         <div>
                           <strong>Q{idx + 1}:</strong> {q.question_text}
                           <br />
-                          <small className="text-muted">Correct Answer: {q.options[q.correct_answer]}</small>
+                          <small className="text-muted">
+                            Correct Answer: {q.options[q.correct_answer]}
+                          </small>
                         </div>
                         <Button
                           variant="outline-danger"
@@ -916,7 +1017,9 @@ const SchoolQuiz = () => {
             )}
 
             <Card className="mb-3">
-              <Card.Header className="bg-light py-2">Add New Question</Card.Header>
+              <Card.Header className="bg-light py-2">
+                Add New Question
+              </Card.Header>
               <Card.Body>
                 <Row className="mb-2">
                   <Col md={6} xs={12}>
@@ -950,17 +1053,27 @@ const SchoolQuiz = () => {
                     <Form.Group>
                       <Form.Label>Options *</Form.Label>
                       {newQuestion.options.map((opt, idx) => (
-                        <div key={idx} className="d-flex align-items-center mb-2">
+                        <div
+                          key={idx}
+                          className="d-flex align-items-center mb-2"
+                        >
                           <Form.Check
                             type="radio"
                             name="correct_answer"
                             checked={newQuestion.correct_answer === idx}
-                            onChange={() => setNewQuestion(prev => ({ ...prev, correct_answer: idx }))}
+                            onChange={() =>
+                              setNewQuestion((prev) => ({
+                                ...prev,
+                                correct_answer: idx,
+                              }))
+                            }
                           />
                           <Form.Control
                             type="text"
                             value={opt}
-                            onChange={(e) => handleOptionChange(idx, e.target.value)}
+                            onChange={(e) =>
+                              handleOptionChange(idx, e.target.value)
+                            }
                             placeholder={`Option ${idx + 1}`}
                             className="ms-2"
                           />
@@ -976,7 +1089,9 @@ const SchoolQuiz = () => {
                           key={idx}
                           type="text"
                           value={opt}
-                          onChange={(e) => handleOptionHindiChange(idx, e.target.value)}
+                          onChange={(e) =>
+                            handleOptionHindiChange(idx, e.target.value)
+                          }
                           placeholder={`विकल्प ${idx + 1}`}
                           className="mb-2"
                         />
@@ -1012,17 +1127,19 @@ const SchoolQuiz = () => {
             Cancel
           </Button>
           <Button variant="primary" onClick={submitQuiz}>
-            {isEditing ? 'Update Quiz' : 'Create Quiz'}
+            {isEditing ? "Update Quiz" : "Create Quiz"}
           </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
         <Modal.Header closeButton className="border-bottom py-2 px-3">
-          <Modal.Title className="fw-semibold fs-6">
-            Confirm Delete
-          </Modal.Title>
+          <Modal.Title className="fw-semibold fs-6">Confirm Delete</Modal.Title>
         </Modal.Header>
         <Modal.Body className="">
           <p>Are you sure you want to delete this quiz?</p>
@@ -1038,7 +1155,7 @@ const SchoolQuiz = () => {
         </Modal.Footer>
       </Modal>
     </>
-  )
+  );
 }
 
 export default SchoolQuiz

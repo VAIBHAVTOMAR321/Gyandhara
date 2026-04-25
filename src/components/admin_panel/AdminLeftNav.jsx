@@ -65,130 +65,124 @@ const AdminLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   }, [location.pathname, isMobile, isTablet, setSidebarOpen]);
 
 const menuItems = [
-    {
-     icon: <FaBook />,
-      label: "Dashbord",
-      path: "/DashBord",
-      active: true,
-    },
-     {
-      icon: <FaTachometerAlt />,
-      label: "Enrollment Details",
-      path: "/AdminDashboard",
-      
-    },
-    {
-      icon: <FaQuestionCircle />,
-      label: "Student Issues",
-      path: "/StudentIssue",
-    },
-    {
-      icon: <FaClipboardList />,
-      label: "Quiz Management",
-      path: "/QuizManagement",
-    },
-    {
-      icon: <FaGraduationCap />,
-      label: "School Quiz",
-      path: "/SchoolQuiz",
-    },
-    {
-      icon: <FaUsers />,
-      label: " Students",
-      submenu: [
-        {
-          label: "Registered Student",
-          path: "#",
-          icon: <FaPlusSquare />,
-        },
+  {
+    icon: <FaBook />,
+    label: "Dashbord",
+    path: "/DashBord",
+    active: true,
+  },
+  {
+    icon: <FaTachometerAlt />,
+    label: "Enrollment Details",
+    path: "/AdminDashboard",
+  },
 
-      ],
-    },
+  {
+    icon: <FaClipboardList />,
+    label: "Quiz Management",
+    path: "/QuizManagement",
+  },
+  {
+    icon: <FaGraduationCap />,
+    label: "School Quiz",
+    path: "/SchoolQuiz",
+  },
+  // {
+  //   icon: <FaUsers />,
+  //   label: " Students",
+  //   submenu: [
+  //     {
+  //       label: "Registered Student",
+  //       path: "#",
+  //       icon: <FaPlusSquare />,
+  //     },
+  //   ],
+  // },
 
-{
-        icon: <FaBuilding />,
-        label: " Govt schemes",
-        submenu: [
-        
-          {
-            label: "Manage Scheme",
-            path: "/ManageGovtSchemes",
-            icon: <FaListUl />,
-          },
-            {
-            label: "Add Scheme",
-            path: "/AddGovtSchemes",
-            icon: <FaPlusSquare />,
-          },
-        ],
-      
-    },
-    {
-      icon: <FaChalkboardTeacher />,
-      label: " Grooming Classes",
-      submenu: [
-        {
-          label: "Create Class",
-          path: "/CreateGroomingClass",
-          icon: <FaPlusSquare />,
-        },
-        {
-          label: "Manage Classes",
-          path: "/ManageGroomingClasses",
-          icon: <FaListUl />,
-        },
-      ],
-    },
-    {
-      icon: <FaCube />,
-      label: "Jobs & More",
-      submenu: [
-        {
-          label: "Add Job",
-          path: "/AddJob",
-          icon: <FaPlusSquare />,
-        },
-         {
-          label: "Manage Jobs",
-          path: "/ManageJobs",
-          icon: <FaListUl />,
-        },
-        {
-          label: "Add Seminar",
-          path: "/AddSeminar",
-          icon: <FaPlusSquare />,
-        },
-         {
-          label: "Add Workshop",
-          path: "/AddWorkshop",
-          icon: <FaListUl />,
-        },
-      ],
-    },
-    {
-      icon: <FaClipboardList />,
-      label: "Course Feedback",
-      path: "/CourseFeedback",
-    },
-
-    //   icon: <FaCalendarAlt />,
-    //   label: "Event",
-    //   submenu: [
-    //     {
-    //       label: "Add Event",
-    //       path: "/AddEvent",
-    //       icon: <FaPlusSquare />,
-    //     },
-    //     {
-    //       label: "Manage Event",
-    //       path: "/ManageEvent",
-    //       icon: <FaListUl />,
-    //     },
-    //   ],
-    // },
-
-    
-  ];
+  {
+    icon: <FaBuilding />,
+    label: " Govt schemes",
+    submenu: [
+      {
+        label: "Manage Scheme",
+        path: "/ManageGovtSchemes",
+        icon: <FaListUl />,
+      },
+      {
+        label: "Add Scheme",
+        path: "/AddGovtSchemes",
+        icon: <FaPlusSquare />,
+      },
+    ],
+  },
+  {
+    icon: <FaChalkboardTeacher />,
+    label: " Grooming Classes",
+    submenu: [
+      {
+        label: "Create Class",
+        path: "/CreateGroomingClass",
+        icon: <FaPlusSquare />,
+      },
+      {
+        label: "Manage Classes",
+        path: "/ManageGroomingClasses",
+        icon: <FaListUl />,
+      },
+    ],
+  },
+  {
+    icon: <FaCube />,
+    label: "Jobs & More",
+    submenu: [
+      {
+        label: "Add Job",
+        path: "/AddJob",
+        icon: <FaPlusSquare />,
+      },
+      {
+        label: "Manage Jobs",
+        path: "/ManageJobs",
+        icon: <FaListUl />,
+      },
+      {
+        label: "Add Seminar",
+        path: "/AddSeminar",
+        icon: <FaPlusSquare />,
+      },
+      {
+        label: "Add Workshop",
+        path: "/AddWorkshop",
+        icon: <FaListUl />,
+      },
+    ],
+  },
+  {
+    icon: <FaClipboardList />,
+    label: "Course Feedback",
+    path: "/CourseFeedback",
+  },
+  {
+    icon: <FaQuestionCircle />,
+    label: "Student Issues",
+    path: "/StudentIssue",
+  },
+  //   icon: <FaCalendarAlt />,
+  //   label: "Event",
+  //   submenu: [
+  //     {
+  //       label: "Add Event",
+  //       path: "/AddEvent",
+  //       icon: <FaPlusSquare />,
+  //     },
+  //     {
+  //       label: "Manage Event",
+  //       path: "/ManageEvent",
+  //       icon: <FaListUl />,
+  //     },
+  //   ],
+  // },
+];
 
   //  Auto-close sidebar when switching to mobile or tablet
 

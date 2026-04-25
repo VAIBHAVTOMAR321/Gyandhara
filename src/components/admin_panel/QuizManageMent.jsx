@@ -375,7 +375,7 @@ const QuizManageMent = () => {
                       <tr>
                         <th>ID</th>
                         <th>Title</th>
-                        <th>Category</th>
+                        <th>Activity Type</th>
                         <th>Questions</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -460,7 +460,7 @@ const QuizManageMent = () => {
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Category *</Form.Label>
+                  <Form.Label>Activity Type *</Form.Label>
                   <Form.Control
                     type="text"
                     name="quiz_category"
