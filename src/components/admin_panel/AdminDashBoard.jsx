@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Table, Badge, Spinner, Pagination, Card } from "react-bootstrap";
+import { Container, Table, Badge, Spinner, Pagination, Card, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
 import AdminLeftNav from "./AdminLeftNav";
@@ -20,9 +20,12 @@ const AdminDashBoard = () => {
   const [activeTab, setActiveTab] = useState(null);
   const [students, setStudents] = useState([]);
   const [schools, setSchools] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
   const [stats, setStats] = useState({
     totalStudents: 0,
-    totalSchools: 0
+    totalSchools: 0,
+    totalEnrollments: 0,
+    totalUniqueCourses: 0
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -57,7 +60,7 @@ const AdminDashBoard = () => {
     setLoading(true);
     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
     try {
-      const [studentsRes, schoolsRes] = await Promise.all([
+      const [studentsRes, schoolsRes, enrollmentsRes] = await Promise.all([
         axios.get(
           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
           {
@@ -73,11 +76,21 @@ const AdminDashBoard = () => {
               Authorization: `Bearer ${accessToken}`,
             },
           }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
         )
       ]);
 
       console.log('Students Response:', studentsRes.data);
       console.log('Schools Response:', schoolsRes.data);
+      console.log('Enrollments Response:', enrollmentsRes.data);
+
 
       let studentData = [];
       if (studentsRes.data && studentsRes.data.data) {
@@ -93,11 +106,21 @@ const AdminDashBoard = () => {
         schoolData = schoolsRes.data;
       }
       
+      let enrollmentData = [];
+      if (enrollmentsRes.data && enrollmentsRes.data.data) {
+        enrollmentData = enrollmentsRes.data.data;
+      } else if (enrollmentsRes.data && Array.isArray(enrollmentsRes.data)) {
+        enrollmentData = enrollmentsRes.data;
+      }
+
       setStudents(studentData);
       setSchools(schoolData);
+      setEnrollments(enrollmentData);
       setStats({
         totalStudents: studentData.length,
-        totalSchools: schoolData.length
+        totalSchools: schoolData.length,
+        totalEnrollments: enrollmentData.length,
+        totalUniqueCourses: new Set(enrollmentData.map(e => e.course_id)).size
       });
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -165,6 +188,20 @@ const AdminDashBoard = () => {
       number: stats.totalSchools,
       label: "Total Schools",
       className: "schools"
+    },
+    {
+      key: "enrollments",
+      icon: "bi-book",
+      number: stats.totalEnrollments,
+      label: "Total Enrollments",
+      className: "enrollments"
+    },
+    {
+      key: "unique-courses",
+      icon: "bi-layers",
+      number: stats.totalUniqueCourses,
+      label: "Unique Courses",
+      className: "unique-courses"
     }
   ];
 
@@ -173,6 +210,7 @@ const AdminDashBoard = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentStudents = students.slice(indexOfFirstItem, indexOfLastItem);
     const currentSchools = schools.slice(indexOfFirstItem, indexOfLastItem);
+    const currentEnrollments = enrollments.slice(indexOfFirstItem, indexOfLastItem);
     
     const renderPagination = (totalItems, currentPage) => {
       const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -329,6 +367,60 @@ const AdminDashBoard = () => {
           {renderPagination(schools.length, currentPage)}
         </>
       );
+    } else if (activeTab === "enrollments") {
+      return (
+        <>
+          <Table striped bordered hover responsive>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student ID</th>
+                <th>Student Name</th>
+                <th>School Name</th>
+                <th>Class</th>
+                <th>Course ID</th>
+                <th>Course Name</th>
+                <th>Enrolled At</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentEnrollments.length > 0 ? (
+                currentEnrollments.map((enrollment, index) => (
+                  <tr key={index}>
+                    <td>{indexOfFirstItem + index + 1}</td>
+                    <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
+                    <td className="fw-bold">{enrollment.student_name}</td>
+                    <td>{enrollment.school_name || '-'}</td>
+                    <td><Badge bg="info">{enrollment.class_name || '-'}</Badge></td>
+                    <td><Badge bg="info">{enrollment.course_id}</Badge></td>
+                    <td>{enrollment.course_name}</td>
+                    <td className="small">
+                      {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-'}
+                    </td>
+                    <td>
+                      <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
+                        {enrollment.is_completed ? 'Completed' : 'Ongoing'}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center">No enrollments found</td>
+                </tr>
+              )}
+            </tbody>
+          </Table>
+          {renderPagination(enrollments.length, currentPage)}
+        </>
+      );
+    } else {
+      return (
+        <div className="text-center py-5 text-muted">
+          {/* <p>This tab displays district-wise unique course distribution in the graph above.</p> */}
+        </div>
+      );
     }
   };
 
@@ -339,31 +431,73 @@ const AdminDashBoard = () => {
       "Udham Singh Nagar", "Uttarkashi"
     ];
 
+    const studentDistrictMap = students.reduce((acc, s) => {
+      if (s.student_id) {
+        acc[s.student_id] = s.district?.trim().toLowerCase();
+      }
+      return acc;
+    }, {});
+
     const stats = districts.map(district => {
-      const studentCount = students.filter(s => s.district?.trim().toLowerCase() === district.toLowerCase()).length;
-      const schoolCount = schools.filter(s => s.district?.trim().toLowerCase() === district.toLowerCase()).length;
-      return { district, studentCount, schoolCount };
+      const dLower = district.toLowerCase();
+      const studentCount = students.filter(s => s.district?.trim().toLowerCase() === dLower).length;
+      const schoolCount = schools.filter(s => s.district?.trim().toLowerCase() === dLower).length;
+      
+      const districtEnrollments = enrollments.filter(e => studentDistrictMap[e.student_id] === dLower);
+      const enrollmentCount = districtEnrollments.length;
+      
+      const districtUniqueCourses = [...new Set(districtEnrollments.map(e => e.course_name))].filter(Boolean);
+      const uniqueCourseCount = districtUniqueCourses.length;
+
+      return { 
+        district, 
+        studentCount, 
+        schoolCount, 
+        enrollmentCount, 
+        uniqueCourseCount, 
+        courseNames: districtUniqueCourses.join(', ') 
+      };
     });
 
-    const maxCount = Math.max(...stats.map(s => activeTab === 'students' ? s.studentCount : s.schoolCount), 1);
-    const chartColor = activeTab === 'students' ? '#4361ee' : '#2ecc71';
+    const maxCount = Math.max(...stats.map(s => {
+      if (activeTab === 'students') return s.studentCount;
+      if (activeTab === 'schools') return s.schoolCount;
+      if (activeTab === 'enrollments') return s.enrollmentCount;
+      if (activeTab === 'unique-courses') return s.uniqueCourseCount;
+      return 0;
+    }), 1);
+
+    const chartColor = 
+      activeTab === 'students' ? '#4361ee' : 
+      activeTab === 'schools' ? '#2ecc71' : 
+      activeTab === 'enrollments' ? '#f39c12' : 
+      '#e84393'; 
 
     return (
       <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
         <Card.Body className="p-4">
           <h5 className="mb-4 fw-bold text-dark d-flex align-items-center">
             <i className={`bi bi-bar-chart-fill me-2`} style={{ color: chartColor }}></i>
-            {activeTab === 'students' ? 'Student' : 'School'} Distribution by District
+            {activeTab === 'students' ? 'Student' : activeTab === 'schools' ? 'School' : activeTab === 'enrollments' ? 'Course Enrollment' : 'Unique Course'} Distribution by District
           </h5>
           <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div style={{ minWidth: '950px', height: '340px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '20px 10px 70px 10px' }}>
               {stats.map((item, index) => {
-                const currentCount = activeTab === 'students' ? item.studentCount : item.schoolCount;
+                const currentCount = 
+                  activeTab === 'students' ? item.studentCount : 
+                  activeTab === 'schools' ? item.schoolCount : 
+                  activeTab === 'enrollments' ? item.enrollmentCount : 
+                  item.uniqueCourseCount;
+
                 const barHeight = (currentCount / maxCount) * 220;
+                const tooltipText = activeTab === 'unique-courses' 
+                  ? `${item.district}: ${currentCount} Unique Courses\nCourses: ${item.courseNames || 'None'}`
+                  : `${item.district}: ${currentCount}`;
+
                 return (
                   <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
                     <div className="fw-bold mb-1" style={{ fontSize: '12px', color: chartColor, opacity: currentCount > 0 ? 1 : 0.3 }}>{currentCount}</div>
-                    <div className="district-bar" style={{ height: `${barHeight}px`, width: '100%', maxWidth: '40px', background: `linear-gradient(to top, ${chartColor}, ${chartColor}aa)`, borderRadius: '8px 8px 0 0', transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }} title={`${item.district}: ${currentCount}`}></div>
+                    <div className="district-bar" style={{ height: `${barHeight}px`, width: '100%', maxWidth: '40px', background: `linear-gradient(to top, ${chartColor}, ${chartColor}aa)`, borderRadius: '8px 8px 0 0', transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }} title={tooltipText}></div>
                     <div className="position-absolute text-center text-truncate" style={{ bottom: '-60px', width: '130px', fontSize: '11px', fontWeight: '700', transform: 'rotate(-30deg)', transformOrigin: 'top center', color: '#555', letterSpacing: '0.2px' }}>
                       {item.district}
                     </div>
@@ -395,157 +529,169 @@ const AdminDashBoard = () => {
             </div>
           ) : (
             <>
-              <div className="stats-grid">
-                {statCards.map((stat) => (
-                  <div
-                    key={stat.key}
-                    className={`stat-card ${stat.className} ${activeTab === stat.key ? 'active' : ''}`}
-                    onClick={() => {
-                      setActiveTab(stat.key);
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <div className="stat-icon">
-                      <i className={`bi ${stat.icon}`}></i>
-                    </div>
-                    <div className="stat-content card-content-mob-box ">
-                      <h2>{stat.number}</h2>
-                      <h6>{stat.label}</h6>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {renderDistrictChart()}
-
-              <div className="table-card">
-                <h4>
-                  {activeTab === "students" && "Student List"}
-                  {activeTab === "schools" && "School List"}
-                </h4>
-                <div className="table-responsive">
-                  {renderTable()}
-                </div>
-                <div className="mobile-table-wrapper">
-                  {activeTab === "students" && students.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((student, index) => (
-                    <div key={index} className="mobile-card">
-                      <div className="mobile-card-header">
-                        <span className="mobile-card-id">{student.student_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
-                        <span className={`mobile-status ${student.status || 'pending'}`}>
-                          {student.status || "pending"}
-                        </span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">Name</span>
-                        <span className="mobile-card-value">{student.full_name || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">Aadhaar</span>
-                        <span className="mobile-card-value">{student.aadhaar_no ? `****${student.aadhaar_no.slice(-4)}` : "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">Phone</span>
-                        <span className="mobile-card-value">{student.phone || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">Email</span>
-                        <span className="mobile-card-value">{student.email || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">Class</span>
-                        <span className="mobile-card-value">{student.class_name || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">School</span>
-                        <span className="mobile-card-value">{student.school_name || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">District</span>
-                        <span className="mobile-card-value">{student.district || "-"}</span>
-                      </div>
-                    </div>
-                  ))}
-                  {activeTab === "schools" && schools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((school, index) => (
-                    <div key={index} className="mobile-card">
-                      <div className="mobile-card-header">
-                        <span className="mobile-card-id">{school.school_uni_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span className={`mobile-status ${school.status || 'pending'}`}>
-                            {school.status || "pending"}
-                          </span>
-                          <select
-                            className="status-select-mobile form-select form-select-sm"
-                            value={school.status || "pending"}
-                            onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
-                            style={{ cursor: 'pointer', padding: '2px 4px', fontSize: '12px', minWidth: '80px' }}
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                          </select>
+                <Row className="g-4 mb-4">
+                  {statCards.map((stat) => (
+                    <Col key={stat.key} lg={3} md={6} sm={12}>
+                      <div
+                        className={`stat-card h-100 mb-0 ${stat.className} ${activeTab === stat.key ? 'active' : ''}`}
+                        onClick={() => {
+                          setActiveTab(stat.key);
+                          setCurrentPage(1);
+                        }}
+                      >
+                        <div className="stat-icon">
+                          <i className={`bi ${stat.icon}`}></i>
+                        </div>
+                        <div className="stat-content card-content-mob-box">
+                          <h2>{stat.number}</h2>
+                          <h6>{stat.label}</h6>
                         </div>
                       </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">School Name</span>
-                        <span className="mobile-card-value">{school.school_name || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">District</span>
-                        <span className="mobile-card-value">{school.district || "-"}</span>
-                      </div>
-                      <div className="mobile-card-row">
-                        <span className="mobile-card-label">State</span>
-                        <span className="mobile-card-value">{school.state || "Uttarakhand"}</span>
-                      </div>
-                    </div>
+                    </Col>
                   ))}
-                  {(activeTab === "students" && students.length === 0) || (activeTab === "schools" && schools.length === 0) ? (
-                    <div className="mobile-card text-center">No data found</div>
-                  ) : null}
-                  {students.length > itemsPerPage && activeTab === "students" && (
-                    <div className="mobile-pagination">
-                      <button 
-                        className="mobile-page-btn" 
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                      >
-                        Previous
-                      </button>
-                      <span className="mobile-page-info">
-                        Page {currentPage} of {Math.ceil(students.length / itemsPerPage)}
-                      </span>
-                      <button 
-                        className="mobile-page-btn"
-                        disabled={currentPage === Math.ceil(students.length / itemsPerPage)}
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                      >
-                        Next
-                      </button>
+                </Row>
+
+                {activeTab ? (
+                  <>
+                    {renderDistrictChart()}
+
+                    <div className="table-card">
+                      <h4>
+                        {activeTab === "students" && "Student List"}
+                        {activeTab === "schools" && "School List"}
+                        {activeTab === "enrollments" && "Enrollment List"}
+                        {/* {activeTab === "unique-courses" && "Unique Courses Overview"} */}
+                      </h4>
+                      <div className="table-responsive">
+                        {renderTable()}
+                      </div>
+                      <div className="mobile-table-wrapper">
+                        {activeTab === "students" && students.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((student, index) => (
+                          <div key={index} className="mobile-card">
+                            <div className="mobile-card-header">
+                              <span className="mobile-card-id">{student.student_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
+                              <span className={`mobile-status ${student.status || 'pending'}`}>
+                                {student.status || "pending"}
+                              </span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">Name</span>
+                              <span className="mobile-card-value">{student.full_name || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">Aadhaar</span>
+                              <span className="mobile-card-value">{student.aadhaar_no ? `****${student.aadhaar_no.slice(-4)}` : "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">Phone</span>
+                              <span className="mobile-card-value">{student.phone || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">Email</span>
+                              <span className="mobile-card-value">{student.email || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">Class</span>
+                              <span className="mobile-card-value">{student.class_name || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">School</span>
+                              <span className="mobile-card-value">{student.school_name || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">District</span>
+                              <span className="mobile-card-value">{student.district || "-"}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {activeTab === "schools" && schools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((school, index) => (
+                          <div key={index} className="mobile-card">
+                            <div className="mobile-card-header">
+                              <span className="mobile-card-id">{school.school_uni_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span className={`mobile-status ${school.status || 'pending'}`}>
+                                  {school.status || "pending"}
+                                </span>
+                                <select
+                                  className="status-select-mobile form-select form-select-sm"
+                                  value={school.status || "pending"}
+                                  onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
+                                  style={{ cursor: 'pointer', padding: '2px 4px', fontSize: '12px', minWidth: '80px' }}
+                                >
+                                  <option value="pending">Pending</option>
+                                  <option value="approved">Approved</option>
+                                  <option value="rejected">Rejected</option>
+                                </select>
+                              </div>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">School Name</span>
+                              <span className="mobile-card-value">{school.school_name || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">District</span>
+                              <span className="mobile-card-value">{school.district || "-"}</span>
+                            </div>
+                            <div className="mobile-card-row">
+                              <span className="mobile-card-label">State</span>
+                              <span className="mobile-card-value">{school.state || "Uttarakhand"}</span>
+                            </div>
+                          </div>
+                        ))}
+                        {(activeTab === "students" && students.length === 0) || (activeTab === "schools" && schools.length === 0) ? (
+                          <div className="mobile-card text-center">No data found</div>
+                        ) : null}
+                        {students.length > itemsPerPage && activeTab === "students" && (
+                          <div className="mobile-pagination">
+                            <button 
+                              className="mobile-page-btn" 
+                              disabled={currentPage === 1}
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                            >
+                              Previous
+                            </button>
+                            <span className="mobile-page-info">
+                              Page {currentPage} of {Math.ceil(students.length / itemsPerPage)}
+                            </span>
+                            <button 
+                              className="mobile-page-btn"
+                              disabled={currentPage === Math.ceil(students.length / itemsPerPage)}
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                            >
+                              Next
+                            </button>
+                          </div>
+                        )}
+                        {schools.length > itemsPerPage && activeTab === "schools" && (
+                          <div className="mobile-pagination">
+                            <button 
+                              className="mobile-page-btn" 
+                              disabled={currentPage === 1}
+                              onClick={() => setCurrentPage(currentPage - 1)}
+                            >
+                              Previous
+                            </button>
+                            <span className="mobile-page-info">
+                              Page {currentPage} of {Math.ceil(schools.length / itemsPerPage)}
+                            </span>
+                            <button 
+                              className="mobile-page-btn"
+                              disabled={currentPage === Math.ceil(schools.length / itemsPerPage)}
+                              onClick={() => setCurrentPage(currentPage + 1)}
+                            >
+                              Next
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  {schools.length > itemsPerPage && activeTab === "schools" && (
-                    <div className="mobile-pagination">
-                      <button 
-                        className="mobile-page-btn" 
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(currentPage - 1)}
-                      >
-                        Previous
-                      </button>
-                      <span className="mobile-page-info">
-                        Page {currentPage} of {Math.ceil(schools.length / itemsPerPage)}
-                      </span>
-                      <button 
-                        className="mobile-page-btn"
-                        disabled={currentPage === Math.ceil(schools.length / itemsPerPage)}
-                        onClick={() => setCurrentPage(currentPage + 1)}
-                      >
-                        Next
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
+                  </>
+                ) : (
+                  <div className="text-center py-5 text-muted">
+                    <i className="bi bi-arrow-up-circle fs-1 mb-3 d-block"></i>
+                    <h5>Select a summary card above to view detailed reports and graphs</h5>
+                  </div>
+                )}
             </>
           )}
         </Container>
