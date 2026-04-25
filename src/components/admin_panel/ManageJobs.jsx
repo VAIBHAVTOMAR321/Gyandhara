@@ -365,7 +365,7 @@ const ManageJobs = () => {
         <div className="main-content-dash">
           <AdminHeader toggleSidebar={toggleSidebar} />
           <div className="dashboard-content">
-            <Container className="dashboard-box">
+            <Container fluid className="dashboard-box">
               <div className="loading-spinner">
                 <Spinner animation="border" variant="primary" />
               </div>
@@ -389,7 +389,7 @@ const ManageJobs = () => {
       <div className="main-content-dash">
         <AdminHeader toggleSidebar={toggleSidebar} />
         <div className="dashboard-content">
-          <Container className="dashboard-box">
+          <Container fluid className="dashboard-box">
               <div className="d-flex justify-content-between align-items-center mb-4 page-header">
                 <div className="d-flex align-items-center all-en-box gap-3">
                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">

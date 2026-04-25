@@ -93,7 +93,7 @@ const menuItems = [
           path: "#",
           icon: <FaPlusSquare />,
         },
-          
+
       ],
     },
 
@@ -156,6 +156,11 @@ const menuItems = [
           icon: <FaListUl />,
         },
       ],
+    },
+    {
+      icon: <FaClipboardList />,
+      label: "Course Feedback",
+      path: "/CourseFeedback",
     },
 
     //   icon: <FaCalendarAlt />,

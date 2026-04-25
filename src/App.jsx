@@ -33,6 +33,7 @@ import SendQuery from "./components/user_panel/SendQuery";
 import StudentIssue from "./components/admin_panel/StudentIssue";
 import QuizManageMent from "./components/admin_panel/QuizManageMent";
 import SchoolQuiz from "./components/admin_panel/SchoolQuiz";
+import CourseFeedback from "./components/admin_panel/CourseFeedback";
 import UserQuiz from "./components/user_panel/UserQuiz";
 import TenthGuidance from "./components/user_panel/TenthGuidance";
 import OccupationDetails from "./components/user_panel/OccupationDetails";
@@ -59,7 +60,7 @@ import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/CourseFeedback', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -75,7 +76,7 @@ function NavBarWrapper() {
 function FooterWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/CourseFeedback', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -250,21 +251,29 @@ function AppContent() {
           }
         />
           <Route
-          path="/StudentIssue"
-          element={
-            <ProtectedRoute>
-              <StudentIssue />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/QuizManagement"
-          element={
-            <ProtectedRoute>
-              <QuizManageMent />
-            </ProtectedRoute>
-          }
-        />
+           path="/StudentIssue"
+           element={
+             <ProtectedRoute>
+               <StudentIssue />
+             </ProtectedRoute>
+           }
+         />
+         <Route
+           path="/CourseFeedback"
+           element={
+             <ProtectedRoute>
+               <CourseFeedback />
+             </ProtectedRoute>
+           }
+         />
+         <Route
+           path="/QuizManagement"
+           element={
+             <ProtectedRoute>
+               <QuizManageMent />
+             </ProtectedRoute>
+           }
+         />
         <Route
           path="/SchoolQuiz"
           element={

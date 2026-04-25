@@ -262,7 +262,7 @@ const StudentIssue = () => {
         <div className="main-content-dash">
           <AdminHeader toggleSidebar={toggleSidebar} />
           <div className="dashboard-content">
-            <Container className="dashboard-box">
+            <Container fluid className="dashboard-box">
               <div className="loading-spinner">
                 <Spinner animation="border" variant="primary" />
               </div>
@@ -285,7 +285,7 @@ const StudentIssue = () => {
       <div className="main-content-dash">
         <AdminHeader toggleSidebar={toggleSidebar} />
         <div className="dashboard-content">
-          <Container className="dashboard-box">
+          <Container fluid className="dashboard-box">
             <div className="d-flex justify-content-between align-items-center mb-4 page-header">
               <div className="d-flex align-items-center all-en-box gap-3">
                 <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
@@ -397,26 +397,26 @@ const StudentIssue = () => {
                                   <td className="py-3 px-2 small">{formatDate(query.created_at)}</td>
                                   <td className="py-3 px-2 text-end">
                                     <div className="d-flex gap-1 justify-content-end">
-                                      <Button
-                                        variant="outline-light"
-                                        size="sm"
-                                        className="p-1"
-                                        style={{ width: '28px', height: '28px' }}
-                                        onClick={() => handleReply(query)}
-                                        title="Reply"
-                                      >
-                                        <FaReply style={{ fontSize: '12px' }} />
-                                      </Button>
-                                      <Button
-                                        variant="outline-light"
-                                        size="sm"
-                                        className="p-1"
-                                        style={{ width: '28px', height: '28px' }}
-                                        onClick={() => handleDelete(query)}
-                                        title="Delete"
-                                      >
-                                        <FaTrash style={{ fontSize: '12px' }} />
-                                      </Button>
+                                     <Button
+                                       variant="outline-primary"
+                                       size="sm"
+                                       className="p-1"
+                                       style={{ width: '28px', height: '28px' }}
+                                       onClick={() => handleReply(query)}
+                                       title="Reply"
+                                     >
+                                       <FaReply style={{ fontSize: '12px' }} />
+                                     </Button>
+                                     <Button
+                                       variant="outline-danger"
+                                       size="sm"
+                                       className="p-1"
+                                       style={{ width: '28px', height: '28px' }}
+                                       onClick={() => handleDelete(query)}
+                                       title="Delete"
+                                     >
+                                       <FaTrash style={{ fontSize: '12px' }} />
+                                     </Button>
                                     </div>
                                   </td>
                                 </tr>
@@ -483,25 +483,25 @@ const StudentIssue = () => {
                                   )}
                                 </div>
 
-                                {/* Action Buttons */}
-                                <div className="d-flex gap-2 mt-3 pt-3 border-top">
-                                  <Button
-                                    variant="outline-primary"
-                                    size="sm"
-                                    className="flex-fill"
-                                    onClick={() => handleReply(query)}
-                                  >
-                                    <FaReply className="me-1" /> Reply
-                                  </Button>
-                                  <Button
-                                    variant="outline-danger"
-                                    size="sm"
-                                    className="flex-fill"
-                                    onClick={() => handleDelete(query)}
-                                  >
-                                    <FaTrash className="me-1" /> Delete
-                                  </Button>
-                                </div>
+                                 {/* Action Buttons */}
+                                 <div className="d-flex gap-2 mt-3 pt-3 border-top">
+                                   <Button
+                                     variant="primary"
+                                     size="sm"
+                                     className="flex-fill"
+                                     onClick={() => handleReply(query)}
+                                   >
+                                     <FaReply className="me-1" /> Reply
+                                   </Button>
+                                   <Button
+                                     variant="danger"
+                                     size="sm"
+                                     className="flex-fill"
+                                     onClick={() => handleDelete(query)}
+                                   >
+                                     <FaTrash className="me-1" /> Delete
+                                   </Button>
+                                 </div>
                               </Card.Body>
                             </Card>
                           ))

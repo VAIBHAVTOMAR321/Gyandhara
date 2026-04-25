@@ -326,7 +326,7 @@ const QuizManageMent = () => {
         <div className="main-content-dash">
           <AdminHeader toggleSidebar={toggleSidebar} />
           <div className="dashboard-content">
-            <Container className="dashboard-box">
+            <Container fluid className="dashboard-box">
               <div className="loading-spinner">
                 <Spinner animation="border" variant="primary" />
               </div>
@@ -349,7 +349,7 @@ const QuizManageMent = () => {
         <div className="main-content-dash">
           <AdminHeader toggleSidebar={toggleSidebar} />
           <div className="dashboard-content">
-            <Container className="dashboard-box">
+            <Container fluid className="dashboard-box">
               <Card className="shadow-sm mb-4">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-center mb-4 page-header">

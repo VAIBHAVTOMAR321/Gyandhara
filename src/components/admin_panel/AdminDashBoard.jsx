@@ -337,7 +337,7 @@ const AdminDashBoard = () => {
       <div className="main-content-dash">
         <AdminHeader toggleSidebar={toggleSidebar} />
 <div className="dashboard-content">
-        <Container className="dashboard-box">
+        <Container fluid className="dashboard-box">
           {loading ? (
             <div className="loading-spinner">
               <Spinner animation="border" variant="primary" />

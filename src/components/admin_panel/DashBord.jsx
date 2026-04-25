@@ -3231,7 +3231,7 @@ const DashBord = () => {
       <div className="main-content-dash">
         <AdminHeader toggleSidebar={toggleSidebar} />
         <div className="dashboard-content">
-          <Container className="dashboard-box">
+          <Container fluid className="dashboard-box">
             {currentView === 'dashboard' && renderDashboardView()}
             {currentView === 'unpaidEnrollments' && renderUnpaidEnrollmentsView()}
             {currentView === 'list' && renderCoursesListView()}
