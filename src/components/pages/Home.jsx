@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { Container, Row, Col } from 'react-bootstrap'
 import { useLanguage } from '../all_login/LanguageContext'
 import heroImg from "../../assets/images/CBSEimg.png";
 import '../../assets/css/home.css'
@@ -19,16 +20,16 @@ function Home() {
       studentTitle: "For Students 🎓",
       studentSubtitle: "Empower your future with comprehensive career guidance and learning resources",
       studentFeatures: [
-        { icon: "bi-briefcase-fill", title: "Job Openings", desc: "Discover career opportunities across various industries and sectors" },
-        { icon: "bi-book-fill", title: "10th & 12th Guidance", desc: "Expert guidance for board exams and stream selection" },
+        { icon: "bi-book", title: "Course Content", desc: "Access high-quality educational materials and resources" },
         { icon: "bi-trophy-fill", title: "Competitions", desc: "Participate in competitions and showcase your talents" },
-        { icon: "bi-bookmark-check", title: "Government Schemes", desc: "Learn about educational schemes and benefits" },
-        { icon: "bi-star-fill", title: "Occupation Details", desc: "Explore different career paths and opportunities" },
-        { icon: "bi-chat-left-quote-fill", title: "Counseling", desc: "Get personalized career counseling from experts" },
+        { icon: "bi-journal-check", title: "Career Guidance", desc: "Expert guidance for your academic and career journey" },
+        { icon: "bi-pencil-square", title: "Quiz & Tests", desc: "Assess your knowledge with interactive quizzes" },
         { icon: "bi-graph-up", title: "Grooming Classes", desc: "Develop professional and soft skills" },
-        { icon: "bi-pencil-square", title: "Quizzes & Tests", desc: "Assess your knowledge with interactive quizzes" },
-        { icon: "bi-calendar-event", title: "Seminars & Workshops", desc: "Attend training events and skill development workshops" },
-        { icon: "bi-chat-dots-fill", title: "Support & Queries", desc: "Get support and raise your concerns to administrators" }
+        { icon: "bi-chat-left-quote-fill", title: "Counseling", desc: "Get personalized career counseling from experts" },
+        { icon: "bi-bookmark-check", title: "Govt Schemes", desc: "Learn about educational schemes and benefits" },
+        { icon: "bi-briefcase-fill", title: "Job Opportunities", desc: "Discover career opportunities across various sectors" },
+        { icon: "bi-calendar-event", title: "Seminar & Workshop", desc: "Attend training events and skill development workshops" },
+        { icon: "bi-camera-video-fill", title: "Live Session", desc: "Join interactive live sessions with experts" }
       ],
 
       // For Schools Section
@@ -37,7 +38,7 @@ function Home() {
       schoolFeatures: [
         { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard" },
         { icon: "bi-people-fill", title: "Student Management", desc: "Efficiently manage student registrations and profiles" },
-        { icon: "bi-question-circle-fill", title: "Quiz Creation", desc: "Create and manage quizzes for your students" },
+        { icon: "bi-question-circle-fill", title: "Events And Activities", desc: "Create and manage events and activities for your students" },
         { icon: "bi-bar-chart-line-fill", title: "Performance Tracking", desc: "Monitor student progress and learning outcomes" }
       ],
       
@@ -47,7 +48,11 @@ function Home() {
         { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, schools, and administrators" },
         { icon: "bi-people-fill", title: "Comprehensive Services", desc: "Career guidance, academic support, and skill development" },
         { icon: "bi-lightbulb", title: "Career Oriented", desc: "Focus on job opportunities and professional growth" },
-        { icon: "bi-shield-check", title: "Secure & Reliable", desc: "Safe platform for educational and career information" }
+        { icon: "bi-shield-check", title: "Secure & Reliable", desc: "Safe platform for educational and career information" },
+        { icon: "bi-book-half", title: "Multiple Courses", desc: "Access a wide range of academic and skill-based courses" },
+        { icon: "bi-chat-dots-fill", title: "24/7 Text Support", desc: "Round-the-clock text assistance for all your queries" },
+        { icon: "bi-bar-chart-fill", title: "Data Analysis", desc: "Detailed insights and analytics for your learning journey" },
+        { icon: "bi-award-fill", title: "Rewards & Certification", desc: "Get recognized for your success with verified certificates" }
       ],
 
       // CTA
@@ -65,16 +70,17 @@ function Home() {
       studentTitle: "छात्रों के लिए 🎓",
       studentSubtitle: "व्यापक करियर मार्गदर्शन और सीखने के संसाधनों से अपने भविष्य को सशक्त बनाएं",
       studentFeatures: [
-        { icon: "bi-briefcase-fill", title: "नौकरी के अवसर", desc: "विभिन्न उद्योगों में करियर के अवसर खोजें" },
-        { icon: "bi-book-fill", title: "10वीं और 12वीं मार्गदर्शन", desc: "बोर्ड परीक्षा और स्ट्रीम चयन में विशेषज्ञ मार्गदर्शन" },
+        { icon: "bi-book", title: "कोर्स कंटेंट", desc: "उच्च गुणवत्ता वाली शैक्षिक सामग्री और संसाधनों तक पहुंच प्राप्त करें" },
         { icon: "bi-trophy-fill", title: "प्रतियोगिताएं", desc: "प्रतियोगिताओं में भाग लें और प्रतिभा प्रदर्शन करें" },
-        { icon: "bi-bookmark-check", title: "सरकारी योजनाएं", desc: "शैक्षिक योजनाओं और लाभों के बारे में जानें" },
-        { icon: "bi-star-fill", title: "व्यावसायिक विवरण", desc: "विभिन्न करियर पथों का अन्वेषण करें" },
-        { icon: "bi-chat-left-quote-fill", title: "परामर्श", desc: "विशेषज्ञों से व्यक्तिगत करियर परामर्श प्राप्त करें" },
+        { icon: "bi-journal-check", title: "करियर मार्गदर्शन", desc: "आपकी शैक्षणिक और करियर यात्रा के लिए विशेषज्ञ मार्गदर्शन" },
+        { icon: "bi-pencil-square", title: "क्विज और टेस्ट", desc: "इंटरैक्टिव क्विज के साथ अपना ज्ञान मूल्यांकन करें" },
         { icon: "bi-graph-up", title: "संवारने की कक्षाएं", desc: "व्यावसायिक और नरम कौशल विकसित करें" },
-        { icon: "bi-pencil-square", title: "क्विज और परीक्षा", desc: "इंटरैक्टिव क्विज के साथ अपना ज्ञान मूल्यांकन करें" },
+        { icon: "bi-chat-left-quote-fill", title: "परामर्श", desc: "विशेषज्ञों से व्यक्तिगत करियर परामर्श प्राप्त करें" },
+        { icon: "bi-bookmark-check", title: "सरकारी योजनाएं", desc: "शैक्षिक योजनाओं और लाभों के बारे में जानें" },
+        { icon: "bi-briefcase-fill", title: "नौकरी के अवसर", desc: "विभिन्न क्षेत्रों में करियर के अवसर खोजें" },
         { icon: "bi-calendar-event", title: "सेमिनार और कार्यशाला", desc: "प्रशिक्षण कार्यक्रमों में भाग लें" },
-        { icon: "bi-chat-dots-fill", title: "सहायता और प्रश्न", desc: "प्रशासकों से सहायता प्राप्त करें" }
+        { icon: "bi-chat-dots-fill", title: "सहायता और प्रश्न", desc: "प्रशासकों से सहायता प्राप्त करें" },
+        { icon: "bi-camera-video-fill", title: "लाइव सेशन", desc: "विशेषज्ञों के साथ इंटरैक्टिव लाइव सत्रों में शामिल हों" }
       ],
 
       // For Schools Section
@@ -93,7 +99,11 @@ function Home() {
         { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, स्कूलों और प्रशासकों के लिए समर्पित इंटरफेस" },
         { icon: "bi-people-fill", title: "व्यापक सेवाएं", desc: "करियर मार्गदर्शन, शैक्षणिक सहायता और कौशल विकास" },
         { icon: "bi-lightbulb", title: "करियर केंद्रित", desc: "नौकरी के अवसरों और व्यावसायिक वृद्धि पर ध्यान केंद्रित" },
-        { icon: "bi-shield-check", title: "सुरक्षित और विश्वसनीय", desc: "शैक्षिक और करियर जानकारी के लिए सुरक्षित मंच" }
+        { icon: "bi-shield-check", title: "सुरक्षित और विश्वसनीय", desc: "शैक्षिक और करियर जानकारी के लिए सुरक्षित मंच" },
+        { icon: "bi-book-half", title: "एकाधिक पाठ्यक्रम", desc: "शैक्षणिक और कौशल-आधारित पाठ्यक्रमों की विस्तृत श्रृंखला तक पहुँचें" },
+        { icon: "bi-chat-dots-fill", title: "24/7 टेक्स्ट सपोर्ट", desc: "आपके सभी प्रश्नों के लिए चौबीसों घंटे टेक्स्ट सहायता" },
+        { icon: "bi-bar-chart-fill", title: "डेटा विश्लेषण", desc: "आपकी सीखने की यात्रा के लिए विस्तृत जानकारी और विश्लेषण" },
+        { icon: "bi-award-fill", title: "पुरस्कार और प्रमाणन", desc: "सत्यापित प्रमाणपत्रों के साथ अपनी सफलता के लिए पहचान प्राप्त करें" }
       ],
 
       // CTA
@@ -165,18 +175,22 @@ function Home() {
 
         {/* Platform Benefits Section */}
         <section className="benefits-section">
-          <h2 className="section-title">{t.benefitsTitle}</h2>
-          <div className="benefits-grid">
-            {t.benefits.map((benefit, index) => (
-              <div className="benefit-card" key={index}>
-                <div className="benefit-icon">
-                  <i className={`bi ${benefit.icon}`}></i>
-                </div>
-                <h4>{benefit.title}</h4>
-                <p>{benefit.desc}</p>
-              </div>
-            ))}
-          </div>
+          <Container>
+            <h2 className="section-title text-center mb-5">{t.benefitsTitle}</h2>
+            <Row className="g-4">
+              {t.benefits.map((benefit, index) => (
+                <Col lg={3} md={6} sm={12} key={index}>
+                  <div className="benefit-card h-100 border-0 shadow-sm">
+                    <div className="benefit-icon">
+                      <i className={`bi ${benefit.icon}`}></i>
+                    </div>
+                    <h4>{benefit.title}</h4>
+                    <p>{benefit.desc}</p>
+                  </div>
+                </Col>
+              ))}
+            </Row>
+          </Container>
         </section>
 
         {/* Final CTA */}
