@@ -152,7 +152,11 @@ const CourseFeedback = () => {
 
   const getRatingStars = (rating) => {
     const num = parseInt(rating) || 0
-    return '★'.repeat(num) + '☆'.repeat(5 - num)
+    return (
+      <span className="rating-stars" style={{ color: '#f39c12', fontSize: '1.15em', letterSpacing: '1px' }}>
+        {'★'.repeat(num)}{'☆'.repeat(5 - num)}
+      </span>
+    )
   }
 
   // Pagination logic

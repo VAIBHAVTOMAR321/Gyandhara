@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Table, Badge, Spinner, Pagination } from "react-bootstrap";
+import { Container, Table, Badge, Spinner, Pagination, Card } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
 import AdminLeftNav from "./AdminLeftNav";
@@ -17,7 +17,7 @@ const AdminDashBoard = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("students");
+  const [activeTab, setActiveTab] = useState(null);
   const [students, setStudents] = useState([]);
   const [schools, setSchools] = useState([]);
   const [stats, setStats] = useState({
@@ -332,6 +332,51 @@ const AdminDashBoard = () => {
     }
   };
 
+  const renderDistrictChart = () => {
+    const districts = [
+      "Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar",
+      "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal",
+      "Udham Singh Nagar", "Uttarkashi"
+    ];
+
+    const stats = districts.map(district => {
+      const studentCount = students.filter(s => s.district?.trim().toLowerCase() === district.toLowerCase()).length;
+      const schoolCount = schools.filter(s => s.district?.trim().toLowerCase() === district.toLowerCase()).length;
+      return { district, studentCount, schoolCount };
+    });
+
+    const maxCount = Math.max(...stats.map(s => activeTab === 'students' ? s.studentCount : s.schoolCount), 1);
+    const chartColor = activeTab === 'students' ? '#4361ee' : '#2ecc71';
+
+    return (
+      <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+        <Card.Body className="p-4">
+          <h5 className="mb-4 fw-bold text-dark d-flex align-items-center">
+            <i className={`bi bi-bar-chart-fill me-2`} style={{ color: chartColor }}></i>
+            {activeTab === 'students' ? 'Student' : 'School'} Distribution by District
+          </h5>
+          <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div style={{ minWidth: '950px', height: '340px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '20px 10px 70px 10px' }}>
+              {stats.map((item, index) => {
+                const currentCount = activeTab === 'students' ? item.studentCount : item.schoolCount;
+                const barHeight = (currentCount / maxCount) * 220;
+                return (
+                  <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
+                    <div className="fw-bold mb-1" style={{ fontSize: '12px', color: chartColor, opacity: currentCount > 0 ? 1 : 0.3 }}>{currentCount}</div>
+                    <div className="district-bar" style={{ height: `${barHeight}px`, width: '100%', maxWidth: '40px', background: `linear-gradient(to top, ${chartColor}, ${chartColor}aa)`, borderRadius: '8px 8px 0 0', transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)', position: 'relative', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }} title={`${item.district}: ${currentCount}`}></div>
+                    <div className="position-absolute text-center text-truncate" style={{ bottom: '-60px', width: '130px', fontSize: '11px', fontWeight: '700', transform: 'rotate(-30deg)', transformOrigin: 'top center', color: '#555', letterSpacing: '0.2px' }}>
+                      {item.district}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+    );
+  };
+
   return (
     <div className="dashboard-container">
       <AdminLeftNav
@@ -370,6 +415,8 @@ const AdminDashBoard = () => {
                   </div>
                 ))}
               </div>
+
+              {renderDistrictChart()}
 
               <div className="table-card">
                 <h4>
