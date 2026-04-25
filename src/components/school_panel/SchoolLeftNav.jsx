@@ -75,7 +75,7 @@ const menuItems = [
     },
      {
       icon: <FaUsers />,
-      label: "offline competition",
+      label: "OFFLINE COMPETITIONS",
       path: "/Offlinecompetition",
     },
     {
