@@ -1358,7 +1358,7 @@ const DashBord = () => {
             <FaChartBar className="me-1" /> View Analytics
           </Button>
         </div>
-        <h4 className="mb-0">Unpaid Enrollments</h4>
+        <h4 className="mb-0">Total Enrollments</h4>
       </div>
 
       {/* Filter Card - Matching Counseling Style */}
@@ -1536,7 +1536,7 @@ const DashBord = () => {
                 <FaUsers className="stat-icon" />
               </div>
               <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Unpaid Enrollments</h6>
+                <h6 className="stat-label text-muted mb-1">Total Enrollments</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : unpaidEnrollmentCount}</h2>
               </div>
             </Card.Body>
@@ -1549,7 +1549,7 @@ const DashBord = () => {
                 <FaBook className="stat-icon" />
               </div>
               <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Unpaid Courses</h6>
+                <h6 className="stat-label text-muted mb-1">Total Courses</h6>
                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : courses.filter(c => c.course_status === 'unpaid').length}</h2>
               </div>
             </Card.Body>

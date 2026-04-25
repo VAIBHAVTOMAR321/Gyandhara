@@ -59,9 +59,7 @@ const CourseFeedback = () => {
     if (searchTerm !== '') {
       filtered = filtered.filter(feedback => {
         if (!feedback) return false
-        return (feedback.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (feedback.student_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (feedback.course_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        return (feedback.course_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
           (feedback.course_id || '').toLowerCase().includes(searchTerm.toLowerCase())
       })
     }
@@ -76,6 +74,38 @@ const CourseFeedback = () => {
       return
     }
 
+    const summarizeData = (data) => {
+      const summaryMap = {}
+      
+      data.forEach(fb => {
+        const cid = fb.course_id
+        if (!summaryMap[cid]) {
+          summaryMap[cid] = {
+            course_id: cid,
+            course_name: fb.course_name,
+            total_stars: 0,
+            total_questions: 0,
+            feedback_count: 0
+          }
+        }
+        
+        const q1 = parseInt(fb.question_1) || 0
+        const q2 = parseInt(fb.question_2) || 0
+        const q3 = parseInt(fb.question_3) || 0
+        const q4 = parseInt(fb.question_4) || 0
+        const q5 = parseInt(fb.question_5) || 0
+        
+        summaryMap[cid].total_stars += (q1 + q2 + q3 + q4 + q5)
+        summaryMap[cid].total_questions += 5
+        summaryMap[cid].feedback_count += 1
+      })
+      
+      return Object.values(summaryMap).map(item => ({
+        ...item,
+        average_rating: (item.total_stars / item.total_questions).toFixed(1)
+      }))
+    }
+
     try {
       setLoading(true)
       const response = await axios.get(API_URL, {
@@ -85,11 +115,13 @@ const CourseFeedback = () => {
       })
 
       if (response.data && response.data.data) {
-        setFeedbacks(response.data.data)
-        setFilteredFeedbacks(response.data.data)
+        const summarized = summarizeData(response.data.data)
+        setFeedbacks(summarized)
+        setFilteredFeedbacks(summarized)
       } else if (Array.isArray(response.data)) {
-        setFeedbacks(response.data)
-        setFilteredFeedbacks(response.data)
+        const summarized = summarizeData(response.data)
+        setFeedbacks(summarized)
+        setFilteredFeedbacks(summarized)
       }
     } catch (error) {
       console.error('Error fetching feedbacks:', error)
@@ -201,7 +233,7 @@ const CourseFeedback = () => {
                             <Form.Label className="small fw-medium mb-1">Search</Form.Label>
                             <Form.Control
                               type="text"
-                              placeholder="Search by name, student ID, course name..."
+                              placeholder="Search by course name or ID..."
                               value={searchTerm}
                               onChange={(e) => setSearchTerm(e.target.value)}
                               size="sm"
@@ -239,17 +271,9 @@ const CourseFeedback = () => {
                         <Table striped bordered hover responsive className="mb-0">
                           <thead className="bg-primary text-white">
                             <tr>
-                              <th className="py-3 px-2">Student Name</th>
-                              <th className="py-3 px-2">Student ID</th>
                               <th className="py-3 px-2">Course ID</th>
                               <th className="py-3 px-2">Course Name</th>
-                              <th className="py-3 px-2">Q1</th>
-                              <th className="py-3 px-2">Q2</th>
-                              <th className="py-3 px-2">Q3</th>
-                              <th className="py-3 px-2">Q4</th>
-                              <th className="py-3 px-2">Q5</th>
-                              <th className="py-3 px-2">Comment</th>
-                              <th className="py-3 px-2">Date</th>
+                              <th className="py-3 px-2">Average Rating</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -261,20 +285,13 @@ const CourseFeedback = () => {
                               </tr>
                             ) : (
                               currentRecords.map((feedback) => (
-                                <tr key={feedback.id}>
-                                  <td className="py-3 px-2 fw-medium text-dark">{feedback.full_name}</td>
-                                  <td className="py-3 px-2 small">{feedback.student_id}</td>
+                                <tr key={feedback.course_id}>
                                   <td className="py-3 px-2 small">{feedback.course_id}</td>
                                   <td className="py-3 px-2 small">{feedback.course_name}</td>
-                                  <td className="py-3 px-2 small">{getRatingStars(feedback.question_1)} ({feedback.question_1})</td>
-                                  <td className="py-3 px-2 small">{getRatingStars(feedback.question_2)} ({feedback.question_2})</td>
-                                  <td className="py-3 px-2 small">{getRatingStars(feedback.question_3)} ({feedback.question_3})</td>
-                                  <td className="py-3 px-2 small">{getRatingStars(feedback.question_4)} ({feedback.question_4})</td>
-                                  <td className="py-3 px-2 small">{getRatingStars(feedback.question_5)} ({feedback.question_5})</td>
-                                  <td className="py-3 px-2 small" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                    {feedback.comment || '-'}
+                                  <td className="py-3 px-2 small">
+                                    {getRatingStars(feedback.average_rating)} ({feedback.average_rating})
+                                    <div className="text-muted extra-small">Based on {feedback.feedback_count} reviews</div>
                                   </td>
-                                  <td className="py-3 px-2 small">{formatDate(feedback.created_at)}</td>
                                 </tr>
                               ))
                             )}
@@ -290,63 +307,19 @@ const CourseFeedback = () => {
                           </div>
                         ) : (
                           currentRecords.map((feedback) => (
-                            <Card key={feedback.id} className="mb-3 mx-2">
+                            <Card key={feedback.course_id} className="mb-3 mx-2">
                               <Card.Body className="p-3">
                                 <div className="d-flex justify-content-between align-items-start mb-2">
                                   <div>
-                                    <h6 className="mb-1 fw-semibold">{feedback.full_name}</h6>
-                                    <small className="text-muted">ID: {feedback.student_id}</small>
-                                  </div>
-                                  <small className="text-muted">{formatDate(feedback.created_at)}</small>
-                                </div>
-
-                                <div className="mb-2">
-                                  <small className="text-muted d-block">Course:</small>
-                                  <span className="small fw-medium">{feedback.course_name}</span>
-                                  <span className="small text-muted ms-2">({feedback.course_id})</span>
-                                </div>
-
-                                {/* Ratings Summary */}
-                                <div className="mb-2">
-                                  <small className="text-muted d-block">Ratings:</small>
-                                  <div className="d-flex flex-wrap gap-2 mt-1">
-                                    <span className="badge bg-light text-dark border">
-                                      Q1: {getRatingStars(feedback.question_1)}
-                                    </span>
-                                    <span className="badge bg-light text-dark border">
-                                      Q2: {getRatingStars(feedback.question_2)}
-                                    </span>
-                                    <span className="badge bg-light text-dark border">
-                                      Q3: {getRatingStars(feedback.question_3)}
-                                    </span>
-                                    <span className="badge bg-light text-dark border">
-                                      Q4: {getRatingStars(feedback.question_4)}
-                                    </span>
-                                    <span className="badge bg-light text-dark border">
-                                      Q5: {getRatingStars(feedback.question_5)}
-                                    </span>
+                                    <h6 className="mb-1 fw-semibold">{feedback.course_name}</h6>
+                                    <small className="text-muted">Course ID: {feedback.course_id}</small>
                                   </div>
                                 </div>
 
-                                {/* Expandable Details */}
-                                <div className="mt-3">
-                                  <Button
-                                    variant="link"
-                                    className="p-0 text-decoration-none d-flex align-items-center gap-1"
-                                    onClick={() => toggleCardExpansion(feedback.id)}
-                                  >
-                                    {expandedCards[feedback.id] ? <FaChevronUp /> : <FaChevronDown />}
-                                    <small>{expandedCards[feedback.id] ? 'Hide Details' : 'Show Comment'}</small>
-                                  </Button>
-
-                                  {expandedCards[feedback.id] && (
-                                    <div className="mt-3 pt-3 border-top">
-                                      <div>
-                                        <small className="text-muted d-block">Comment:</small>
-                                        <p className="small mb-0 mt-1">{feedback.comment || 'No comment'}</p>
-                                      </div>
-                                    </div>
-                                  )}
+                                <div className="mb-2">
+                                  <small className="text-muted d-block">Average Rating:</small>
+                                  <span className="small fw-medium">{getRatingStars(feedback.average_rating)} ({feedback.average_rating})</span>
+                                  <div className="text-muted small">From {feedback.feedback_count} reviews</div>
                                 </div>
                               </Card.Body>
                             </Card>

@@ -66,16 +66,16 @@ const AdminLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
 
 const menuItems = [
     {
-      icon: <FaTachometerAlt />,
-      label: "DASHBOARD",
-      path: "/AdminDashboard",
+     icon: <FaBook />,
+      label: "Dashbord",
+      path: "/DashBord",
       active: true,
     },
      {
-      icon: <FaBook />,
-      label: "Course Dashboard",
-      path: "/DashBord",
-      active: true,
+      icon: <FaTachometerAlt />,
+      label: "Enrollment Details",
+      path: "/AdminDashboard",
+      
     },
     {
       icon: <FaQuestionCircle />,
