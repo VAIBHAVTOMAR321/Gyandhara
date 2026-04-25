@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Table, Button, Spinner, Modal, Badge, Nav, Tab } from 'react-bootstrap'
 import AdminLeftNav from './AdminLeftNav'
-import AdminTopNav from './AdminTopNav'
 import axios from 'axios'
+import { useAuth } from '../all_login/AuthContext'
+import AdminHeader from './AdminHeader'
 import '../../assets/css/Enrollments.css'
-import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaCalendar, FaClock, FaBriefcase, FaLink, FaMapMarkerAlt, FaMoneyBillWave, FaGraduationCap, FaTools, FaToggleOn, FaToggleOff, FaChalkboardTeacher, FaUser, FaVideo } from 'react-icons/fa'
 
-const JOB_API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/job-openings/'
-const SEMINAR_API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/seminar-items/'
-const WORKSHOP_API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/workshop-items/'
+const JOB_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/job-openings/'
+const SEMINAR_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/seminar-items/'
+const WORKSHOP_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/workshop-items/'
 
 const statusLabels = {
   active: 'Active',
@@ -24,7 +24,9 @@ const ManageJobs = () => {
   const [seminars, setSeminars] = useState([])
   const [workshops, setWorkshops] = useState([])
   const [loading, setLoading] = useState(true)
-  const [showSidebar, setShowSidebar] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showViewModal, setShowViewModal] = useState(false)
   const [selectedJob, setSelectedJob] = useState(null)
@@ -38,6 +40,22 @@ const ManageJobs = () => {
   const [seminarCurrentPage, setSeminarCurrentPage] = useState(1)
   const [workshopFilter, setWorkshopFilter] = useState('all')
   const [workshopCurrentPage, setWorkshopCurrentPage] = useState(1)
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const isJobActive = (job) => job.status === 'active' || job.status === true || job.status === 1 || job.status === '1'
 
@@ -336,32 +354,42 @@ const ManageJobs = () => {
 
   if (loading) {
     return (
-      <div className="admin-layout">
-        <div className="admin-wrapper d-flex">
-          <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-          <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-            <AdminTopNav />
-            <div className="content-area">
-              <Container fluid className=''>
-                <div className="d-flex align-items-center justify-content-center h-100">
-                  <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-                </div>
-              </Container>
-            </div>
+      <>
+      <div className="dashboard-container">
+        <AdminLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+        <div className="main-content-dash">
+          <AdminHeader toggleSidebar={toggleSidebar} />
+          <div className="dashboard-content">
+            <Container className="dashboard-box">
+              <div className="loading-spinner">
+                <Spinner animation="border" variant="primary" />
+              </div>
+            </Container>
           </div>
         </div>
       </div>
+      </>
     )
   }
 
   return (
-    <div className="admin-layout">
-      <div className="admin-wrapper d-flex">
-        <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-        <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-          <AdminTopNav />
-          <div className="content-area">
-            <Container className='mob-top-view'>
+    <>
+    <div className="dashboard-container">
+      <AdminLeftNav
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <AdminHeader toggleSidebar={toggleSidebar} />
+        <div className="dashboard-content">
+          <Container className="dashboard-box">
               <div className="d-flex justify-content-between align-items-center mb-4 page-header">
                 <div className="d-flex align-items-center all-en-box gap-3">
                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
@@ -1109,7 +1137,7 @@ const ManageJobs = () => {
           </div>
         </div>
       </div>
-
+ 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
@@ -1127,7 +1155,7 @@ const ManageJobs = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-
+ 
       <Modal show={showViewModal} onHide={() => setShowViewModal(false)} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>{activeTab === 'jobs' ? 'Job' : activeTab === 'seminars' ? 'Seminar' : 'Workshop'} Details - {activeTab === 'jobs' ? selectedJob?.title : activeTab === 'seminars' ? selectedSeminar?.title : selectedWorkshop?.title}</Modal.Title>
@@ -1162,7 +1190,7 @@ const ManageJobs = () => {
                   </ul>
                 </div>
               )}
-
+ 
               {selectedJob.description_hindi && selectedJob.description_hindi.length > 0 && (
                 <div className="mb-3">
                   <h6>Description (Hindi)</h6>
@@ -1173,7 +1201,7 @@ const ManageJobs = () => {
                   </ul>
                 </div>
               )}
-
+ 
               {selectedJob.qualifications_required && selectedJob.qualifications_required.length > 0 && (
                 <div className="mb-3">
                   <h6><FaGraduationCap className="me-1" />Qualifications Required</h6>
@@ -1184,7 +1212,7 @@ const ManageJobs = () => {
                   </div>
                 </div>
               )}
-
+ 
               {selectedJob.skills_required && selectedJob.skills_required.length > 0 && (
                 <div className="mb-3">
                   <h6><FaTools className="me-1" />Skills Required</h6>
@@ -1226,7 +1254,7 @@ const ManageJobs = () => {
                   </ul>
                 </div>
               )}
-
+ 
               {selectedSeminar.description_hindi && selectedSeminar.description_hindi.length > 0 && (
                 <div className="mb-3">
                   <h6>Description (Hindi)</h6>
@@ -1237,7 +1265,7 @@ const ManageJobs = () => {
                   </ul>
                 </div>
               )}
-
+ 
               {selectedSeminar.eligibility && selectedSeminar.eligibility.length > 0 && (
                 <div className="mb-3">
                   <h6><FaGraduationCap className="me-1" />Eligibility</h6>
@@ -1248,7 +1276,7 @@ const ManageJobs = () => {
                   </div>
                 </div>
               )}
-
+ 
               {selectedSeminar.benefits && selectedSeminar.benefits.length > 0 && (
                 <div className="mb-3">
                   <h6><FaTools className="me-1" />Benefits</h6>
@@ -1259,7 +1287,7 @@ const ManageJobs = () => {
                   </div>
                 </div>
               )}
-
+ 
               <p><strong><FaCalendar className="me-1" />Last Date to Register:</strong> {formatDate(selectedSeminar.last_date_to_register)}</p>
             </div>
           )}
@@ -1292,7 +1320,7 @@ const ManageJobs = () => {
                   </ul>
                 </div>
               )}
-
+ 
               {selectedWorkshop.description_hindi && selectedWorkshop.description_hindi.length > 0 && (
                 <div className="mb-3">
                   <h6>Description (Hindi)</h6>
@@ -1303,7 +1331,7 @@ const ManageJobs = () => {
                   </ul>
                 </div>
               )}
-
+ 
               {selectedWorkshop.eligibility && selectedWorkshop.eligibility.length > 0 && (
                 <div className="mb-3">
                   <h6><FaGraduationCap className="me-1" />Eligibility</h6>
@@ -1314,7 +1342,7 @@ const ManageJobs = () => {
                   </div>
                 </div>
               )}
-
+ 
               {selectedWorkshop.benefits && selectedWorkshop.benefits.length > 0 && (
                 <div className="mb-3">
                   <h6><FaGift className="me-1" />Benefits</h6>
@@ -1325,7 +1353,7 @@ const ManageJobs = () => {
                   </div>
                 </div>
               )}
-
+ 
               <p><strong><FaCalendar className="me-1" />Last Date to Register:</strong> {formatDate(selectedWorkshop.last_date_to_register)}</p>
             </div>
           )}
@@ -1336,7 +1364,7 @@ const ManageJobs = () => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   )
 }
 

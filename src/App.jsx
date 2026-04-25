@@ -44,6 +44,10 @@ import ManageGovtSchemes from "./components/admin_panel/ManageGovtSchemes";
 import AddGovtSchemes from "./components/admin_panel/AddGovtSchemes";
 import CreateGroomingClass from "./components/admin_panel/CreateGroomingClass";
 import ManageGroomingClasses from "./components/admin_panel/ManageGroomingClass";
+import AddJob from "./components/admin_panel/AddJob";
+import ManageJobs from "./components/admin_panel/ManageJobs";
+import AddSeminar from "./components/admin_panel/AddSeminar";
+import AddWorkshop from "./components/admin_panel/AddWorkshop";
 
 import JobOpenings from "./components/user_panel/JobOpenings";
 import UserEvents from "./components/user_panel/UserEvents";
@@ -55,7 +59,7 @@ import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -71,7 +75,7 @@ function NavBarWrapper() {
 function FooterWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions'];
+  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
 
   const shouldHide = hideOnRoutes.some(route =>
     location.pathname.startsWith(route)
@@ -323,6 +327,38 @@ function AppContent() {
            element={
              <ProtectedRoute>
                <TenthGuidance />
+             </ProtectedRoute>
+           }
+         />
+         <Route
+           path="/AddJob"
+           element={
+             <ProtectedRoute>
+               <AddJob />
+             </ProtectedRoute>
+           }
+         />
+          <Route
+           path="/ManageJobs"
+           element={
+             <ProtectedRoute>
+               <ManageJobs />
+             </ProtectedRoute>
+           }
+         />
+         <Route
+           path="/AddSeminar"
+           element={
+             <ProtectedRoute>
+               <AddSeminar />
+             </ProtectedRoute>
+           }
+         />
+          <Route
+           path="/AddWorkshop"
+           element={
+             <ProtectedRoute>
+               <AddWorkshop />
              </ProtectedRoute>
            }
          />

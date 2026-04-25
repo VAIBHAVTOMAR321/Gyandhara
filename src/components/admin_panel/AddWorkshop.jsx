@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Button, Spinner, Modal, Form, Badge } from 'react-bootstrap'
 import AdminLeftNav from './AdminLeftNav'
-import AdminTopNav from './AdminTopNav'
-import axios from 'axios'
+import { useAuth } from '../all_login/AuthContext'
+import AdminHeader from './AdminHeader'
 import '../../assets/css/Enrollments.css'
-import { useAuth } from '../../contexts/AuthContext'
+import axios from 'axios'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaClock, FaCalendar, FaChalkboardTeacher, FaLink, FaGraduationCap, FaGift, FaUser, FaMapMarkerAlt, FaGlobe } from 'react-icons/fa'
 
-const API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/workshop-items/'
+const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/workshop-items/'
 
 const AddWorkshop = () => {
   const { accessToken } = useAuth()
@@ -16,10 +16,28 @@ const AddWorkshop = () => {
   const location = useLocation()
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isMobile, setIsMobile] = useState(false)
+  const [isTablet, setIsTablet] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [editMode, setEditMode] = useState(false)
   const [editWorkshopId, setEditWorkshopId] = useState(null)
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen)
+  }
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth
+      setIsMobile(width < 768)
+      setIsTablet(width >= 768 && width < 1024)
+    }
+    
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const [formData, setFormData] = useState({
     title: '',
@@ -265,32 +283,42 @@ const benefitOptions = [
 
   if (loading) {
     return (
-      <div className="admin-layout">
-        <div className="admin-wrapper d-flex">
-          <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-          <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-            <AdminTopNav />
-            <div className="content-area">
-              <Container fluid className=''>
-                <div className="d-flex align-items-center justify-content-center h-100">
-                  <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-                </div>
-              </Container>
-            </div>
+      <>
+      <div className="dashboard-container">
+        <AdminLeftNav
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+          isMobile={isMobile}
+          isTablet={isTablet}
+        />
+        <div className="main-content-dash">
+          <AdminHeader toggleSidebar={toggleSidebar} />
+          <div className="dashboard-content">
+            <Container className="dashboard-box">
+              <div className="loading-spinner">
+                <Spinner animation="border" variant="primary" />
+              </div>
+            </Container>
           </div>
         </div>
       </div>
+      </>
     )
   }
 
   return (
-    <div className="admin-layout">
-      <div className="admin-wrapper d-flex">
-        <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-        <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-          <AdminTopNav />
-          <div className="content-area">
-            <Container className='mob-top-view'>
+    <>
+    <div className="dashboard-container">
+      <AdminLeftNav
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <AdminHeader toggleSidebar={toggleSidebar} />
+        <div className="dashboard-content">
+          <Container className="dashboard-box">
               <div className="d-flex justify-content-between align-items-center mb-4 page-header">
                 <div className="d-flex align-items-center all-en-box gap-3">
                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
@@ -599,7 +627,7 @@ const benefitOptions = [
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   )
 }
 

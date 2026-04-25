@@ -133,17 +133,27 @@ const menuItems = [
     },
     {
       icon: <FaCube />,
-      label: "Test",
+      label: "Jobs & More",
       submenu: [
         {
-          label: "test1",
-          path: "#",
+          label: "Add Job",
+          path: "/AddJob",
           icon: <FaPlusSquare />,
         },
          {
-          label: "test1",
-          path: "#",
+          label: "Manage Jobs",
+          path: "/ManageJobs",
+          icon: <FaListUl />,
+        },
+        {
+          label: "Add Seminar",
+          path: "/AddSeminar",
           icon: <FaPlusSquare />,
+        },
+         {
+          label: "Add Workshop",
+          path: "/AddWorkshop",
+          icon: <FaListUl />,
         },
       ],
     },
