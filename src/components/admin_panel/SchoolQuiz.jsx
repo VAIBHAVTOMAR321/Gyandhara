@@ -931,35 +931,117 @@ const SchoolQuiz = () => {
               <Col md={4} xs={12}>
                 <Form.Group>
                   <Form.Label>Enrolled Schools</Form.Label>
-                  {schoolsLoading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : schools.length === 0 ? (
-                    <Button
-                      variant="outline-secondary"
-                      size="sm"
-                      onClick={fetchSchools}
-                    >
-                      Load Schools
-                    </Button>
-                  ) : (
+
+                  <div className="border rounded p-2 bg-white">
+                    {/* Selected Items with Scroll */}
                     <div
-                      className="d-flex flex-wrap gap-2"
-                      style={{ maxHeight: "100px", overflowY: "auto" }}
+                      className="d-flex flex-wrap gap-2 mb-2"
+                      style={{
+                        maxHeight: "100px",
+                        overflowY: "auto",
+                      }}
                     >
-                      {schools.map((school) => (
-                        <Form.Check
-                          key={school.school_uni_id}
-                          type="checkbox"
-                          label={school.school_name}
-                          value={school.school_uni_id}
-                          checked={quizForm.school_allowed.includes(
-                            school.school_uni_id,
-                          )}
-                          onChange={handleSchoolChange}
-                        />
-                      ))}
+                      {quizForm.school_allowed.map((id) => {
+                        const school = schools.find(
+                          (s) => s.school_uni_id === id,
+                        );
+
+                        return (
+                          <span
+                            key={id}
+                            className="badge bg-primary d-flex align-items-center"
+                          >
+                            {school?.school_name}
+
+                            <span
+                              style={{
+                                cursor: "pointer",
+                                marginLeft: "8px",
+                              }}
+                              onClick={() =>
+                                setQuizForm((prev) => ({
+                                  ...prev,
+                                  school_allowed: prev.school_allowed.filter(
+                                    (item) => item !== id,
+                                  ),
+                                }))
+                              }
+                            >
+                              ✕
+                            </span>
+                          </span>
+                        );
+                      })}
                     </div>
-                  )}
+
+                    {/* Dropdown with Scroll */}
+                    <Form.Select
+                      size={8}
+                      style={{
+                        overflowY: "auto",
+                      }}
+                      onChange={(e) => {
+                        const value = e.target.value;
+
+                        if (value === "all") {
+                          setQuizForm((prev) => ({
+                            ...prev,
+                            school_allowed: schools.map(
+                              (school) => school.school_uni_id,
+                            ),
+                          }));
+                        } else if (
+                          value &&
+                          !quizForm.school_allowed.includes(value)
+                        ) {
+                          setQuizForm((prev) => ({
+                            ...prev,
+                            school_allowed: [...prev.school_allowed, value],
+                          }));
+                        }
+
+                        e.target.value = "";
+                      }}
+                    >
+                      <option value="">Select School</option>
+
+                      <option value="all">Select All Schools</option>
+
+                      {schools
+                        .filter(
+                          (school) =>
+                            !quizForm.school_allowed.includes(
+                              school.school_uni_id,
+                            ),
+                        )
+                        .map((school) => (
+                          <option
+                            key={school.school_uni_id}
+                            value={school.school_uni_id}
+                          >
+                            {school.school_name}
+                          </option>
+                        ))}
+                    </Form.Select>
+
+                    {/* Clear All */}
+                    {quizForm.school_allowed.length > 0 && (
+                      <div className="mt-2">
+                        <Button
+                          size="sm"
+                          variant="outline-danger"
+                          onClick={() =>
+                            setQuizForm((prev) => ({
+                              ...prev,
+                              school_allowed: [],
+                            }))
+                          }
+                        >
+                          Clear All
+                        </Button>
+                      </div>
+                    )}
+                  </div>
                 </Form.Group>
               </Col>
               <Col md={4} xs={12}>
