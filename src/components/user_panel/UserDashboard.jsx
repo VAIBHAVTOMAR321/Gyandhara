@@ -378,7 +378,10 @@ const UserDashboard = () => {
         if (certificateFile) {
           await fetchCourses()
           alert('Certificate generated successfully!')
-          window.open(`https://brjobsedu.com/girls_course/girls_course_backend${certificateFile}`, '_blank')
+          window.open(
+            `https://brjobsedu.com/gyandhara/gyandhara_backend${certificateFile}`,
+            "_blank",
+          );
         } else if (response.data.message && response.data.message.includes('already')) {
           await fetchCourses()
           alert(response.data.message || 'Certificate already exists!')
@@ -428,7 +431,10 @@ const UserDashboard = () => {
   const viewCertificate = () => {
     const course = courses.find(c => c.course_id === selectedCourse.course_id)
     if (course && course.certificate_file) {
-      window.open(`https://brjobsedu.com/girls_course/girls_course_backend${course.certificate_file}`, '_blank')
+      window.open(
+        `https://brjobsedu.com/gyandhara/gyandhara_backend${course.certificate_file}`,
+        "_blank",
+      );
     }
   }
 
@@ -953,34 +959,53 @@ const UserDashboard = () => {
                             }
 
                             return (
-                              <Accordion.Item 
-                                key={module.module_id} 
+                              <Accordion.Item
+                                key={module.module_id}
                                 eventKey={moduleIndex.toString()}
                                 disabled={!isAccessible}
-                                className={isTestPassed ? 'completed-module' : ''}
+                                className={
+                                  isTestPassed ? "completed-module" : ""
+                                }
                               >
                                 <Accordion.Header className="fw-bold">
                                   <div className="d-flex align-items-center w-100">
                                     {isAccessible ? (
                                       isCompleted ? (
                                         <div className="module-icon me-1">
-                                          <FaCertificate className="text-white" style={{ fontSize: '12px' }} />
+                                          <FaCertificate
+                                            className="text-white"
+                                            style={{ fontSize: "12px" }}
+                                          />
                                         </div>
                                       ) : (
                                         <div className="module-icon me-1">
-                                          <FaChalkboardTeacher className="text-white" style={{ fontSize: '12px' }} />
+                                          <FaChalkboardTeacher
+                                            className="text-white"
+                                            style={{ fontSize: "12px" }}
+                                          />
                                         </div>
                                       )
                                     ) : (
                                       <div className="module-icon me-1 opacity-50">
-                                        <FaLock className="text-white" style={{ fontSize: '12px' }} />
+                                        <FaLock
+                                          className="text-white"
+                                          style={{ fontSize: "12px" }}
+                                        />
                                       </div>
                                     )}
-                                    <span className={!isAccessible ? 'text-gray-300' : 'text-white'}>
-                                      Module {module.order}: {renderContentWithLineBreaks(
-                                        courseLanguage === 'english' 
-                                          ? module.mod_title 
-                                          : (module.mod_title_hindi || module.mod_title)
+                                    <span
+                                      className={
+                                        !isAccessible
+                                          ? "text-gray-300"
+                                          : "text-white"
+                                      }
+                                    >
+                                      Module {module.order}:{" "}
+                                      {renderContentWithLineBreaks(
+                                        courseLanguage === "english"
+                                          ? module.mod_title
+                                          : module.mod_title_hindi ||
+                                              module.mod_title,
                                       )}
                                     </span>
                                     {!isAccessible && (
@@ -994,14 +1019,21 @@ const UserDashboard = () => {
                                   <Row className="mb-4">
                                     <Col md={6}>
                                       <div className="p-3 bg-light rounded h-100">
-                                        <h6 className="mb-2 fw-semibold" style={{ fontSize: '12px' }}>
-                                          <FaPlay className="me-1 text-primary" /> Module Video
+                                        <h6
+                                          className="mb-2 fw-semibold"
+                                          style={{ fontSize: "12px" }}
+                                        >
+                                          <FaPlay className="me-1 text-primary" />{" "}
+                                          Module Video
                                         </h6>
                                         <div className="video-container">
                                           <iframe
                                             width="100%"
                                             height="315"
-                                            src={(module.video_link || 'https://www.youtube.com/embed/dQw4w9WgXcQ').replace('watch?v=', 'embed/')}
+                                            src={(
+                                              module.video_link ||
+                                              "https://www.youtube.com/embed/dQw4w9WgXcQ"
+                                            ).replace("watch?v=", "embed/")}
                                             title="Module Video"
                                             frameBorder="0"
                                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -1013,366 +1045,609 @@ const UserDashboard = () => {
 
                                     <Col md={6}>
                                       <div className="p-3 bg-light rounded h-100">
-                                        <h6 className="mb-2 fw-semibold" style={{ fontSize: '12px' }}>
-                                          <FaLayerGroup className="me-1 text-primary" /> Submodules
+                                        <h6
+                                          className="mb-2 fw-semibold"
+                                          style={{ fontSize: "12px" }}
+                                        >
+                                          <FaLayerGroup className="me-1 text-primary" />{" "}
+                                          Submodules
                                         </h6>
-                                        {module.sub_modules && module.sub_modules.length > 0 ? (
+                                        {module.sub_modules &&
+                                        module.sub_modules.length > 0 ? (
                                           <div className="submodules-list">
-                                            {module.sub_modules.map((submod, subIndex) => (
-                                              <div 
-                                                key={submod.sub_module_id} 
-                                                className="submodule-item p-2 mb-2 bg-white rounded border-left border-primary"
-                                                onClick={() => scrollToSubmodule(subIndex, moduleIndex)}
-                                                style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
-                                                onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'}
-                                                onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
-                                              >
-                                                <h6 className="mb-1 fw-semibold text-dark">
-                                                  <span className="badge bg-primary me-2">{subIndex + 1}</span>
-                                                  {renderContentWithLineBreaks(
-                                                    courseLanguage === 'english' 
-                                                      ? submod.sub_modu_title 
-                                                      : (submod.sub_modu_title_hindi || submod.sub_modu_title)
-                                                  )}
-                                                </h6>
-                                              </div>
-                                            ))}
+                                            {module.sub_modules.map(
+                                              (submod, subIndex) => (
+                                                <div
+                                                  key={submod.sub_module_id}
+                                                  className="submodule-item p-2 mb-2 bg-white rounded border-left border-primary"
+                                                  onClick={() =>
+                                                    scrollToSubmodule(
+                                                      subIndex,
+                                                      moduleIndex,
+                                                    )
+                                                  }
+                                                  style={{
+                                                    cursor: "pointer",
+                                                    transition: "all 0.3s ease",
+                                                  }}
+                                                  onMouseEnter={(e) =>
+                                                    (e.currentTarget.style.boxShadow =
+                                                      "0 4px 12px rgba(0,0,0,0.15)")
+                                                  }
+                                                  onMouseLeave={(e) =>
+                                                    (e.currentTarget.style.boxShadow =
+                                                      "none")
+                                                  }
+                                                >
+                                                  <h6 className="mb-1 fw-semibold text-dark">
+                                                    <span className="badge bg-primary me-2">
+                                                      {subIndex + 1}
+                                                    </span>
+                                                    {renderContentWithLineBreaks(
+                                                      courseLanguage ===
+                                                        "english"
+                                                        ? submod.sub_modu_title
+                                                        : submod.sub_modu_title_hindi ||
+                                                            submod.sub_modu_title,
+                                                    )}
+                                                  </h6>
+                                                </div>
+                                              ),
+                                            )}
                                           </div>
                                         ) : (
-                                          <p className="text-muted text-center py-3 small">No submodules available</p>
+                                          <p className="text-muted text-center py-3 small">
+                                            No submodules available
+                                          </p>
                                         )}
                                       </div>
                                     </Col>
                                   </Row>
 
-                                  {module.sub_modules && module.sub_modules.length > 0 ? (
+                                  {module.sub_modules &&
+                                  module.sub_modules.length > 0 ? (
                                     <div className="sub-modules-container">
-                                      {module.sub_modules.map((subModule, subModuleIndex) => (
-                                        <div 
-                                          key={subModule.sub_module_id} 
-                                          id={`submodule-${moduleIndex}-${subModuleIndex}`}
-                                          className="book-card mb-4"
-                                        >
-                                          <div className="book-header d-flex align-items-center mb-3">
-                                            <div className="book-icon me-3">
-                                              {subModuleIndex % 3 === 0 ? (
-                                                <FaBook className="text-primary" style={{ fontSize: '24px' }} />
-                                              ) : subModuleIndex % 3 === 1 ? (
-                                                <FaChalkboardTeacher className="text-primary" style={{ fontSize: '24px' }} />
-                                              ) : (
-                                                <FaGraduationCap className="text-primary" style={{ fontSize: '24px' }} />
-                                              )}
-                                            </div>
-                                            <div className="book-title flex-grow-1">
-                                              <h5 className="mb-1 fw-bold text-primary">
-                                                {subModule.order}: {renderContentWithLineBreaks(
-                                                  courseLanguage === 'english' 
-                                                    ? subModule.sub_modu_title 
-                                                    : (subModule.sub_modu_title_hindi || subModule.sub_modu_title)
+                                      {module.sub_modules.map(
+                                        (subModule, subModuleIndex) => (
+                                          <div
+                                            key={subModule.sub_module_id}
+                                            id={`submodule-${moduleIndex}-${subModuleIndex}`}
+                                            className="book-card mb-4"
+                                          >
+                                            <div className="book-header d-flex align-items-center mb-3">
+                                              <div className="book-icon me-3">
+                                                {subModuleIndex % 3 === 0 ? (
+                                                  <FaBook
+                                                    className="text-primary"
+                                                    style={{ fontSize: "24px" }}
+                                                  />
+                                                ) : subModuleIndex % 3 === 1 ? (
+                                                  <FaChalkboardTeacher
+                                                    className="text-primary"
+                                                    style={{ fontSize: "24px" }}
+                                                  />
+                                                ) : (
+                                                  <FaGraduationCap
+                                                    className="text-primary"
+                                                    style={{ fontSize: "24px" }}
+                                                  />
                                                 )}
-                                              </h5>
-                                              {(courseLanguage === 'english' 
-                                                ? subModule.sub_modu_description 
-                                                : (subModule.sub_modu_description_hindi || subModule.sub_modu_description)
-                                              ) && (
-                                                <p className="mb-0 small">
+                                              </div>
+                                              <div className="book-title flex-grow-1">
+                                                <h5 className="mb-1 fw-bold text-primary">
+                                                  {subModule.order}:{" "}
                                                   {renderContentWithLineBreaks(
-                                                    courseLanguage === 'english' 
-                                                      ? subModule.sub_modu_description 
-                                                      : (subModule.sub_modu_description_hindi || subModule.sub_modu_description)
+                                                    courseLanguage === "english"
+                                                      ? subModule.sub_modu_title
+                                                      : subModule.sub_modu_title_hindi ||
+                                                          subModule.sub_modu_title,
                                                   )}
-                                                </p>
-                                              )}
+                                                </h5>
+                                                {(courseLanguage === "english"
+                                                  ? subModule.sub_modu_description
+                                                  : subModule.sub_modu_description_hindi ||
+                                                    subModule.sub_modu_description) && (
+                                                  <p className="mb-0 small">
+                                                    {renderContentWithLineBreaks(
+                                                      courseLanguage ===
+                                                        "english"
+                                                        ? subModule.sub_modu_description
+                                                        : subModule.sub_modu_description_hindi ||
+                                                            subModule.sub_modu_description,
+                                                    )}
+                                                  </p>
+                                                )}
+                                              </div>
                                             </div>
-                                          </div>
-                                          
-                                          <Row className="g-4">
-                                            {(() => {
-                                              const hasImage = subModule.image;
-                                              let contentCol, imageCol, contentFirst;
 
-                                              if (hasImage) {
-                                                contentCol = 8;
-                                                imageCol = 4;
-                                                contentFirst = subModuleIndex % 2 === 0;
-                                              } else {
-                                                contentCol = 12;
-                                                imageCol = 0;
-                                                contentFirst = true;
-                                              }
+                                            <Row className="g-4">
+                                              {(() => {
+                                                const hasImage =
+                                                  subModule.image;
+                                                let contentCol,
+                                                  imageCol,
+                                                  contentFirst;
 
-                                              const contentElement = (
-                                                <Col lg={contentCol} md={12}>
-                                                  <div className="content-wrapper">
-                                                    {((courseLanguage === 'english' ? subModule.sub_mod : subModule.sub_mod_hindi) || []).length > 0 ? (
-                                                      <div className="content-section">
-                                                        <div className="section-header d-flex align-items-center mb-2">
-                                                          <FaFileAlt className="me-1 text-primary" />
-                                                          <h6 className="mb-0 fw-semibold" style={{ fontSize: '11px' }}>Course Content</h6>
-                                                        </div>
-                                                        <div className="content-items">
-                                                          {(courseLanguage === 'english' ? subModule.sub_mod : subModule.sub_mod_hindi).map((item, itemIndex) => (
-                                                            <div key={itemIndex} className="content-item p-3 mb-3 bg-white rounded-3 shadow-sm border-l-4 border-primary">
-                                                              {Array.isArray(item) && item.length === 2 ? (
-                                                                <div className="content-pair">
-                                                                  {item[0].toLowerCase() === 'title' ? (
-                                                                    <div className="content-title fw-bold text-dark mb-2">
-                                                                      {renderContentWithLineBreaks(item[1])}
-                                                                    </div>
-                                                                  ) : item[0].toLowerCase() === 'description' ? (
-                                                                    <div className="content-description">
-                                                                      {renderContentWithLineBreaks(item[1])}
-                                                                    </div>
-                                                                  ) : (
-                                                                    <div className="content-field">
-                                                                      <span className="field-label fw-semibold text-primary me-2">
-                                                                        {item[0]}:
-                                                                      </span>
-                                                                      <span className="field-value text-dark">
-                                                                        {renderContentWithLineBreaks(item[1])}
-                                                                      </span>
-                                                                    </div>
-                                                                  )}
-                                                                </div>
-                                                              ) : typeof item === 'object' && item !== null ? (
-                                                                <div className="content-object">
-                                                                  {Object.entries(item).map(([key, value]) => (
-                                                                    <div key={key} className="content-entry mb-2">
-                                                                      {key.toLowerCase() === 'title' ? (
-                                                                        <h6 className="content-title fw-bold text-dark mb-2">
-                                                                          {renderContentWithLineBreaks(value)}
-                                                                        </h6>
-                                                                      ) : key.toLowerCase() === 'description' ? (
-                                                                        <p className="content-description mb-0">
-                                                                          {renderContentWithLineBreaks(value)}
-                                                                        </p>
+                                                if (hasImage) {
+                                                  contentCol = 8;
+                                                  imageCol = 4;
+                                                  contentFirst =
+                                                    subModuleIndex % 2 === 0;
+                                                } else {
+                                                  contentCol = 12;
+                                                  imageCol = 0;
+                                                  contentFirst = true;
+                                                }
+
+                                                const contentElement = (
+                                                  <Col lg={contentCol} md={12}>
+                                                    <div className="content-wrapper">
+                                                      {(
+                                                        (courseLanguage ===
+                                                        "english"
+                                                          ? subModule.sub_mod
+                                                          : subModule.sub_mod_hindi) ||
+                                                        []
+                                                      ).length > 0 ? (
+                                                        <div className="content-section">
+                                                          <div className="section-header d-flex align-items-center mb-2">
+                                                            <FaFileAlt className="me-1 text-primary" />
+                                                            <h6
+                                                              className="mb-0 fw-semibold"
+                                                              style={{
+                                                                fontSize:
+                                                                  "11px",
+                                                              }}
+                                                            >
+                                                              Course Content
+                                                            </h6>
+                                                          </div>
+                                                          <div className="content-items">
+                                                            {(courseLanguage ===
+                                                            "english"
+                                                              ? subModule.sub_mod
+                                                              : subModule.sub_mod_hindi
+                                                            ).map(
+                                                              (
+                                                                item,
+                                                                itemIndex,
+                                                              ) => (
+                                                                <div
+                                                                  key={
+                                                                    itemIndex
+                                                                  }
+                                                                  className="content-item p-3 mb-3 bg-white rounded-3 shadow-sm border-l-4 border-primary"
+                                                                >
+                                                                  {Array.isArray(
+                                                                    item,
+                                                                  ) &&
+                                                                  item.length ===
+                                                                    2 ? (
+                                                                    <div className="content-pair">
+                                                                      {item[0].toLowerCase() ===
+                                                                      "title" ? (
+                                                                        <div className="content-title fw-bold text-dark mb-2">
+                                                                          {renderContentWithLineBreaks(
+                                                                            item[1],
+                                                                          )}
+                                                                        </div>
+                                                                      ) : item[0].toLowerCase() ===
+                                                                        "description" ? (
+                                                                        <div className="content-description">
+                                                                          {renderContentWithLineBreaks(
+                                                                            item[1],
+                                                                          )}
+                                                                        </div>
                                                                       ) : (
                                                                         <div className="content-field">
                                                                           <span className="field-label fw-semibold text-primary me-2">
-                                                                            {key}:
+                                                                            {
+                                                                              item[0]
+                                                                            }
+                                                                            :
                                                                           </span>
                                                                           <span className="field-value text-dark">
-                                                                            {renderContentWithLineBreaks(value)}
+                                                                            {renderContentWithLineBreaks(
+                                                                              item[1],
+                                                                            )}
                                                                           </span>
                                                                         </div>
                                                                       )}
                                                                     </div>
-                                                                  ))}
+                                                                  ) : typeof item ===
+                                                                      "object" &&
+                                                                    item !==
+                                                                      null ? (
+                                                                    <div className="content-object">
+                                                                      {Object.entries(
+                                                                        item,
+                                                                      ).map(
+                                                                        ([
+                                                                          key,
+                                                                          value,
+                                                                        ]) => (
+                                                                          <div
+                                                                            key={
+                                                                              key
+                                                                            }
+                                                                            className="content-entry mb-2"
+                                                                          >
+                                                                            {key.toLowerCase() ===
+                                                                            "title" ? (
+                                                                              <h6 className="content-title fw-bold text-dark mb-2">
+                                                                                {renderContentWithLineBreaks(
+                                                                                  value,
+                                                                                )}
+                                                                              </h6>
+                                                                            ) : key.toLowerCase() ===
+                                                                              "description" ? (
+                                                                              <p className="content-description mb-0">
+                                                                                {renderContentWithLineBreaks(
+                                                                                  value,
+                                                                                )}
+                                                                              </p>
+                                                                            ) : (
+                                                                              <div className="content-field">
+                                                                                <span className="field-label fw-semibold text-primary me-2">
+                                                                                  {
+                                                                                    key
+                                                                                  }
+                                                                                  :
+                                                                                </span>
+                                                                                <span className="field-value text-dark">
+                                                                                  {renderContentWithLineBreaks(
+                                                                                    value,
+                                                                                  )}
+                                                                                </span>
+                                                                              </div>
+                                                                            )}
+                                                                          </div>
+                                                                        ),
+                                                                      )}
+                                                                    </div>
+                                                                  ) : (
+                                                                    <div className="content-text text-dark">
+                                                                      {renderContentWithLineBreaks(
+                                                                        item,
+                                                                      )}
+                                                                    </div>
+                                                                  )}
                                                                 </div>
-                                                              ) : (
-                                                                <div className="content-text text-dark">
-                                                                  {renderContentWithLineBreaks(item)}
-                                                                </div>
-                                                              )}
-                                                            </div>
-                                                          ))}
+                                                              ),
+                                                            )}
+                                                          </div>
                                                         </div>
-                                                      </div>
-                                                    ) : (
-                                                      <div className="no-content p-5 bg-gray-50 rounded-3 text-center">
-                                                        <FaFileAlt className="text-muted mb-3" style={{ fontSize: '48px' }} />
-                                                        <p className="text-muted mb-0">
-                                                          No content available for this sub-module.
-                                                        </p>
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </Col>
-                                              );
-
-                                              const imageElement = hasImage ? (
-                                                <Col lg={imageCol} md={12}>
-                                                  <div className="image-wrapper">
-                                                    <div className="book-image-container rounded-3 overflow-hidden shadow-lg">
-                                                      <img
-                                                        src={`https://brjobsedu.com/gyandhara/gyandhara_backend/${subModule.image}`}
-                                                        alt={subModule.sub_modu_title}
-                                                        className="book-image w-100 h-100"
-                                                        style={{ objectFit: 'contain', objectPosition: 'center' }}
-                                                        onError={(e) => {
-                                                          e.target.onerror = null;
-                                                          e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23f8f9fa" width="400" height="300"/%3E%3Ctext fill="%236c757d" font-family="Arial" font-size="18" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage Not Available%3C/text%3E%3C/svg%3E';
-                                                        }}
-                                                      />
-                                                      <div className="image-overlay">
-                                                        <div className="overlay-content">
-                                                          <FaImage className="text-white mb-2" style={{ fontSize: '32px' }} />
-                                                          <p className="text-white mb-0 small">
-                                                            Sub Module {subModule.order}
+                                                      ) : (
+                                                        <div className="no-content p-5 bg-gray-50 rounded-3 text-center">
+                                                          <FaFileAlt
+                                                            className="text-muted mb-3"
+                                                            style={{
+                                                              fontSize: "48px",
+                                                            }}
+                                                          />
+                                                          <p className="text-muted mb-0">
+                                                            No content available
+                                                            for this sub-module.
                                                           </p>
                                                         </div>
-                                                      </div>
+                                                      )}
                                                     </div>
-                                                  </div>
-                                                </Col>
-                                              ) : null;
+                                                  </Col>
+                                                );
 
-                                              return (
-                                                <Row className={`align-items-center submodule-row ${contentFirst ? '' : 'flex-row-reverse'}`} key={subModule.sub_module_id}>
-                                                  {contentFirst ? (
-                                                    <>
-                                                      {contentElement}
-                                                      {imageElement}
-                                                    </>
-                                                  ) : (
-                                                    <>
-                                                      {imageElement}
-                                                      {contentElement}
-                                                    </>
-                                                  )}
-                                                </Row>
-                                              );
-                                            })()}
-                                          </Row>
-                                        </div>
-                                      ))}
+                                                const imageElement =
+                                                  hasImage ? (
+                                                    <Col lg={imageCol} md={12}>
+                                                      <div className="image-wrapper">
+                                                        <div className="book-image-container rounded-3 overflow-hidden shadow-lg">
+                                                          <img
+                                                            src={`https://brjobsedu.com/gyandhara/gyandhara_backend/${subModule.image}`}
+                                                            alt={
+                                                              subModule.sub_modu_title
+                                                            }
+                                                            className="book-image w-100 h-100"
+                                                            style={{
+                                                              objectFit:
+                                                                "contain",
+                                                              objectPosition:
+                                                                "center",
+                                                            }}
+                                                            onError={(e) => {
+                                                              e.target.onerror =
+                                                                null;
+                                                              e.target.src =
+                                                                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23f8f9fa" width="400" height="300"/%3E%3Ctext fill="%236c757d" font-family="Arial" font-size="18" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage Not Available%3C/text%3E%3C/svg%3E';
+                                                            }}
+                                                          />
+                                                          <div className="image-overlay">
+                                                            <div className="overlay-content">
+                                                              <FaImage
+                                                                className="text-white mb-2"
+                                                                style={{
+                                                                  fontSize:
+                                                                    "32px",
+                                                                }}
+                                                              />
+                                                              <p className="text-white mb-0 small">
+                                                                Sub Module{" "}
+                                                                {
+                                                                  subModule.order
+                                                                }
+                                                              </p>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </Col>
+                                                  ) : null;
+
+                                                return (
+                                                  <Row
+                                                    className={`align-items-center submodule-row ${contentFirst ? "" : "flex-row-reverse"}`}
+                                                    key={
+                                                      subModule.sub_module_id
+                                                    }
+                                                  >
+                                                    {contentFirst ? (
+                                                      <>
+                                                        {contentElement}
+                                                        {imageElement}
+                                                      </>
+                                                    ) : (
+                                                      <>
+                                                        {imageElement}
+                                                        {contentElement}
+                                                      </>
+                                                    )}
+                                                  </Row>
+                                                );
+                                              })()}
+                                            </Row>
+                                          </div>
+                                        ),
+                                      )}
                                     </div>
                                   ) : (
                                     <div className="text-center py-5">
-                                      <FaFileAlt className="text-muted mb-3" style={{ fontSize: '48px' }} />
-                                      <p className="text-muted">No sub-modules available for this module.</p>
+                                      <FaFileAlt
+                                        className="text-muted mb-3"
+                                        style={{ fontSize: "48px" }}
+                                      />
+                                      <p className="text-muted">
+                                        No sub-modules available for this
+                                        module.
+                                      </p>
                                     </div>
                                   )}
-                                  
-                                  {module.exercises && module.exercises.length > 0 && (
-                                    <div className="mt-4 exercise-section">
-                                      <div className="bg-light p-3 rounded-3 border border-primary">
-                                        <h6 className="fw-bold text-primary mb-3">
-                                          <FaImage className="me-2" /> Module Exercise: Match the Images to Their Names
-                                        </h6>
-                                        
-                                        {exerciseFeedback.message && (
-                                          <div className={`feedback ${exerciseFeedback.type} mb-3 p-2 rounded`}>
-                                            {exerciseFeedback.message}
-                                          </div>
-                                        )}
 
-                                        <div className="game-container">
-                                          <div className="game-column images-column">
-                                            <h6 className="mb-2 text-muted">Images</h6>
-                                            {module.exercises.filter(exercise => 
-                                              !correctMatches.some(correct => correct.img_name === exercise.img_name)
-                                            ).length === 0 ? (
-                                              <div className="no-items text-center py-4">
-                                                <i className="bi bi-check-circle-fill text-success mb-2"></i>
-                                                <p className="mb-0 text-success">All exercises completed!</p>
-                                                <Button 
-                                                  variant="outline-success" 
-                                                  size="sm"
-                                                  onClick={() => {
-                                                    setCorrectMatches([])
-                                                    setExerciseFeedback({ type: '', message: '' })
-                                                  }}
-                                                >
-                                                  Reset Exercise
-                                                </Button>
-                                              </div>
-                                            ) : (
-                                              <div className="items-grid images-grid">
-                                                {module.exercises.filter(exercise => 
-                                                  !correctMatches.some(correct => correct.img_name === exercise.img_name)
-                                                ).map((exercise, index) => (
-                                                  <div
-                                                    key={index}
-                                                    className="draggable-item image-item p-2 bg-white rounded border"
-                                                    draggable
-                                                    onDragStart={(e) => handleDragStart(e, exercise)}
-                                                    onDragEnd={handleDragEnd}
-                                                    onTouchStart={(e) => handleTouchStart(e, exercise)}
-                                                    onTouchMove={handleTouchMove}
-                                                    onTouchEnd={handleTouchEnd}
-                                                  >
-                                                    <img
-                                                      src={`https://brjobsedu.com/girls_course/girls_course_backend${exercise.img}`}
-                                                      alt={exercise.img_name}
-                                                      onError={(e) => {
-                                                        e.target.style.display = 'none';
-                                                        e.target.nextElementSibling.style.display = 'block';
-                                                      }}
-                                                    />
-                                                    <div className="no-image" style={{ display: 'none' }}>
-                                                      No Image
-                                                    </div>
-                                                  </div>
-                                                ))}
-                                              </div>
-                                            )}
-                                          </div>
+                                  {module.exercises &&
+                                    module.exercises.length > 0 && (
+                                      <div className="mt-4 exercise-section">
+                                        <div className="bg-light p-3 rounded-3 border border-primary">
+                                          <h6 className="fw-bold text-primary mb-3">
+                                            <FaImage className="me-2" /> Module
+                                            Exercise: Match the Images to Their
+                                            Names
+                                          </h6>
 
-                                          <div className="game-column targets-column">
-                                            <h6 className="mb-2 text-muted">Names</h6>
-                                            <div className="items-grid targets-grid">
-                                              {module.exercises.map((exercise, index) => {
-                                                const isMatched = correctMatches.some(correct => correct.img_name === exercise.img_name);
-                                                
-                                                return (
-                                                  <div
-                                                    key={index}
-                                                    className={`target-item p-3 bg-white rounded border ${isMatched ? 'matched' : ''}`}
-                                                    data-target={exercise.img_name}
-                                                    onDragOver={handleDragOver}
-                                                    onDrop={(e) => handleDrop(e, exercise.img_name)}
-                                                    onTouchEnd={handleTouchEnd}
+                                          {exerciseFeedback.message && (
+                                            <div
+                                              className={`feedback ${exerciseFeedback.type} mb-3 p-2 rounded`}
+                                            >
+                                              {exerciseFeedback.message}
+                                            </div>
+                                          )}
+
+                                          <div className="game-container">
+                                            <div className="game-column images-column">
+                                              <h6 className="mb-2 text-muted">
+                                                Images
+                                              </h6>
+                                              {module.exercises.filter(
+                                                (exercise) =>
+                                                  !correctMatches.some(
+                                                    (correct) =>
+                                                      correct.img_name ===
+                                                      exercise.img_name,
+                                                  ),
+                                              ).length === 0 ? (
+                                                <div className="no-items text-center py-4">
+                                                  <i className="bi bi-check-circle-fill text-success mb-2"></i>
+                                                  <p className="mb-0 text-success">
+                                                    All exercises completed!
+                                                  </p>
+                                                  <Button
+                                                    variant="outline-success"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                      setCorrectMatches([]);
+                                                      setExerciseFeedback({
+                                                        type: "",
+                                                        message: "",
+                                                      });
+                                                    }}
                                                   >
-                                                    {isMatched ? (
-                                                      <div className="matched-content">
-                                                        <i className="bi bi-check-circle text-success me-2"></i>
-                                                        <span className="text-success">{exercise.img_name}</span>
+                                                    Reset Exercise
+                                                  </Button>
+                                                </div>
+                                              ) : (
+                                                <div className="items-grid images-grid">
+                                                  {module.exercises
+                                                    .filter(
+                                                      (exercise) =>
+                                                        !correctMatches.some(
+                                                          (correct) =>
+                                                            correct.img_name ===
+                                                            exercise.img_name,
+                                                        ),
+                                                    )
+                                                    .map((exercise, index) => (
+                                                      <div
+                                                        key={index}
+                                                        className="draggable-item image-item p-2 bg-white rounded border"
+                                                        draggable
+                                                        onDragStart={(e) =>
+                                                          handleDragStart(
+                                                            e,
+                                                            exercise,
+                                                          )
+                                                        }
+                                                        onDragEnd={
+                                                          handleDragEnd
+                                                        }
+                                                        onTouchStart={(e) =>
+                                                          handleTouchStart(
+                                                            e,
+                                                            exercise,
+                                                          )
+                                                        }
+                                                        onTouchMove={
+                                                          handleTouchMove
+                                                        }
+                                                        onTouchEnd={
+                                                          handleTouchEnd
+                                                        }
+                                                      >
+                                                        <img
+                                                          src={`https://brjobsedu.com/gyandhara/gyandhara_backend${exercise.img}`}
+                                                          alt={
+                                                            exercise.img_name
+                                                          }
+                                                          onError={(e) => {
+                                                            e.target.style.display =
+                                                              "none";
+                                                            e.target.nextElementSibling.style.display =
+                                                              "block";
+                                                          }}
+                                                        />
+                                                        <div
+                                                          className="no-image"
+                                                          style={{
+                                                            display: "none",
+                                                          }}
+                                                        >
+                                                          No Image
+                                                        </div>
                                                       </div>
-                                                    ) : (
-                                                      <span>{exercise.img_name}</span>
-                                                    )}
-                                                  </div>
-                                                );
-                                              })}
+                                                    ))}
+                                                </div>
+                                              )}
+                                            </div>
+
+                                            <div className="game-column targets-column">
+                                              <h6 className="mb-2 text-muted">
+                                                Names
+                                              </h6>
+                                              <div className="items-grid targets-grid">
+                                                {module.exercises.map(
+                                                  (exercise, index) => {
+                                                    const isMatched =
+                                                      correctMatches.some(
+                                                        (correct) =>
+                                                          correct.img_name ===
+                                                          exercise.img_name,
+                                                      );
+
+                                                    return (
+                                                      <div
+                                                        key={index}
+                                                        className={`target-item p-3 bg-white rounded border ${isMatched ? "matched" : ""}`}
+                                                        data-target={
+                                                          exercise.img_name
+                                                        }
+                                                        onDragOver={
+                                                          handleDragOver
+                                                        }
+                                                        onDrop={(e) =>
+                                                          handleDrop(
+                                                            e,
+                                                            exercise.img_name,
+                                                          )
+                                                        }
+                                                        onTouchEnd={
+                                                          handleTouchEnd
+                                                        }
+                                                      >
+                                                        {isMatched ? (
+                                                          <div className="matched-content">
+                                                            <i className="bi bi-check-circle text-success me-2"></i>
+                                                            <span className="text-success">
+                                                              {
+                                                                exercise.img_name
+                                                              }
+                                                            </span>
+                                                          </div>
+                                                        ) : (
+                                                          <span>
+                                                            {exercise.img_name}
+                                                          </span>
+                                                        )}
+                                                      </div>
+                                                    );
+                                                  },
+                                                )}
+                                              </div>
                                             </div>
                                           </div>
                                         </div>
                                       </div>
-                                    </div>
-                                  )}
-                                  
+                                    )}
+
                                   <div className="mt-4 d-flex justify-content-between align-items-center">
                                     <div>
                                       {isCompleted || isTestPassed ? (
                                         <div className="d-flex align-items-center text-success">
                                           <FaCheckCircle className="me-2" />
-                                          <span className="fw-semibold">Module Completed</span>
-                                          {isTestPassed && moduleProgressData?.test_score !== null && moduleProgressData?.test_score !== undefined && (
-                                            <span className="ms-3 text-success">
-                                              Score: {moduleProgressData.test_score}%
-                                            </span>
-                                          )}
+                                          <span className="fw-semibold">
+                                            Module Completed
+                                          </span>
+                                          {isTestPassed &&
+                                            moduleProgressData?.test_score !==
+                                              null &&
+                                            moduleProgressData?.test_score !==
+                                              undefined && (
+                                              <span className="ms-3 text-success">
+                                                Score:{" "}
+                                                {moduleProgressData.test_score}%
+                                              </span>
+                                            )}
                                         </div>
                                       ) : (
                                         !isCompleted && (
                                           <div className="d-flex align-items-center text-warning">
                                             <FaClock className="me-2" />
-                                            <span className="fw-semibold">Module In Progress</span>
+                                            <span className="fw-semibold">
+                                              Module In Progress
+                                            </span>
                                           </div>
                                         )
                                       )}
                                     </div>
                                     {isAccessible ? (
                                       <div className="d-flex gap-1">
-                                        {isTestPassed ? (
-                                          null
-                                        ) : !isCompleted && !isOngoing ? (
+                                        {isTestPassed ? null : !isCompleted &&
+                                          !isOngoing ? (
                                           <>
-                                            <Button 
-                                              variant="success" 
-                                              onClick={() => markModuleComplete(moduleIndex)}
+                                            <Button
+                                              variant="success"
+                                              onClick={() =>
+                                                markModuleComplete(moduleIndex)
+                                              }
                                               className="d-flex align-items-center px-3 py-1"
                                               size="sm"
                                             >
                                               <FaCheckCircle className="me-2" />
                                               Complete
                                             </Button>
-                                            <Button 
-                                              variant={testButtonVariant} 
-                                              onClick={() => handleTestClick(moduleIndex)}
+                                            <Button
+                                              variant={testButtonVariant}
+                                              onClick={() =>
+                                                handleTestClick(moduleIndex)
+                                              }
                                               className="d-flex align-items-center px-3 py-1"
-                                              disabled={!isOngoing || isTestDisabled}
+                                              disabled={
+                                                !isOngoing || isTestDisabled
+                                              }
                                               size="sm"
                                             >
                                               <FaQuestionCircle className="me-2" />
@@ -1380,9 +1655,11 @@ const UserDashboard = () => {
                                             </Button>
                                           </>
                                         ) : (
-                                          <Button 
-                                            variant={testButtonVariant} 
-                                            onClick={() => handleTestClick(moduleIndex)}
+                                          <Button
+                                            variant={testButtonVariant}
+                                            onClick={() =>
+                                              handleTestClick(moduleIndex)
+                                            }
                                             className="d-flex align-items-center px-3 py-1"
                                             disabled={isTestDisabled}
                                             size="sm"
@@ -1393,8 +1670,8 @@ const UserDashboard = () => {
                                         )}
                                       </div>
                                     ) : (
-                                      <Button 
-                                        variant="secondary" 
+                                      <Button
+                                        variant="secondary"
                                         disabled
                                         className="d-flex align-items-center px-3 py-1"
                                         size="sm"
@@ -1406,7 +1683,7 @@ const UserDashboard = () => {
                                   </div>
                                 </Accordion.Body>
                               </Accordion.Item>
-                            )
+                            );
                           })}
                         </Accordion>
                       </div>
@@ -1561,7 +1838,10 @@ const UserDashboard = () => {
                                                   <Button 
                                                     variant="success" 
                                                     onClick={() => {
-                                                      window.open(`https://brjobsedu.com/girls_course/girls_course_backend${course.certificate_file}`, '_blank')
+                                                      window.open(
+                                                        `https://brjobsedu.com/gyandhara/gyandhara_backend${course.certificate_file}`,
+                                                        "_blank",
+                                                      );
                                                     }}
                                                     className="d-flex align-items-center btn-custom"
                                                     style={{
@@ -1596,7 +1876,10 @@ const UserDashboard = () => {
                                             <Button 
                                               variant="success" 
                                               onClick={() => {
-                                                window.open(`https://brjobsedu.com/girls_course/girls_course_backend${course.certificate_file}`, '_blank')
+                                                window.open(
+                                                  `https://brjobsedu.com/gyandhara/gyandhara_backend${course.certificate_file}`,
+                                                  "_blank",
+                                                );
                                               }}
                                               className="d-flex align-items-center btn-custom"
                                               style={{
@@ -1772,7 +2055,10 @@ const UserDashboard = () => {
                                                     <Button 
                                                       variant="success" 
                                                       onClick={() => {
-                                                        window.open(`https://brjobsedu.com/girls_course/girls_course_backend${foundEnrolledCourse.certificate_file}`, '_blank')
+                                                        window.open(
+                                                          `https://brjobsedu.com/gyandhara/gyandhara_backend${foundEnrolledCourse.certificate_file}`,
+                                                          "_blank",
+                                                        );
                                                       }}
                                                       className="w-100 d-flex align-items-center justify-content-center"
                                                       style={{
@@ -2070,7 +2356,11 @@ const UserDashboard = () => {
     return (
       <div className="exercise-view fade-in">
         <div className="d-flex justify-content-between align-items-center mb-4 page-header">
-          <Button variant="outline-secondary" size="sm" onClick={() => setShowExerciseView(false)}>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() => setShowExerciseView(false)}
+          >
             <FaArrowLeft /> Back to Module
           </Button>
           <h4 className="mb-0">Exercise: Match the Images to Their Names</h4>
@@ -2089,11 +2379,11 @@ const UserDashboard = () => {
               <div className="no-items">
                 <i className="bi bi-check-circle-fill"></i>
                 <p>All exercises completed!</p>
-                <Button 
+                <Button
                   className="reset-button"
                   onClick={() => {
-                    setCorrectMatches([])
-                    setExerciseFeedback({ type: '', message: '' })
+                    setCorrectMatches([]);
+                    setExerciseFeedback({ type: "", message: "" });
                   }}
                 >
                   Reset Exercise
@@ -2113,14 +2403,14 @@ const UserDashboard = () => {
                     onTouchEnd={handleTouchEnd}
                   >
                     <img
-                      src={`https://brjobsedu.com/girls_course/girls_course_backend${exercise.img}`}
+                      src={`https://brjobsedu.com/gyandhara/gyandhara_backend${exercise.img}`}
                       alt={exercise.img_name}
                       onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextElementSibling.style.display = 'block';
+                        e.target.style.display = "none";
+                        e.target.nextElementSibling.style.display = "block";
                       }}
                     />
-                    <div className="no-image" style={{ display: 'none' }}>
+                    <div className="no-image" style={{ display: "none" }}>
                       No Image
                     </div>
                   </div>
@@ -2133,12 +2423,14 @@ const UserDashboard = () => {
             <h3>Names</h3>
             <div className="items-grid targets-grid">
               {currentExerciseModule.exercises.map((exercise, index) => {
-                const isMatched = correctMatches.some(correct => correct.img_name === exercise.img_name);
-                
+                const isMatched = correctMatches.some(
+                  (correct) => correct.img_name === exercise.img_name,
+                );
+
                 return (
                   <div
                     key={index}
-                    className={`target-item ${isMatched ? 'matched' : ''}`}
+                    className={`target-item ${isMatched ? "matched" : ""}`}
                     data-target={exercise.img_name}
                     onDragOver={handleDragOver}
                     onDrop={(e) => handleDrop(e, exercise.img_name)}
@@ -2159,7 +2451,7 @@ const UserDashboard = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 }
 
