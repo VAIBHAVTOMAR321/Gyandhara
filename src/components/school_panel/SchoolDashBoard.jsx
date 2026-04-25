@@ -36,7 +36,13 @@ import SchoolLeftNav from "./SchoolLeftNav";
 const SchoolDashBoard = () => {
   // Device width state
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== "undefined") {
+      const width = window.innerWidth;
+      return width >= 1024;
+    }
+    return true;
+  });
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [loading, setLoading] = useState(false);
