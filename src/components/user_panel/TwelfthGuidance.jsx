@@ -15,7 +15,13 @@ import { useAuth } from '../all_login/AuthContext'
 const TwelfthGuidance = () => {
   const { uniqueId, userRoleType, accessToken } = useAuth()
   const [loading, setLoading] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      return width >= 1024;
+    }
+    return true;
+  });
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   const [selectedStream, setSelectedStream] = useState('')

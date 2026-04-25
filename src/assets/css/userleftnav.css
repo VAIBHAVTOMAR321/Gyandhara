@@ -902,10 +902,10 @@ border: none !important;
     }
 }
 
-/* Mobile Sidebar */
-.mobile-sidebar-user {
-   background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10)) !important;
-}
+ /* Mobile Sidebar */
+ .mobile-sidebar-user {
+    background: linear-gradient(135deg, #383be8, hsl(25, 92%, 47%)) !important;
+ }
 
 .mobile-sidebar-user .nav-item {
     color: white;
@@ -921,8 +921,8 @@ border: none !important;
 }
 
 .mobile-sidebar-user .submenu-container-user {
-   background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10));
-    padding-left: 2rem;
+   background: hsl(240, 28%, 43%) !important;
+   padding-left: 2rem;
 }
 
 .mobile-sidebar-user .submenu-item {

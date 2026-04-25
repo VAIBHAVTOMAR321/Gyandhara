@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Nav, Offcanvas, Collapse } from "react-bootstrap";
 import {
   FaTachometerAlt,
@@ -31,7 +31,7 @@ import {
 import axios from "axios";
 
 import "../../assets/css/schoolleftnav.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
 import {
   FaInfoCircle,
@@ -40,18 +40,25 @@ import {
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
-import { useNavigate } from "react-router-dom";
-
 
 const SchoolLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
     const [userRole, setUserRole] = useState(null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const toggleSubmenu = (index) => {
     setOpenSubmenu(openSubmenu === index ? null : index);
   };
+
+  // Automatically close sidebar when navigating on mobile or tablet views
+  // This fixes the "opening again after clicking" and "two clicks" issues
+  useEffect(() => {
+    if (isMobile || isTablet) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile, isTablet, setSidebarOpen]);
 
 const menuItems = [
     {

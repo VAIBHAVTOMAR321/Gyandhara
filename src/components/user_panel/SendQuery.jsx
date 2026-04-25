@@ -15,7 +15,13 @@ function SendQuery() {
   const { uniqueId, accessToken, userRoleType } = useAuth()
   const navigate = useNavigate()
   
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      return width >= 1024;
+    }
+    return true;
+  });
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   

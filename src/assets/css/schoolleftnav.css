@@ -903,10 +903,10 @@ border: none !important;
     }
 }
 
-/* Mobile Sidebar */
-.mobile-sidebar-user {
-     background-color: hsl(240deg 48.17% 70.51%) !important;
-}
+ /* Mobile Sidebar */
+ .mobile-sidebar-user {
+      background-color: hsl(37, 92%, 47%) !important;
+ }
 
 .mobile-sidebar-user .nav-item {
     color: white;
@@ -922,7 +922,7 @@ border: none !important;
 }
 
 .mobile-sidebar-user .submenu-container-school {
-    background: hsl(240, 85%, 30%) !important;
+    background: hsl(37, 92%, 38%) !important;
     padding-left: 2rem;
 }
 

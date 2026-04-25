@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { Nav, Offcanvas, Collapse } from "react-bootstrap";
 import {
   FaTachometerAlt,
@@ -32,7 +32,7 @@ import {
 import axios from "axios";
 
 import "../../assets/css/UserLeftNav.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
 import {
   FaInfoCircle,
@@ -41,20 +41,25 @@ import {
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
-import { useNavigate } from "react-router-dom";
-
-
 
 
 const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [userRole, setUserRole] = useState(user ? user.role : null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const toggleSubmenu = (index) => {
     setOpenSubmenu(openSubmenu === index ? null : index);
   };
+
+  // Automatically close sidebar when navigating on mobile or tablet views
+  useEffect(() => {
+    if (isMobile || isTablet) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile, isTablet, setSidebarOpen]);
 
 const menuItems = [
      {

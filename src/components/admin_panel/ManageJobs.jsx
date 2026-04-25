@@ -24,7 +24,13 @@ const ManageJobs = () => {
   const [seminars, setSeminars] = useState([])
   const [workshops, setWorkshops] = useState([])
   const [loading, setLoading] = useState(true)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const width = window.innerWidth;
+      return width >= 1024;
+    }
+    return true;
+  });
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
