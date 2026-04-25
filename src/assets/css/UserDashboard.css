@@ -28,11 +28,11 @@ body.sidebar-compact .dashboard-content {
 /* Tablet responsive adjustments */
 @media (min-width: 768px) and (max-width: 1023px) {
   .dashboard-content {
-    margin-left: 250px;
+    margin-left: 0px;
   }
 
   body.sidebar-compact .dashboard-content {
-    margin-left: 80px;
+    margin-left: 0px;
   }
 }
 
