@@ -87,7 +87,7 @@ const Login = () => {
         alert('Login successful!');
         
         if (response.data.role === 'admin') {
-          navigate('/AdminDashboard');
+          navigate('/DashBord');
         } else if (response.data.role === 'school') {
           navigate('/SchoolDashBoard');
         } else {
