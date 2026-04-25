@@ -294,7 +294,7 @@ const UserTest = () => {
         alert('Certificate generated successfully!')
         
         if (response.data.data && response.data.data.certificate_file) {
-          window.open(`https://brjobsedu.com/girls_course/girls_course_backend${response.data.data.certificate_file}`, '_blank')
+          window.open(`https://brjobsedu.com/gyandhara/gyandhara_backend${response.data.data.certificate_file}`, '_blank')
         } else {
           const coursesEndpoint = `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?student_id=${uniqueId}`
             
@@ -314,7 +314,7 @@ const UserTest = () => {
             )
             
             if (updatedCourse && updatedCourse.certificate_file) {
-              window.open(`https://brjobsedu.com/girls_course/girls_course_backend${updatedCourse.certificate_file}`, '_blank')
+              window.open(`https://brjobsedu.com/gyandhara/gyandhara_backend${updatedCourse.certificate_file}`, '_blank')
             }
           }
         }

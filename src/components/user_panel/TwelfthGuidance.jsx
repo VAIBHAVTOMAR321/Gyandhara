@@ -100,7 +100,7 @@ const TwelfthGuidance = () => {
         }
 
         if (userRoleType === 'student-unpaid') {
-          response = await axios.get(`https://brjobsedu.com/girls_course/girls_course_backend/api/student-unpaid/?student_id=${uniqueId}`, config)
+          response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-unpaid/?student_id=${uniqueId}`, config)
         } else {
           response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/all-registration/?student_id=${uniqueId}`, config)
         }
