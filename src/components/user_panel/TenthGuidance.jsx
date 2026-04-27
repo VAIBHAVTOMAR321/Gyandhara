@@ -149,7 +149,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in medical and biological sciences', 
             careers: ['Doctor', 'Pharmacist', 'Biotechnologist', 'Research Scientist'],
             careerPaths: [
-              { path: 'PCB → MBBS → Doctor', steps: ['Complete 11th-12th with PCB', 'Clear NEET exam', 'Complete MBBS (5.5 years)', 'Intern for 1 year', 'Become a doctor'], salary: '₹10-50 LPA', growth: 'Junior Doctor → Senior Doctor → Head of Department' }
+              { path: 'PCB → MBBS → Doctor', steps: ['Complete 11th-12th with PCB', 'Clear NEET exam', 'Complete MBBS (5.5 years)', 'Intern for 1 year', 'Become a doctor'], growth: 'Junior Doctor → Senior Doctor → Head of Department' }
             ]
           },
           { 
@@ -158,7 +158,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in engineering and technology', 
             careers: ['Engineer', 'Architect', 'Data Scientist', 'Pilot'],
             careerPaths: [
-              { path: 'PCM → B.Tech → Engineer', steps: ['Complete 11th-12th with PCM', 'Clear JEE exam', 'Complete B.Tech (4 years)', 'Get campus placement', 'Grow to senior roles'], salary: '₹6-25 LPA', growth: 'Junior Engineer → Senior Engineer → Tech Lead' }
+              { path: 'PCM → B.Tech → Engineer', steps: ['Complete 11th-12th with PCM', 'Clear JEE exam', 'Complete B.Tech (4 years)', 'Get campus placement', 'Grow to senior roles'], growth: 'Junior Engineer → Senior Engineer → Tech Lead' }
             ]
           }
         ],
@@ -169,7 +169,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in medical and biological sciences', 
             careers: ['Nurse', 'Lab Technician', 'Pharmacist'],
             careerPaths: [
-              { path: 'PCB → B.Sc Nursing → Nurse', steps: ['Complete 11th-12th with PCB', 'Clear nursing entrance', 'Complete B.Sc Nursing (4 years)', 'Register with nursing council', 'Work in hospital'], salary: '₹3-8 LPA', growth: 'Staff Nurse → Nursing Supervisor → Nursing Director' }
+              { path: 'PCB → B.Sc Nursing → Nurse', steps: ['Complete 11th-12th with PCB', 'Clear nursing entrance', 'Complete B.Sc Nursing (4 years)', 'Register with nursing council', 'Work in hospital'], growth: 'Staff Nurse → Nursing Supervisor → Nursing Director' }
             ]
           }
         ],
@@ -180,7 +180,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in computer applications', 
             careers: ['Computer Operator', 'Data Entry Operator', 'IT Support'],
             careerPaths: [
-              { path: 'Science → BCA → IT Support', steps: ['Complete 11th-12th with Science', 'Complete BCA (3 years)', 'Learn IT support skills', 'Join company as IT support', 'Gain experience'], salary: '₹2-6 LPA', growth: 'IT Support → Senior Support → IT Manager' }
+              { path: 'Science → BCA → IT Support', steps: ['Complete 11th-12th with Science', 'Complete BCA (3 years)', 'Learn IT support skills', 'Join company as IT support', 'Gain experience'], growth: 'IT Support → Senior Support → IT Manager' }
             ]
           }
         ]
@@ -193,7 +193,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in finance and accounting', 
             careers: ['Chartered Accountant', 'Financial Analyst', 'Investment Banker'],
             careerPaths: [
-              { path: 'Commerce → CA → Chartered Accountant', steps: ['Complete 11th-12th with Commerce', 'Register for CA Foundation', 'Clear IPCC', 'Complete articleship', 'Clear CA Final'], salary: '₹8-50 LPA', growth: 'Junior CA → Senior CA → Partner' }
+              { path: 'Commerce → CA → Chartered Accountant', steps: ['Complete 11th-12th with Commerce', 'Register for CA Foundation', 'Clear IPCC', 'Complete articleship', 'Clear CA Final'], growth: 'Junior CA → Senior CA → Partner' }
             ]
           }
         ],
@@ -204,7 +204,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in business and technology', 
             careers: ['Business Analyst', 'Accountant', 'Tax Consultant'],
             careerPaths: [
-              { path: 'Commerce → B.Com → Accountant', steps: ['Complete 11th-12th with Commerce', 'Complete B.Com (3 years)', 'Learn accounting software', 'Join company as accountant', 'Gain experience'], salary: '₹3-8 LPA', growth: 'Junior Accountant → Senior Accountant → Finance Manager' }
+              { path: 'Commerce → B.Com → Accountant', steps: ['Complete 11th-12th with Commerce', 'Complete B.Com (3 years)', 'Learn accounting software', 'Join company as accountant', 'Gain experience'], growth: 'Junior Accountant → Senior Accountant → Finance Manager' }
             ]
           }
         ],
@@ -215,7 +215,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in business management', 
             careers: ['Office Assistant', 'Sales Executive', 'Customer Service'],
             careerPaths: [
-              { path: 'Commerce → BBA → Sales Executive', steps: ['Complete 11th-12th with Commerce', 'Complete BBA (3 years)', 'Join company as sales executive', 'Learn sales skills', 'Grow to manager'], salary: '₹2-6 LPA', growth: 'Sales Executive → Sales Manager → Sales Director' }
+              { path: 'Commerce → BBA → Sales Executive', steps: ['Complete 11th-12th with Commerce', 'Complete BBA (3 years)', 'Join company as sales executive', 'Learn sales skills', 'Grow to manager'], growth: 'Sales Executive → Sales Manager → Sales Director' }
             ]
           }
         ]
@@ -228,7 +228,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in human behavior', 
             careers: ['Psychologist', 'Counselor', 'HR Manager', 'Social Worker'],
             careerPaths: [
-              { path: 'Arts → BA Psychology → Psychologist', steps: ['Complete 11th-12th with Arts', 'Complete BA Psychology (3 years)', 'Complete MA Psychology (2 years)', 'Get licensed', 'Start practice'], salary: '₹4-15 LPA', growth: 'Counselor → Psychologist → Clinical Psychologist' }
+              { path: 'Arts → BA Psychology → Psychologist', steps: ['Complete 11th-12th with Arts', 'Complete BA Psychology (3 years)', 'Complete MA Psychology (2 years)', 'Get licensed', 'Start practice'], growth: 'Counselor → Psychologist → Clinical Psychologist' }
             ]
           }
         ],
@@ -239,7 +239,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in politics and law', 
             careers: ['Journalist', 'Content Writer', 'Office Assistant'],
             careerPaths: [
-              { path: 'Arts → BA → Journalist', steps: ['Complete 11th-12th with Arts', 'Complete BA (3 years)', 'Pursue BJMC (3 years)', 'Intern with media house', 'Work as reporter'], salary: '₹3-12 LPA', growth: 'Reporter → Senior Journalist → Editor' }
+              { path: 'Arts → BA → Journalist', steps: ['Complete 11th-12th with Arts', 'Complete BA (3 years)', 'Pursue BJMC (3 years)', 'Intern with media house', 'Work as reporter'], growth: 'Reporter → Senior Journalist → Editor' }
             ]
           }
         ],
@@ -250,7 +250,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in history and civil services', 
             careers: ['Office Assistant', 'Data Entry Operator', 'Customer Service'],
             careerPaths: [
-              { path: 'Arts → BA → Office Assistant', steps: ['Complete 11th-12th with Arts', 'Complete BA (3 years)', 'Learn office software', 'Join company as office assistant', 'Handle administrative tasks'], salary: '₹2-6 LPA', growth: 'Office Assistant → Office Manager → Admin Head' }
+              { path: 'Arts → BA → Office Assistant', steps: ['Complete 11th-12th with Arts', 'Complete BA (3 years)', 'Learn office software', 'Join company as office assistant', 'Handle administrative tasks'], growth: 'Office Assistant → Office Manager → Admin Head' }
             ]
           }
         ]
@@ -263,7 +263,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in technical trades', 
             careers: ['Electrician', 'Fitter', 'Mechanic', 'Welder'],
             careerPaths: [
-              { path: 'ITI → Electrician', steps: ['Complete 11th-12th', 'Join ITI (2 years)', 'Learn electrical work', 'Get certified', 'Join company or start own business'], salary: '₹3-10 LPA', growth: 'Electrician → Senior Electrician → Contractor' }
+              { path: 'ITI → Electrician', steps: ['Complete 11th-12th', 'Join ITI (2 years)', 'Learn electrical work', 'Get certified', 'Join company or start own business'], growth: 'Electrician → Senior Electrician → Contractor' }
             ]
           }
         ],
@@ -274,7 +274,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in engineering diploma', 
             careers: ['Technician', 'Junior Engineer', 'Supervisor'],
             careerPaths: [
-              { path: 'Polytechnic → Technician', steps: ['Complete 11th-12th', 'Join Polytechnic (3 years)', 'Learn engineering skills', 'Join company as technician', 'Gain experience'], salary: '₹2-6 LPA', growth: 'Technician → Senior Technician → Supervisor' }
+              { path: 'Polytechnic → Technician', steps: ['Complete 11th-12th', 'Join Polytechnic (3 years)', 'Learn engineering skills', 'Join company as technician', 'Gain experience'], growth: 'Technician → Senior Technician → Supervisor' }
             ]
           }
         ],
@@ -285,7 +285,7 @@ const getStreamDisplayName = (streamId) => {
             description: 'For students interested in skill-based training', 
             careers: ['Computer Operator', 'Data Entry Operator', 'Office Assistant'],
             careerPaths: [
-              { path: 'Certificate → Computer Operator', steps: ['Complete 11th-12th', 'Complete certificate course (6 months-1 year)', 'Learn computer skills', 'Join company as computer operator', 'Handle data entry'], salary: '₹2-5 LPA', growth: 'Operator → Assistant → Office Manager' }
+              { path: 'Certificate → Computer Operator', steps: ['Complete 11th-12th', 'Complete certificate course (6 months-1 year)', 'Learn computer skills', 'Join company as computer operator', 'Handle data entry'], growth: 'Operator → Assistant → Office Manager' }
             ]
           }
         ]
@@ -391,7 +391,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in medical and biological sciences', 
           careers: ['Doctor', 'Pharmacist', 'Biotechnologist', 'Research Scientist'],
           careerPaths: [
-            { path: 'PCB → MBBS → Doctor', steps: ['Complete 11th-12th with PCB', 'Clear NEET exam', 'Complete MBBS (5.5 years)', 'Intern for 1 year', 'Become a doctor'], salary: '₹10-50 LPA', growth: 'Junior Doctor → Senior Doctor → Head of Department' }
+            { path: 'PCB → MBBS → Doctor', steps: ['Complete 11th-12th with PCB', 'Clear NEET exam', 'Complete MBBS (5.5 years)', 'Intern for 1 year', 'Become a doctor'], growth: 'Junior Doctor → Senior Doctor → Head of Department' }
           ]
         },
         { 
@@ -400,7 +400,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in engineering and technology', 
           careers: ['Engineer', 'Architect', 'Data Scientist', 'Pilot'],
           careerPaths: [
-            { path: 'PCM → B.Tech → Engineer', steps: ['Complete 11th-12th with PCM', 'Clear JEE exam', 'Complete B.Tech (4 years)', 'Get campus placement', 'Grow to senior roles'], salary: '₹6-25 LPA', growth: 'Junior Engineer → Senior Engineer → Tech Lead' }
+            { path: 'PCM → B.Tech → Engineer', steps: ['Complete 11th-12th with PCM', 'Clear JEE exam', 'Complete B.Tech (4 years)', 'Get campus placement', 'Grow to senior roles'], growth: 'Junior Engineer → Senior Engineer → Tech Lead' }
           ]
         },
         { 
@@ -409,7 +409,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in both medical and engineering fields', 
           careers: ['Biomedical Engineer', 'Biotechnologist', 'Research Scientist'],
           careerPaths: [
-            { path: 'PCMB → B.Tech Biomedical → Biomedical Engineer', steps: ['Complete 11th-12th with PCMB', 'Clear entrance exam', 'Complete B.Tech Biomedical (4 years)', 'Join hospital or medical device company', 'Grow to senior roles'], salary: '₹6-20 LPA', growth: 'Junior Engineer → Senior Engineer → R&D Head' }
+            { path: 'PCMB → B.Tech Biomedical → Biomedical Engineer', steps: ['Complete 11th-12th with PCMB', 'Clear entrance exam', 'Complete B.Tech Biomedical (4 years)', 'Join hospital or medical device company', 'Grow to senior roles'], growth: 'Junior Engineer → Senior Engineer → R&D Head' }
           ]
         }
       ],
@@ -420,7 +420,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in finance and accounting with strong math skills', 
           careers: ['Chartered Accountant', 'Financial Analyst', 'Investment Banker'],
           careerPaths: [
-            { path: 'Commerce → B.Com → CA', steps: ['Complete 11th-12th with Commerce', 'Register for CA Foundation', 'Clear IPCC', 'Complete articleship', 'Clear CA Final'], salary: '₹8-50 LPA', growth: 'Junior CA → Senior CA → Partner' }
+            { path: 'Commerce → B.Com → CA', steps: ['Complete 11th-12th with Commerce', 'Register for CA Foundation', 'Clear IPCC', 'Complete articleship', 'Clear CA Final'], growth: 'Junior CA → Senior CA → Partner' }
           ]
         },
         { 
@@ -429,7 +429,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in business and technology', 
           careers: ['Business Analyst', 'IT Consultant', 'E-commerce Manager'],
           careerPaths: [
-            { path: 'Commerce → BBA → Business Analyst', steps: ['Complete 11th-12th with Commerce', 'Complete BBA (3 years)', 'Learn business analytics tools', 'Join company as analyst', 'Grow to senior roles'], salary: '₹5-20 LPA', growth: 'Junior Analyst → Senior Analyst → Manager' }
+            { path: 'Commerce → BBA → Business Analyst', steps: ['Complete 11th-12th with Commerce', 'Complete BBA (3 years)', 'Learn business analytics tools', 'Join company as analyst', 'Grow to senior roles'], growth: 'Junior Analyst → Senior Analyst → Manager' }
           ]
         },
         { 
@@ -438,7 +438,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in starting their own business', 
           careers: ['Entrepreneur', 'Business Owner', 'Startup Founder'],
           careerPaths: [
-            { path: 'Commerce → BBA → Entrepreneur', steps: ['Complete 11th-12th with Commerce', 'Complete BBA (3 years)', 'Identify business opportunity', 'Start own business', 'Scale operations'], salary: 'Variable', growth: 'Startup → Established Business → Industry Leader' }
+            { path: 'Commerce → BBA → Entrepreneur', steps: ['Complete 11th-12th with Commerce', 'Complete BBA (3 years)', 'Identify business opportunity', 'Start own business', 'Scale operations'], growth: 'Startup → Established Business → Industry Leader' }
           ]
         }
       ],
@@ -449,7 +449,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in history and civil services', 
           careers: ['IAS Officer', 'Historian', 'Archaeologist', 'Professor'],
           careerPaths: [
-            { path: 'Arts → BA History → UPSC', steps: ['Complete 11th-12th with Arts', 'Complete BA History (3 years)', 'Prepare for UPSC exam', 'Clear Prelims and Mains', 'Clear Interview'], salary: '₹10-25 LPA', growth: 'IAS Officer → District Collector → Secretary' }
+            { path: 'Arts → BA History → UPSC', steps: ['Complete 11th-12th with Arts', 'Complete BA History (3 years)', 'Prepare for UPSC exam', 'Clear Prelims and Mains', 'Clear Interview'], growth: 'IAS Officer → District Collector → Secretary' }
           ]
         },
         { 
@@ -458,7 +458,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in politics and law', 
           careers: ['Lawyer', 'Politician', 'Political Analyst', 'Journalist'],
           careerPaths: [
-            { path: 'Arts → BA Political Science → LLB', steps: ['Complete 11th-12th with Arts', 'Complete BA Political Science (3 years)', 'Pursue LLB (3 years)', 'Enroll with Bar Council', 'Practice under senior lawyer'], salary: '₹5-50 LPA', growth: 'Junior Lawyer → Senior Lawyer → Senior Advocate' }
+            { path: 'Arts → BA Political Science → LLB', steps: ['Complete 11th-12th with Arts', 'Complete BA Political Science (3 years)', 'Pursue LLB (3 years)', 'Enroll with Bar Council', 'Practice under senior lawyer'], growth: 'Junior Lawyer → Senior Lawyer → Senior Advocate' }
           ]
         },
         { 
@@ -467,7 +467,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in human behavior and counseling', 
           careers: ['Psychologist', 'Counselor', 'HR Manager', 'Social Worker'],
           careerPaths: [
-            { path: 'Arts → BA Psychology → MA Psychology', steps: ['Complete 11th-12th with Arts', 'Complete BA Psychology (3 years)', 'Complete MA Psychology (2 years)', 'Get licensed', 'Start practice'], salary: '₹4-15 LPA', growth: 'Counselor → Psychologist → Clinical Psychologist' }
+            { path: 'Arts → BA Psychology → MA Psychology', steps: ['Complete 11th-12th with Arts', 'Complete BA Psychology (3 years)', 'Complete MA Psychology (2 years)', 'Get licensed', 'Start practice'], growth: 'Counselor → Psychologist → Clinical Psychologist' }
           ]
         },
         { 
@@ -476,7 +476,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in social issues and community work', 
           careers: ['Social Worker', 'NGO Worker', 'Community Developer', 'Researcher'],
           careerPaths: [
-            { path: 'Arts → BA Sociology → MSW', steps: ['Complete 11th-12th with Arts', 'Complete BA Sociology (3 years)', 'Pursue MSW (2 years)', 'Join NGO', 'Lead social programs'], salary: '₹3-10 LPA', growth: 'Social Worker → Program Manager → Director' }
+            { path: 'Arts → BA Sociology → MSW', steps: ['Complete 11th-12th with Arts', 'Complete BA Sociology (3 years)', 'Pursue MSW (2 years)', 'Join NGO', 'Lead social programs'], growth: 'Social Worker → Program Manager → Director' }
           ]
         }
       ],
@@ -487,7 +487,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in technical trades', 
           careers: ['Electrician', 'Fitter', 'Mechanic', 'Welder'],
           careerPaths: [
-            { path: 'ITI → Electrician', steps: ['Complete 11th-12th', 'Join ITI (2 years)', 'Learn electrical work', 'Get certified', 'Join company or start own business'], salary: '₹3-10 LPA', growth: 'Electrician → Senior Electrician → Contractor' }
+            { path: 'ITI → Electrician', steps: ['Complete 11th-12th', 'Join ITI (2 years)', 'Learn electrical work', 'Get certified', 'Join company or start own business'], growth: 'Electrician → Senior Electrician → Contractor' }
           ]
         },
         { 
@@ -496,7 +496,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in engineering diploma', 
           careers: ['Junior Engineer', 'Technician', 'Supervisor'],
           careerPaths: [
-            { path: 'Polytechnic → Junior Engineer', steps: ['Complete 11th-12th', 'Join Polytechnic (3 years)', 'Learn engineering skills', 'Join manufacturing company', 'Gain experience'], salary: '₹3-8 LPA', growth: 'Technician → Supervisor → Manager' }
+            { path: 'Polytechnic → Junior Engineer', steps: ['Complete 11th-12th', 'Join Polytechnic (3 years)', 'Learn engineering skills', 'Join manufacturing company', 'Gain experience'], growth: 'Technician → Supervisor → Manager' }
           ]
         },
         { 
@@ -505,7 +505,7 @@ const getStreamDisplayName = (streamId) => {
           description: 'For students interested in skill-based training', 
           careers: ['Computer Operator', 'Data Entry Operator', 'Office Assistant'],
           careerPaths: [
-            { path: 'Certificate → Computer Operator', steps: ['Complete 11th-12th', 'Complete certificate course (6 months-1 year)', 'Learn computer skills', 'Join company as computer operator', 'Handle data entry'], salary: '₹2-5 LPA', growth: 'Operator → Assistant → Office Manager' }
+            { path: 'Certificate → Computer Operator', steps: ['Complete 11th-12th', 'Complete certificate course (6 months-1 year)', 'Learn computer skills', 'Join company as computer operator', 'Handle data entry'], growth: 'Operator → Assistant → Office Manager' }
           ]
         }
       ]
@@ -899,9 +899,8 @@ const getStreamDisplayName = (streamId) => {
                         >
                           <Card.Body className="p-3" style={{ maxHeight: selectedCareerPath === path ? '400px' : 'auto', overflowY: selectedCareerPath === path ? 'auto' : 'visible' }}>
                             <h6 className="mb-2 text-primary">{path.path}</h6>
-                            <div className="d-flex justify-content-between mb-2">
-                              <Badge bg="success">{path.salary}</Badge>
-                              <Badge bg="secondary">{path.growth}</Badge>
+                            <div className="mb-2">
+                              <Badge bg="secondary" className="w-100">{path.growth}</Badge>
                             </div>
                             {selectedCareerPath === path && (
                               <div className="mt-3">
