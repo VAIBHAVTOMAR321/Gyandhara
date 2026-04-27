@@ -61,47 +61,27 @@ const SchoolLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   }, [location.pathname, isMobile, isTablet, setSidebarOpen]);
 
 const menuItems = [
-    {
-      icon: <FaTachometerAlt />,
-      label: "DASHBOARD",
-      path: "/SchoolDashBoard",
-      active: true,
-    },
-   
-    {
-      icon: <FaUsers />,
-      label: "ADD STUDENTS",
-      path: "/SchoolStudentRegistration",
-    },
-     {
-      icon: <FaUsers />,
-      label: "OFFLINE COMPETITIONS",
-      path: "/Offlinecompetition",
-    },
-    {
-      icon: <FaGraduationCap />,
-      label: "QUIZ COMPETITIONS",
-      path: "/SchoolQuizList",
-    },
- 
-
-    //   icon: <FaCalendarAlt />,
-    //   label: "Event",
-    //   submenu: [
-    //     {
-    //       label: "Add Event",
-    //       path: "/AddEvent",
-    //       icon: <FaPlusSquare />,
-    //     },
-    //     {
-    //       label: "Manage Event",
-    //       path: "/ManageEvent",
-    //       icon: <FaListUl />,
-    //     },
-    //   ],
-    // },
-
-      
+  {
+    icon: <FaTachometerAlt />,
+    label: "DASHBOARD",
+    path: "/SchoolDashBoard",
+    active: true,
+  },
+  {
+    icon: <FaUsers />,
+    label: "ADD STUDENTS",
+    path: "/SchoolStudentRegistration",
+  },
+  {
+    icon: <FaGraduationCap />,
+    label: "QUIZ COMPETITIONS",
+    path: "/SchoolQuizList",
+  },
+  {
+    icon: <FaUsers />,
+    label: "OFFLINE COMPETITIONS",
+    path: "/Offlinecompetition",
+  },
   ];
 
   //  Auto-close sidebar when switching to mobile or tablet

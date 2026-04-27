@@ -100,22 +100,6 @@ const menuItems = [
   // },
 
   {
-    icon: <FaBuilding />,
-    label: " Govt schemes",
-    submenu: [
-      {
-        label: "Manage Scheme",
-        path: "/ManageGovtSchemes",
-        icon: <FaListUl />,
-      },
-      {
-        label: "Add Scheme",
-        path: "/AddGovtSchemes",
-        icon: <FaPlusSquare />,
-      },
-    ],
-  },
-  {
     icon: <FaChalkboardTeacher />,
     label: " Grooming Classes",
     submenu: [
@@ -128,6 +112,22 @@ const menuItems = [
         label: "Manage Classes",
         path: "/ManageGroomingClasses",
         icon: <FaListUl />,
+      },
+    ],
+  },
+  {
+    icon: <FaBuilding />,
+    label: " Govt schemes",
+    submenu: [
+      {
+        label: "Manage Scheme",
+        path: "/ManageGovtSchemes",
+        icon: <FaListUl />,
+      },
+      {
+        label: "Add Scheme",
+        path: "/AddGovtSchemes",
+        icon: <FaPlusSquare />,
       },
     ],
   },

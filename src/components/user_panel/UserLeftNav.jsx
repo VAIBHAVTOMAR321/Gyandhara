@@ -76,21 +76,6 @@ const menuItems = [
        path: "/UserProfile",
      },
      {
-       icon: <FaGraduationCap />,
-       label: language === 'hi' ? "क्विज़" : "Quiz",
-       path: "/UserQuiz",
-     },
-     {
-       icon: <FaTrophy />,
-       label: language === 'hi' ? "प्रतियोगिता" : "Competition",
-       path: "/Competition",
-     },
-     {
-       icon: <FaUsers />,
-       label: language === 'hi' ? "स्कूल प्रतियोगिताएं" : "School Competitions",
-       path: "/SchoolCompetitions",
-     },
-     {
        icon: <FaChalkboardTeacher />,
        label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
        submenu: [
@@ -107,19 +92,34 @@ const menuItems = [
        ],
      },
      {
-       icon: <FaBuilding />,
-       label: language === 'hi' ? "सरकारी योजनाएं" : "Government Schemes",
-       path: "/GovernmentSchemes",
-     },
-      {
        icon: <FaTasks />,
        label: language === 'hi' ? "ग्रूमिंग क्लासेस" : "Grooming Classes",
        path: "/GroomingClasses",
      },
      {
+       icon: <FaGraduationCap />,
+       label: language === 'hi' ? "क्विज़" : "Quiz",
+       path: "/UserQuiz",
+     },
+     {
+       icon: <FaTrophy />,
+       label: language === 'hi' ? "प्रतियोगिता" : "Competition",
+       path: "/Competition",
+     },
+     {
+       icon: <FaUsers />,
+       label: language === 'hi' ? "स्कूल प्रतियोगिताएं" : "School Competitions",
+       path: "/SchoolCompetitions",
+     },
+     {
        icon: <FaBriefcase />,
        label: language === 'hi' ? "नौकरियां और सेमिनार" : "Jobs & Seminars",
        path: "/JobOpenings",
+     },
+     {
+       icon: <FaBuilding />,
+       label: language === 'hi' ? "सरकारी योजनाएं" : "Government Schemes",
+       path: "/GovernmentSchemes",
      },
      {
        icon: <FaCalendarAlt />,
