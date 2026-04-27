@@ -17,7 +17,7 @@ function Home() {
   joinBtn: "Register Today",
       
       // For Students Section
-      studentTitle: "For Students 🎓",
+      studentTitle: "LMS For Students 🎓",
       studentSubtitle: "Empower your future with comprehensive career guidance and learning resources",
       studentFeatures: [
         { icon: "bi-book", title: "Course Content", desc: "Access high-quality educational materials and resources" },
@@ -33,7 +33,7 @@ function Home() {
       ],
 
       // For Schools Section
-      schoolTitle: "For Schools 🏫",
+      schoolTitle: "LMS For Schools 🏫",
       schoolSubtitle: "Transform your institution's learning experience with Gyandhara's comprehensive platform",
       schoolFeatures: [
         { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard" },
