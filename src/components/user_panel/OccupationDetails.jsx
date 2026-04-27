@@ -12,6 +12,7 @@ import {
 } from 'react-icons/fa';
 import UserHeader from "./UserHeader";
 import UserLeftNav from "./UserLeftNav";
+import { useLanguage } from "../all_login/LanguageContext";
 import '../../assets/css/OccupationDetails.css';
 
 const OccupationDetails = () => {
@@ -27,6 +28,7 @@ const OccupationDetails = () => {
   const { uniqueId, accessToken } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { language } = useLanguage();
   const [loading, setLoading] = useState(true);
 
   const { occupation, course, prepType: initialPrepType, stream, percentage } = location.state || {};
@@ -57,139 +59,143 @@ const OccupationDetails = () => {
   const getOccupationDetails = (occupationName) => {
     const occupations = {
       'Teacher': {
-        title: 'Teacher',
+        title: language === 'hi' ? 'शिक्षक' : 'Teacher',
         icon: <FaChalkboardTeacher className="text-primary" />,
-        description: 'Teachers educate students at various levels, from primary schools to universities. They play a crucial role in shaping the future of students.',
-        salaryRange: '₹3-15 LPA',
-        growthPotential: 'High',
-        demandLevel: 'Very High',
+        description: language === 'hi' ? 'शिक्षक प्राथमिक स्कूलों से लेकर विश्वविद्यालयों तक विभिन्न स्तरों पर छात्रों को शिक्षित करते हैं। वे छात्रों के भविष्य को आकार देने में महत्वपूर्ण भूमिका निभाते हैं।' : 'Teachers educate students at various levels, from primary schools to universities. They play a crucial role in shaping the future of students.',
+        growthPotential: language === 'hi' ? 'उच्च' : 'High',
+        demandLevel: language === 'hi' ? 'बहुत उच्च' : 'Very High',
         steps: [
-          { step: 1, title: 'Complete 12th Standard', description: 'Complete your 12th standard with good percentage', duration: '2 Years', tips: ['Focus on favorite subjects', 'Participate in teaching activities', 'Develop communication skills'] },
-          { step: 2, title: 'Pursue Bachelor\'s Degree', description: 'Complete BA/B.Sc/B.Com in your preferred subject', duration: '3 Years', tips: ['Choose relevant subjects', 'Maintain good record', 'Participate in college events'] },
-          { step: 3, title: 'Complete B.Ed', description: 'Pursue Bachelor of Education (B.Ed) from a recognized university', duration: '2 Years', tips: ['Choose a good B.Ed college', 'Learn teaching methodologies', 'Practice teaching'] },
-          { step: 4, title: 'Clear Teaching Exams', description: 'Clear CTET/TET/STET exams as per your state requirements', duration: '3-6 Months', tips: ['Study previous papers', 'Learn child psychology', 'Take mock tests'] },
-          { step: 5, title: 'Apply for Teaching Positions', description: 'Apply for government or private school teaching positions', duration: 'Ongoing', tips: ['Prepare for interviews', 'Create a good resume', 'Apply to multiple schools'] }
+          { step: 1, title: language === 'hi' ? '12वीं कक्षा पूरी करें' : 'Complete 12th Standard', description: language === 'hi' ? 'अच्छे प्रतिशत के साथ अपनी 12वीं कक्षा पूरी करें' : 'Complete your 12th standard with good percentage', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['पसंदीदा विषयों पर ध्यान दें', 'शिक्षण गतिविधियों में भाग लें', 'संचार कौशल विकसित करें'] : ['Focus on favorite subjects', 'Participate in teaching activities', 'Develop communication skills'] },
+          { step: 2, title: language === 'hi' ? 'स्नातक की डिग्री प्राप्त करें' : 'Pursue Bachelor\'s Degree', description: language === 'hi' ? 'अपने पसंदीदा विषय में बीए/बीएससी/बीकॉम पूरा करें' : 'Complete BA/B.Sc/B.Com in your preferred subject', duration: language === 'hi' ? '3 वर्ष' : '3 Years', tips: language === 'hi' ? ['प्रासंगिक विषय चुनें', 'अच्छा रिकॉर्ड बनाए रखें', 'कॉलेज कार्यक्रमों में भाग लें'] : ['Choose relevant subjects', 'Maintain good record', 'Participate in college events'] },
+          { step: 3, title: language === 'hi' ? 'बी.एड पूरा करें' : 'Complete B.Ed', description: language === 'hi' ? 'किसी मान्यता प्राप्त विश्वविद्यालय से शिक्षा स्नातक (बी.एड) करें' : 'Pursue Bachelor of Education (B.Ed) from a recognized university', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['एक अच्छा बी.एड कॉलेज चुनें', 'शिक्षण पद्धतियां सीखें', 'शिक्षण का अभ्यास करें'] : ['Choose a good B.Ed college', 'Learn teaching methodologies', 'Practice teaching'] },
+          { step: 4, title: language === 'hi' ? 'शिक्षण परीक्षा उत्तीर्ण करें' : 'Clear Teaching Exams', description: language === 'hi' ? 'अपनी राज्य की आवश्यकताओं के अनुसार CTET/TET/STET परीक्षा उत्तीर्ण करें' : 'Clear CTET/TET/STET exams as per your state requirements', duration: language === 'hi' ? '3-6 महीने' : '3-6 Months', tips: language === 'hi' ? ['पिछले पेपर्स का अध्ययन करें', 'बाल मनोविज्ञान सीखें', 'मॉक टेस्ट दें'] : ['Study previous papers', 'Learn child psychology', 'Take mock tests'] },
+          { step: 5, title: language === 'hi' ? 'शिक्षण पदों के लिए आवेदन करें' : 'Apply for Teaching Positions', description: language === 'hi' ? 'सरकारी या निजी स्कूल शिक्षण पदों के लिए आवेदन करें' : 'Apply for government or private school teaching positions', duration: language === 'hi' ? 'जारी' : 'Ongoing', tips: language === 'hi' ? ['साक्षात्कार के लिए तैयारी करें', 'एक अच्छा बायोडाटा बनाएं', 'कई स्कूलों में आवेदन करें'] : ['Prepare for interviews', 'Create a good resume', 'Apply to multiple schools'] }
         ],
         exams: [
-          { name: 'CTET (Central Teacher Eligibility Test)', eligibility: 'B.Ed qualified', frequency: 'Twice a year', difficulty: 'Moderate' },
-          { name: 'TET (Teacher Eligibility Test)', eligibility: 'B.Ed qualified', frequency: 'State-wise', difficulty: 'Moderate' },
-          { name: 'STET (State Teacher Eligibility Test)', eligibility: 'B.Ed qualified', frequency: 'State-wise', difficulty: 'Moderate' },
-          { name: 'UGC NET (for College Teachers)', eligibility: 'Post-Graduation', frequency: 'Twice a year', difficulty: 'High' }
+          { name: 'CTET (Central Teacher Eligibility Test)', eligibility: language === 'hi' ? 'बी.एड योग्य' : 'B.Ed qualified', frequency: language === 'hi' ? 'वर्ष में दो बार' : 'Twice a year', difficulty: language === 'hi' ? 'मध्यम' : 'Moderate' },
+          { name: 'TET (Teacher Eligibility Test)', eligibility: language === 'hi' ? 'बी.एड योग्य' : 'B.Ed qualified', frequency: language === 'hi' ? 'राज्यवार' : 'State-wise', difficulty: language === 'hi' ? 'मध्यम' : 'Moderate' },
+          { name: 'STET (State Teacher Eligibility Test)', eligibility: language === 'hi' ? 'बी.एड योग्य' : 'B.Ed qualified', frequency: language === 'hi' ? 'राज्यवार' : 'State-wise', difficulty: language === 'hi' ? 'मध्यम' : 'Moderate' },
+          { name: 'UGC NET (for College Teachers)', eligibility: language === 'hi' ? 'स्नातकोत्तर' : 'Post-Graduation', frequency: language === 'hi' ? 'वर्ष में दो बार' : 'Twice a year', difficulty: language === 'hi' ? 'उच्च' : 'High' }
         ],
-        skills: ['Communication Skills', 'Patience', 'Subject Knowledge', 'Classroom Management', 'Creativity', 'Adaptability'],
+        skills: language === 'hi' 
+          ? ['संचार कौशल', 'धैर्य', 'विषय ज्ञान', 'कक्षा प्रबंधन', 'रचनात्मकता', 'अनुकूलनशीलता'] 
+          : ['Communication Skills', 'Patience', 'Subject Knowledge', 'Classroom Management', 'Creativity', 'Adaptability'],
         careerPath: [
-          { level: 'Primary Teacher', experience: '0-5 years', salary: '₹3-6 LPA' },
-          { level: 'TGT (Trained Graduate Teacher)', experience: '5-10 years', salary: '₹6-10 LPA' },
-          { level: 'PGT (Post Graduate Teacher)', experience: '10-15 years', salary: '₹10-15 LPA' },
-          { level: 'Vice Principal', experience: '15-20 years', salary: '₹12-18 LPA' },
-          { level: 'Principal', experience: '20+ years', salary: '₹15-25 LPA' }
+          { level: language === 'hi' ? 'प्राथमिक शिक्षक' : 'Primary Teacher', experience: '0-5 years' },
+          { level: language === 'hi' ? 'टीजीटी (प्रशिक्षित स्नातक शिक्षक)' : 'TGT (Trained Graduate Teacher)', experience: '5-10 years' },
+          { level: language === 'hi' ? 'पीजीटी (स्नातकोत्तर शिक्षक)' : 'PGT (Post Graduate Teacher)', experience: '10-15 years' },
+          { level: language === 'hi' ? 'उप प्रधानाचार्य' : 'Vice Principal', experience: '15-20 years' },
+          { level: language === 'hi' ? 'प्रधानाचार्य' : 'Principal', experience: '20+ years' }
         ],
         topColleges: [
-          { name: 'Delhi University', location: 'Delhi', ranking: 'Top 10' },
-          { name: 'Jamia Millia Islamia', location: 'Delhi', ranking: 'Top 20' },
-          { name: 'Banaras Hindu University', location: 'Varanasi', ranking: 'Top 10' },
-          { name: 'University of Mumbai', location: 'Mumbai', ranking: 'Top 20' }
+          { name: language === 'hi' ? 'दिल्ली विश्वविद्यालय' : 'Delhi University', location: 'Delhi', ranking: 'Top 10' },
+          { name: language === 'hi' ? 'जामिया मिलिया इस्लामिया' : 'Jamia Millia Islamia', location: 'Delhi', ranking: 'Top 20' },
+          { name: language === 'hi' ? 'बनारस हिंदू विश्वविद्यालय' : 'Banaras Hindu University', location: 'Varanasi', ranking: 'Top 10' },
+          { name: language === 'hi' ? 'मुंबई विश्वविद्यालय' : 'University of Mumbai', location: 'Mumbai', ranking: 'Top 20' }
         ]
       },
       'Lawyer': {
-        title: 'Lawyer',
+        title: language === 'hi' ? 'वकील' : 'Lawyer',
         icon: <FaBalanceScale className="text-primary" />,
-        description: 'Lawyers provide legal advice and representation to individuals, businesses, and government agencies. They play a vital role in the justice system.',
-        salaryRange: '₹4-50 LPA',
-        growthPotential: 'Very High',
-        demandLevel: 'High',
+        description: language === 'hi' ? 'वकील व्यक्तियों, व्यवसायों और सरकारी एजेंसियों को कानूनी सलाह और प्रतिनिधित्व प्रदान करते हैं। वे न्याय प्रणाली में महत्वपूर्ण भूमिका निभाते हैं।' : 'Lawyers provide legal advice and representation to individuals, businesses, and government agencies. They play a vital role in the justice system.',
+        growthPotential: language === 'hi' ? 'बहुत उच्च' : 'Very High',
+        demandLevel: language === 'hi' ? 'उच्च' : 'High',
         steps: [
-          { step: 1, title: 'Complete 12th Standard', description: 'Complete your 12th standard with good percentage', duration: '2 Years', tips: ['Focus on humanities subjects', 'Develop reading habits', 'Participate in debates'] },
-          { step: 2, title: 'Pursue LLB', description: 'Complete LLB (3 years after graduation) or BA LLB (5 years integrated)', duration: '3-5 Years', tips: ['Choose a good law college', 'Study case laws', 'Participate in moot courts'] },
-          { step: 3, title: 'Enroll with Bar Council', description: 'Register with State Bar Council after completing LLB', duration: '1-2 Months', tips: ['Complete bar council formalities', 'Get bar council registration', 'Start internship'] },
-          { step: 4, title: 'Complete Internship', description: 'Intern under a senior lawyer to gain practical experience', duration: '1-2 Years', tips: ['Learn court procedures', 'Draft documents', 'Build professional network'] },
-          { step: 5, title: 'Start Practice', description: 'Start independent practice or join a law firm', duration: 'Ongoing', tips: ['Build client base', 'Specialize in a field', 'Continue learning'] }
+          { step: 1, title: language === 'hi' ? '12वीं कक्षा पूरी करें' : 'Complete 12th Standard', description: language === 'hi' ? 'अच्छे प्रतिशत के साथ अपनी 12वीं कक्षा पूरी करें' : 'Complete your 12th standard with good percentage', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['मानविकी विषयों पर ध्यान दें', 'पढ़ने की आदतें विकसित करें', 'वाद-विवाद में भाग लें'] : ['Focus on humanities subjects', 'Develop reading habits', 'Participate in debates'] },
+          { step: 2, title: language === 'hi' ? 'एलएलबी करें' : 'Pursue LLB', description: language === 'hi' ? 'एलएलबी (स्नातक के बाद 3 वर्ष) या बीए एलएलबी (5 वर्ष एकीकृत) पूरा करें' : 'Complete LLB (3 years after graduation) or BA LLB (5 years integrated)', duration: language === 'hi' ? '3-5 वर्ष' : '3-5 Years', tips: language === 'hi' ? ['एक अच्छा लॉ कॉलेज चुनें', 'केस कानूनों का अध्ययन करें', 'मूट कोर्ट में भाग लें'] : ['Choose a good law college', 'Study case laws', 'Participate in moot courts'] },
+          { step: 3, title: language === 'hi' ? 'बार काउंसिल में पंजीकरण करें' : 'Enroll with Bar Council', description: language === 'hi' ? 'एलएलबी पूरा करने के बाद राज्य बार काउंसिल के साथ पंजीकरण करें' : 'Register with State Bar Council after completing LLB', duration: language === 'hi' ? '1-2 महीने' : '1-2 Months', tips: language === 'hi' ? ['बार काउंसिल की औपचारिकताएं पूरी करें', 'बार काउंसिल पंजीकरण प्राप्त करें', 'इंटर्नशिप शुरू करें'] : ['Complete bar council formalities', 'Get bar council registration', 'Start internship'] },
+          { step: 4, title: language === 'hi' ? 'इंटर्नशिप पूरी करें' : 'Complete Internship', description: language === 'hi' ? 'व्यावहारिक अनुभव प्राप्त करने के लिए एक वरिष्ठ वकील के अधीन इंटर्नशिप करें' : 'Intern under a senior lawyer to gain practical experience', duration: language === 'hi' ? '1-2 वर्ष' : '1-2 Years', tips: language === 'hi' ? ['अदालती प्रक्रियाओं को सीखें', 'दस्तावेज तैयार करें', 'पेशेवर नेटवर्क बनाएं'] : ['Learn court procedures', 'Draft documents', 'Build professional network'] },
+          { step: 5, title: language === 'hi' ? 'अभ्यास शुरू करें' : 'Start Practice', description: language === 'hi' ? 'स्वतंत्र अभ्यास शुरू करें या लॉ फर्म में शामिल हों' : 'Start independent practice or join a law firm', duration: language === 'hi' ? 'जारी' : 'Ongoing', tips: language === 'hi' ? ['क्लाइंट बेस बनाएं', 'किसी क्षेत्र में विशेषज्ञता हासिल करें', 'सीखना जारी रखें'] : ['Build client base', 'Specialize in a field', 'Continue learning'] }
         ],
         exams: [
-          { name: 'CLAT (Common Law Admission Test)', eligibility: '12th Pass', frequency: 'Once a year', difficulty: 'High' },
-          { name: 'AILET (All India Law Entrance Test)', eligibility: '12th Pass', frequency: 'Once a year', difficulty: 'High' },
-          { name: 'LSAT (Law School Admission Test)', eligibility: '12th Pass', frequency: 'Multiple times', difficulty: 'Moderate' }
+          { name: 'CLAT (Common Law Admission Test)', eligibility: language === 'hi' ? '12वीं पास' : '12th Pass', frequency: language === 'hi' ? 'वर्ष में एक बार' : 'Once a year', difficulty: language === 'hi' ? 'उच्च' : 'High' },
+          { name: 'AILET (All India Law Entrance Test)', eligibility: language === 'hi' ? '12वीं पास' : '12th Pass', frequency: language === 'hi' ? 'वर्ष में एक बार' : 'Once a year', difficulty: language === 'hi' ? 'उच्च' : 'High' },
+          { name: 'LSAT (Law School Admission Test)', eligibility: language === 'hi' ? '12वीं पास' : '12th Pass', frequency: language === 'hi' ? 'कई बार' : 'Multiple times', difficulty: language === 'hi' ? 'मध्यम' : 'Moderate' }
         ],
-        skills: ['Analytical Skills', 'Communication Skills', 'Research Skills', 'Negotiation Skills', 'Ethics', 'Problem Solving'],
+        skills: language === 'hi'
+          ? ['विश्लेषणात्मक कौशल', 'संचार कौशल', 'अनुसंधान कौशल', 'बातचीत कौशल', 'नैतिकता', 'समस्या समाधान']
+          : ['Analytical Skills', 'Communication Skills', 'Research Skills', 'Negotiation Skills', 'Ethics', 'Problem Solving'],
         careerPath: [
-          { level: 'Junior Lawyer', experience: '0-5 years', salary: '₹4-10 LPA' },
-          { level: 'Senior Lawyer', experience: '5-10 years', salary: '₹10-25 LPA' },
-          { level: 'Associate Partner', experience: '10-15 years', salary: '₹25-50 LPA' },
-          { level: 'Senior Partner', experience: '15-20 years', salary: '₹50-100 LPA' },
-          { level: 'Judge', experience: '20+ years', salary: '₹15-25 LPA (Government)' }
+          { level: language === 'hi' ? 'कनिष्ठ वकील' : 'Junior Lawyer', experience: '0-5 years' },
+          { level: language === 'hi' ? 'वरिष्ठ वकील' : 'Senior Lawyer', experience: '5-10 years' },
+          { level: language === 'hi' ? 'एसोसिएट पार्टनर' : 'Associate Partner', experience: '10-15 years' },
+          { level: language === 'hi' ? 'सीनियर पार्टनर' : 'Senior Partner', experience: '15-20 years' },
+          { level: language === 'hi' ? 'न्यायाधीश' : 'Judge', experience: '20+ years' }
         ],
         topColleges: [
-          { name: 'National Law School of India University', location: 'Bangalore', ranking: 'Top 1' },
-          { name: 'NALSAR University of Law', location: 'Hyderabad', ranking: 'Top 3' },
-          { name: 'National Law University', location: 'Delhi', ranking: 'Top 5' },
-          { name: 'Faculty of Law, Delhi University', location: 'Delhi', ranking: 'Top 10' }
+          { name: language === 'hi' ? 'नेशनल लॉ स्कूल ऑफ इंडिया यूनिवर्सिटी' : 'National Law School of India University', location: 'Bangalore', ranking: 'Top 1' },
+          { name: language === 'hi' ? 'नालसार विधि विश्वविद्यालय' : 'NALSAR University of Law', location: 'Hyderabad', ranking: 'Top 3' },
+          { name: language === 'hi' ? 'नेशनल लॉ यूनिवर्सिटी' : 'National Law University', location: 'Delhi', ranking: 'Top 5' },
+          { name: language === 'hi' ? 'विधि संकाय, दिल्ली विश्वविद्यालय' : 'Faculty of Law, Delhi University', location: 'Delhi', ranking: 'Top 10' }
         ]
       },
       'Software Engineer': {
-        title: 'Software Engineer',
+        title: language === 'hi' ? 'सॉफ्टवेयर इंजीनियर' : 'Software Engineer',
         icon: <FaCode className="text-primary" />,
-        description: 'Software engineers design, develop, and maintain software applications. They are the backbone of the IT industry.',
-        salaryRange: '₹6-25 LPA',
-        growthPotential: 'Very High',
-        demandLevel: 'Very High',
+        description: language === 'hi' ? 'सॉफ्टवेयर इंजीनियर सॉफ्टवेयर एप्लिकेशन डिजाइन, विकसित और रखरखाव करते हैं। वे आईटी उद्योग की रीढ़ हैं।' : 'Software engineers design, develop, and maintain software applications. They are the backbone of the IT industry.',
+        growthPotential: language === 'hi' ? 'बहुत उच्च' : 'Very High',
+        demandLevel: language === 'hi' ? 'बहुत उच्च' : 'Very High',
         steps: [
-          { step: 1, title: 'Complete 12th Standard', description: 'Complete your 12th standard with Physics, Chemistry, and Mathematics', duration: '2 Years', tips: ['Focus on mathematics', 'Learn basic programming', 'Participate in coding competitions'] },
-          { step: 2, title: 'Pursue B.Tech/BCA', description: 'Complete B.Tech in Computer Science/IT or BCA', duration: '3-4 Years', tips: ['Learn programming languages', 'Build projects', 'Participate in hackathons'] },
-          { step: 3, title: 'Learn Programming Languages', description: 'Master programming languages like Java, Python, JavaScript, etc.', duration: 'Ongoing', tips: ['Practice daily', 'Build real projects', 'Contribute to open source'] },
-          { step: 4, title: 'Build Portfolio', description: 'Create a portfolio of projects to showcase your skills', duration: '6-12 Months', tips: ['Work on diverse projects', 'Document your work', 'Host code on GitHub'] },
-          { step: 5, title: 'Apply for Jobs', description: 'Apply for software engineering positions in IT companies', duration: 'Ongoing', tips: ['Prepare for interviews', 'Practice coding problems', 'Network with professionals'] }
+          { step: 1, title: language === 'hi' ? '12वीं कक्षा पूरी करें' : 'Complete 12th Standard', description: language === 'hi' ? 'भौतिकी, रसायन विज्ञान और गणित के साथ अपनी 12वीं कक्षा पूरी करें' : 'Complete your 12th standard with Physics, Chemistry, and Mathematics', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['गणित पर ध्यान दें', 'बुनियादी प्रोग्रामिंग सीखें', 'कोडिंग प्रतियोगिताओं में भाग लें'] : ['Focus on mathematics', 'Learn basic programming', 'Participate in coding competitions'] },
+          { step: 2, title: language === 'hi' ? 'बी.टेक/बीसीए करें' : 'Pursue B.Tech/BCA', description: language === 'hi' ? 'कंप्यूटर साइंस/आईटी या बीसीए में बी.टेक पूरा करें' : 'Complete B.Tech in Computer Science/IT or BCA', duration: language === 'hi' ? '3-4 वर्ष' : '3-4 Years', tips: language === 'hi' ? ['प्रोग्रामिंग भाषाएं सीखें', 'प्रोजेक्ट बनाएं', 'हैकाथॉन में भाग लें'] : ['Learn programming languages', 'Build projects', 'Participate in hackathons'] },
+          { step: 3, title: language === 'hi' ? 'प्रोग्रामिंग भाषाएं सीखें' : 'Learn Programming Languages', description: language === 'hi' ? 'जावा, पायथन, जावास्क्रिप्ट जैसी प्रोग्रामिंग भाषाओं में महारत हासिल करें' : 'Master programming languages like Java, Python, JavaScript, etc.', duration: language === 'hi' ? 'जारी' : 'Ongoing', tips: language === 'hi' ? ['रोजाना अभ्यास करें', 'वास्तविक प्रोजेक्ट बनाएं', 'ओपन सोर्स में योगदान दें'] : ['Practice daily', 'Build real projects', 'Contribute to open source'] },
+          { step: 4, title: language === 'hi' ? 'पोर्टफोलियो बनाएं' : 'Build Portfolio', description: language === 'hi' ? 'अपने कौशल को दिखाने के लिए प्रोजेक्ट्स का पोर्टफोलियो बनाएं' : 'Create a portfolio of projects to showcase your skills', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['विविध प्रोजेक्ट्स पर काम करें', 'अपने काम का दस्तावेजीकरण करें', 'GitHub पर कोड होस्ट करें'] : ['Work on diverse projects', 'Document your work', 'Host code on GitHub'] },
+          { step: 5, title: language === 'hi' ? 'नौकरियों के लिए आवेदन करें' : 'Apply for Jobs', description: language === 'hi' ? 'आईटी कंपनियों में सॉफ्टवेयर इंजीनियरिंग पदों के लिए आवेदन करें' : 'Apply for software engineering positions in IT companies', duration: language === 'hi' ? 'जारी' : 'Ongoing', tips: language === 'hi' ? ['साक्षात्कार के लिए तैयारी करें', 'कोडिंग समस्याओं का अभ्यास करें', 'पेशेवरों के साथ नेटवर्क बनाएं'] : ['Prepare for interviews', 'Practice coding problems', 'Network with professionals'] }
         ],
         exams: [
-          { name: 'GATE (Graduate Aptitude Test in Engineering)', eligibility: 'B.Tech', frequency: 'Once a year', difficulty: 'High' },
-          { name: 'Company-specific Tests', eligibility: 'B.Tech/BCA', frequency: 'As per recruitment', difficulty: 'Moderate to High' }
+          { name: 'GATE (Graduate Aptitude Test in Engineering)', eligibility: language === 'hi' ? 'बी.टेक' : 'B.Tech', frequency: language === 'hi' ? 'वर्ष में एक बार' : 'Once a year', difficulty: language === 'hi' ? 'उच्च' : 'High' },
+          { name: 'Company-specific Tests', eligibility: language === 'hi' ? 'बी.टेक/बीसीए' : 'B.Tech/BCA', frequency: language === 'hi' ? 'भर्ती के अनुसार' : 'As per recruitment', difficulty: language === 'hi' ? 'मध्यम से उच्च' : 'Moderate to High' }
         ],
-        skills: ['Programming Languages', 'Problem Solving', 'Data Structures', 'Algorithms', 'Database Management', 'Version Control'],
+        skills: language === 'hi'
+          ? ['प्रोग्रामिंग भाषाएं', 'समस्या समाधान', 'डेटा स्ट्रक्चर', 'एल्गोरिदम', 'डेटाबेस प्रबंधन', 'वर्जन कंट्रोल']
+          : ['Programming Languages', 'Problem Solving', 'Data Structures', 'Algorithms', 'Database Management', 'Version Control'],
         careerPath: [
-          { level: 'Junior Developer', experience: '0-3 years', salary: '₹6-10 LPA' },
-          { level: 'Senior Developer', experience: '3-6 years', salary: '₹10-18 LPA' },
-          { level: 'Tech Lead', experience: '6-10 years', salary: '₹18-25 LPA' },
-          { level: 'Engineering Manager', experience: '10-15 years', salary: '₹25-40 LPA' },
-          { level: 'CTO', experience: '15+ years', salary: '₹40-100 LPA' }
+          { level: language === 'hi' ? 'कनिष्ठ डेवलपर' : 'Junior Developer', experience: '0-3 years' },
+          { level: language === 'hi' ? 'वरिष्ठ डेवलपर' : 'Senior Developer', experience: '3-6 years' },
+          { level: language === 'hi' ? 'टेक लीड' : 'Tech Lead', experience: '6-10 years' },
+          { level: language === 'hi' ? 'इंजीनियरिंग मैनेजर' : 'Engineering Manager', experience: '10-15 years' },
+          { level: language === 'hi' ? 'सीटीओ' : 'CTO', experience: '15+ years' }
         ],
         topColleges: [
-          { name: 'IIT Bombay', location: 'Mumbai', ranking: 'Top 1' },
-          { name: 'IIT Delhi', location: 'Delhi', ranking: 'Top 2' },
-          { name: 'IIT Madras', location: 'Chennai', ranking: 'Top 3' },
-          { name: 'BITS Pilani', location: 'Pilani', ranking: 'Top 5' }
+          { name: language === 'hi' ? 'आईआईटी बॉम्बे' : 'IIT Bombay', location: 'Mumbai', ranking: 'Top 1' },
+          { name: language === 'hi' ? 'आईआईटी दिल्ली' : 'IIT Delhi', location: 'Delhi', ranking: 'Top 2' },
+          { name: language === 'hi' ? 'आईआईटी मद्रास' : 'IIT Madras', location: 'Chennai', ranking: 'Top 3' },
+          { name: language === 'hi' ? 'बिट्स पिलानी' : 'BITS Pilani', location: 'Pilani', ranking: 'Top 5' }
         ]
       },
       'Doctor': {
-        title: 'Doctor',
+        title: language === 'hi' ? 'डॉक्टर' : 'Doctor',
         icon: <FaHospital className="text-primary" />,
-        description: 'Doctors diagnose and treat illnesses, injuries, and diseases. They are essential healthcare professionals.',
-        salaryRange: '₹10-50 LPA',
-        growthPotential: 'Very High',
-        demandLevel: 'Very High',
+        description: language === 'hi' ? 'डॉक्टर बीमारियों, चोटों और रोगों का निदान और उपचार करते हैं। वे आवश्यक स्वास्थ्य देखभाल पेशेवर हैं।' : 'Doctors diagnose and treat illnesses, injuries, and diseases. They are essential healthcare professionals.',
+        growthPotential: language === 'hi' ? 'बहुत उच्च' : 'Very High',
+        demandLevel: language === 'hi' ? 'बहुत उच्च' : 'Very High',
         steps: [
-          { step: 1, title: 'Complete 12th Standard', description: 'Complete your 12th standard with Physics, Chemistry, and Biology', duration: '2 Years', tips: ['Focus on biology', 'Develop empathy', 'Volunteer in healthcare settings'] },
-          { step: 2, title: 'Clear NEET Exam', description: 'Qualify NEET (National Eligibility cum Entrance Test)', duration: '1 Year', tips: ['Understand NCERT thoroughly', 'Solve previous papers', 'Take mock tests'] },
-          { step: 3, title: 'Complete MBBS', description: 'Pursue MBBS (Bachelor of Medicine and Bachelor of Surgery)', duration: '5.5 Years', tips: ['Focus on studies', 'Gain clinical experience', 'Develop bedside manners'] },
-          { step: 4, title: 'Complete Internship', description: 'Complete mandatory internship in hospital', duration: '1 Year', tips: ['Learn from professionals', 'Handle real cases', 'Build patient relationships'] },
-          { step: 5, title: 'Specialize (Optional)', description: 'Pursue MD/MS for specialization', duration: '3 Years', tips: ['Choose specialization wisely', 'Clear NEET PG', 'Join good hospital'] }
+          { step: 1, title: language === 'hi' ? '12वीं कक्षा पूरी करें' : 'Complete 12th Standard', description: language === 'hi' ? 'भौतिकी, रसायन विज्ञान और जीव विज्ञान के साथ अपनी 12वीं कक्षा पूरी करें' : 'Complete your 12th standard with Physics, Chemistry, and Biology', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['जीव विज्ञान पर ध्यान दें', 'सहानुभूति विकसित करें', 'स्वास्थ्य देखभाल सेटिंग्स में स्वयंसेवा करें'] : ['Focus on biology', 'Develop empathy', 'Volunteer in healthcare settings'] },
+          { step: 2, title: language === 'hi' ? 'नीट परीक्षा उत्तीर्ण करें' : 'Clear NEET Exam', description: language === 'hi' ? 'नीट (राष्ट्रीय पात्रता सह प्रवेश परीक्षा) पास करें' : 'Qualify NEET (National Eligibility cum Entrance Test)', duration: language === 'hi' ? '1 वर्ष' : '1 Year', tips: language === 'hi' ? ['NCERT को अच्छी तरह समझें', 'पिछले पेपर्स हल करें', 'मॉक टेस्ट दें'] : ['Understand NCERT thoroughly', 'Solve previous papers', 'Take mock tests'] },
+          { step: 3, title: language === 'hi' ? 'एमबीबीएस पूरा करें' : 'Complete MBBS', description: language === 'hi' ? 'एमबीबीएस (बैचलर ऑफ मेडिसिन और बैचलर ऑफ सर्जरी) करें' : 'Pursue MBBS (Bachelor of Medicine and Bachelor of Surgery)', duration: language === 'hi' ? '5.5 वर्ष' : '5.5 Years', tips: language === 'hi' ? ['पढ़ाई पर ध्यान दें', 'नैदानिक अनुभव प्राप्त करें', 'अच्छे व्यवहार विकसित करें'] : ['Focus on studies', 'Gain clinical experience', 'Develop bedside manners'] },
+          { step: 4, title: language === 'hi' ? 'इंटर्नशिप पूरी करें' : 'Complete Internship', description: language === 'hi' ? 'अस्पताल में अनिवार्य इंटर्नशिप पूरी करें' : 'Complete mandatory internship in hospital', duration: language === 'hi' ? '1 वर्ष' : '1 Year', tips: language === 'hi' ? ['पेशेवरों से सीखें', 'वास्तविक मामलों को संभालें', 'रोगी संबंध बनाएं'] : ['Learn from professionals', 'Handle real cases', 'Build patient relationships'] },
+          { step: 5, title: language === 'hi' ? 'विशेषज्ञता हासिल करें (वैकल्पिक)' : 'Specialize (Optional)', description: language === 'hi' ? 'विशेषज्ञता के लिए एमडी/एमएस करें' : 'Pursue MD/MS for specialization', duration: language === 'hi' ? '3 वर्ष' : '3 Years', tips: language === 'hi' ? ['विशेषज्ञता बुद्धिमानी से चुनें', 'नीट पीजी पास करें', 'अच्छे अस्पताल में शामिल हों'] : ['Choose specialization wisely', 'Clear NEET PG', 'Join good hospital'] }
         ],
         exams: [
-          { name: 'NEET (National Eligibility cum Entrance Test)', eligibility: '12th with PCB', frequency: 'Once a year', difficulty: 'Very High' },
-          { name: 'NEET PG', eligibility: 'MBBS', frequency: 'Once a year', difficulty: 'Very High' },
-          { name: 'AIIMS PG', eligibility: 'MBBS', frequency: 'Once a year', difficulty: 'Very High' }
+          { name: 'NEET (National Eligibility cum Entrance Test)', eligibility: language === 'hi' ? 'PCB के साथ 12वीं' : '12th with PCB', frequency: language === 'hi' ? 'वर्ष में एक बार' : 'Once a year', difficulty: language === 'hi' ? 'बहुत उच्च' : 'Very High' },
+          { name: 'NEET PG', eligibility: language === 'hi' ? 'एमबीबीएस' : 'MBBS', frequency: language === 'hi' ? 'वर्ष में एक बार' : 'Once a year', difficulty: language === 'hi' ? 'बहुत उच्च' : 'Very High' },
+          { name: 'AIIMS PG', eligibility: language === 'hi' ? 'एमबीबीएस' : 'MBBS', frequency: language === 'hi' ? 'वर्ष में एक बार' : 'Once a year', difficulty: language === 'hi' ? 'बहुत उच्च' : 'Very High' }
         ],
-        skills: ['Medical Knowledge', 'Empathy', 'Communication Skills', 'Problem Solving', 'Decision Making', 'Patience'],
+        skills: language === 'hi'
+          ? ['चिकित्सा ज्ञान', 'सहानुभूति', 'संचार कौशल', 'समस्या समाधान', 'निर्णय लेना', 'धैर्य']
+          : ['Medical Knowledge', 'Empathy', 'Communication Skills', 'Problem Solving', 'Decision Making', 'Patience'],
         careerPath: [
-          { level: 'Junior Resident', experience: '0-3 years', salary: '₹10-15 LPA' },
-          { level: 'Senior Resident', experience: '3-6 years', salary: '₹15-25 LPA' },
-          { level: 'Consultant', experience: '6-10 years', salary: '₹25-40 LPA' },
-          { level: 'Senior Consultant', experience: '10-15 years', salary: '₹40-60 LPA' },
-          { level: 'Head of Department', experience: '15+ years', salary: '₹60-100 LPA' }
+          { level: language === 'hi' ? 'कनिष्ठ रेजिडेंट' : 'Junior Resident', experience: '0-3 years', salary: '₹10-15 LPA' },
+          { level: language === 'hi' ? 'वरिष्ठ रेजिडेंट' : 'Senior Resident', experience: '3-6 years', salary: '₹15-25 LPA' },
+          { level: language === 'hi' ? 'कंसल्टेंट' : 'Consultant', experience: '6-10 years', salary: '₹25-40 LPA' },
+          { level: language === 'hi' ? 'वरिष्ठ कंसल्टेंट' : 'Senior Consultant', experience: '10-15 years', salary: '₹40-60 LPA' },
+          { level: language === 'hi' ? 'विभागाध्यक्ष' : 'Head of Department', experience: '15+ years', salary: '₹60-100 LPA' }
         ],
         topColleges: [
-          { name: 'AIIMS Delhi', location: 'Delhi', ranking: 'Top 1' },
-          { name: 'CMC Vellore', location: 'Vellore', ranking: 'Top 3' },
-          { name: 'AFMC Pune', location: 'Pune', ranking: 'Top 5' },
-          { name: 'Maulana Azad Medical College', location: 'Delhi', ranking: 'Top 10' }
+          { name: language === 'hi' ? 'एम्स दिल्ली' : 'AIIMS Delhi', location: 'Delhi', ranking: 'Top 1' },
+          { name: language === 'hi' ? 'सीएमसी वेल्लोर' : 'CMC Vellore', location: 'Vellore', ranking: 'Top 3' },
+          { name: language === 'hi' ? 'एएफएमसी पुणे' : 'AFMC Pune', location: 'Pune', ranking: 'Top 5' },
+          { name: language === 'hi' ? 'मौलाना आज़ाद मेडिकल कॉलेज' : 'Maulana Azad Medical College', location: 'Delhi', ranking: 'Top 10' }
         ]
       }
     };
@@ -217,6 +223,16 @@ const OccupationDetails = () => {
       ],
       topColleges: []
     };
+  };
+
+  const getLocalizedOccupationName = (name) => {
+    const names = {
+      'Teacher': language === 'hi' ? 'शिक्षक' : 'Teacher',
+      'Lawyer': language === 'hi' ? 'वकील' : 'Lawyer',
+      'Software Engineer': language === 'hi' ? 'सॉफ्टवेयर इंजीनियर' : 'Software Engineer',
+      'Doctor': language === 'hi' ? 'डॉक्टर' : 'Doctor'
+    };
+    return names[name] || name;
   };
 
   const occupationDetails = occupation ? getOccupationDetails(occupation) : null;
@@ -264,93 +280,93 @@ const OccupationDetails = () => {
    const getGovtExamDetails = (examType) => {
      const govtExams = {
        'IIT-JEE': {
-         title: 'IIT-JEE (Joint Entrance Examination)',
+         title: language === 'hi' ? 'आईआईटी-जेईई (संयुक्त प्रवेश परीक्षा)' : 'IIT-JEE (Joint Entrance Examination)',
          icon: <FaCog className="text-warning" />,
-         description: 'Crack JEE to get admission in IITs, NITs, and other top government engineering colleges for B.Tech',
-         fullPath: '12th (PCM) → JEE Main → JEE Advanced → Admission in IIT/NIT/IIIT → B.Tech → Campus Placement → Job in Top Companies',
+         description: language === 'hi' ? 'बी.टेक के लिए आईआईटी, एनआईटी और अन्य शीर्ष सरकारी इंजीनियरिंग कॉलेजों में प्रवेश पाने के लिए जेईई क्रैक करें' : 'Crack JEE to get admission in IITs, NITs, and other top government engineering colleges for B.Tech',
+         fullPath: language === 'hi' ? '12वीं (PCM) → जेईई मेन → जेईई एडवांस → आईआईटी/एनआईटी/आईआईआईटी में प्रवेश → बी.टेक → कैंपस प्लेसमेंट → शीर्ष कंपनियों में नौकरी' : '12th (PCM) → JEE Main → JEE Advanced → Admission in IIT/NIT/IIIT → B.Tech → Campus Placement → Job in Top Companies',
          steps: [
-           { step: 1, title: 'Complete 12th with PCM', description: 'Complete 12th with Physics, Chemistry, Mathematics (PCM)', duration: '2 Years', tips: ['Focus on NCERT concepts', 'Practice numerical problems', 'Consider joining coaching'] },
-           { step: 2, title: 'Prepare for JEE Main', description: 'Cover complete syllabus of Physics, Chemistry, Mathematics for JEE Main', duration: '1-2 Years', tips: ['Solve previous papers', 'Take mock tests', 'Work on speed and accuracy'] },
-           { step: 3, title: 'Appear for JEE Main', description: 'Appear for JEE Main exam (conducted twice a year)', duration: 'Exam Season', tips: ['Manage time effectively', 'Attempt easier questions first', 'Stay calm'] },
-           { step: 4, title: 'Prepare for JEE Advanced (if qualified)', description: 'If qualified in JEE Main, prepare for JEE Advanced for IITs', duration: '6-12 Months', tips: ['Focus on conceptual clarity', 'Solve advanced problems', 'Take mock tests'] },
-           { step: 5, title: 'Participate in Counseling', description: 'Participate in JoSAA counseling for college allocation', duration: 'After Results', tips: ['Fill choices wisely', 'Research colleges', 'Consider branch preferences'] },
-           { step: 6, title: 'Complete B.Tech', description: 'Complete B.Tech from allocated college', duration: '4 Years', tips: ['Focus on studies', 'Do internships', 'Build projects'] },
-           { step: 7, title: 'Campus Placement', description: 'Appear for campus placement in top companies', duration: 'Final Year', tips: ['Prepare resume', 'Practice daily', 'Apply to multiple companies'] }
+           { step: 1, title: language === 'hi' ? 'PCM के साथ 12वीं पूरी करें' : 'Complete 12th with PCM', description: language === 'hi' ? 'भौतिकी, रसायन विज्ञान, गणित (PCM) के साथ 12वीं पूरी करें' : 'Complete 12th with Physics, Chemistry, Mathematics (PCM)', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['NCERT अवधारणाओं पर ध्यान दें', 'संख्यात्मक समस्याओं का अभ्यास करें', 'कोचिंग में शामिल होने पर विचार करें'] : ['Focus on NCERT concepts', 'Practice numerical problems', 'Consider joining coaching'] },
+           { step: 2, title: language === 'hi' ? 'जेईई मेन की तैयारी' : 'Prepare for JEE Main', description: language === 'hi' ? 'जेईई मेन के लिए PCM का पूरा पाठ्यक्रम कवर करें' : 'Cover complete syllabus of Physics, Chemistry, Mathematics for JEE Main', duration: language === 'hi' ? '1-2 वर्ष' : '1-2 Years', tips: language === 'hi' ? ['पिछले पेपर्स हल करें', 'मॉक टेस्ट लें', 'गति और सटीकता पर काम करें'] : ['Solve previous papers', 'Take mock tests', 'Work on speed and accuracy'] },
+           { step: 3, title: language === 'hi' ? 'जेईई मेन में उपस्थित हों' : 'Appear for JEE Main', description: language === 'hi' ? 'जेईई मेन परीक्षा दें (वर्ष में दो बार आयोजित)' : 'Appear for JEE Main exam (conducted twice a year)', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['समय का प्रभावी ढंग से प्रबंधन करें', 'पहले आसान प्रश्नों का प्रयास करें', 'शांत रहें'] : ['Manage time effectively', 'Attempt easier questions first', 'Stay calm'] },
+           { step: 4, title: language === 'hi' ? 'जेईई एडवांस की तैयारी' : 'Prepare for JEE Advanced', description: language === 'hi' ? 'यदि योग्य हों, तो आईआईटी के लिए जेईई एडवांस की तैयारी करें' : 'If qualified in JEE Main, prepare for JEE Advanced for IITs', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['वैचारिक स्पष्टता पर ध्यान दें', 'उन्नत समस्याओं को हल करें', 'मॉक टेस्ट लें'] : ['Focus on conceptual clarity', 'Solve advanced problems', 'Take mock tests'] },
+           { step: 5, title: language === 'hi' ? 'काउंसलिंग में भाग लें' : 'Participate in Counseling', description: language === 'hi' ? 'कॉलेज आवंटन के लिए JoSAA काउंसलिंग में भाग लें' : 'Participate in JoSAA counseling for college allocation', duration: language === 'hi' ? 'परिणाम के बाद' : 'After Results', tips: language === 'hi' ? ['विकल्प सोच-समझकर भरें', 'कॉलेजों पर शोध करें', 'शाखा प्राथमिकताओं पर विचार करें'] : ['Fill choices wisely', 'Research colleges', 'Consider branch preferences'] },
+           { step: 6, title: language === 'hi' ? 'बी.टेक पूरा करें' : 'Complete B.Tech', description: language === 'hi' ? 'आवंटित कॉलेज से बी.टेक पूरा करें' : 'Complete B.Tech from allocated college', duration: language === 'hi' ? '4 वर्ष' : '4 Years', tips: language === 'hi' ? ['पढ़ाई पर ध्यान दें', 'इंटर्नशिप करें', 'प्रोजेक्ट बनाएं'] : ['Focus on studies', 'Do internships', 'Build projects'] },
+           { step: 7, title: language === 'hi' ? 'कैंपस प्लेसमेंट' : 'Campus Placement', description: language === 'hi' ? 'शीर्ष कंपनियों में कैंपस प्लेसमेंट के लिए उपस्थित हों' : 'Appear for campus placement in top companies', duration: language === 'hi' ? 'अंतिम वर्ष' : 'Final Year', tips: language === 'hi' ? ['बायोडाटा तैयार करें', 'दैनिक अभ्यास करें', 'कई कंपनियों में आवेदन करें'] : ['Prepare resume', 'Practice daily', 'Apply to multiple companies'] }
          ],
          colleges: [
-           { name: 'IIT Bombay', location: 'Mumbai', ranking: 'Top 1', seats: 'Total ~1000' },
-           { name: 'IIT Delhi', location: 'Delhi', ranking: 'Top 2', seats: 'Total ~900' },
-           { name: 'IIT Madras', location: 'Chennai', ranking: 'Top 3', seats: 'Total ~800' },
-           { name: 'IIT Kharagpur', location: 'Kharagpur', ranking: 'Top 4', seats: 'Total ~900' },
-           { name: 'IIT Kanpur', location: 'Kanpur', ranking: 'Top 5', seats: 'Total ~800' },
+           { name: language === 'hi' ? 'आईआईटी बॉम्बे' : 'IIT Bombay', location: 'Mumbai', ranking: 'Top 1', seats: 'Total ~1000' },
+           { name: language === 'hi' ? 'आईआईटी दिल्ली' : 'IIT Delhi', location: 'Delhi', ranking: 'Top 2', seats: 'Total ~900' },
+           { name: language === 'hi' ? 'आईआईटी मद्रास' : 'IIT Madras', location: 'Chennai', ranking: 'Top 3', seats: 'Total ~800' },
+           { name: language === 'hi' ? 'आईआईटी खड़गपुर' : 'IIT Kharagpur', location: 'Kharagpur', ranking: 'Top 4', seats: 'Total ~900' },
+           { name: language === 'hi' ? 'आईआईटी कानपुर' : 'IIT Kanpur', location: 'Kanpur', ranking: 'Top 5', seats: 'Total ~800' },
          ],
          skills: ['Physics', 'Chemistry', 'Mathematics', 'Problem Solving', 'Analytical Thinking', 'Time Management']
        },
        'NEET': {
-         title: 'NEET (National Eligibility cum Entrance Test)',
+         title: language === 'hi' ? 'नीट (राष्ट्रीय पात्रता सह प्रवेश परीक्षा)' : 'NEET (National Eligibility cum Entrance Test)',
          icon: <FaHospital className="text-danger" />,
-         description: 'Crack NEET to get admission in Government Medical Colleges for MBBS/BDS',
-         fullPath: '12th (PCB) → NEET → Admission in Government Medical College → MBBS → Internship → License → Job/PG',
+         description: language === 'hi' ? 'एमबीबीएस/बीडीएस के लिए सरकारी मेडिकल कॉलेजों में प्रवेश पाने के लिए नीट पास करें' : 'Crack NEET to get admission in Government Medical Colleges for MBBS/BDS',
+         fullPath: language === 'hi' ? '12वीं (PCB) → नीट → सरकारी मेडिकल कॉलेज में प्रवेश → एमबीबीएस → इंटर्नशिप → लाइसेंस → नौकरी/पीजी' : '12th (PCB) → NEET → Admission in Government Medical College → MBBS → Internship → License → Job/PG',
          steps: [
-           { step: 1, title: 'Complete 12th with PCB', description: 'Complete 12th with Physics, Chemistry, Biology (PCB)', duration: '2 Years', tips: ['Focus on biology', 'Understand NCERT thoroughly', 'Practice diagrams'] },
-           { step: 2, title: 'Prepare for NEET', description: 'Cover complete syllabus of PCB for NEET', duration: '1-2 Years', tips: ['Study NCERT books', 'Solve previous papers', 'Take mock tests'] },
-           { step: 3, title: 'Appear for NEET', description: 'Appear for NEET exam (conducted once a year)', duration: 'Exam Season', tips: ['Manage time', 'Maintain accuracy', 'Stay calm'] },
-           { step: 4, title: 'Participate in Counseling', description: 'Participate in All India Quota counseling for college allocation', duration: 'After Results', tips: ['Fill choices wisely', 'Research colleges', 'Consider location'] },
-           { step: 5, title: 'Complete MBBS', description: 'Complete MBBS course (5.5 years including internship)', duration: '5.5 Years', tips: ['Focus on studies', 'Gain clinical experience', 'Build skills'] },
-           { step: 6, title: 'Complete Internship', description: 'Complete mandatory internship in hospital', duration: '1 Year', tips: ['Learn from professionals', 'Handle real cases', 'Build patient relationships'] },
-           { step: 7, title: 'Start Career', description: 'Start working as doctor or pursue PG', duration: 'Ongoing', tips: ['Get medical license', 'Apply for jobs', 'Consider specialization'] }
+           { step: 1, title: language === 'hi' ? 'PCB के साथ 12वीं पूरी करें' : 'Complete 12th with PCB', description: language === 'hi' ? 'भौतिकी, रसायन विज्ञान, जीव विज्ञान (PCB) के साथ 12वीं पूरी करें' : 'Complete 12th with Physics, Chemistry, Biology (PCB)', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['जीव विज्ञान पर ध्यान दें', 'NCERT को अच्छी तरह समझें', 'आरेखों का अभ्यास करें'] : ['Focus on biology', 'Understand NCERT thoroughly', 'Practice diagrams'] },
+           { step: 2, title: language === 'hi' ? 'नीट की तैयारी' : 'Prepare for NEET', description: language === 'hi' ? 'नीट के लिए PCB का पूरा पाठ्यक्रम कवर करें' : 'Cover complete syllabus of PCB for NEET', duration: language === 'hi' ? '1-2 वर्ष' : '1-2 Years', tips: language === 'hi' ? ['NCERT किताबें पढ़ें', 'पिछले पेपर्स हल करें', 'मॉक टेस्ट लें'] : ['Study NCERT books', 'Solve previous papers', 'Take mock tests'] },
+           { step: 3, title: language === 'hi' ? 'नीट में उपस्थित हों' : 'Appear for NEET', description: language === 'hi' ? 'नीट परीक्षा दें (वर्ष में एक बार आयोजित)' : 'Appear for NEET exam (conducted once a year)', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['समय प्रबंधन', 'सटीकता बनाए रखें', 'शांत रहें'] : ['Manage time', 'Maintain accuracy', 'Stay calm'] },
+           { step: 4, title: language === 'hi' ? 'काउंसलिंग में भाग लें' : 'Participate in Counseling', description: language === 'hi' ? 'कॉलेज आवंटन के लिए ऑल इंडिया कोटा काउंसलिंग में भाग लें' : 'Participate in All India Quota counseling for college allocation', duration: language === 'hi' ? 'परिणाम के बाद' : 'After Results', tips: language === 'hi' ? ['विकल्प बुद्धिमानी से भरें', 'कॉलेजों पर शोध करें', 'स्थान पर विचार करें'] : ['Fill choices wisely', 'Research colleges', 'Consider location'] },
+           { step: 5, title: language === 'hi' ? 'एमबीबीएस पूरा करें' : 'Complete MBBS', description: language === 'hi' ? 'एमबीबीएस कोर्स पूरा करें (इंटर्नशिप सहित 5.5 वर्ष)' : 'Complete MBBS course (5.5 years including internship)', duration: language === 'hi' ? '5.5 वर्ष' : '5.5 Years', tips: language === 'hi' ? ['पढ़ाई पर ध्यान दें', 'नैदानिक अनुभव प्राप्त करें', 'कौशल विकसित करें'] : ['Focus on studies', 'Gain clinical experience', 'Build skills'] },
+           { step: 6, title: language === 'hi' ? 'इंटर्नशिप पूरी करें' : 'Complete Internship', description: language === 'hi' ? 'अस्पताल में अनिवार्य इंटर्नशिप पूरी करें' : 'Complete mandatory internship in hospital', duration: language === 'hi' ? '1 वर्ष' : '1 Year', tips: language === 'hi' ? ['पेशेवरों से सीखें', 'वास्तविक मामलों को संभालें', 'रोगी संबंध बनाएं'] : ['Learn from professionals', 'Handle real cases', 'Build patient relationships'] },
+           { step: 7, title: language === 'hi' ? 'करियर शुरू करें' : 'Start Career', description: language === 'hi' ? 'डॉक्टर के रूप में काम करना शुरू करें या पीजी करें' : 'Start working as doctor or pursue PG', duration: language === 'hi' ? 'जारी' : 'Ongoing', tips: language === 'hi' ? ['मेडिकल लाइसेंस प्राप्त करें', 'नौकरियों के लिए आवेदन करें', 'विशेषज्ञता पर विचार करें'] : ['Get medical license', 'Apply for jobs', 'Consider specialization'] }
          ],
          colleges: [
-           { name: 'AIIMS Delhi', location: 'Delhi', ranking: 'Top 1', seats: 'Total ~100' },
-           { name: 'Maulana Azad Medical College', location: 'Delhi', ranking: 'Top 2', seats: 'Total ~250' },
-           { name: 'VMMC & Safdarjung Hospital', location: 'Delhi', ranking: 'Top 3', seats: 'Total ~200' },
-           { name: 'Lady Hardinge Medical College', location: 'Delhi', ranking: 'Top 10', seats: 'Total ~200' },
+           { name: language === 'hi' ? 'एम्स दिल्ली' : 'AIIMS Delhi', location: 'Delhi', ranking: 'Top 1', seats: 'Total ~100' },
+           { name: language === 'hi' ? 'मौलाना आज़ाद मेडिकल कॉलेज' : 'Maulana Azad Medical College', location: 'Delhi', ranking: 'Top 2', seats: 'Total ~250' },
+           { name: language === 'hi' ? 'वीएमएमसी और सफदरजंग अस्पताल' : 'VMMC & Safdarjung Hospital', location: 'Delhi', ranking: 'Top 3', seats: 'Total ~200' },
+           { name: language === 'hi' ? 'लेडी हार्डिंग मेडिकल कॉलेज' : 'Lady Hardinge Medical College', location: 'Delhi', ranking: 'Top 10', seats: 'Total ~200' },
          ],
          skills: ['Biology', 'Physics', 'Chemistry', 'Medical Knowledge', 'Empathy', 'Communication Skills']
        },
        'UPSC': {
-         title: 'UPSC (Union Public Service Commission)',
+         title: language === 'hi' ? 'यूपीएससी (संघ लोक सेवा आयोग)' : 'UPSC (Union Public Service Commission)',
          icon: <FaLandmark className="text-primary" />,
-         description: 'Crack Civil Services Exam to become IAS, IPS, IFS and other Group A services',
-         fullPath: 'Graduate → UPSC CSE (Pre+Mains+Interview) → IAS/IPS/IFS → Service',
+         description: language === 'hi' ? 'आईएएस, आईपीएस, आईएफएस और अन्य ग्रुप ए सेवाओं में शामिल होने के लिए सिविल सेवा परीक्षा पास करें' : 'Crack Civil Services Exam to become IAS, IPS, IFS and other Group A services',
+         fullPath: language === 'hi' ? 'स्नातक → यूपीएससी सीएसई (प्री+मेंस+इंटरव्यू) → आईएएस/आईपीएस/आईएफएस → सेवा' : 'Graduate → UPSC CSE (Pre+Mains+Interview) → IAS/IPS/IFS → Service',
          steps: [
-           { step: 1, title: 'Complete Graduation', description: 'Complete graduation in any stream', duration: '3 Years', tips: ['Choose interesting subjects', 'Read newspapers regularly', 'Develop analytical skills'] },
-           { step: 2, title: 'Basic Preparation', description: 'Start basic preparation - read NCERTs, basic books', duration: '6-12 Months', tips: ['Start with NCERT basics', 'Focus on current affairs', 'Practice answer writing'] },
-           { step: 3, title: 'Deep Preparation', description: 'Deep preparation for all subjects', duration: '1-2 Years', tips: ['Read standard books', 'Practice answer writing', 'Join test series'] },
-           { step: 4, title: 'Appear for UPSC Prelims', description: 'Appear for UPSC Prelims (CSAT + GS)', duration: 'Exam Season', tips: ['Clear cutoff', 'Manage time well', 'Stay focused'] },
-           { step: 5, title: 'Appear for UPSC Mains', description: 'Appear for UPSC Mains (9 papers)', duration: 'Exam Season', tips: ['Structure answers properly', 'Write neatly', 'Manage time'] },
-           { step: 6, title: 'Interview', description: 'Appear for Personality Test/Interview', duration: '30-45 Minutes', tips: ['Be confident', 'Stay updated on current affairs', 'Be honest'] },
-           { step: 7, title: 'Service Allocation', description: 'Get allocated to service based on rank', duration: 'After Result', tips: ['Fill service preferences', 'Stay updated', 'Complete training'] }
+           { step: 1, title: language === 'hi' ? 'स्नातक पूरा करें' : 'Complete Graduation', description: language === 'hi' ? 'किसी भी विषय में स्नातक पूरा करें' : 'Complete graduation in any stream', duration: language === 'hi' ? '3 वर्ष' : '3 Years', tips: language === 'hi' ? ['रुचिकर विषय चुनें', 'नियमित रूप से समाचार पत्र पढ़ें', 'विश्लेषणात्मक कौशल विकसित करें'] : ['Choose interesting subjects', 'Read newspapers regularly', 'Develop analytical skills'] },
+           { step: 2, title: language === 'hi' ? 'बुनियादी तैयारी' : 'Basic Preparation', description: language === 'hi' ? 'बुनियादी तैयारी शुरू करें - NCERT और बुनियादी किताबें पढ़ें' : 'Start basic preparation - read NCERTs, basic books', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['NCERT बुनियादी बातों से शुरू करें', 'समसामयिक मामलों पर ध्यान दें', 'उत्तर लेखन का अभ्यास करें'] : ['Start with NCERT basics', 'Focus on current affairs', 'Practice answer writing'] },
+           { step: 3, title: language === 'hi' ? 'गहन तैयारी' : 'Deep Preparation', description: language === 'hi' ? 'सभी विषयों के लिए गहन तैयारी' : 'Deep preparation for all subjects', duration: language === 'hi' ? '1-2 वर्ष' : '1-2 Years', tips: language === 'hi' ? ['मानक किताबें पढ़ें', 'उत्तर लेखन का अभ्यास करें', 'टेस्ट सीरीज जॉइन करें'] : ['Read standard books', 'Practice answer writing', 'Join test series'] },
+           { step: 4, title: language === 'hi' ? 'यूपीएससी प्रीलिम्स' : 'Appear for UPSC Prelims', description: language === 'hi' ? 'यूपीएससी प्रीलिम्स (CSAT + GS) दें' : 'Appear for UPSC Prelims (CSAT + GS)', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['कटऑफ पास करें', 'समय का सही प्रबंधन करें', 'केंद्रित रहें'] : ['Clear cutoff', 'Manage time well', 'Stay focused'] },
+           { step: 5, title: language === 'hi' ? 'यूपीएससी मेंस' : 'Appear for UPSC Mains', description: language === 'hi' ? 'यूपीएससी मेंस परीक्षा (9 पेपर) दें' : 'Appear for UPSC Mains (9 papers)', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['उत्तरों को सही ढंग से संरेखित करें', 'साफ-सुथरा लिखें', 'समय का ध्यान रखें'] : ['Structure answers properly', 'Write neatly', 'Manage time'] },
+           { step: 6, title: language === 'hi' ? 'साक्षात्कार' : 'Interview', description: language === 'hi' ? 'व्यक्तित्व परीक्षण/साक्षात्कार में शामिल हों' : 'Appear for Personality Test/Interview', duration: language === 'hi' ? '30-45 मिनट' : '30-45 Minutes', tips: language === 'hi' ? ['आत्मविश्वासी बनें', 'समसामयिक मामलों पर अपडेट रहें', 'ईमानदार रहें'] : ['Be confident', 'Stay updated on current affairs', 'Be honest'] },
+           { step: 7, title: language === 'hi' ? 'सेवा आवंटन' : 'Service Allocation', description: language === 'hi' ? 'रैंक के आधार पर सेवा प्राप्त करें' : 'Get allocated to service based on rank', duration: language === 'hi' ? 'परिणाम के बाद' : 'After Result', tips: language === 'hi' ? ['सेवा प्राथमिकताएं भरें', 'अपडेट रहें', 'प्रशिक्षण पूरा करें'] : ['Fill service preferences', 'Stay updated', 'Complete training'] }
          ],
          skills: ['Current Affairs', 'Analytical Skills', 'Communication', 'Leadership', 'Decision Making', 'Time Management']
        },
        'SSC': {
-         title: 'SSC (Staff Selection Commission)',
+         title: language === 'hi' ? 'एसएससी (कर्मचारी चयन आयोग)' : 'SSC (Staff Selection Commission)',
          icon: <FaUserShield className="text-success" />,
-         description: 'Crack SSC exams to get Group B and C government jobs',
-         fullPath: '12th/Graduate → SSC Exams → Document Verification → Joining',
+         description: language === 'hi' ? 'ग्रुप बी और सी सरकारी नौकरियां पाने के लिए एसएससी परीक्षा पास करें' : 'Crack SSC exams to get Group B and C government jobs',
+         fullPath: language === 'hi' ? '12वीं/स्नातक → एसएससी परीक्षा → दस्तावेज सत्यापन → नियुक्ति' : '12th/Graduate → SSC Exams → Document Verification → Joining',
          steps: [
-           { step: 1, title: 'Check Eligibility', description: 'Check eligibility for SSC exams (10th/12th/Graduate as per exam)', duration: 'Before Exam', tips: ['Check eligibility criteria', 'Choose correct exam', 'Verify age limit'] },
-           { step: 2, title: 'Basic Preparation', description: 'Start preparation with basics of English, Math, Reasoning, GK', duration: '3-6 Months', tips: ['Start with NCERT basics', 'Practice daily', 'Learn formulas'] },
-           { step: 3, title: 'Deep Preparation', description: 'Deep preparation for all sections', duration: '6-12 Months', tips: ['Solve previous papers', 'Take mock tests', 'Identify weak areas'] },
-           { step: 4, title: 'Appear for Tier 1', description: 'Appear for CBT exam (Objective)', duration: 'Exam Season', tips: ['Clear cutoff', 'Manage time', 'Attempt all questions'] },
-           { step: 5, title: 'Appear for Tier 2', description: 'Appear for Descriptive/Typing test', duration: 'After Tier 1', tips: ['Practice typing', 'Write essays', 'Practice English/Hindi'] },
-           { step: 6, title: 'Document Verification', description: 'Submit documents for verification', duration: 'After Tier 2', tips: ['Keep documents ready', 'Verify details', 'Carry originals'] },
-           { step: 7, title: 'Joining', description: 'Get joining letter and join department', duration: 'After DV', tips: ['Check official website', 'Report on time', 'Complete formalities'] }
+           { step: 1, title: language === 'hi' ? 'पात्रता जांचें' : 'Check Eligibility', description: language === 'hi' ? 'एसएससी परीक्षा के लिए पात्रता जांचें' : 'Check eligibility for SSC exams (10th/12th/Graduate as per exam)', duration: language === 'hi' ? 'परीक्षा से पहले' : 'Before Exam', tips: language === 'hi' ? ['पात्रता मानदंड जांचें', 'सही परीक्षा चुनें', 'आयु सीमा सत्यापित करें'] : ['Check eligibility criteria', 'Choose correct exam', 'Verify age limit'] },
+           { step: 2, title: language === 'hi' ? 'बुनियादी तैयारी' : 'Basic Preparation', description: language === 'hi' ? 'अंग्रेजी, गणित, रीजनिंग, जीके के साथ तैयारी शुरू करें' : 'Start preparation with basics of English, Math, Reasoning, GK', duration: language === 'hi' ? '3-6 महीने' : '3-6 Months', tips: language === 'hi' ? ['NCERT बुनियादी बातों से शुरू करें', 'दैनिक अभ्यास करें', 'सूत्र सीखें'] : ['Start with NCERT basics', 'Practice daily', 'Learn formulas'] },
+           { step: 3, title: language === 'hi' ? 'गहन तैयारी' : 'Deep Preparation', description: language === 'hi' ? 'सभी वर्गों के लिए गहन तैयारी' : 'Deep preparation for all sections', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['पिछले पेपर्स हल करें', 'मॉक टेस्ट लें', 'कमजोर क्षेत्रों की पहचान करें'] : ['Solve previous papers', 'Take mock tests', 'Identify weak areas'] },
+           { step: 4, title: language === 'hi' ? 'टियर 1 परीक्षा' : 'Appear for Tier 1', description: language === 'hi' ? 'CBT परीक्षा (वस्तुनिष्ठ) दें' : 'Appear for CBT exam (Objective)', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['कटऑफ पास करें', 'समय प्रबंधन', 'सभी प्रश्नों का प्रयास करें'] : ['Clear cutoff', 'Manage time', 'Attempt all questions'] },
+           { step: 5, title: language === 'hi' ? 'टियर 2 और स्किल टेस्ट' : 'Appear for Tier 2', description: language === 'hi' ? 'वर्णनात्मक/टाइपिंग टेस्ट दें' : 'Appear for Descriptive/Typing test', duration: language === 'hi' ? 'टियर 1 के बाद' : 'After Tier 1', tips: language === 'hi' ? ['टाइपिंग का अभ्यास करें', 'निबंध लिखें', 'अंग्रेजी/हिंदी का अभ्यास करें'] : ['Practice typing', 'Write essays', 'Practice English/Hindi'] },
+           { step: 6, title: language === 'hi' ? 'दस्तावेज सत्यापन' : 'Document Verification', description: language === 'hi' ? 'सत्यापन के लिए दस्तावेज जमा करें' : 'Submit documents for verification', duration: language === 'hi' ? 'टियर 2 के बाद' : 'After Tier 2', tips: language === 'hi' ? ['दस्तावेज तैयार रखें', 'विवरण सत्यापित करें', 'मूल प्रतियां साथ ले जाएं'] : ['Keep documents ready', 'Verify details', 'Carry originals'] },
+           { step: 7, title: language === 'hi' ? 'नियुक्ति' : 'Joining', description: language === 'hi' ? 'नियुक्ति पत्र प्राप्त करें और विभाग में शामिल हों' : 'Get joining letter and join department', duration: language === 'hi' ? 'सत्यापन के बाद' : 'After DV', tips: language === 'hi' ? ['आधिकारिक वेबसाइट देखें', 'समय पर रिपोर्ट करें', 'औपचारिकताएं पूरी करें'] : ['Check official website', 'Report on time', 'Complete formalities'] }
          ],
          skills: ['Quantitative Aptitude', 'English', 'General Awareness', 'Reasoning', 'Computer Knowledge', 'Time Management']
        },
        'Banking': {
-         title: 'Banking Exams (IBPS/SBI)',
+         title: language === 'hi' ? 'बैंकिंग परीक्षा (IBPS/SBI)' : 'Banking Exams (IBPS/SBI)',
          icon: <FaMoneyBillWave className="text-success" />,
-         description: 'Crack Banking exams to get Officer/Clerk positions in Public Sector Banks',
-         fullPath: 'Graduate → PO/Clerk Exam → GD/Interview → Appointment in Bank',
+         description: language === 'hi' ? 'सार्वजनिक क्षेत्र के बैंकों में अधिकारी/क्लर्क पद पाने के लिए बैंकिंग परीक्षा पास करें' : 'Crack Banking exams to get Officer/Clerk positions in Public Sector Banks',
+         fullPath: language === 'hi' ? 'स्नातक → पीओ/क्लर्क परीक्षा → जीडी/इंटरव्यू → बैंक में नियुक्ति' : 'Graduate → PO/Clerk Exam → GD/Interview → Appointment in Bank',
          steps: [
-           { step: 1, title: 'Complete Graduation', description: 'Complete graduation in any stream', duration: '3 Years', tips: ['Maintain good percentage', 'Stay updated on banking news', 'Read financial news'] },
-           { step: 2, title: 'Check Eligibility', description: 'Check eligibility for Banking exams', duration: 'Before Exam', tips: ['Check age limit', 'Verify required percentage', 'Confirm nationality'] },
-           { step: 3, title: 'Basic Preparation', description: 'Start preparation with basics of Quant, Reasoning, English, GA', duration: '3-6 Months', tips: ['Learn formulas', 'Practice tables', 'Read newspapers'] },
-           { step: 4, title: 'Appear for Preliminary', description: 'Appear for Prelims (Quant, Reasoning, English)', duration: 'Exam Season', tips: ['Clear cutoff', 'Manage time', 'Maintain accuracy'] },
-           { step: 5, title: 'Appear for Mains', description: 'Appear for Mains (All sections + Computer)', duration: 'After Prelims', tips: ['Study thoroughly', 'Take mock tests', 'Improve speed'] },
+           { step: 1, title: language === 'hi' ? 'स्नातक पूरा करें' : 'Complete Graduation', description: language === 'hi' ? 'किसी भी विषय में स्नातक पूरा करें' : 'Complete graduation in any stream', duration: language === 'hi' ? '3 वर्ष' : '3 Years', tips: language === 'hi' ? ['अच्छा प्रतिशत बनाए रखें', 'बैंकिंग समाचारों पर अपडेट रहें', 'वित्तीय समाचार पढ़ें'] : ['Maintain good percentage', 'Stay updated on banking news', 'Read financial news'] },
+           { step: 2, title: language === 'hi' ? 'पात्रता जांचें' : 'Check Eligibility', description: language === 'hi' ? 'बैंकिंग परीक्षाओं के लिए पात्रता जांचें' : 'Check eligibility for Banking exams', duration: language === 'hi' ? 'परीक्षा से पहले' : 'Before Exam', tips: language === 'hi' ? ['आयु सीमा जांचें', 'आवश्यक प्रतिशत सत्यापित करें', 'राष्ट्रीयता की पुष्टि करें'] : ['Check age limit', 'Verify required percentage', 'Confirm nationality'] },
+           { step: 3, title: language === 'hi' ? 'बुनियादी तैयारी' : 'Basic Preparation', description: language === 'hi' ? 'क्वांट, रीजनिंग, अंग्रेजी, जीए के साथ तैयारी शुरू करें' : 'Start preparation with basics of Quant, Reasoning, English, GA', duration: language === 'hi' ? '3-6 महीने' : '3-6 Months', tips: language === 'hi' ? ['सूत्र सीखें', 'तालिकाओं का अभ्यास करें', 'समाचार पत्र पढ़ें'] : ['Learn formulas', 'Practice tables', 'Read newspapers'] },
+           { step: 4, title: language === 'hi' ? 'प्रारंभिक परीक्षा' : 'Appear for Preliminary', description: language === 'hi' ? 'प्रीलिम्स (क्वांट, रीजनिंग, अंग्रेजी) दें' : 'Appear for Prelims (Quant, Reasoning, English)', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['कटऑफ पास करें', 'समय प्रबंधन', 'सटीकता बनाए रखें'] : ['Clear cutoff', 'Manage time', 'Maintain accuracy'] },
+           { step: 5, title: language === 'hi' ? 'मेंस परीक्षा' : 'Appear for Mains', description: language === 'hi' ? 'मेंस परीक्षा (सभी खंड + कंप्यूटर) दें' : 'Appear for Mains (All sections + Computer)', duration: language === 'hi' ? 'प्रीलिम्स के बाद' : 'After Prelims', tips: language === 'hi' ? ['गहन अध्ययन करें', 'मॉक टेस्ट लें', 'गति सुधारें'] : ['Study thoroughly', 'Take mock tests', 'Improve speed'] },
            { step: 6, title: 'Group Discussion', description: 'Appear for Group Discussion', duration: 'After Mains', tips: ['Read current topics', 'Form opinions', 'Be polite'] },
            { step: 7, title: 'Personal Interview', description: 'Appear for Personal Interview', duration: 'After GD', tips: ['Be confident', 'Know about bank', 'Dress formally'] },
            { step: 8, title: 'Joining', description: 'Get joining and become PO/Clerk', duration: 'After Result', tips: ['Check website', 'Report on time', 'Complete training'] }
@@ -358,65 +374,65 @@ const OccupationDetails = () => {
          skills: ['Quantitative Aptitude', 'Reasoning', 'English', 'General Awareness', 'Computer Knowledge', 'Communication']
        },
        'Railway': {
-         title: 'Railway Exams (RRB)',
+         title: language === 'hi' ? 'रेलवे परीक्षा (RRB)' : 'Railway Exams (RRB)',
          icon: <FaTrain className="text-warning" />,
-         description: 'Crack RRB exams to get jobs in Indian Railways (Group C/D)',
-         fullPath: '12th/Graduate → RRB Exam → Document Verification → Joining',
+         description: language === 'hi' ? 'भारतीय रेलवे (ग्रुप सी/डी) में नौकरी पाने के लिए आरआरबी परीक्षा पास करें' : 'Crack RRB exams to get jobs in Indian Railways (Group C/D)',
+         fullPath: language === 'hi' ? '12वीं/स्नातक → आरआरबी परीक्षा → दस्तावेज सत्यापन → नियुक्ति' : '12th/Graduate → RRB Exam → Document Verification → Joining',
          steps: [
-           { step: 1, title: 'Check Eligibility', description: 'Check eligibility for RRB exams (10th/12th/Graduate)', duration: 'Before Exam', tips: ['Check notification', 'Verify age limit', 'Confirm qualification'] },
-           { step: 2, title: 'Basic Preparation', description: 'Start preparation with basics', duration: '2-3 Months', tips: ['Study NCERT', 'Practice math', 'Work on reasoning'] },
-           { step: 3, title: 'Deep Preparation', description: 'Prepare for all subjects thoroughly', duration: '6-12 Months', tips: ['Solve previous papers', 'Take mock tests', 'Improve weak areas'] },
-           { step: 4, title: 'Appear for CBT', description: 'Appear for Computer Based Test', duration: 'Exam Season', tips: ['Clear cutoff', 'Manage time', 'Maintain accuracy'] },
-           { step: 5, title: 'Skill Test (if applicable)', description: 'Appear for Typing/Document verification', duration: 'After CBT', tips: ['Practice typing', 'Keep documents ready'] },
-           { step: 6, title: 'Medical Examination', description: 'Clear medical examination', duration: 'After Skill Test', tips: ['Know medical standards', 'Stay fit', 'Be honest'] },
+           { step: 1, title: language === 'hi' ? 'पात्रता जांचें' : 'Check Eligibility', description: language === 'hi' ? 'आरआरबी परीक्षाओं के लिए पात्रता जांचें' : 'Check eligibility for RRB exams (10th/12th/Graduate)', duration: language === 'hi' ? 'परीक्षा से पहले' : 'Before Exam', tips: language === 'hi' ? ['अधिसूचना जांचें', 'आयु सीमा सत्यापित करें', 'योग्यता की पुष्टि करें'] : ['Check notification', 'Verify age limit', 'Confirm qualification'] },
+           { step: 2, title: language === 'hi' ? 'बुनियादी तैयारी' : 'Basic Preparation', description: language === 'hi' ? 'बुनियादी बातों के साथ तैयारी शुरू करें' : 'Start preparation with basics', duration: language === 'hi' ? '2-3 महीने' : '2-3 Months', tips: language === 'hi' ? ['NCERT पढ़ें', 'गणित का अभ्यास करें', 'रीजनिंग पर काम करें'] : ['Study NCERT', 'Practice math', 'Work on reasoning'] },
+           { step: 3, title: language === 'hi' ? 'गहन तैयारी' : 'Deep Preparation', description: language === 'hi' ? 'सभी विषयों की अच्छी तैयारी करें' : 'Prepare for all subjects thoroughly', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['पिछले पेपर्स हल करें', 'मॉक टेस्ट लें', 'कमजोर क्षेत्रों में सुधार करें'] : ['Solve previous papers', 'Take mock tests', 'Improve weak areas'] },
+           { step: 4, title: language === 'hi' ? 'CBT में उपस्थित हों' : 'Appear for CBT', description: language === 'hi' ? 'कंप्यूटर आधारित टेस्ट दें' : 'Appear for Computer Based Test', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['कटऑफ पास करें', 'समय प्रबंधन', 'सटीकता बनाए रखें'] : ['Clear cutoff', 'Manage time', 'Maintain accuracy'] },
+           { step: 5, title: language === 'hi' ? 'स्किल टेस्ट' : 'Skill Test (if applicable)', description: language === 'hi' ? 'टाइपिंग/दस्तावेज सत्यापन के लिए उपस्थित हों' : 'Appear for Typing/Document verification', duration: language === 'hi' ? 'CBT के बाद' : 'After CBT', tips: language === 'hi' ? ['टाइपिंग का अभ्यास करें', 'दस्तावेज तैयार रखें'] : ['Practice typing', 'Keep documents ready'] },
+           { step: 6, title: language === 'hi' ? 'चिकित्सा परीक्षण' : 'Medical Examination', description: language === 'hi' ? 'चिकित्सा परीक्षण पास करें' : 'Clear medical examination', duration: language === 'hi' ? 'स्किल टेस्ट के बाद' : 'After Skill Test', tips: language === 'hi' ? ['चिकित्सा मानक जानें', 'फिट रहें', 'ईमानदार रहें'] : ['Know medical standards', 'Stay fit', 'Be honest'] },
            { step: 7, title: 'Joining', description: 'Get joining and join Railway', duration: 'After Medical', tips: ['Check website', 'Report on time', 'Complete training'] }
          ],
          skills: ['Mathematics', 'General Intelligence', 'Reasoning', 'General Awareness', 'Basic English', 'Physical Fitness']
        },
        'StatePSC': {
-         title: 'State PSC Exams',
+         title: language === 'hi' ? 'राज्य पीएससी परीक्षा' : 'State PSC Exams',
          icon: <FaFlag className="text-info" />,
-         description: 'Crack State PSC exams to get state government jobs',
-         fullPath: 'Graduate → State PSC Exam → Interview → Joining',
+         description: language === 'hi' ? 'राज्य सरकार की नौकरियां पाने के लिए राज्य पीएससी परीक्षा पास करें' : 'Crack State PSC exams to get state government jobs',
+         fullPath: language === 'hi' ? 'स्नातक → राज्य पीएससी परीक्षा → साक्षात्कार → नियुक्ति' : 'Graduate → State PSC Exam → Interview → Joining',
          steps: [
-           { step: 1, title: 'Complete Graduation', description: 'Complete graduation in any stream', duration: '3 Years', tips: ['Study strategically', 'Gain state-specific knowledge', 'Stay updated'] },
-           { step: 2, title: 'Check State PSC Notification', description: 'Check notification for your state PSC exam', duration: 'When Notified', tips: ['Visit PSC website', 'Check eligibility', 'Know exam pattern'] },
-           { step: 3, title: 'Prepare for Preliminary', description: 'Prepare for Preliminary exam (if applicable)', duration: '3-6 Months', tips: ['Study state syllabus', 'Solve previous papers', 'Take mock tests'] },
-           { step: 4, title: 'Prepare for Mains', description: 'Prepare for Mains exam', duration: '6-12 Months', tips: ['Focus on state-specific topics', 'Practice answer writing', 'Study state issues'] },
-           { step: 5, title: 'Interview', description: 'Appear for Personality Test', duration: 'After Mains', tips: ['Know your state', 'Be confident', 'Stay updated on state issues'] },
-           { step: 6, title: 'Joining', description: 'Get joining in state department', duration: 'After Result', tips: ['Check website', 'Report on time', 'Complete formalities'] }
+           { step: 1, title: language === 'hi' ? 'स्नातक पूरा करें' : 'Complete Graduation', description: language === 'hi' ? 'किसी भी विषय में स्नातक पूरा करें' : 'Complete graduation in any stream', duration: language === 'hi' ? '3 वर्ष' : '3 Years', tips: language === 'hi' ? ['रणनीतिक अध्ययन करें', 'राज्य-विशिष्ट ज्ञान प्राप्त करें', 'अपडेट रहें'] : ['Study strategically', 'Gain state-specific knowledge', 'Stay updated'] },
+           { step: 2, title: language === 'hi' ? 'राज्य PSC अधिसूचना' : 'Check State PSC Notification', description: language === 'hi' ? 'अपने राज्य की PSC अधिसूचना जांचें' : 'Check notification for your state PSC exam', duration: language === 'hi' ? 'जब अधिसूचित हो' : 'When Notified', tips: language === 'hi' ? ['PSC वेबसाइट देखें', 'पात्रता जांचें', 'परीक्षा पैटर्न जानें'] : ['Visit PSC website', 'Check eligibility', 'Know exam pattern'] },
+           { step: 3, title: language === 'hi' ? 'प्रारंभिक तैयारी' : 'Prepare for Preliminary', description: language === 'hi' ? 'प्रारंभिक परीक्षा (यदि लागू हो) की तैयारी करें' : 'Prepare for Preliminary exam (if applicable)', duration: language === 'hi' ? '3-6 महीने' : '3-6 Months', tips: language === 'hi' ? ['राज्य पाठ्यक्रम पढ़ें', 'पिछले पेपर्स हल करें', 'मॉक टेस्ट लें'] : ['Study state syllabus', 'Solve previous papers', 'Take mock tests'] },
+           { step: 4, title: language === 'hi' ? 'मेंस की तैयारी' : 'Prepare for Mains', description: language === 'hi' ? 'मुख्य परीक्षा की तैयारी करें' : 'Prepare for Mains exam', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['राज्य-विशिष्ट विषयों पर ध्यान दें', 'उत्तर लेखन का अभ्यास करें', 'राज्य के मुद्दों का अध्ययन करें'] : ['Focus on state-specific topics', 'Practice answer writing', 'Study state issues'] },
+           { step: 5, title: language === 'hi' ? 'साक्षात्कार' : 'Interview', description: language === 'hi' ? 'व्यक्तित्व परीक्षण दें' : 'Appear for Personality Test', duration: language === 'hi' ? 'मेंस के बाद' : 'After Mains', tips: language === 'hi' ? ['अपने राज्य को जानें', 'आत्मविश्वासी बनें', 'राज्य के मुद्दों पर अपडेट रहें'] : ['Know your state', 'Be confident', 'Stay updated on state issues'] },
+           { step: 6, title: language === 'hi' ? 'नियुक्ति' : 'Joining', description: language === 'hi' ? 'राज्य विभाग में शामिल हों' : 'Get joining in state department', duration: language === 'hi' ? 'परिणाम के बाद' : 'After Result', tips: language === 'hi' ? ['वेबसाइट जांचें', 'समय पर रिपोर्ट करें', 'औपचारिकताएं पूरी करें'] : ['Check website', 'Report on time', 'Complete formalities'] }
          ],
          skills: ['State-specific Knowledge', 'Current Affairs', 'General Studies', 'Communication', 'Leadership', 'Time Management']
        },
        'NDA': {
-         title: 'NDA (National Defense Academy)',
+         title: language === 'hi' ? 'एनडीए (राष्ट्रीय रक्षा अकादमी)' : 'NDA (National Defense Academy)',
          icon: <FaShieldAlt className="text-primary" />,
-         description: 'Crack NDA to join Indian Defense Forces (Army, Navy, Air Force)',
-         fullPath: '12th → NDA Exam → SSB Interview → Medical → Joining → Training',
+         description: language === 'hi' ? 'भारतीय रक्षा बलों (सेना, नौसेना, वायु सेना) में शामिल होने के लिए एनडीए पास करें' : 'Crack NDA to join Indian Defense Forces (Army, Navy, Air Force)',
+         fullPath: language === 'hi' ? '12वीं → एनडीए परीक्षा → एसएसबी इंटरव्यू → मेडिकल → नियुक्ति → प्रशिक्षण' : '12th → NDA Exam → SSB Interview → Medical → Joining → Training',
          steps: [
-           { step: 1, title: 'Complete 12th', description: 'Complete 12th in any stream (Science for Air Force/Navy)', duration: '2 Years', tips: ['Focus on fitness', 'Stay focused on studies', 'Stay updated on defense news'] },
-           { step: 2, title: 'Apply for NDA', description: 'Apply for NDA when notification is out', duration: 'When Notified', tips: ['Check eligibility', 'Know exam pattern', 'Prepare required documents'] },
-           { step: 3, title: 'Prepare for Written Exam', description: 'Prepare for Mathematics and General Ability', duration: '6-12 Months', tips: ['Study NCERT', 'Practice previous papers', 'Take mock tests'] },
-           { step: 4, title: 'Appear for Written Exam', description: 'Appear for NDA written exam', duration: 'Exam Season', tips: ['Manage time', 'Attempt all questions', 'Stay calm'] },
-           { step: 5, title: 'SSB Interview', description: 'Appear for Services Selection Board (SSB) interview', duration: '5 Days', tips: ['Be confident', 'Show leadership qualities', 'Be natural'] },
-           { step: 6, title: 'Medical Examination', description: 'Clear medical examination', duration: 'During SSB', tips: ['Know medical standards', 'Stay fit', 'Be honest'] },
-           { step: 7, title: 'Joining & Training', description: 'Join NDA for training', duration: '3 Years', tips: ['Stay disciplined', 'Focus on training', 'Build camaraderie'] }
+           { step: 1, title: language === 'hi' ? '12वीं पूरी करें' : 'Complete 12th', description: language === 'hi' ? 'किसी भी विषय में 12वीं पूरी करें' : 'Complete 12th in any stream (Science for Air Force/Navy)', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['फिटनेस पर ध्यान दें', 'पढ़ाई पर केंद्रित रहें', 'रक्षा समाचारों पर अपडेट रहें'] : ['Focus on fitness', 'Stay focused on studies', 'Stay updated on defense news'] },
+           { step: 2, title: language === 'hi' ? 'एनडीए के लिए आवेदन करें' : 'Apply for NDA', description: language === 'hi' ? 'अधिसूचना आने पर आवेदन करें' : 'Apply for NDA when notification is out', duration: language === 'hi' ? 'जब अधिसूचित हो' : 'When Notified', tips: language === 'hi' ? ['पात्रता जांचें', 'परीक्षा पैटर्न जानें', 'दस्तावेज तैयार करें'] : ['Check eligibility', 'Know exam pattern', 'Prepare required documents'] },
+           { step: 3, title: language === 'hi' ? 'लिखित परीक्षा की तैयारी' : 'Prepare for Written Exam', description: language === 'hi' ? 'गणित और सामान्य योग्यता की तैयारी करें' : 'Prepare for Mathematics and General Ability', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['NCERT पढ़ें', 'पिछले पेपर्स का अभ्यास करें', 'मॉक टेस्ट लें'] : ['Study NCERT', 'Practice previous papers', 'Take mock tests'] },
+           { step: 4, title: language === 'hi' ? 'लिखित परीक्षा दें' : 'Appear for Written Exam', description: language === 'hi' ? 'एनडीए की लिखित परीक्षा में बैठें' : 'Appear for NDA written exam', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['समय प्रबंधन', 'सभी प्रश्नों का प्रयास करें', 'शांत रहें'] : ['Manage time', 'Attempt all questions', 'Stay calm'] },
+           { step: 5, title: language === 'hi' ? 'एसएसबी इंटरव्यू' : 'SSB Interview', description: language === 'hi' ? 'एसएसबी (SSB) साक्षात्कार दें' : 'Appear for Services Selection Board (SSB) interview', duration: language === 'hi' ? '5 दिन' : '5 Days', tips: language === 'hi' ? ['आत्मविश्वासी बनें', 'नेतृत्व के गुण दिखाएं', 'स्वाभाविक रहें'] : ['Be confident', 'Show leadership qualities', 'Be natural'] },
+           { step: 6, title: language === 'hi' ? 'चिकित्सा परीक्षण' : 'Medical Examination', description: language === 'hi' ? 'चिकित्सा परीक्षण पास करें' : 'Clear medical examination', duration: language === 'hi' ? 'SSB के दौरान' : 'During SSB', tips: language === 'hi' ? ['चिकित्सा मानक जानें', 'फिट रहें', 'ईमानदार रहें'] : ['Know medical standards', 'Stay fit', 'Be honest'] },
+           { step: 7, title: language === 'hi' ? 'ट्रेनिंग' : 'Joining & Training', description: language === 'hi' ? 'ट्रेनिंग के लिए एनडीए जॉइन करें' : 'Join NDA for training', duration: language === 'hi' ? '3 वर्ष' : '3 Years', tips: language === 'hi' ? ['अनुशासित रहें', 'प्रशिक्षण पर ध्यान दें', 'भाईचारा बनाएं'] : ['Stay disciplined', 'Focus on training', 'Build camaraderie'] }
          ],
          skills: ['Mathematics', 'General Knowledge', 'English', 'Physical Fitness', 'Leadership', 'Discipline']
        },
        'GATE': {
-         title: 'GATE (Graduate Aptitude Test in Engineering)',
+         title: language === 'hi' ? 'गेट (इंजीनियरिंग में स्नातक योग्यता परीक्षा)' : 'GATE (Graduate Aptitude Test in Engineering)',
          icon: <FaFlask className="text-info" />,
-         description: 'Crack GATE to get admission in M.Tech or PSU jobs',
-         fullPath: 'Graduate (Engineering) → GATE → M.Tech/PSU Job',
+         description: language === 'hi' ? 'एम.टेक या पीएसयू नौकरियों में प्रवेश पाने के लिए गेट पास करें' : 'Crack GATE to get admission in M.Tech or PSU jobs',
+         fullPath: language === 'hi' ? 'स्नातक (इंजीनियरिंग) → गेट → एम.टेक/पीएसयू नौकरी' : 'Graduate (Engineering) → GATE → M.Tech/PSU Job',
          steps: [
-           { step: 1, title: 'Complete B.Tech', description: 'Complete engineering graduation in your stream', duration: '4 Years', tips: ['Focus on studies', 'Build strong foundation', 'Learn basics'] },
-           { step: 2, title: 'Check Eligibility', description: 'Check GATE eligibility for your stream', duration: 'Before Exam', tips: ['Verify GATE eligibility', 'Check relevant paper', 'Know exam pattern'] },
-           { step: 3, title: 'Study GATE Syllabus', description: 'Cover complete syllabus according to your stream', duration: '6-12 Months', tips: ['Clear all concepts', 'Use standard books', 'Make notes'] },
-           { step: 4, title: 'Prepare for GATE', description: 'Solve previous papers, take mock tests', duration: '6-12 Months', tips: ['Solve previous year papers', 'Take mock tests', 'Manage time'] },
-           { step: 5, title: 'Appear for GATE', description: 'Appear for GATE exam', duration: 'Exam Season', tips: ['Manage time', 'Maintain accuracy', 'Stay calm'] },
-           { step: 6, title: 'GATE Counseling', description: 'Participate in COAP/CCMT counseling', duration: 'After Result', tips: ['Fill choices', 'Research colleges', 'Set branch preferences'] },
-           { step: 7, title: 'Complete M.Tech', description: 'Complete M.Tech or join PSU', duration: '2 Years', tips: ['Specialize in a field', 'Do projects', 'Build network'] }
+           { step: 1, title: language === 'hi' ? 'बी.टेक पूरा करें' : 'Complete B.Tech', description: language === 'hi' ? 'अपनी स्ट्रीम में इंजीनियरिंग स्नातक पूरा करें' : 'Complete engineering graduation in your stream', duration: language === 'hi' ? '4 वर्ष' : '4 Years', tips: language === 'hi' ? ['पढ़ाई पर ध्यान दें', 'मजबूत आधार बनाएं', 'बुनियादी बातें सीखें'] : ['Focus on studies', 'Build strong foundation', 'Learn basics'] },
+           { step: 2, title: language === 'hi' ? 'पात्रता जांचें' : 'Check Eligibility', description: language === 'hi' ? 'अपनी स्ट्रीम के लिए गेट पात्रता जांचें' : 'Check GATE eligibility for your stream', duration: language === 'hi' ? 'परीक्षा से पहले' : 'Before Exam', tips: language === 'hi' ? ['पात्रता सत्यापित करें', 'प्रासंगिक पेपर जांचें', 'परीक्षा पैटर्न जानें'] : ['Verify GATE eligibility', 'Check relevant paper', 'Know exam pattern'] },
+           { step: 3, title: language === 'hi' ? 'गेट सिलेबस' : 'Study GATE Syllabus', description: language === 'hi' ? 'अपनी स्ट्रीम के अनुसार सिलेबस कवर करें' : 'Cover complete syllabus according to your stream', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['सभी अवधारणाएं स्पष्ट करें', 'मानक किताबों का उपयोग करें', 'नोट्स बनाएं'] : ['Clear all concepts', 'Use standard books', 'Make notes'] },
+           { step: 4, title: language === 'hi' ? 'गेट की तैयारी' : 'Prepare for GATE', description: language === 'hi' ? 'पिछले पेपर्स हल करें, मॉक टेस्ट लें' : 'Solve previous papers, take mock tests', duration: language === 'hi' ? '6-12 महीने' : '6-12 Months', tips: language === 'hi' ? ['पिछले साल के पेपर हल करें', 'मॉक टेस्ट लें', 'समय प्रबंधन'] : ['Solve previous year papers', 'Take mock tests', 'Manage time'] },
+           { step: 5, title: language === 'hi' ? 'गेट में उपस्थित हों' : 'Appear for GATE', description: language === 'hi' ? 'गेट परीक्षा दें' : 'Appear for GATE exam', duration: language === 'hi' ? 'परीक्षा सत्र' : 'Exam Season', tips: language === 'hi' ? ['समय प्रबंधन', 'सटीकता बनाए रखें', 'शांत रहें'] : ['Manage time', 'Maintain accuracy', 'Stay calm'] },
+           { step: 6, title: language === 'hi' ? 'गेट काउंसलिंग' : 'GATE Counseling', description: language === 'hi' ? 'COAP/CCMT काउंसलिंग में भाग लें' : 'Participate in COAP/CCMT counseling', duration: language === 'hi' ? 'परिणाम के बाद' : 'After Result', tips: language === 'hi' ? ['विकल्प भरें', 'कॉलेजों पर शोध करें', 'शाखा प्राथमिकताएं सेट करें'] : ['Fill choices', 'Research colleges', 'Set branch preferences'] },
+           { step: 7, title: language === 'hi' ? 'एम.टेक पूरा करें' : 'Complete M.Tech', description: language === 'hi' ? 'एम.टेक पूरा करें या पीएसयू में शामिल हों' : 'Complete M.Tech or join PSU', duration: language === 'hi' ? '2 वर्ष' : '2 Years', tips: language === 'hi' ? ['एक क्षेत्र में विशेषज्ञता प्राप्त करें', 'प्रोजेक्ट्स करें', 'नेटवर्क बनाएं'] : ['Specialize in a field', 'Do projects', 'Build network'] }
          ],
          skills: ['Technical Knowledge', 'Problem Solving', 'Analytical Skills', 'Time Management', 'Core Engineering Concepts', 'Mathematics']
        }
@@ -441,6 +457,77 @@ const OccupationDetails = () => {
 
    const filteredExamTypes = stream ? getFilteredExamTypesByStream() : govtExamTypes;
 
+   // Translation object for UI elements
+   const labels = {
+     en: {
+       noOccupation: "No occupation selected. Please go back and select an occupation.",
+       backToGuidance: "Back to Guidance",
+       loading: "Loading occupation details...",
+       growth: "Growth",
+       demand: "Demand",
+       salary: "Salary",
+       govtExamPrep: "Government Exam Prep",
+       careerOpp: "Career Opportunities",
+       stepPath: "Step-by-Step Path",
+       skillsExams: "Skills & Exams",
+       topColleges: "Top Colleges",
+       govtPrepDesc: "Select an exam type to see the complete roadmap and details.",
+       backToSelection: "Back to Career Selection",
+       completePath: "Complete Path:",
+       stepByStepPrep: "Step-by-Step Preparation", // UI Header
+       completeRoadmap: "Complete Roadmap", // UI Header
+       availableCareerOpp: "Available Career Opportunities",
+       relatedToCourse: "Related to your course",
+       exploreInterests: "Explore different career paths based on your interests:",
+       exploreMoreRelated: "Explore More Related Occupations",
+       careerProgression: "Career Progression",
+       careerPathTitle: "Career Path",
+       followSteps: "Follow these steps to build your career:",
+       requiredSkills: "Required Skills",
+       entranceExams: "Entrance Exams",
+       eligibility: "Eligibility",
+       frequency: "Frequency",
+       difficulty: "Difficulty",
+       location: "Location",
+       ranking: "Ranking",
+       tips: "Tips:",
+     },
+     hi: {
+       noOccupation: "कोई पेशा नहीं चुना गया है। कृपया वापस जाएं और एक पेशा चुनें।",
+       backToGuidance: "मार्गदर्शन पर वापस जाएं",
+       loading: "पेशे का विवरण लोड हो रहा है...",
+       growth: "विकास",
+       demand: "मांग",
+       salary: "वेतन",
+       govtExamPrep: "सरकारी परीक्षा की तैयारी",
+       careerOpp: "करियर के अवसर",
+       stepPath: "चरण-दर-चरण पथ",
+       skillsExams: "कौशल और परीक्षा",
+       topColleges: "शीर्ष कॉलेज",
+       govtPrepDesc: "पूरा रोडमैप और विवरण देखने के लिए परीक्षा का प्रकार चुनें।",
+       backToSelection: "करियर चयन पर वापस जाएं",
+       completePath: "पूरा पथ:",
+       stepByStepPrep: "चरण-दर-चरण तैयारी", // UI Header
+       completeRoadmap: "पूर्ण रोडमैप", // UI Header
+       availableCareerOpp: "उपलब्ध करियर के अवसर",
+       relatedToCourse: "आपके कोर्स से संबंधित",
+       exploreInterests: "अपनी रुचियों के आधार पर विभिन्न करियर पथों का अन्वेषण करें:",
+       exploreMoreRelated: "अधिक संबंधित व्यवसायों का अन्वेषण करें",
+       careerProgression: "करियर की प्रगति",
+       careerPathTitle: "करियर पथ",
+       followSteps: "अपना करियर बनाने के लिए इन चरणों का पालन करें:",
+       requiredSkills: "आवश्यक कौशल",
+       entranceExams: "प्रवेश परीक्षा",
+       eligibility: "पात्रता",
+       frequency: "आवृत्ति",
+       difficulty: "कठिनाई",
+       location: "स्थान",
+       ranking: "रैंकिंग",
+       tips: "सुझाव:",
+     }
+   };
+   const t = labels[language] || labels.en;
+
    // Update selectedGovtExam when stream or occupation changes
    useEffect(() => {
      const validExamTypes = ['IIT-JEE', 'NEET', 'UPSC', 'SSC', 'Banking', 'Railway', 'StatePSC', 'NDA', 'GATE'];
@@ -464,13 +551,13 @@ const OccupationDetails = () => {
         <UserLeftNav sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} isMobile={isMobile} isTablet={isTablet} />
         <div className="main-content-dash">
           <UserHeader toggleSidebar={toggleSidebar} />
-          <Container className="dashboard-box mt-3">
+          <Container fluid className="dashboard-box mt-3">
             <Alert variant="warning">
-              No occupation selected. Please go back and select an occupation.
+              {t.noOccupation}
             </Alert>
              <Button variant="outline-primary" onClick={() => navigate('/UserNotifications')}>
                <FaArrowLeft className="me-2" />
-               Back to Guidance
+               {t.backToGuidance}
              </Button>
           </Container>
         </div>
@@ -489,13 +576,13 @@ const OccupationDetails = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
-              <p className="mt-3">Loading occupation details...</p>
+              <p className="mt-3">{t.loading}</p>
             </div>
           ) : (
             <>
@@ -513,13 +600,10 @@ const OccupationDetails = () => {
                            <p className="text-muted mb-2" style={{ fontSize: '1.05rem', lineHeight: '1.6' }}>{occupationDetails.description}</p>
                            <div className="header-stats">
                              <div className="stat-item">
-                               <FaChartLine className="me-1" /> Growth: {occupationDetails.growthPotential}
+                               <FaChartLine className="me-1" /> {t.growth}: {occupationDetails.growthPotential}
                              </div>
                              <div className="stat-item">
-                               <FaUsers className="me-1" /> Demand: {occupationDetails.demandLevel}
-                             </div>
-                             <div className="stat-item">
-                               <FaGraduationCap className="me-1" /> Salary: {occupationDetails.salaryRange}
+                               <FaUsers className="me-1" /> {t.demand}: {occupationDetails.demandLevel}
                              </div>
                            </div>
                          </div>
@@ -538,32 +622,32 @@ const OccupationDetails = () => {
                          <Nav.Item>
                            <Nav.Link eventKey="govt-exams">
                              <FaShieldAlt className="me-2" />
-                             Government Exam Prep
+                             {t.govtExamPrep}
                            </Nav.Link>
                          </Nav.Item>
                        )}
                        <Nav.Item>
                          <Nav.Link eventKey="career-opportunities">
                            <FaRocket className="me-2" />
-                           Career Opportunities
+                           {t.careerOpp}
                          </Nav.Link>
                        </Nav.Item>
                        <Nav.Item>
                          <Nav.Link eventKey="step-by-step">
                            <FaClipboardList className="me-2" />
-                           Step-by-Step Path
+                           {t.stepPath}
                          </Nav.Link>
                        </Nav.Item>
                        <Nav.Item>
                          <Nav.Link eventKey="skills-exams">
                            <FaStar className="me-2" />
-                           Skills & Exams
+                           {t.skillsExams}
                          </Nav.Link>
                        </Nav.Item>
                        <Nav.Item>
                          <Nav.Link eventKey="colleges">
                            <FaUniversity className="me-2" />
-                           Top Colleges
+                           {t.topColleges}
                          </Nav.Link>
                        </Nav.Item>
                      </Nav>
@@ -573,9 +657,9 @@ const OccupationDetails = () => {
                        {(prepType === 'govtJob' || prepType === 'govtCollege') && (
                          <Tab.Pane eventKey="govt-exams">
                            <div className="mb-4">
-                             <h5 className="mb-3">Government Exam Preparation</h5>
+                             <h5 className="mb-3">{t.govtExamPrep}</h5>
                              <p className="text-muted mb-4">
-                               Select an exam type to see the complete roadmap and details.
+                               {t.govtPrepDesc}
                              </p>
                              <Row>
                                {filteredExamTypes.map((examType, index) => {
@@ -633,11 +717,12 @@ const OccupationDetails = () => {
                                  <Card.Body className="p-4">
                                    <Alert variant="info" className="mb-4">
                                      <FaLightbulb className="me-2" />
-                                     <strong>Complete Path:</strong> {getGovtExamDetails(selectedGovtExam).fullPath}
+                                     <strong>{t.completePath}</strong> {getGovtExamDetails(selectedGovtExam).fullPath}
                                    </Alert>
                                    <p className="text-muted mb-4">{getGovtExamDetails(selectedGovtExam).description}</p>
 
-                                   <h6 className="mb-3">Step-by-Step Preparation</h6>
+                                   <h5 className="mb-3">{selectedGovtExam} - {t.completeRoadmap}</h5>
+                                   <h6 className="mb-3">{t.stepByStepPrep}</h6>
                                    <Row>
                                      {getGovtExamDetails(selectedGovtExam).steps.map((step, idx) => (
                                        <Col md={6} key={idx}>
@@ -654,7 +739,7 @@ const OccupationDetails = () => {
                                                  <p className="mb-2 fw-bold" style={{ fontSize: '1.1rem' }}>{step.description}</p>
                                                  <Badge bg="info" className="mb-2">{step.duration}</Badge>
                                                  <div className="mt-2">
-                                                   <small className="text-muted d-block mb-1">Tips:</small>
+                                                   <small className="text-muted d-block mb-1">{t.tips}</small>
                                                    <ul className="mb-0 ps-3 tips-list">
                                                      {step.tips.map((tip, tipIdx) => (
                                                        <li key={tipIdx} className="small text-muted">{tip}</li>
@@ -676,7 +761,7 @@ const OccupationDetails = () => {
                                    <Card.Header className="bg-white border-0 pt-4 pb-0">
                                      <div className="d-flex align-items-center gap-2">
                                        <FaUniversity className="text-primary" />
-                                       <h5 className="mb-0">Top Colleges</h5>
+                                       <h5 className="mb-0">{t.topColleges}</h5>
                                      </div>
                                    </Card.Header>
                                    <Card.Body className="p-4">
@@ -717,9 +802,9 @@ const OccupationDetails = () => {
                        {/* Career Opportunities Tab */}
                        <Tab.Pane eventKey="career-opportunities">
                          <div className="mb-4">
-                           <h5 className="mb-3">Available Career Opportunities</h5>
+                           <h5 className="mb-3">{t.availableCareerOpp}</h5>
                            <p className="text-muted mb-4">
-                             {course ? `Related to your course (${course}):` : 'Explore different career paths based on your interests:'}
+                             {course ? `${t.relatedToCourse} (${course}):` : t.exploreInterests}
                            </p>
                            <Row>
                              {getRelatedOccupations().map((occ, index) => {
@@ -757,7 +842,7 @@ const OccupationDetails = () => {
 
                          {course && (
                            <div className="mb-4">
-                             <h5 className="mb-3">Explore More Related Occupations</h5>
+                             <h5 className="mb-3">{t.exploreMoreRelated}</h5>
                              <div className="d-flex flex-wrap gap-2">
                                {getRelatedOccupations().map((occ, idx) => (
                                  <Button
@@ -768,7 +853,7 @@ const OccupationDetails = () => {
                                      state: { occupation: occ, stream, percentage, course }
                                    })}
                                  >
-                                   {occ}
+                                   {getLocalizedOccupationName(occ)}
                                  </Button>
                                ))}
                              </div>
@@ -776,7 +861,7 @@ const OccupationDetails = () => {
                          )}
 
                          <div className="mb-4">
-                           <h5 className="mb-3">Career Progression: {occupationDetails.title}</h5>
+                           <h5 className="mb-3">{t.careerProgression}: {occupationDetails.title}</h5>
                            <Row>
                              {occupationDetails.careerPath.map((level, index) => (
                                <Col lg={4} md={6} sm={12} key={index} className="mb-4">
@@ -787,7 +872,6 @@ const OccupationDetails = () => {
                                      </div>
                                      <h6 className="mb-1">{level.level}</h6>
                                      <small className="text-muted d-block">{level.experience}</small>
-                                     <small className="d-block text-primary fw-bold mt-1">{level.salary}</small>
                                    </Card.Body>
                                  </Card>
                                </Col>
@@ -798,8 +882,8 @@ const OccupationDetails = () => {
 
                        {/* Step-by-Step Guidance Tab */}
                        <Tab.Pane eventKey="step-by-step">
-                         <h5 className="mb-3">Career Path: {occupationDetails.title}</h5>
-                         <p className="text-muted mb-4">Follow these steps to build your career:</p>
+                         <h5 className="mb-3">{t.careerPathTitle}: {occupationDetails.title}</h5>
+                         <p className="text-muted mb-4">{t.followSteps}</p>
                          <Row>
                            {occupationDetails.steps.map((step, index) => (
                              <Col lg={6} md={6} sm={12} key={index}>
@@ -816,7 +900,7 @@ const OccupationDetails = () => {
                                        <p className="mb-2 fw-bold" style={{ fontSize: '1.1rem' }}>{step.description}</p>
                                        <Badge bg="info" className="mb-2">{step.duration}</Badge>
                                        <div className="mt-2">
-                                         <small className="text-muted d-block mb-1">Tips:</small>
+                                         <small className="text-muted d-block mb-1">{t.tips}</small>
                                          <ul className="mb-0 ps-3 tips-list">
                                            {step.tips.map((tip, idx) => (
                                              <li key={idx} className="small text-muted">{tip}</li>
@@ -840,7 +924,7 @@ const OccupationDetails = () => {
                                <Card.Header className="bg-white border-0 pt-4 pb-0">
                                  <div className="d-flex align-items-center gap-2">
                                    <FaStar className="text-warning" />
-                                   <h5 className="mb-0">Required Skills</h5>
+                                   <h5 className="mb-0">{t.requiredSkills}</h5>
                                  </div>
                                </Card.Header>
                                <Card.Body className="p-4">
@@ -861,7 +945,7 @@ const OccupationDetails = () => {
                                  <Card.Header className="bg-white border-0 pt-4 pb-0">
                                    <div className="d-flex align-items-center gap-2">
                                      <FaClipboardList className="text-info" />
-                                     <h5 className="mb-0">Entrance Exams</h5>
+                                     <h5 className="mb-0">{t.entranceExams}</h5>
                                    </div>
                                  </Card.Header>
                                  <Card.Body className="p-4">
@@ -869,9 +953,9 @@ const OccupationDetails = () => {
                                      <div key={index} className="mb-3 pb-3 border-bottom">
                                        <h6>{exam.name}</h6>
                                        <div className="d-flex flex-wrap gap-2">
-                                         <Badge bg="info">Eligibility: {exam.eligibility}</Badge>
-                                         <Badge bg="success">Frequency: {exam.frequency}</Badge>
-                                         <Badge bg="warning">Difficulty: {exam.difficulty}</Badge>
+                                         <Badge bg="info">{t.eligibility}: {exam.eligibility}</Badge>
+                                         <Badge bg="success">{t.frequency}: {exam.frequency}</Badge>
+                                         <Badge bg="warning">{t.difficulty}: {exam.difficulty}</Badge>
                                        </div>
                                      </div>
                                    ))}
@@ -910,7 +994,7 @@ const OccupationDetails = () => {
                {/* Back Button */}
                <div className="mt-4 text-left">
                  <Button variant="outline-secondary" size="lg" onClick={() => navigate(-1)}>
-                   <FaArrowLeft className="me-2" /> Back to Career Selection
+                   <FaArrowLeft className="me-2" /> {t.backToSelection}
                  </Button>
                </div>
             </>
