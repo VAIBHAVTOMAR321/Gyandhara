@@ -100,6 +100,14 @@
 .stream-selection-card {
     transition: all 0.3s ease;
     border: 2px solid #dee2e6 !important;
+    text-align: center !important;
+}
+
+.stream-selection-card h6,
+.stream-selection-card small {
+    text-align: center !important;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .stream-selection-card:hover {
