@@ -77,16 +77,30 @@
 }
 
 .quiz-timer {
-  font-size: 12px;
+  font-size: 24px;
   font-weight: bold;
+  color: #dc3545;
 }
 
 .quiz-timer-active {
-  color: rgb(94 117 223);
+  color: #dc3545;
 }
 
 .quiz-timer-warning {
   color: #dc3545;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 .quiz-question-num {

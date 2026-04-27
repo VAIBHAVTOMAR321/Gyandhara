@@ -891,6 +891,7 @@ const UserQuiz = () => {
         setSidebarOpen={setSidebarOpen}
         isMobile={isMobile}
         isTablet={isTablet}
+        onNavClick={handleNavFromLeftNav}
       />
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
@@ -1102,9 +1103,15 @@ const UserQuiz = () => {
                 <div className="quiz-header">
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <h6 className="mb-0 quiz-title">{language === 'hi' && currentQuiz.title_hindi ? currentQuiz.title_hindi : currentQuiz.title}</h6>
-                    <div className={`timer ${timeRemaining < 60 ? 'quiz-timer-warning' : 'quiz-timer-active'} quiz-timer`}>
-                      <FaClock className="me-1" />
-                      {language === 'hi' ? "समय: " : "Time: "}{formatTime(timeRemaining)}
+                    <div className="timer quiz-timer" style={{ 
+                      fontSize: '2rem', 
+                      fontWeight: 'bold', 
+                      color: '#dc3545',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                      <FaClock className="me-2" />
+                      {formatTime(timeRemaining)}
                     </div>
                   </div>
                   <ProgressBar 

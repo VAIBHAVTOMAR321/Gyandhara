@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Badge, Modal, Spinner } from 'react-bootstrap'
+import { Container, Row, Col, Card, Button, Badge, Modal, Spinner, Alert } from 'react-bootstrap'
 import { useAuth } from "../all_login/AuthContext";
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'
@@ -28,6 +28,10 @@ const UserTest = () => {
   const [testResult, setTestResult] = useState(null);
   const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(0);
+
+  const [showNavigationWarning, setShowNavigationWarning] = useState(false);
+  const [navigationWarningShown, setNavigationWarningShown] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState(null);
 
   const location = useLocation()
   const navigate = useNavigate()
@@ -331,13 +335,7 @@ const UserTest = () => {
       navigate('/UserDashboard')
       return
     }
-    
-    if (navigationAttempts === 0) {
-      alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.')
-      setNavigationAttempts(1)
-    } else {
-      handleTestComplete()
-    }
+    handleNavFromLeftNav('/UserDashboard')
   }
 
   const toggleSidebar = () => {
@@ -357,6 +355,7 @@ const UserTest = () => {
         setSidebarOpen={setSidebarOpen}
         isMobile={isMobile}
         isTablet={isTablet}
+        onNavClick={handleNavFromLeftNav}
       />
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
@@ -433,10 +432,14 @@ const UserTest = () => {
                         Module {moduleIndex + 1} Test - Question {currentQuestionIndex + 1} of {questions.length}
                       </p>
                       <div className="d-flex align-items-center justify-content-between">
-                        <Badge bg="warning" className="p-1 small">
-                          <FaClock className="me-1" />
-                          Time: {formatTime(timer)}
-                        </Badge>
+                        <div className="timer" style={{ 
+                          fontSize: '2rem', 
+                          fontWeight: 'bold', 
+                          color: '#dc3545',
+                        }}>
+                          <FaClock className="me-2" />
+                          {formatTime(timer)}
+                        </div>
                       </div>
                     </div>
                     
@@ -562,6 +565,7 @@ const UserTest = () => {
           </div>
         </Modal.Body>
       </Modal>
+      <NavigationWarningModal />
     </div>
   )
 }

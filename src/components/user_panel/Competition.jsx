@@ -85,6 +85,23 @@ const Competition = () => {
     }
   }, [isMobile])
 
+  const handleNavFromLeftNav = (path) => {
+    if (!takingQuiz) {
+      navigate(path)
+      return
+    }
+
+    if (navigationWarningShown) {
+      confirmSubmitQuiz()
+      setTimeout(() => navigate(path), 500)
+      return
+    }
+
+    setNavigationWarningShown(true)
+    setShowNavigationWarning(true)
+    setPendingNavigation(() => () => navigate(path))
+  }
+
   useEffect(() => {
     if (!takingQuiz) return
 
@@ -667,6 +684,7 @@ const Competition = () => {
         setSidebarOpen={setSidebarOpen}
         isMobile={isMobile}
         isTablet={isTablet}
+        onNavClick={handleNavFromLeftNav}
       />
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
@@ -868,9 +886,15 @@ const Competition = () => {
 <div className="competition-header">
                   <div className="d-flex justify-content-between align-items-center mb-2">
                     <h6 className="mb-0 competition-title">{language === 'hi' && currentQuiz.title_hindi ? currentQuiz.title_hindi : currentQuiz.title}</h6>
-                    <div className={`timer ${timeRemaining < 60 ? 'competition-timer-warning' : 'competition-timer-active'} competition-timer`}>
-                      <FaClock className="me-1" />
-                      {language === 'hi' ? "समय: " : "Time: "}{formatTime(timeRemaining)}
+                    <div className="timer competition-timer" style={{ 
+                      fontSize: '2rem', 
+                      fontWeight: 'bold', 
+                      color: '#dc3545',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                      <FaClock className="me-2" />
+                      {formatTime(timeRemaining)}
                     </div>
                   </div>
                   <ProgressBar 
