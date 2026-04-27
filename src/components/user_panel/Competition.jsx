@@ -3,6 +3,7 @@ import { Container, Row, Col, Card, Button, Badge, Spinner, Alert, ProgressBar, 
 import axios from 'axios'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { useLanguage } from '../all_login/LanguageContext'
 
 import { FaArrowLeft, FaClock, FaQuestion, FaTrophy, FaCheckCircle, FaTimesCircle, FaChevronRight, FaLock, FaSchool, FaUsers } from 'react-icons/fa'
 import '../../assets/css/userleftnav.css'
@@ -12,15 +13,10 @@ import "../../assets/css/Competition.css"
 
 const Competition = () => {
   const { uniqueId, accessToken } = useAuth()
+  const { language } = useLanguage()
   const navigate = useNavigate()
   
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
 
@@ -685,11 +681,11 @@ const Competition = () => {
                   className="d-flex align-items-center competition-btn-back"
                 >
                   <FaArrowLeft className="me-1" />
-                  Back
+                  {language === 'hi' ? "पीछे" : "Back"}
                 </Button>
               </div>
 
-              <h5 className="competition-heading">Quiz Competition</h5>
+              <h5 className="competition-heading">{language === 'hi' ? "क्विज़ प्रतियोगिता" : "Quiz Competition"}</h5>
 
               {loading ? (
                 <div className="text-center py-5">
@@ -707,23 +703,23 @@ const Competition = () => {
                         <Card className="h-100 competition-card shadow-sm">
                           <Card.Body className="d-flex flex-column competition-card-body">
                             <div className="mb-2">
-                              <h6 className="competition-card-title">{quiz.title}</h6>
-                              <p className="text-muted competition-card-desc mb-1">{quiz.description}</p>
+                              <h6 className="competition-card-title">{language === 'hi' && quiz.title_hindi ? quiz.title_hindi : quiz.title}</h6>
+                              <p className="text-muted competition-card-desc mb-1">{language === 'hi' && quiz.description_hindi ? quiz.description_hindi : quiz.description}</p>
                             </div>
 
                             <div className="mb-2">
                               <div className="d-flex justify-content-between mb-1">
                                 <small className="competition-meta">
                                   <FaQuestion className="me-1" />
-                                  Questions: {quiz.number_of_questions || quiz.questions?.length || 0}
+                                  {language === 'hi' ? "प्रश्न" : "Questions"}: {quiz.number_of_questions || quiz.questions?.length || 0}
                                 </small>
                                 <Badge bg="info competition-badge">{quiz.quiz_category}</Badge>
                               </div>
                               <small className="text-muted d-block mb-1 competition-meta">
-                                Start: {formatDateDDMMYY(startTime)} {startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                {language === 'hi' ? "प्रारंभ" : "Start"}: {formatDateDDMMYY(startTime)} {startTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </small>
                               <small className="text-muted d-block mb-1 competition-meta">
-                                End: {formatDateDDMMYY(endTime)} {endTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                {language === 'hi' ? "समाप्ति" : "End"}: {formatDateDDMMYY(endTime)} {endTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                               </small>
                             </div>
 
@@ -734,14 +730,14 @@ const Competition = () => {
                                   onClick={() => fetchSchoolRanks(quiz.quiz_id)}
                                 >
                                   <FaSchool className="me-1" />
-                                  School Rankings
+                                  {language === 'hi' ? "स्कूल रैंकिंग" : "School Rankings"}
                                 </small>
                                 <small 
                                   className="text-primary competition-rank-link"
                                   onClick={() => fetchStudentRanks(quiz.quiz_id)}
                                 >
                                   <FaUsers className="me-1" />
-                                  Top 10
+                                  {language === 'hi' ? "शीर्ष 10" : "Top 10"}
                                 </small>
                               </div>
                             </div>
@@ -754,12 +750,12 @@ const Competition = () => {
                                   disabled
                                 >
                                   <FaCheckCircle className="me-1" />
-                                  Done
+                                  {language === 'hi' ? "पूर्ण" : "Done"}
                                   {quizRanks[quiz.quiz_id]?.score !== undefined && (
-                                    <span className="ms-1">| score : {quizRanks[quiz.quiz_id].score}</span>
+                                    <span className="ms-1">| {language === 'hi' ? "स्कोर" : "score"} : {quizRanks[quiz.quiz_id].score}</span>
                                   )}
                                   {quizRanks[quiz.quiz_id]?.rank && (
-                                    <span className="ms-1">|Rank #{quizRanks[quiz.quiz_id].rank}</span>
+                                    <span className="ms-1">|{language === 'hi' ? "रैंक" : "Rank"} #{quizRanks[quiz.quiz_id].rank}</span>
                                   )}
                                 </Button>
                               ) : (
@@ -772,11 +768,11 @@ const Competition = () => {
                                   {quizStarting ? (
                                     <>
                                       <Spinner animation="border" size="sm" className="me-1" />
-                                      Wait...
+                                      {language === 'hi' ? "प्रतीक्षा करें..." : "Wait..."}
                                     </>
                                   ) : (
                                     <>
-                                      Start
+                                      {language === 'hi' ? "शुरू करें" : "Start"}
                                       <FaChevronRight className="ms-1" />
                                     </>
                                   )}
@@ -792,9 +788,9 @@ const Competition = () => {
               ) : (
                 <Alert variant="info" className="text-center">
                   <FaLock className="me-2" />
-                  You are not registered for any quiz competition yet.
+                  {language === 'hi' ? "आप अभी तक किसी क्विज़ प्रतियोगिता के लिए पंजीकृत नहीं हैं।" : "You are not registered for any quiz competition yet."}
                   <br />
-                  <small className="text-muted">Contact your school to register for quiz competitions.</small>
+                  <small className="text-muted">{language === 'hi' ? "क्विज़ प्रतियोगिताओं के लिए पंजीकरण करने के लिए अपने स्कूल से संपर्क करें।" : "Contact your school to register for quiz competitions."}</small>
                 </Alert>
               )}
             </>
@@ -804,11 +800,11 @@ const Competition = () => {
                 <div className="mb-3">
                   <FaTrophy className="text-warning competition-result-icon" />
                 </div>
-                <h5 className="competition-result-title">{quizResults.status === 'passed' ? 'Congratulations!' : 'Keep Trying!'}</h5>
+                <h5 className="competition-result-title">{quizResults.status === 'passed' ? (language === 'hi' ? "बधाई हो!" : "Congratulations!") : (language === 'hi' ? "कोशिश जारी रखें!" : "Keep Trying!")}</h5>
                 <p className="text-muted competition-result-score">
-                  Score: {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}
+                  {language === 'hi' ? "स्कोर:" : "Score:"} {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}
                   {quizResults.rank && (
-                    <span className="ms-1">| Rank: #{quizResults.rank}</span>
+                    <span className="ms-1">| {language === 'hi' ? "रैंक" : "Rank"}: #{quizResults.rank}</span>
                   )}
                 </p>
 
@@ -820,7 +816,7 @@ const Competition = () => {
                           <h5 className="competition-result-correct">{quizResults.correctAnswers}</h5>
                           <small className="text-muted competition-result-label">
                             <FaCheckCircle className="me-1 text-success" />
-                            Correct
+                            {language === 'hi' ? "सही" : "Correct"}
                           </small>
                         </div>
                       </Col>
@@ -829,14 +825,14 @@ const Competition = () => {
                           <h5 className="competition-result-wrong">{quizResults.wrongAnswers}</h5>
                           <small className="text-muted competition-result-label">
                             <FaTimesCircle className="me-1 text-danger" />
-                            Wrong
+                            {language === 'hi' ? "गलत" : "Wrong"}
                           </small>
                         </div>
                       </Col>
                     </Row>
 
                     <div className="mb-2">
-                      <small className="text-muted competition-result-label">Percentage</small>
+                      <small className="text-muted competition-result-label">{language === 'hi' ? "प्रतिशत" : "Percentage"}</small>
                       <h5 className={`mb-1 ${quizResults.percentage >= 60 ? 'competition-result-percentage-pass' : 'competition-result-percentage-fail'}`}>
                         {quizResults.percentage}%
                       </h5>
@@ -861,7 +857,7 @@ const Competition = () => {
                       }}
                       className="d-flex align-items-center competition-btn-back-result"
                     >
-                      Back
+                      {language === 'hi' ? "पीछे" : "Back"}
                     </Button>
                  </div>
               </div>
@@ -871,10 +867,10 @@ const Competition = () => {
               <div className="quiz-taking-container">
 <div className="competition-header">
                   <div className="d-flex justify-content-between align-items-center mb-2">
-                    <h6 className="mb-0 competition-title">{currentQuiz.title}</h6>
+                    <h6 className="mb-0 competition-title">{language === 'hi' && currentQuiz.title_hindi ? currentQuiz.title_hindi : currentQuiz.title}</h6>
                     <div className={`timer ${timeRemaining < 60 ? 'competition-timer-warning' : 'competition-timer-active'} competition-timer`}>
                       <FaClock className="me-1" />
-                      {formatTime(timeRemaining)}
+                      {language === 'hi' ? "समय: " : "Time: "}{formatTime(timeRemaining)}
                     </div>
                   </div>
                   <ProgressBar 
@@ -888,14 +884,13 @@ const Competition = () => {
                     <Card.Body>
                       <div className="mb-2">
                           <h6 className="competition-question-num mb-1">
-                            Question {currentQuestionIndex + 1} of {currentQuiz.questions.length}
+                            {language === 'hi' ? "प्रश्न" : "Question"} {currentQuestionIndex + 1} / {currentQuiz.questions.length}
                           </h6>
                           <div className="mb-1">
-                            {currentQuestion.question && (
-                              <p className="competition-question-text mb-1">{currentQuestion.question}</p>
-                            )}
-                            {currentQuestion.question_hindi && (
-                              <p className="text-muted competition-question-hindi mb-0">{currentQuestion.question_hindi}</p>
+                            {language === 'hi' ? (
+                               <p className="competition-question-text mb-1">{currentQuestion.question_hindi || currentQuestion.question}</p>
+                            ) : (
+                               <p className="competition-question-text mb-1">{currentQuestion.question}</p>
                             )}
                           </div>
                         </div>
@@ -903,7 +898,9 @@ const Competition = () => {
                       <div className="competition-options">
                         {currentQuestion.options && currentQuestion.options.map((option, idx) => {
                           const isSelected = answers[currentQuestionIndex] === idx
-                          const hindiOption = currentQuestion.options_hindi?.[idx]
+                          const displayText = language === 'hi' && currentQuestion.options_hindi?.[idx] 
+                            ? currentQuestion.options_hindi[idx] 
+                            : option
                           return (
                             <div key={idx} className="competition-option-item">
                               <Button 
@@ -912,11 +909,8 @@ const Competition = () => {
                               >
                                 <div className="d-flex align-items-center">
                                   <span className="competition-option-letter me-1">{String.fromCharCode(65 + idx)}.</span>
-                                  <span>{option}</span>
+                                  <span>{displayText}</span>
                                 </div>
-                                {hindiOption && (
-                                  <span className="ms-2 mt-1" style={{ fontSize: '0.85em' }}>({hindiOption})</span>
-                                )}
                               </Button>
                             </div>
                           )
@@ -935,7 +929,7 @@ const Competition = () => {
                     disabled={currentQuestionIndex === 0}
                     className="competition-btn-prev"
                   >
-                    Previous
+                    {language === 'hi' ? "पिछला" : "Previous"}
                   </Button>
                   
                   <div style={{ flex: 1 }} />
@@ -948,7 +942,7 @@ const Competition = () => {
                       }}
                       className="competition-btn-next"
                     >
-                      Next
+                      {language === 'hi' ? "अगला" : "Next"}
                     </Button>
                   ) : (
                     <Button 
@@ -958,7 +952,7 @@ const Competition = () => {
                       }}
                       className="competition-btn-submit"
                     >
-                      Submit
+                      {language === 'hi' ? "सबमिट" : "Submit"}
                     </Button>
                   )}
                 </div>

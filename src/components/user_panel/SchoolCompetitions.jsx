@@ -2,18 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Spinner, Button } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
+import { useLanguage } from "../all_login/LanguageContext";
 import UserHeader from "./UserHeader";
 import UserLeftNav from "./UserLeftNav";
 import "./UserProfile.css";
 
 const SchoolCompetitions = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const { language } = useLanguage();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
 
@@ -212,38 +208,26 @@ const SchoolCompetitions = () => {
                         <Card.Body>
 
                           <Card.Title>
-                            {comp.title || "Untitled"}
+                            {language === 'hi' && comp.title_hindi ? comp.title_hindi : (comp.title || (language === 'hi' ? "बिना शीर्षक" : "Untitled"))}
                           </Card.Title>
 
-                          {comp.title_hindi && (
-                            <div className="text-muted small">
-                              {comp.title_hindi}
-                            </div>
-                          )}
-
                           <Card.Text className="mt-2">
-                            {comp.description || "-"}
+                            {language === 'hi' && comp.description_hindi ? comp.description_hindi : (comp.description || "-")}
                           </Card.Text>
-
-                          {comp.description_hindi && (
-                            <div className="text-muted small">
-                              {comp.description_hindi}
-                            </div>
-                          )}
 
                           <div className="mt-3">
                             <p>
-                              <strong>School:</strong>{" "}
+                              <strong>{language === 'hi' ? "स्कूल:" : "School:"}</strong>{" "}
                               {comp.school_name || "-"}
                             </p>
 
                             <p>
-                              <strong>Location:</strong>{" "}
+                              <strong>{language === 'hi' ? "स्थान:" : "Location:"}</strong>{" "}
                               {comp.location || "-"}
                             </p>
 
                             <p>
-                              <strong>Date:</strong>{" "}
+                              <strong>{language === 'hi' ? "तिथि:" : "Date:"}</strong>{" "}
                               {comp.comp_date_time
                                 ? new Date(
                                     comp.comp_date_time
@@ -258,7 +242,7 @@ const SchoolCompetitions = () => {
                               className="w-100 mt-3"
                               disabled
                             >
-                              Enrolled
+                              {language === 'hi' ? "नामांकित" : "Enrolled"}
                             </Button>
                           ) : (
                             <Button
@@ -266,7 +250,7 @@ const SchoolCompetitions = () => {
                               className="w-100 mt-3"
                               onClick={() => handleEnroll(comp)}
                             >
-                              Enroll Now
+                              {language === 'hi' ? "अभी शामिल हों" : "Enroll Now"}
                             </Button>
                           )}
 

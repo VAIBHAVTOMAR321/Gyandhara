@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Card, Button, Form, Row, Col, Modal } from 'react-bootstrap'
 import { FaLightbulb } from 'react-icons/fa'
+import { useLanguage } from '../all_login/LanguageContext'
 
 const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onToggle }) => {
   const [internalShowForm, setInternalShowForm] = useState(false)
@@ -12,6 +13,7 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
       setInternalShowForm(value)
     }
   }
+  const { language } = useLanguage()
   
   const [formData, setFormData] = useState({
     student_id: studentId,
@@ -22,16 +24,16 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
   const [submitting, setSubmitting] = useState(false)
 
   const counselingCategories = [
-    'Career Guidance',
-    'Course Selection',
-    'Admission Process',
-    'Financial Aid',
-    'Study Abroad',
-    'Job Placement',
-    'Skill Development',
-    'Personal Counseling',
-    'Health',
-    'Domestic'
+    language === 'hi' ? 'करियर मार्गदर्शन' : 'Career Guidance',
+    language === 'hi' ? 'कोर्स चयन' : 'Course Selection',
+    language === 'hi' ? 'प्रवेश प्रक्रिया' : 'Admission Process',
+    language === 'hi' ? 'वित्तीय सहायता' : 'Financial Aid',
+    language === 'hi' ? 'विदेश में अध्ययन' : 'Study Abroad',
+    language === 'hi' ? 'नौकरी प्लेसमेंट' : 'Job Placement',
+    language === 'hi' ? 'कौशल विकास' : 'Skill Development',
+    language === 'hi' ? 'व्यक्तिगत परामर्श' : 'Personal Counseling',
+    language === 'hi' ? 'स्वास्थ्य' : 'Health',
+    language === 'hi' ? 'घरेलू' : 'Domestic'
   ]
 
   const handleChange = (field, value) => {
@@ -47,12 +49,12 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
     if (submitting) return
 
     if (!formData.student_id) {
-      alert('Student ID is required')
+      alert(language === 'hi' ? 'छात्र आईडी आवश्यक है' : 'Student ID is required')
       return
     }
     
     if (!formData.category_consulting) {
-      alert('Please select a counseling category')
+      alert(language === 'hi' ? 'कृपया एक परामर्श श्रेणी चुनें' : 'Please select a counseling category')
       return
     }
 
@@ -66,7 +68,7 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
 
       await onSubmit(payload)
 
-      alert('Your counselling request has been submitted successfully!')
+      alert(language === 'hi' ? 'आपका परामर्श अनुरोध सफलतापूर्वक सबमिट कर दिया गया है!' : 'Your counselling request has been submitted successfully!')
       setFormData({
         student_id: studentId,
         category_consulting: 'Career Guidance'
@@ -77,7 +79,7 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
         setSubmitted(false)
       }, 1000)
     } catch (error) {
-      alert(error.message || 'An error occurred. Please try again.')
+      alert(error.message || (language === 'hi' ? 'एक त्रुटि हुई। कृपया पुनः प्रयास करें।' : 'An error occurred. Please try again.'))
     } finally {
       setSubmitting(false)
     }
@@ -91,16 +93,16 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
             <div>
               <h5 className="mb-0">
                 <FaLightbulb className="me-2 text-warning" />
-                Request Career Counseling
+                {language === 'hi' ? 'करियर परामर्श का अनुरोध करें' : 'Request Career Counseling'}
               </h5>
-              <small className="text-muted">Get expert guidance for your career</small>
+              <small className="text-muted">{language === 'hi' ? 'अपने करियर के लिए विशेषज्ञ मार्गदर्शन प्राप्त करें' : 'Get expert guidance for your career'}</small>
             </div>
             <Button
               variant="outline-primary"
               onClick={() => setShowForm(!showForm)}
               size="sm"
             >
-              {showForm ? 'Cancel' : 'Request Counseling'}
+              {showForm ? (language === 'hi' ? 'रद्द करें' : 'Cancel') : (language === 'hi' ? 'परामर्श का अनुरोध करें' : 'Request Counseling')}
             </Button>
           </div>
 
@@ -109,7 +111,7 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
               <Row className="g-3">
                 <Col md={12}>
                   <Form.Group>
-                    <Form.Label className="fw-bold">Student ID</Form.Label>
+                    <Form.Label className="fw-bold">{language === 'hi' ? 'छात्र आईडी' : 'Student ID'}</Form.Label>
                     <Form.Control
                       type="text"
                       value={formData.student_id}
@@ -120,13 +122,13 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
                 </Col>
                 <Col md={12}>
                   <Form.Group>
-                    <Form.Label className="fw-bold">Select Counseling Category <span className="text-danger">*</span></Form.Label>
+                    <Form.Label className="fw-bold">{language === 'hi' ? 'परामर्श श्रेणी चुनें' : 'Select Counseling Category'} <span className="text-danger">*</span></Form.Label>
                     <Form.Select
                       value={formData.category_consulting}
                       onChange={(e) => handleChange('category_consulting', e.target.value)}
                       required
                     >
-                      <option value="">-- Select Category --</option>
+                      <option value="">{language === 'hi' ? '-- श्रेणी चुनें --' : '-- Select Category --'}</option>
                       {counselingCategories.map((category) => (
                         <option key={category} value={category}>
                           {category}
@@ -145,12 +147,12 @@ const CounselingForm = ({ onSubmit, studentId = '', showForm: propShowForm, onTo
                     {submitting ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Submitting...
+                        {language === 'hi' ? 'सबमिट हो रहा है...' : 'Submitting...'}
                       </>
                     ) : submitted ? (
-                      <>✓ Submitted Successfully</>
+                      <>✓ {language === 'hi' ? 'सफलतापूर्वक सबमिट किया गया' : 'Submitted Successfully'}</>
                     ) : (
-                      'Submit Request'
+                      (language === 'hi' ? 'अनुरोध सबमिट करें' : 'Submit Request')
                     )}
                   </Button>
                 </Col>

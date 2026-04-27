@@ -6,18 +6,14 @@ import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
 import '../../assets/css/userleftnav.css'
 import "../../assets/css/UserEvents.css";
+import { useLanguage } from '../all_login/LanguageContext'
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaEye } from 'react-icons/fa'
 
 const UserEvents = () => {
   const { uniqueId, accessToken } = useAuth()
+  const { language } = useLanguage()
   
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   
@@ -151,10 +147,10 @@ const UserEvents = () => {
             <Col xs={12} className="mt-4">
               <div className="d-flex align-items-center mb-3">
                 <FaCalendarAlt className="me-2 text-primary" style={{ fontSize: '24px' }} />
-                <h3 className="mb-0 fw-bold">Events</h3>
+                <h3 className="mb-0 fw-bold">{language === 'hi' ? "कार्यक्रम" : "Events"}</h3>
               </div>
               <p className="text-muted">
-                Discover and participate in upcoming events, workshops, and seminars.
+                {language === 'hi' ? "आगामी कार्यक्रमों, कार्यशालाओं और सेमिनारों की खोज करें और उनमें भाग लें।" : "Discover and participate in upcoming events, workshops, and seminars."}
               </p>
             </Col>
           </Row>
@@ -164,22 +160,22 @@ const UserEvents = () => {
               <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => { setActiveTab(key); setCurrentPage(1) }}>
                 <Nav.Item>
                   <Nav.Link eventKey="all">
-                    All ({counts.all})
+                    {language === 'hi' ? "सभी" : "All"} ({counts.all})
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link eventKey="active">
-                    Active ({counts.active})
+                    {language === 'hi' ? "सक्रिय" : "Active"} ({counts.active})
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link eventKey="upcoming">
-                    Upcoming ({counts.upcoming})
+                    {language === 'hi' ? "आगामी" : "Upcoming"} ({counts.upcoming})
                   </Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link eventKey="past">
-                    Past ({counts.past})
+                    {language === 'hi' ? "पुराने" : "Past"} ({counts.past})
                   </Nav.Link>
                 </Nav.Item>
               </Nav>
@@ -193,12 +189,12 @@ const UserEvents = () => {
           {loading ? (
             <div className="text-center py-5">
               <Spinner animation="border" variant="primary" style={{ width: '60px', height: '60px' }} />
-              <p className="mt-3">Loading events...</p>
+              <p className="mt-3">{language === 'hi' ? "कार्यक्रम लोड हो रहे हैं..." : "Loading events..."}</p>
             </div>
           ) : filteredEvents.length === 0 ? (
             <Alert variant="info" className="text-center">
               <FaCalendarAlt className="me-2" />
-              No {activeTab === 'all' ? '' : activeTab} events found
+              {language === 'hi' ? `कोई ${activeTab === 'all' ? '' : activeTab} कार्यक्रम नहीं मिला` : `No ${activeTab === 'all' ? '' : activeTab} events found`}
             </Alert>
           ) : (
             <>
@@ -231,7 +227,7 @@ const UserEvents = () => {
                             {event.event_image ? (
                               <img 
                                 src={`https://brjobsedu.com/gyandhara/gyandhara_backend${event.event_image}`}
-                                alt={event.event_name}
+                              alt={language === 'hi' && event.event_name_hindi ? event.event_name_hindi : event.event_name}
                                 style={{ 
                                   width: '100%',
                                   objectFit: 'cover'
@@ -260,12 +256,12 @@ const UserEvents = () => {
                           
                           <Card.Body className="d-flex flex-column">
                             <div className="mb-3">
-                              <h5 className="mb-2 fw-bold" style={{ color: '#333' }}>{event.event_name}</h5>
-                              {event.description && (
+                              <h5 className="mb-2 fw-bold" style={{ color: '#333' }}>{language === 'hi' && event.event_name_hindi ? event.event_name_hindi : event.event_name}</h5>
+                              {(language === 'hi' ? event.description_hindi || event.description : event.description) && (
                                 <p className="text-muted small mb-0" style={{ lineHeight: '1.5' }}>
-                                  {event.description.length > 100 
-                                    ? event.description.substring(0, 100) + '...' 
-                                    : event.description}
+                                  {(language === 'hi' ? event.description_hindi || event.description : event.description).length > 100 
+                                    ? (language === 'hi' ? event.description_hindi || event.description : event.description).substring(0, 100) + '...' 
+                                    : (language === 'hi' ? event.description_hindi || event.description : event.description)}
                                 </p>
                               )}
                             </div>
@@ -274,7 +270,7 @@ const UserEvents = () => {
                               <div className="d-flex align-items-center mb-2">
                                 <div className="d-flex align-items-center text-muted">
                                   <FaClock className="me-2 text-primary" style={{ fontSize: '14px' }} />
-                                  <small>Start: {formatDateTime(event.event_date_time)}</small>
+                                  <small>{language === 'hi' ? "प्रारंभ" : "Start"}: {formatDateTime(event.event_date_time)}</small>
                                 </div>
                               </div>
                               
@@ -282,7 +278,7 @@ const UserEvents = () => {
                                 <div className="d-flex align-items-center mb-2">
                                   <div className="d-flex align-items-center text-muted">
                                     <FaClock className="me-2 text-danger" style={{ fontSize: '14px' }} />
-                                    <small>End: {formatDateTime(event.end_date_time)}</small>
+                                    <small>{language === 'hi' ? "समाप्ति" : "End"}: {formatDateTime(event.end_date_time)}</small>
                                   </div>
                                 </div>
                               )}
@@ -309,7 +305,7 @@ const UserEvents = () => {
                                 }}
                               >
                                 <FaEye className="me-2" />
-                                View Details
+                                {language === 'hi' ? "विवरण देखें" : "View Details"}
                               </Button>
                             </div>
                           </Card.Body>
@@ -322,7 +318,7 @@ const UserEvents = () => {
               {filteredEvents.length > eventsPerPage && (
                 <div className="d-flex justify-content-between align-items-center mt-4">
                   <div className="text-muted">
-                    Showing {((currentPage - 1) * eventsPerPage) + 1}-{Math.min(currentPage * eventsPerPage, filteredEvents.length)} of {filteredEvents.length} events
+                    {language === 'hi' ? "दिखाया जा रहा है" : "Showing"} {((currentPage - 1) * eventsPerPage) + 1}-{Math.min(currentPage * eventsPerPage, filteredEvents.length)} {language === 'hi' ? "कुल" : "of"} {filteredEvents.length} {language === 'hi' ? "कार्यक्रम" : "events"}
                   </div>
                   <div className="d-flex align-items-center gap-2">
                     <Button
@@ -331,7 +327,7 @@ const UserEvents = () => {
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(currentPage - 1)}
                     >
-                      Previous
+                      {language === 'hi' ? "पिछला" : "Previous"}
                     </Button>
                     {Array.from({ length: Math.ceil(filteredEvents.length / eventsPerPage) }, function(_, i) { return i + 1 }).map(function(page) { return (
                       <Button
@@ -349,7 +345,7 @@ const UserEvents = () => {
                       disabled={currentPage === Math.ceil(filteredEvents.length / eventsPerPage)}
                       onClick={() => setCurrentPage(currentPage + 1)}
                     >
-                      Next
+                      {language === 'hi' ? "अगला" : "Next"}
                     </Button>
                   </div>
                 </div>
@@ -364,7 +360,7 @@ const UserEvents = () => {
         <Modal.Header closeButton className="bg-primary text-white">
           <Modal.Title>
             <FaCalendarAlt className="me-2" />
-            Event Details
+            {language === 'hi' ? "कार्यक्रम विवरण" : "Event Details"}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -388,12 +384,12 @@ const UserEvents = () => {
                 )}
               </div>
                
-              <h4 className="mb-3">{selectedEvent.event_name}</h4>
+              <h4 className="mb-3">{language === 'hi' && selectedEvent.event_name_hindi ? selectedEvent.event_name_hindi : selectedEvent.event_name}</h4>
                 
-              {selectedEvent.description && (
+              {(language === 'hi' ? selectedEvent.description_hindi || selectedEvent.description : selectedEvent.description) && (
                 <div className="mb-4">
-                  <h6 className="text-muted mb-2">Description</h6>
-                  <p className="">{selectedEvent.description}</p>
+                  <h6 className="text-muted mb-2">{language === 'hi' ? "विवरण" : "Description"}</h6>
+                  <p className="">{language === 'hi' ? selectedEvent.description_hindi || selectedEvent.description : selectedEvent.description}</p>
                 </div>
               )}
               
@@ -401,7 +397,7 @@ const UserEvents = () => {
                 <Col md={6}>
                   <div className="p-3 bg-light rounded">
                     <h6 className="text-muted mb-2">
-                      <FaClock className="me-2" /> Start Date & Time
+                      <FaClock className="me-2" /> {language === 'hi' ? "प्रारंभ तिथि और समय" : "Start Date & Time"}
                     </h6>
                     <p className="mb-0 fw-semibold">{formatDateTime(selectedEvent.event_date_time)}</p>
                   </div>
@@ -409,7 +405,7 @@ const UserEvents = () => {
                 <Col md={6}>
                   <div className="p-3 bg-light rounded">
                     <h6 className="text-muted mb-2">
-                      <FaClock className="me-2" /> End Date & Time
+                      <FaClock className="me-2" /> {language === 'hi' ? "समाप्ति तिथि और समय" : "End Date & Time"}
                     </h6>
                     <p className="mb-0 fw-semibold">
                       {selectedEvent.end_date_time ? formatDateTime(selectedEvent.end_date_time) : 'N/A'}
@@ -420,7 +416,7 @@ const UserEvents = () => {
               
               <div className="p-3 bg-light rounded">
                 <h6 className="text-muted mb-2">
-                  <FaMapMarkerAlt className="me-2" /> Venue
+                  <FaMapMarkerAlt className="me-2" /> {language === 'hi' ? "स्थान" : "Venue"}
                 </h6>
                 <p className="mb-0 fw-semibold">{selectedEvent.venue || 'N/A'}</p>
               </div>
@@ -429,7 +425,7 @@ const UserEvents = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={closeModal}>
-            Close
+            {language === 'hi' ? "बंद करें" : "Close"}
           </Button>
         </Modal.Footer>
       </Modal>

@@ -21,7 +21,8 @@ const translations = {
     joinClass: 'Join Class',
     upcoming: 'Upcoming',
     myClasses: 'My Classes',
-    noEnrolledClasses: 'You have not enrolled in any class yet.'
+    noEnrolledClasses: 'You have not enrolled in any class yet.',
+    participants: 'Participants'
   },
   hi: {
     title: 'ग्रूमिंग क्लासेस',
@@ -34,7 +35,8 @@ const translations = {
     joinClass: 'क्लास में शामिल हों',
     upcoming: 'आगामी',
     myClasses: 'मेरी क्लासेस',
-    noEnrolledClasses: 'आपने अभी तक किसी क्लास में भर्ती नहीं हुई है।'
+    noEnrolledClasses: 'आपने अभी तक किसी क्लास में भर्ती नहीं हुई है।',
+    participants: 'प्रतिभागी'
   }
 }
 
@@ -42,13 +44,7 @@ const GroomingClasses = () => {
   const { uniqueId, accessToken } = useAuth()
   const { language } = useLanguage()
   const navigate = useNavigate()
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   const [loading, setLoading] = useState(true)

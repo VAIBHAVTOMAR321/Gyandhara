@@ -3,18 +3,14 @@ import { Container, Row, Col, Card, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
 import "../../assets/css/userleftnav.css"
+import { useLanguage } from "../all_login/LanguageContext";
 import UserHeader from "./UserHeader";
 import UserLeftNav from "./UserLeftNav";
 import "./UserProfile.css";
 
 const UserProfile = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const { language } = useLanguage();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   
@@ -114,13 +110,15 @@ const UserProfile = () => {
                         )}
                       </div>
                       <div className="profile-info">
-                        <h2>{profile?.full_name || "User"}</h2>
+                        <h2>{profile?.full_name || (language === 'hi' ? "यूजर" : "User")}</h2>
                         <p className="student-id">
                           <i className="bi bi-person-badge"></i>
                           {profile?.student_id}
                         </p>
                         <span className={`status-badge ${getStatusClass(profile?.status)}`}>
-                          {profile?.status || "N/A"}
+                          {profile?.status === 'approved' ? (language === 'hi' ? "स्वीकृत" : "Approved") : 
+                           profile?.status === 'pending' ? (language === 'hi' ? "लंबित" : "Pending") : 
+                           profile?.status === 'rejected' ? (language === 'hi' ? "अस्वीकृत" : "Rejected") : (profile?.status || "N/A")}
                         </span>
                       </div>
                     </div>
@@ -135,22 +133,22 @@ const UserProfile = () => {
               <Col lg={8}>
                 <Card className="shadow-box mb-3">
                   <Card.Body>
-                    <h5 className="section-title">Personal Information</h5>
+                    <h5 className="section-title">{language === 'hi' ? "व्यक्तिगत जानकारी" : "Personal Information"}</h5>
                     <div className="info-grid">
                       <div className="info-item">
-                        <label>Full Name</label>
+                        <label>{language === 'hi' ? "पूरा नाम" : "Full Name"}</label>
                         <span>{profile?.full_name || "-"}</span>
                       </div>
                       <div className="info-item">
-                        <label>Aadhaar Number</label>
+                        <label>{language === 'hi' ? "आधार संख्या" : "Aadhaar Number"}</label>
                         <span>{profile?.aadhaar_no || "-"}</span>
                       </div>
                       <div className="info-item">
-                        <label>Phone</label>
+                        <label>{language === 'hi' ? "फोन" : "Phone"}</label>
                         <span>{profile?.phone || "-"}</span>
                       </div>
                       <div className="info-item">
-                        <label>Email</label>
+                        <label>{language === 'hi' ? "ईमेल" : "Email"}</label>
                         <span>{profile?.email || "-"}</span>
                       </div>
                     </div>
@@ -159,14 +157,14 @@ const UserProfile = () => {
 
                 <Card className="shadow-box mb-3">
                   <Card.Body>
-                    <h5 className="section-title">Academic Details</h5>
+                    <h5 className="section-title">{language === 'hi' ? "शैक्षणिक विवरण" : "Academic Details"}</h5>
                     <div className="info-grid">
                       <div className="info-item">
-                        <label>Class</label>
+                        <label>{language === 'hi' ? "कक्षा" : "Class"}</label>
                         <span>{profile?.class_name || "-"}</span>
                       </div>
                       <div className="info-item">
-                        <label>Associate Wing</label>
+                        <label>{language === 'hi' ? "एसोसिएट विंग" : "Associate Wing"}</label>
                         <span>{profile?.associate_wings || "-"}</span>
                       </div>
                     </div>
@@ -177,18 +175,18 @@ const UserProfile = () => {
               <Col lg={4}>
                 <Card className="shadow-box mb-3 location-card">
                   <Card.Body>
-                    <h5 className="section-title">Location Details</h5>
+                    <h5 className="section-title">{language === 'hi' ? "स्थान विवरण" : "Location Details"}</h5>
                     <div className="info-grid">
                       <div className="info-item">
-                        <label>State</label>
+                        <label>{language === 'hi' ? "राज्य" : "State"}</label>
                         <span>{profile?.state || "-"}</span>
                       </div>
                       <div className="info-item">
-                        <label>District</label>
+                        <label>{language === 'hi' ? "ज़िला" : "District"}</label>
                         <span>{profile?.district || "-"}</span>
                       </div>
                       <div className="info-item">
-                        <label>Block</label>
+                        <label>{language === 'hi' ? "ब्लॉक" : "Block"}</label>
                         <span>{profile?.block || "-"}</span>
                       </div>
                     </div>
@@ -197,10 +195,10 @@ const UserProfile = () => {
 
                 <Card className="shadow-box mb-3">
                   <Card.Body>
-                    <h5 className="section-title">Account Info</h5>
+                    <h5 className="section-title">{language === 'hi' ? "खाता जानकारी" : "Account Info"}</h5>
                     <div className="info-grid">
                       <div className="info-item">
-                        <label>Registered On</label>
+                        <label>{language === 'hi' ? "पंजीकरण तिथि" : "Registered On"}</label>
                         <span>
                           {profile?.created_at
                             ? new Date(profile.created_at).toLocaleDateString()

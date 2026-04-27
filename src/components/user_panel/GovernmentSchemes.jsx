@@ -11,13 +11,7 @@ import { useLanguage } from '../all_login/LanguageContext'
 
 
 const GovernmentSchemes = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   
@@ -314,7 +308,7 @@ const GovernmentSchemes = () => {
               className="d-flex align-items-center"
             >
               <FaArrowLeft className="me-2" />
-              Back to Dashboard
+                  {language === 'hi' ? "डैशबोर्ड पर वापस जाएं" : "Back to Dashboard"}
             </Button>
           </div>
 
@@ -323,7 +317,7 @@ const GovernmentSchemes = () => {
               <div className="spinner-border text-primary" role="status" style={{ width: '60px', height: '60px' }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
-              <p className="mt-3">Loading Government Schemes...</p>
+                  <p className="mt-3">{language === 'hi' ? "सरकारी योजनाएं लोड हो रही हैं..." : "Loading Government Schemes..."}</p>
             </div>
           ) : error ? (
             <Card className="shadow-box mb-4">
@@ -331,14 +325,14 @@ const GovernmentSchemes = () => {
                 <div className="d-flex align-items-start gap-3">
                   <div style={{fontSize: '1.5rem'}}>⚠️</div>
                   <div style={{flex: 1}}>
-                    <h5 className="text-danger mb-2">Error Loading Government Schemes</h5>
+                        <h5 className="text-danger mb-2">{language === 'hi' ? "सरकारी योजनाएं लोड करने में त्रुटि" : "Error Loading Government Schemes"}</h5>
                     <p className="text-muted mb-3">{error}</p>
                     <Button 
                       variant="outline-danger" 
                       size="sm"
                       onClick={() => setRetryCount(prev => prev + 1)}
                     >
-                      Retry
+                          {language === 'hi' ? "पुनः प्रयास करें" : "Retry"}
                     </Button>
                   </div>
                 </div>
@@ -347,7 +341,7 @@ const GovernmentSchemes = () => {
           ) : apiCategories.length === 0 ? (
             <Card className="shadow-box mb-4">
               <Card.Body className="p-4 text-center">
-                <p className="text-muted mb-0">No government schemes available at the moment. Please try again later.</p>
+                    <p className="text-muted mb-0">{language === 'hi' ? "इस समय कोई सरकारी योजना उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें।" : "No government schemes available at the moment. Please try again later."}</p>
               </Card.Body>
             </Card>
           ) : (
@@ -359,10 +353,10 @@ const GovernmentSchemes = () => {
                     <div>
                       <h3 className="mb-2">
                         <FaAward className="me-2 text-primary" />
-                        Government Schemes
+                            {language === 'hi' ? "सरकारी योजनाएं" : "Government Schemes"}
                       </h3>
                       <p className="text-muted mb-0">
-                        Explore government schemes available for you
+                            {language === 'hi' ? "आपके लिए उपलब्ध सरकारी योजनाओं का अन्वेषण करें" : "Explore government schemes available for you"}
                       </p>
                     </div>
                   </div>
@@ -373,8 +367,8 @@ const GovernmentSchemes = () => {
               <Card className="shadow-box mb-4">
                 <Card.Body>
                   <h5 className="mb-3">
-                    <Badge bg="primary" className="me-2">Step 1</Badge>
-                    Select Scheme Category
+                        <Badge bg="primary" className="me-2">{language === 'hi' ? "चरण 1" : "Step 1"}</Badge>
+                        {language === 'hi' ? "योजना श्रेणी चुनें" : "Select Scheme Category"}
                   </h5>
                   <Row>
                     {categories.map((category) => (
@@ -412,11 +406,11 @@ const GovernmentSchemes = () => {
                             </div>
                           )}
                           <Card.Body className="p-3 text-center">
-                            <h6 className="mb-1">{category.name_hindi || category.name}</h6>
-                            <small className="text-muted">{category.description_hindi || category.description}</small>
+                                <h6 className="mb-1">{language === 'hi' ? category.name_hindi || category.name : category.name}</h6>
+                                <small className="text-muted">{language === 'hi' ? category.description_hindi || category.description : category.description}</small>
                             {selectedCategory === category.id && (
                               <Badge bg="primary" className="mt-2">
-                                <FaCheckCircle className="me-1" /> Selected
+                                    <FaCheckCircle className="me-1" /> {language === 'hi' ? "चयनित" : "Selected"}
                               </Badge>
                             )}
                           </Card.Body>
@@ -489,14 +483,14 @@ const GovernmentSchemes = () => {
                                       </div>
                                     ) : null}
                                     <Card.Body className="p-3 text-center">
-                                      <h6 className="mb-1">{scheme.title_hindi || scheme.title}</h6>
+                                        <h6 className="mb-1">{language === 'hi' ? scheme.title_hindi || scheme.title : scheme.title}</h6>
                                       {scheme.amount && scheme.amount !== 'Visit Website' ? (
                                         <Badge bg="success" className="mb-2">₹{Number(scheme.amount).toLocaleString('en-IN')}</Badge>
                                       ) : (
                                         <Badge bg="warning" text="dark" className="mb-2">{scheme.amount}</Badge>
                                       )}
                                       <p className="text-muted small mb-2">
-                                        {scheme.about}
+                                          {language === 'hi' ? scheme.description_hindi || scheme.description : scheme.description}
                                       </p>
                                       <div className="d-flex flex-wrap gap-1 justify-content-center">
                                         {scheme.benefits?.slice(0, 3).map((benefit, idx) => (
@@ -513,7 +507,7 @@ const GovernmentSchemes = () => {
                           ) : (
                             <div className="text-center py-4">
                               <p className="text-muted mb-0">
-                                Please select a category above to view schemes
+                                {language === 'hi' ? "योजनाएं देखने के लिए कृपया ऊपर एक श्रेणी चुनें" : "Please select a category above to view schemes"}
                               </p>
                             </div>
                           )}
@@ -550,14 +544,14 @@ const GovernmentSchemes = () => {
                                     </div>
                                   ) : null}
                                   <Card.Body className="p-3 text-center">
-                                    <h6 className="mb-1">{scheme.title_hindi || scheme.title}</h6>
+                                        <h6 className="mb-1">{language === 'hi' ? scheme.title_hindi || scheme.title : scheme.title}</h6>
                                     {scheme.amount && scheme.amount !== 'Visit Website' ? (
                                       <Badge bg="success" className="mb-2">₹{Number(scheme.amount).toLocaleString('en-IN')}</Badge>
                                     ) : (
                                       <Badge bg="warning" text="dark" className="mb-2">{scheme.amount}</Badge>
                                     )}
                                     <p className="text-muted small mb-2">
-                                      {scheme.about}
+                                          {language === 'hi' ? scheme.description_hindi || scheme.description : scheme.description}
                                     </p>
                                     <div className="d-flex flex-wrap gap-1 justify-content-center">
                                       {scheme.benefits?.slice(0, 3).map((benefit, idx) => (
@@ -582,11 +576,11 @@ const GovernmentSchemes = () => {
               {!selectedCategory && (
                 <Card className="shadow-box instructions-card">
                   <Card.Body>
-                    <h4>How to Use Government Schemes</h4>
+                    <h4>{language === 'hi' ? "सरकारी योजनाओं का उपयोग कैसे करें" : "How to Use Government Schemes"}</h4>
                     <p className="text-muted mb-0">
-                      <strong>Step 1:</strong> Select a scheme category from the options above<br />
-                      <strong>Step 2:</strong> Browse available schemes in that category<br />
-                      <strong>Step 3:</strong> Click on any scheme to view full details and apply
+                      <strong>{language === 'hi' ? "चरण 1:" : "Step 1:"}</strong> {language === 'hi' ? "ऊपर दिए गए विकल्पों में से एक योजना श्रेणी चुनें" : "Select a scheme category from the options above"}<br />
+                      <strong>{language === 'hi' ? "चरण 2:" : "Step 2:"}</strong> {language === 'hi' ? "उस श्रेणी में उपलब्ध योजनाओं को ब्राउज़ करें" : "Browse available schemes in that category"}<br />
+                      <strong>{language === 'hi' ? "चरण 3:" : "Step 3:"}</strong> {language === 'hi' ? "पूरा विवरण देखने और आवेदन करने के लिए किसी भी योजना पर क्लिक करें" : "Click on any scheme to view full details and apply"}
                     </p>
                   </Card.Body>
                 </Card>
@@ -605,11 +599,11 @@ const GovernmentSchemes = () => {
                 {selectedScheme?.icon}
               </div>
               <div style={{flex: 1}}>
-                <h3 className="mb-2 fw-bold" style={{color: 'white', fontSize: '1.5rem'}}>
-                  {selectedScheme?.title_hindi || selectedScheme?.title}
+                  <h3 className="mb-2 fw-bold" style={{color: 'white', fontSize: '1.5rem'}}>
+                    {language === 'hi' ? selectedScheme?.title_hindi || selectedScheme?.title : selectedScheme?.title}
                 </h3>
                 <p className="mb-0" style={{fontSize: '0.9rem', color: 'rgba(255,255,255,0.9)'}}>
-                  ✓ Government Scheme
+                    ✓ {language === 'hi' ? "सरकारी योजना" : "Government Scheme"}
                 </p>
               </div>
             </div>
@@ -621,7 +615,7 @@ const GovernmentSchemes = () => {
               {/* Amount Badge */}
               <div className="mb-4">
                 <div className="text-center p-4 rounded" style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white'}}>
-                  <small style={{fontSize: '0.85rem', opacity: 0.9}}>Total Benefit Amount</small>
+                  <small style={{fontSize: '0.85rem', opacity: 0.9}}>{language === 'hi' ? "कुल लाभ राशि" : "Total Benefit Amount"}</small>
                   <h2 className="mb-0 mt-2 fw-bold">{selectedScheme.amount}</h2>
                 </div>
               </div>
@@ -629,16 +623,16 @@ const GovernmentSchemes = () => {
               {/* About Section */}
               <div className="mb-4 p-4 bg-white rounded border-start border-5" style={{borderColor: '#667eea'}}>
                 <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                  📌 About this Scheme
+                  📌 {language === 'hi' ? "इस योजना के बारे में" : "About this Scheme"}
                 </h6>
-                <p className="mb-0 text-muted" style={{lineHeight: '1.6'}}>{selectedScheme.about}</p>
+                <p className="mb-0 text-muted" style={{lineHeight: '1.6'}}>{language === 'hi' ? selectedScheme.description_hindi || selectedScheme.description : selectedScheme.description}</p>
               </div>
 
               {/* Benefits Section */}
               {selectedScheme.benefits && selectedScheme.benefits.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded">
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#28a745'}}>✨ Key Benefits</span>
+                    <span style={{color: '#28a745'}}>✨ {language === 'hi' ? "मुख्य लाभ" : "Key Benefits"}</span>
                   </h6>
                   <div className="ps-2">
                     {selectedScheme.benefits.map((benefit, idx) => (
@@ -655,7 +649,7 @@ const GovernmentSchemes = () => {
               {selectedScheme.eligibility && selectedScheme.eligibility.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded border-start border-5" style={{borderColor: '#0d6efd'}}>
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#0d6efd'}}>👤 Who Can Apply?</span>
+                    <span style={{color: '#0d6efd'}}>👤 {language === 'hi' ? "कौन आवेदन कर सकता है?" : "Who Can Apply?"}</span>
                   </h6>
                   <div className="ps-2">
                     {selectedScheme.eligibility.map((elig, idx) => (
@@ -672,7 +666,7 @@ const GovernmentSchemes = () => {
               {selectedScheme.documents && selectedScheme.documents.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded">
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#fd7e14'}}>📄 Documents Needed</span>
+                    <span style={{color: '#fd7e14'}}>📄 {language === 'hi' ? "आवश्यक दस्तावेज़" : "Documents Needed"}</span>
                   </h6>
                   <div className="row g-3 ps-2">
                     {selectedScheme.documents.map((doc, idx) => (
@@ -691,7 +685,7 @@ const GovernmentSchemes = () => {
               {selectedScheme.howToApply && selectedScheme.howToApply.length > 0 && (
                 <div className="mb-4 p-4 bg-white rounded border-top border-5" style={{borderColor: '#0dcaf0'}}>
                   <h6 className="text-dark mb-4 fw-bold" style={{fontSize: '1.05rem'}}>
-                    <span style={{color: '#0dcaf0'}}>📍 How to Apply?</span>
+                    <span style={{color: '#0dcaf0'}}>📍 {language === 'hi' ? "आवेदन कैसे करें?" : "How to Apply?"}</span>
                   </h6>
                   <div className="ms-2">
                     {selectedScheme.howToApply.map((step, idx) => (
@@ -712,7 +706,7 @@ const GovernmentSchemes = () => {
               {selectedScheme.tips && selectedScheme.tips.length > 0 && (
                 <div className="mb-4 p-4 rounded" style={{background: '#fff3cd', border: '2px solid #ffc107'}}>
                   <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                    <span style={{color: '#fd7e14'}}>⚠️ Important Tips</span>
+                    <span style={{color: '#fd7e14'}}>⚠️ {language === 'hi' ? "महत्वपूर्ण सुझाव" : "Important Tips"}</span>
                   </h6>
                   <ul className="mb-0 ps-4 small" style={{color: '#856404', fontSize: '0.9rem'}}>
                     {selectedScheme.tips.map((tip, idx) => (
@@ -725,7 +719,7 @@ const GovernmentSchemes = () => {
               {/* Official Website Section */}
               <div className="p-4 rounded" style={{background: '#e7f3ff', border: '2px solid #0d6efd'}}>
                 <h6 className="text-dark mb-3 fw-bold" style={{fontSize: '1rem'}}>
-                  <span style={{color: '#0d6efd'}}>🔗 Official Website</span>
+                  <span style={{color: '#0d6efd'}}>🔗 {language === 'hi' ? "आधिकारिक वेबसाइट" : "Official Website"}</span>
                 </h6>
                 <a href={selectedScheme.officialLink} target="_blank" rel="noopener noreferrer" className="text-break" style={{color: '#0d6efd', textDecoration: 'none', fontWeight: '500'}}>
                   {selectedScheme.officialLink}
@@ -736,13 +730,13 @@ const GovernmentSchemes = () => {
         </Modal.Body>
         <Modal.Footer className="border-0 bg-white pt-3 pb-3">
           <Button variant="secondary" onClick={() => setShowModal(false)} style={{borderRadius: '8px', padding: '0.5rem 2rem'}}>
-            Close
+            {language === 'hi' ? "बंद करें" : "Close"}
           </Button>
           <Button 
             style={{background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', border: 'none', borderRadius: '8px', padding: '0.5rem 2rem', fontWeight: 'bold'}} 
             onClick={() => window.open(selectedScheme?.officialLink, '_blank')}
           >
-            🚀 Apply Now
+            🚀 {language === 'hi' ? "अभी आवेदन करें" : "Apply Now"}
           </Button>
         </Modal.Footer>
       </Modal>

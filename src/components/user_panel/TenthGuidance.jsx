@@ -6,6 +6,7 @@ import axios from 'axios'
 
 import CounselingForm from './CounselingForm'
 import { useAuth } from '../all_login/AuthContext'
+import { useLanguage } from '../all_login/LanguageContext'
 import '../../assets/css/10thclass.css'
 import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
@@ -13,6 +14,7 @@ import UserLeftNav from './UserLeftNav'
 const TenthGuidance = () => {
   const navigate = useNavigate()
   const { uniqueId, accessToken } = useAuth()
+  const { language } = useLanguage()
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       const width = window.innerWidth;
@@ -90,27 +92,27 @@ const TenthGuidance = () => {
   const streams = [
     { 
       id: 'science', 
-      name: 'Science', 
+      name: language === 'hi' ? 'विज्ञान' : 'Science', 
       icon: <FaFlask />, 
-      subjects: 'Physics, Chemistry, Biology/Mathematics'
+      subjects: language === 'hi' ? 'भौतिकी, रसायन विज्ञान, जीव विज्ञान/गणित' : 'Physics, Chemistry, Biology/Mathematics'
     },
     { 
       id: 'commerce', 
-      name: 'Commerce', 
+      name: language === 'hi' ? 'वाणिज्य' : 'Commerce', 
       icon: <FaCalculator />, 
-      subjects: 'Accountancy, Economics, Business Studies'
+      subjects: language === 'hi' ? 'अकाउंटेंसी, अर्थशास्त्र, बिजनेस स्टडीज' : 'Accountancy, Economics, Business Studies'
     },
     { 
       id: 'arts', 
-      name: 'Arts', 
+      name: language === 'hi' ? 'कला' : 'Arts', 
       icon: <FaBook />, 
-      subjects: 'History, Political Science, Sociology'
+      subjects: language === 'hi' ? 'इतिहास, राजनीति विज्ञान, समाजशास्त्र' : 'History, Geography, Political Science'
     },
     { 
       id: 'vocational', 
-      name: 'Vocational', 
+      name: language === 'hi' ? 'व्यावसायिक' : 'Vocational', 
       icon: <FaWrench />, 
-      subjects: 'Technical, IT, Skills'
+      subjects: language === 'hi' ? 'तकनीकी, आईटी, कौशल' : 'Technical, IT, Skills'
     }
   ]
 
@@ -554,7 +556,7 @@ const getStreamDisplayName = (streamId) => {
                   className="d-flex align-items-center"
                 >
                   <FaArrowLeft className="me-2" />
-                  Back to Dashboard
+              {language === 'hi' ? "डैशबोर्ड पर वापस जाएं" : "Back to Dashboard"}
                 </Button>
               </div>
 
@@ -565,10 +567,10 @@ const getStreamDisplayName = (streamId) => {
                     <div>
                       <h3 className="mb-2">
                         <FaGraduationCap className="me-2 text-primary" />
-                        10th Career Guidance
+                    {language === 'hi' ? "10वीं करियर मार्गदर्शन" : "10th Career Guidance"}
                       </h3>
                       <p className="text-muted mb-0">
-                        Get personalized career guidance based on your 10th grade stream and percentage
+                    {language === 'hi' ? "अपनी 10वीं की स्ट्रीम और प्रतिशत के आधार पर व्यक्तिगत मार्गदर्शन प्राप्त करें" : "Get personalized career guidance based on your 10th grade stream and percentage"}
                       </p>
                     </div>
                   </div>
@@ -586,8 +588,8 @@ const getStreamDisplayName = (streamId) => {
               <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
                 <Card.Body>
                   <h5 className="mb-3">
-                    <Badge bg="primary" className="me-2">Step 1:</Badge>
-                    Select Your Stream
+                  <Badge bg="primary" className="me-2">{language === 'hi' ? "चरण 1:" : "Step 1:"}</Badge>
+                  {language === 'hi' ? "अपनी स्ट्रीम चुनें" : "Select Your Stream"}
                   </h5>
                   <Row>
                     {streams.map((stream) => (
@@ -609,7 +611,7 @@ const getStreamDisplayName = (streamId) => {
                             <small className="text-muted">{stream.subjects}</small>
                             {selectedStream === stream.id && (
                               <Badge bg="primary" className="mt-2">
-                                <FaCheckCircle className="me-1" /> Selected
+                                <FaCheckCircle className="me-1" /> {language === 'hi' ? "चयनित" : "Selected"}
                               </Badge>
                             )}
                           </Card.Body>
@@ -625,14 +627,14 @@ const getStreamDisplayName = (streamId) => {
                 <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
                   <Card.Body>
                     <h5 className="mb-3">
-                      <Badge bg="primary" className="me-2">Step 2:</Badge>
-                      Enter Your Percentage
+                      <Badge bg="primary" className="me-2">{language === 'hi' ? "चरण 2:" : "Step 2:"}</Badge>
+                      {language === 'hi' ? "अपनी प्रतिशत दर्ज करें" : "Enter Your Percentage"}
                     </h5>
                     <Row className="align-items-center">
                       <Col md={6}>
                         <Form.Control
                           type="number"
-                          placeholder="Enter percentage"
+                          placeholder={language === 'hi' ? "प्रतिशत दर्ज करें" : "Enter percentage"}
                           value={percentage}
                           onChange={handlePercentageChange}
                           min="0"
@@ -649,7 +651,7 @@ const getStreamDisplayName = (streamId) => {
                           className="w-100 mobile-btn-get"
                         >
                           <FaLightbulb className="me-2" />
-                          Get Guidance
+                          {language === 'hi' ? "मार्गदर्शन प्राप्त करें" : "Get Guidance"}
                         </Button>
                       </Col>
                     </Row>
@@ -664,9 +666,9 @@ const getStreamDisplayName = (streamId) => {
                     <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
                       <Card.Body className=" text-center">
                         <FaInfoCircle className="text-warning mb-3" style={{ fontSize: '48px' }} />
-                        <h4>No Recommendations Available</h4>
+                        <h4>{language === 'hi' ? "कोई अनुशंसा उपलब्ध नहीं है" : "No Recommendations Available"}</h4>
                         <p className="text-muted mb-0">
-                          Try adjusting your percentage or selecting a different stream.
+                          {language === 'hi' ? "अपना प्रतिशत बदलने या दूसरी स्ट्रीम चुनने का प्रयास करें।" : "Try adjusting your percentage or selecting a different stream."}
                         </p>
                       </Card.Body>
                     </Card>
@@ -677,9 +679,9 @@ const getStreamDisplayName = (streamId) => {
                         <Card.Body>
                           <div className="d-flex justify-content-between align-items-center">
                             <div>
-                              <h5 className="mb-1">Performance Summary</h5>
+                              <h5 className="mb-1">{language === 'hi' ? "प्रदर्शन सारांश" : "Performance Summary"}</h5>
                               <p className="text-muted mb-0">
-                                Based on {percentage}% in {getStreamDisplayName(selectedStream)}
+                                {language === 'hi' ? `${getStreamDisplayName(selectedStream)} में आपकी ${percentage}% के आधार पर` : `Based on ${percentage}% in ${getStreamDisplayName(selectedStream)}`}
                               </p>
                             </div>
                             <div className="text-end">
@@ -703,10 +705,10 @@ const getStreamDisplayName = (streamId) => {
                         <Card.Header className="bg-white border-0 pt-4 pb-0">
                           <h5 className="mb-0">
                             <FaUniversity className="me-2 text-primary" />
-                            11th Stream Recommendations
+                            {language === 'hi' ? "11वीं स्ट्रीम अनुशंसाएँ" : "11th Stream Recommendations"}
                           </h5>
                           <p className="text-muted mb-0">
-                            Browse recommended streams based on your performance
+                            {language === 'hi' ? "अपने प्रदर्शन के आधार पर अनुशंसित स्ट्रीम ब्राउज़ करें" : "Browse recommended streams based on your performance"}
                           </p>
                         </Card.Header>
                         <Card.Body>
@@ -715,13 +717,13 @@ const getStreamDisplayName = (streamId) => {
                               <Nav.Item>
                                 <Nav.Link eventKey="recommended">
                                   <FaUniversity className="me-2" />
-                                  Recommended Streams
+                                  {language === 'hi' ? "अनुशंसित स्ट्रीम" : "Recommended Streams"}
                                 </Nav.Link>
                               </Nav.Item>
                               <Nav.Item>
                                 <Nav.Link eventKey="all">
                                   <FaBookOpen className="me-2" />
-                                  All Streams for {getStreamDisplayName(selectedStream)}
+                                  {language === 'hi' ? `सभी ${getStreamDisplayName(selectedStream)} स्ट्रीम` : `All Streams for ${getStreamDisplayName(selectedStream)}`}
                                 </Nav.Link>
                               </Nav.Item>
                             </Nav>
@@ -742,14 +744,14 @@ const getStreamDisplayName = (streamId) => {
                                             </div>
                                             <div>
                                               <h6 className="mb-1">{stream.name}</h6>
-                                              <Badge bg="info">{stream.careers.length} Career Options</Badge>
+                                              <Badge bg="info">{stream.careers.length} {language === 'hi' ? "करियर विकल्प" : "Career Options"}</Badge>
                                             </div>
                                           </div>
                                           <p className="text-muted small mb-3">
                                             {stream.description}
                                           </p>
                                           <div className="mt-auto">
-                                            <small className="text-muted d-block mb-2">Career Opportunities</small>
+                                            <small className="text-muted d-block mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</small>
                                             <div className="d-flex flex-wrap gap-1">
                                               {stream.careers.slice(0, 3).map((career, idx) => (
                                                 <Badge bg="light" text="dark" key={idx} className="small">
@@ -780,14 +782,14 @@ const getStreamDisplayName = (streamId) => {
                                             </div>
                                             <div>
                                               <h6 className="mb-1">{stream.name}</h6>
-                                              <Badge bg="info">{stream.careers.length} Career Options</Badge>
+                                              <Badge bg="info">{stream.careers.length} {language === 'hi' ? "करियर विकल्प" : "Career Options"}</Badge>
                                             </div>
                                           </div>
                                           <p className="text-muted small mb-3">
                                             {stream.description}
                                           </p>
                                           <div className="mt-auto">
-                                            <small className="text-muted d-block mb-2">Career Opportunities</small>
+                                            <small className="text-muted d-block mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</small>
                                             <div className="d-flex flex-wrap gap-1">
                                               {stream.careers.slice(0, 3).map((career, idx) => (
                                                 <Badge bg="light" text="dark" key={idx} className="small">
@@ -812,30 +814,30 @@ const getStreamDisplayName = (streamId) => {
                         <Card.Body>
                           <h5 className="mb-3">
                             <FaLightbulb className="me-2 text-warning" />
-                            Additional Guidance
+                            {language === 'hi' ? "अतिरिक्त मार्गदर्शन" : "Additional Guidance"}
                           </h5>
                           <Row>
                             <Col md={6}>
                               <h6>
-                                {selectedStream === 'science' && 'Guidance for Science Students'}
-                                {selectedStream === 'commerce' && 'Guidance for Commerce Students'}
-                                {selectedStream === 'arts' && 'Guidance for Arts Students'}
-                                {selectedStream === 'vocational' && 'Guidance for Vocational Students'}
+                                {selectedStream === 'science' && (language === 'hi' ? 'विज्ञान छात्रों के लिए मार्गदर्शन' : 'Guidance for Science Students')}
+                                {selectedStream === 'commerce' && (language === 'hi' ? 'वाणिज्य छात्रों के लिए मार्गदर्शन' : 'Guidance for Commerce Students')}
+                                {selectedStream === 'arts' && (language === 'hi' ? 'कला छात्रों के लिए मार्गदर्शन' : 'Guidance for Arts Students')}
+                                {selectedStream === 'vocational' && (language === 'hi' ? 'व्यावसायिक छात्रों के लिए मार्गदर्शन' : 'Guidance for Vocational Students')}
                               </h6>
                               <ul className="text-muted">
-                                <li>Focus on understanding core concepts</li>
-                                <li>Join study groups for better learning</li>
-                                <li>Take regular mock tests</li>
-                                <li>Seek guidance from teachers</li>
+                                <li>{language === 'hi' ? "मूल अवधारणाओं को समझने पर ध्यान दें" : "Focus on understanding core concepts"}</li>
+                                <li>{language === 'hi' ? "बेहतर सीखने के लिए अध्ययन समूहों में शामिल हों" : "Join study groups for better learning"}</li>
+                                <li>{language === 'hi' ? "नियमित मॉक टेस्ट लें" : "Take regular mock tests"}</li>
+                                <li>{language === 'hi' ? "शिक्षकों से मार्गदर्शन लें" : "Seek guidance from teachers"}</li>
                               </ul>
                             </Col>
                             <Col md={6}>
-                              <h6>Career Tips:</h6>
+                              <h6>{language === 'hi' ? "करियर टिप्स:" : "Career Tips:"}</h6>
                               <ul className="text-muted">
-                                <li>Explore various career options</li>
-                                <li>Build relevant skills</li>
-                                <li>Stay updated with industry trends</li>
-                                <li>Network with professionals</li>
+                                <li>{language === 'hi' ? "विभिन्न करियर विकल्पों का पता लगाएं" : "Explore various career options"}</li>
+                                <li>{language === 'hi' ? "प्रासंगिक कौशल बनाएं" : "Build relevant skills"}</li>
+                                <li>{language === 'hi' ? "उद्योग के रुझानों के साथ अपडेट रहें" : "Stay updated with industry trends"}</li>
+                                <li>{language === 'hi' ? "पेशेवरों के साथ नेटवर्क बनाएं" : "Network with professionals"}</li>
                               </ul>
                             </Col>
                           </Row>
@@ -850,11 +852,11 @@ const getStreamDisplayName = (streamId) => {
               {!selectedStream && (
                 <Card className="shadow-sm border-0 instructions-card" style={{ borderRadius: '10px' }}>
                   <Card.Body>
-                    <h4>How to Get Guidance</h4>
+                    <h4>{language === 'hi' ? "मार्गदर्शन कैसे प्राप्त करें" : "How to Get Guidance"}</h4>
                     <p className="text-muted mb-0">
-                      <strong>Step 1:</strong> Select your 10th grade stream<br />
-                      <strong>Step 2:</strong> Enter your percentage<br />
-                      <strong>Step 3:</strong> Click "Get Guidance" to see recommendations
+                      <strong>{language === 'hi' ? "चरण 1:" : "Step 1:"}</strong> {language === 'hi' ? "अपनी 10वीं कक्षा की स्ट्रीम चुनें" : "Select your 10th grade stream"}<br />
+                      <strong>{language === 'hi' ? "चरण 2:" : "Step 2:"}</strong> {language === 'hi' ? "अपना प्रतिशत दर्ज करें" : "Enter your percentage"}<br />
+                      <strong>{language === 'hi' ? "चरण 3:" : "Step 3:"}</strong> {language === 'hi' ? "अनुशंसाएँ देखने के लिए 'मार्गदर्शन प्राप्त करें' पर क्लिक करें" : "Click \"Get Guidance\" to see recommendations"}
                     </p>
                   </Card.Body>
                 </Card>
@@ -876,7 +878,7 @@ const getStreamDisplayName = (streamId) => {
           {selectedCourse && (
             <div>
               <div className="mb-4">
-                <h6 className="text-muted mb-2">Description</h6>
+                <h6 className="text-muted mb-2">{language === 'hi' ? "विवरण" : "Description"}</h6>
                 <p>{selectedCourse.description}</p>
               </div>
               
@@ -885,7 +887,7 @@ const getStreamDisplayName = (streamId) => {
                 <div className="mb-4">
                   <h6 className="text-muted mb-3">
                     <FaLightbulb className="me-2 text-warning" />
-                    Step-by-Step Career Path
+                    {language === 'hi' ? "कदम-दर-कदम करियर पथ" : "Step-by-Step Career Path"}
                   </h6>
                   <Row>
                     {selectedCourse.careerPaths.map((path, index) => (
@@ -903,7 +905,7 @@ const getStreamDisplayName = (streamId) => {
                             </div>
                             {selectedCareerPath === path && (
                               <div className="mt-3">
-                                <h6 className="text-muted mb-2">Steps to Achieve:</h6>
+                                <h6 className="text-muted mb-2">{language === 'hi' ? "सफलता के चरण:" : "Steps to Achieve:"}</h6>
                                 <ol className="ps-3 mb-0">
                                   {path.steps.map((step, idx) => (
                                     <li key={idx} className="mb-1 small">{step}</li>
@@ -921,7 +923,7 @@ const getStreamDisplayName = (streamId) => {
               
               {/* Career Opportunities */}
               <div className="mb-4">
-                <h6 className="text-muted mb-2">Career Opportunities</h6>
+                <h6 className="text-muted mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</h6>
                 <Row>
                   {selectedCourse.careers.map((career, index) => (
                     <Col md={6} key={index} className="mb-2">
@@ -936,20 +938,20 @@ const getStreamDisplayName = (streamId) => {
               
               <Alert variant="info">
                 <FaInfoCircle className="me-2" />
-                <strong>Tip:</strong> Click on a career path to see detailed steps
+                <strong>{language === 'hi' ? "सुझाव:" : "Tip:"}</strong> {language === 'hi' ? "विस्तृत चरणों को देखने के लिए करियर पथ पर क्लिक करें" : "Click on a career path to see detailed steps"}
               </Alert>
             </div>
           )}
         </Modal.Body>
         <Modal.Footer className="border-0">
           <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
+            {language === 'hi' ? "बंद करें" : "Close"}
           </Button>
           <Button variant="primary" onClick={() => {
             setShowModal(false)
             navigate('/UserDashboard')
           }}>
-            Go to Dashboard
+            {language === 'hi' ? "डैशबोर्ड पर जाएं" : "Go to Dashboard"}
           </Button>
         </Modal.Footer>
       </Modal>

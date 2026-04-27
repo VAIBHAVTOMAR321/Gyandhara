@@ -11,6 +11,7 @@ import '../../assets/css/12thclass.css'
 import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
 import { useAuth } from '../all_login/AuthContext'
+import { useLanguage } from '../all_login/LanguageContext'
 
 const TwelfthGuidance = () => {
   const { uniqueId, userRoleType, accessToken } = useAuth()
@@ -38,6 +39,7 @@ const TwelfthGuidance = () => {
   const [selectedCollegeTab, setSelectedCollegeTab] = useState('recommended')
   const [govtExamData, setGovtExamData] = useState({})
   const [govtCollegeData, setGovtCollegeData] = useState({})
+  const { language } = useLanguage()
   const navigate = useNavigate()
   const resultsRef = useRef(null)
   const tabsRef = useRef(null)
@@ -458,10 +460,10 @@ const TwelfthGuidance = () => {
   // Helper function to get stream display name
   const getStreamName = (streamId) => {
     const streamNames = {
-      'science': 'Science',
-      'commerce': 'Commerce',
-      'arts': 'Arts',
-      'computer': 'Computer Science'
+      'science': language === 'hi' ? 'विज्ञान' : 'Science',
+      'commerce': language === 'hi' ? 'वाणिज्य' : 'Commerce',
+      'arts': language === 'hi' ? 'कला' : 'Arts',
+      'computer': language === 'hi' ? 'कंप्यूटर विज्ञान' : 'Computer Science'
     }
     return streamNames[streamId] || 'Unknown'
   }
@@ -670,9 +672,9 @@ const TwelfthGuidance = () => {
 
   const getPerformanceLevel = () => {
     const perc = Number(percentage)
-    if (perc >= 75) return { levelKey: 'Excellent', color: 'success', icon: <FaCheckCircle /> }
-    if (perc >= 60) return { levelKey: 'Good', color: 'warning', icon: <FaInfoCircle /> }
-    return { levelKey: 'Average', color: 'danger', icon: <FaInfoCircle /> }
+    if (perc >= 75) return { levelKey: language === 'hi' ? 'उत्कृष्ट' : 'Excellent', color: 'success', icon: <FaCheckCircle /> }
+    if (perc >= 60) return { levelKey: language === 'hi' ? 'अच्छा' : 'Good', color: 'warning', icon: <FaInfoCircle /> }
+    return { levelKey: language === 'hi' ? 'औसत' : 'Average', color: 'danger', icon: <FaInfoCircle /> }
    }
 
    const courses = showResults ? getCoursesByStreamAndPercentage(selectedStream, percentage) : []
@@ -702,7 +704,7 @@ const TwelfthGuidance = () => {
               className="d-flex align-items-center"
             >
               <FaArrowLeft className="me-2" />
-              Back to Dashboard
+              {language === 'hi' ? "डैशबोर्ड पर वापस जाएं" : "Back to Dashboard"}
             </Button>
           </div>
 
@@ -722,10 +724,10 @@ const TwelfthGuidance = () => {
                     <div>
                       <h3 className="mb-2">
                         <FaGraduationCap className="me-2 text-primary" />
-                        12th Class Career Guidance
+                    {language === 'hi' ? "12वीं कक्षा करियर मार्गदर्शन" : "12th Class Career Guidance"}
                       </h3>
                       <p className="text-muted mb-0">
-                        Choose Your Path After 12th
+                    {language === 'hi' ? "12वीं के बाद अपना रास्ता चुनें" : "Choose Your Path After 12th"}
                       </p>
                     </div>
                   </div>
@@ -742,8 +744,8 @@ const TwelfthGuidance = () => {
               <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
                 <Card.Body className="">
                   <h5 className="mb-3">
-                    <Badge bg="primary" className="me-2">Step 1</Badge>
-                    Select Your Stream
+                  <Badge bg="primary" className="me-2">{language === 'hi' ? "चरण 1" : "Step 1"}</Badge>
+                  {language === 'hi' ? "अपनी स्ट्रीम चुनें" : "Select Your Stream"}
                   </h5>
                   <Row>
                     {streams.map((stream) => (
@@ -762,20 +764,20 @@ const TwelfthGuidance = () => {
                               {stream.icon}
                             </div>
                             <h6 className="mb-1">
-                              {stream.id === 'science' ? 'Science' :
-                               stream.id === 'commerce' ? 'Commerce' :
-                               stream.id === 'arts' ? 'Arts' :
-                               stream.id === 'computer' ? 'Computer Science' : 'Unknown'}
+                              {stream.id === 'science' ? (language === 'hi' ? 'विज्ञान' : 'Science') :
+                               stream.id === 'commerce' ? (language === 'hi' ? 'वाणिज्य' : 'Commerce') :
+                               stream.id === 'arts' ? (language === 'hi' ? 'कला' : 'Arts') :
+                               stream.id === 'computer' ? (language === 'hi' ? 'कंप्यूटर विज्ञान' : 'Computer Science') : 'Unknown'}
                             </h6>
                             <small className="text-muted">
-                              {stream.id === 'science' ? 'Physics, Chemistry, Mathematics' :
-                               stream.id === 'commerce' ? 'Accountancy, Business Studies, Economics' :
-                               stream.id === 'arts' ? 'History, Geography, Political Science' :
-                               stream.id === 'computer' ? 'Computer Science, Mathematics, Physics' : ''}
+                              {stream.id === 'science' ? (language === 'hi' ? 'भौतिकी, रसायन विज्ञान, गणित' : 'Physics, Chemistry, Mathematics') :
+                               stream.id === 'commerce' ? (language === 'hi' ? 'अकाउंटेंसी, बिजनेस स्टडीज, अर्थशास्त्र' : 'Accountancy, Business Studies, Economics') :
+                               stream.id === 'arts' ? (language === 'hi' ? 'इतिहास, भूगोल, राजनीति विज्ञान' : 'History, Geography, Political Science') :
+                               stream.id === 'computer' ? (language === 'hi' ? 'कंप्यूटर विज्ञान, गणित, भौतिकी' : 'Computer Science, Mathematics, Physics') : ''}
                             </small>
                             {selectedStream === stream.id && (
                               <Badge bg="primary" className="mt-2">
-                                <FaCheckCircle className="me-1" /> Selected
+                                <FaCheckCircle className="me-1" /> {language === 'hi' ? "चयनित" : "Selected"}
                               </Badge>
                             )}
                           </Card.Body>
@@ -791,15 +793,15 @@ const TwelfthGuidance = () => {
                 <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
                   <Card.Body className="p-4">
                     <h5 className="mb-3">
-                      <Badge bg="primary" className="me-2">Step 2</Badge>
-                      Enter Your 12th Percentage
+                      <Badge bg="primary" className="me-2">{language === 'hi' ? "चरण 2" : "Step 2"}</Badge>
+                      {language === 'hi' ? "अपनी 12वीं की प्रतिशत दर्ज करें" : "Enter Your 12th Percentage"}
                     </h5>
                     <Row className="align-items-center">
                       <Col md={6}>
                         <div className="percentage-input-wrapper">
                           <Form.Control
                             type="number"
-                            placeholder="Enter percentage"  
+                            placeholder={language === 'hi' ? "प्रतिशत दर्ज करें" : "Enter percentage"}
                             value={percentage}
                             onChange={handlePercentageChange}
                             min="0"
@@ -818,7 +820,7 @@ const TwelfthGuidance = () => {
                           className="w-100 mobile-btn-get"
                         >
                           <FaLightbulb className="me-2" />
-                          Get Course Guidance
+                          {language === 'hi' ? "कोर्स मार्गदर्शन प्राप्त करें" : "Get Course Guidance"}
                         </Button>
                       </Col>
                     </Row>
@@ -834,9 +836,9 @@ const TwelfthGuidance = () => {
                     <Card.Body className="p-4">
                       <div className="d-flex justify-content-between align-items-center">
                         <div>
-                          <h5 className="mb-1">Your Performance</h5>
+                          <h5 className="mb-1">{language === 'hi' ? "आपका प्रदर्शन" : "Your Performance"}</h5>
                           <p className="text-muted mb-0">
-                            Based on your {percentage}% in {getStreamName(selectedStream)}
+                            {language === 'hi' ? `आपकी ${percentage}% के आधार पर ${getStreamName(selectedStream)} में` : `Based on your ${percentage}% in ${getStreamName(selectedStream)}`}
                           </p>
                         </div>
                         <div className="text-end govt-job-performance">
@@ -858,8 +860,8 @@ const TwelfthGuidance = () => {
                   {/* Private/Govt College/Govt Job Selection */}
                   <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
                     <Card.Body className="p-4">
-                      <h5 className="mb-3">Choose Your Path</h5>
-                      <p className="text-muted mb-3">Select your preferred path</p>
+                      <h5 className="mb-3">{language === 'hi' ? "अपना रास्ता चुनें" : "Choose Your Path"}</h5>
+                      <p className="text-muted mb-3">{language === 'hi' ? "अपनी पसंदीदा राह चुनें" : "Select your preferred path"}</p>
                       <Row className="g-3">
                         <Col lg={4} md={4} sm={12}>
                           <Card 
@@ -869,8 +871,8 @@ const TwelfthGuidance = () => {
                           >
                             <Card.Body className="p-4 text-center">
                               <FaUniversity className={`fs-2 mb-2 ${prepType === 'govtCollege' ? 'text-white' : 'text-muted'}`} />
-                              <h6 className={prepType === 'govtCollege' ? 'text-white fw-bold' : 'text-muted'}>Government College</h6>
-                              <small className={prepType === 'govtCollege' ? 'text-white' : 'text-muted'}>{getGovtCollegeDescription()}</small>
+                              <h6 className={prepType === 'govtCollege' ? 'text-white fw-bold' : 'text-muted'}>{language === 'hi' ? "सरकारी कॉलेज" : "Government College"}</h6>
+                              <small className={prepType === 'govtCollege' ? 'text-white' : 'text-muted'}>{language === 'hi' ? "इंजीनियरिंग, मेडिकल और रिसर्च पथ" : "Engineering, medical & research pathways"}</small>
                             </Card.Body>
                           </Card>
                         </Col>
@@ -882,8 +884,8 @@ const TwelfthGuidance = () => {
                           >
                             <Card.Body className="p-4 text-center">
                               <FaShieldAlt className={`fs-2 mb-2 ${prepType === 'govtJob' ? 'text-primary' : 'text-muted'}`} />
-                              <h6 className={prepType === 'govtJob' ? 'text-primary fw-bold' : 'text-muted'}>Government Job</h6>
-                              <small className="text-muted">Prepare for competitive exams</small>
+                              <h6 className={prepType === 'govtJob' ? 'text-primary fw-bold' : 'text-muted'}>{language === 'hi' ? "सरकारी नौकरी" : "Government Job"}</h6>
+                              <small className="text-muted">{language === 'hi' ? "प्रतियोगी परीक्षाओं की तैयारी करें" : "Prepare for competitive exams"}</small>
                             </Card.Body>
                           </Card>
                         </Col>
@@ -895,8 +897,8 @@ const TwelfthGuidance = () => {
                           >
                             <Card.Body className="p-4 text-center">
                               <FaBriefcase className={`fs-2 mb-2 ${prepType === 'private' ? 'text-primary' : 'text-muted'}`} />
-                              <h6 className={prepType === 'private' ? 'text-primary fw-bold' : 'text-muted'}>Private College</h6>
-                              <small className="text-muted">Direct admission in private colleges</small>
+                              <h6 className={prepType === 'private' ? 'text-primary fw-bold' : 'text-muted'}>{language === 'hi' ? "प्राइवेट कॉलेज" : "Private College"}</h6>
+                              <small className="text-muted">{language === 'hi' ? "प्राइवेट कॉलेजों में सीधा प्रवेश" : "Direct admission in private colleges"}</small>
                             </Card.Body>
                           </Card>
                         </Col>
@@ -909,15 +911,15 @@ const TwelfthGuidance = () => {
                     <Card.Header className="bg-white border-0 pt-4 pb-0">
                       <h5 className="mb-0">
                         {prepType === 'govtJob' ? (
-                          <><FaShieldAlt className="me-2 text-primary" />Government Job Roadmap</>
+                          <><FaShieldAlt className="me-2 text-primary" />{language === 'hi' ? "सरकारी नौकरी रोडमैप" : "Government Job Roadmap"}</>
                         ) : prepType === 'govtCollege' ? (
-                          <><FaUniversity className="me-2 text-primary" />Government College Roadmap</>
+                          <><FaUniversity className="me-2 text-primary" />{language === 'hi' ? "सरकारी कॉलेज रोडमैप" : "Government College Roadmap"}</>
                         ) : (
-                          <><FaBriefcase className="me-2 text-primary" />Course Recommendations</>
+                          <><FaBriefcase className="me-2 text-primary" />{language === 'hi' ? "कोर्स अनुशंसाएँ" : "Course Recommendations"}</>
                         )}
                       </h5>
                       <p className="text-muted mb-0">
-                        {prepType === 'govtJob' ? 'Select Exam Path' : prepType === 'govtCollege' ? 'Select College Path' : 'Browse courses based on your performance'}
+                        {language === 'hi' ? (prepType === 'govtJob' ? 'परीक्षा पथ चुनें' : prepType === 'govtCollege' ? 'कॉलेज पथ चुनें' : 'अपने प्रदर्शन के आधार पर कोर्स ब्राउज़ करें') : (prepType === 'govtJob' ? 'Select Exam Path' : prepType === 'govtCollege' ? 'Select College Path' : 'Browse courses based on your performance')}
                       </p>
                     </Card.Header>
                     <Card.Body className="p-4">
@@ -981,10 +983,10 @@ const TwelfthGuidance = () => {
                         <div className="mb-4">
                           <Tab.Container id="govt-college-tabs" defaultActiveKey="colleges">
                             <Nav variant="tabs" className="mb-4">
-                              <Nav.Item><Nav.Link eventKey="colleges"><FaUniversity className="me-2" style={{ color: '#fff' }} />Top Colleges</Nav.Link></Nav.Item>
-                              <Nav.Item><Nav.Link eventKey="universities"><FaBuilding className="me-2" style={{ color: '#fff' }} />Top Universities</Nav.Link></Nav.Item>
-                              <Nav.Item><Nav.Link eventKey="recommended"><FaLightbulb className="me-2" />Recommended Courses</Nav.Link></Nav.Item>
-                              <Nav.Item><Nav.Link eventKey="all"><FaBookOpen className="me-2" />All Courses For {getStreamName(selectedStream)}</Nav.Link></Nav.Item>
+                              <Nav.Item><Nav.Link eventKey="colleges"><FaUniversity className="me-2" style={{ color: '#fff' }} />{language === 'hi' ? "शीर्ष कॉलेज" : "Top Colleges"}</Nav.Link></Nav.Item>
+                              <Nav.Item><Nav.Link eventKey="universities"><FaBuilding className="me-2" style={{ color: '#fff' }} />{language === 'hi' ? "शीर्ष विश्वविद्यालय" : "Top Universities"}</Nav.Link></Nav.Item>
+                              <Nav.Item><Nav.Link eventKey="recommended"><FaLightbulb className="me-2" />{language === 'hi' ? "अनुशंसित कोर्स" : "Recommended Courses"}</Nav.Link></Nav.Item>
+                              <Nav.Item><Nav.Link eventKey="all"><FaBookOpen className="me-2" />{language === 'hi' ? "सभी उपलब्ध कोर्स" : "All Courses Available"}</Nav.Link></Nav.Item>
                             </Nav>
                             <Tab.Content>
                               <Tab.Pane eventKey="colleges">
@@ -1091,7 +1093,7 @@ const TwelfthGuidance = () => {
                                             </div>
                                             <p className="text-muted small mb-3">{getCourseDescription(course.name, course.description)}</p>
                                             <div className="mt-auto">
-                                              <small className="text-muted d-block mb-2">Career Opportunities</small>
+                                              <small className="text-muted d-block mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</small>
                                               <div className="d-flex flex-wrap gap-1">
                                                 {course.careers?.slice(0, 3).map((career, idx) => (
                                                   <Badge bg="light" text="dark" key={idx} className="small">{career}</Badge>
@@ -1104,7 +1106,7 @@ const TwelfthGuidance = () => {
                                     ))}
                                   </Row>
                                 ) : (
-                                  <Alert variant="info"><FaInfoCircle className="me-2" />No Recommended Courses</Alert>
+                                  <Alert variant="info"><FaInfoCircle className="me-2" />{language === 'hi' ? "कोई अनुशंसित कोर्स नहीं" : "No Recommended Courses"}</Alert>
                                 )}
                               </Tab.Pane>
                               <Tab.Pane eventKey="all">
@@ -1120,7 +1122,7 @@ const TwelfthGuidance = () => {
                                             </div>
                                             <p className="text-muted small mb-3">{getCourseDescription(course.name, course.description)}</p>
                                             <div className="mt-auto">
-                                              <small className="text-muted d-block mb-2">Career Opportunities</small>
+                                              <small className="text-muted d-block mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</small>
                                               <div className="d-flex flex-wrap gap-1">
                                                 {course.careers?.slice(0, 3).map((career, idx) => (
                                                   <Badge bg="light" text="dark" key={idx} className="small">{career}</Badge>
@@ -1133,7 +1135,7 @@ const TwelfthGuidance = () => {
                                     ))}
                                   </Row>
                                 ) : (
-                                  <Alert variant="info"><FaInfoCircle className="me-2" />No Courses Available</Alert>
+                                  <Alert variant="info"><FaInfoCircle className="me-2" />{language === 'hi' ? "कोई कोर्स उपलब्ध नहीं" : "No Courses Available"}</Alert>
                                 )}
                               </Tab.Pane>
                             </Tab.Content>
@@ -1142,8 +1144,8 @@ const TwelfthGuidance = () => {
                       ) : (
                         <Tab.Container id="courses-tabs" defaultActiveKey="recommended">
                           <Nav variant="tabs" className="mb-4">
-                            <Nav.Item><Nav.Link eventKey="recommended"><FaUniversity className="me-2" />Recommended Courses</Nav.Link></Nav.Item>
-                            <Nav.Item><Nav.Link eventKey="all"><FaBookOpen className="me-2" />All Courses For {getStreamName(selectedStream)}</Nav.Link></Nav.Item>
+                            <Nav.Item><Nav.Link eventKey="recommended"><FaUniversity className="me-2" />{language === 'hi' ? "अनुशंसित कोर्स" : "Recommended Courses"}</Nav.Link></Nav.Item>
+                            <Nav.Item><Nav.Link eventKey="all"><FaBookOpen className="me-2" />{language === 'hi' ? "सभी उपलब्ध कोर्स" : "All Courses Available"}</Nav.Link></Nav.Item>
                           </Nav>
                           <Tab.Content>
                             <Tab.Pane eventKey="recommended">
@@ -1159,7 +1161,7 @@ const TwelfthGuidance = () => {
                                           </div>
                                           <p className="text-muted small mb-3">{getCourseDescription(course.name, course.description)}</p>
                                           <div className="mt-auto">
-                                            <small className="text-muted d-block mb-2">Career Opportunities</small>
+                                            <small className="text-muted d-block mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</small>
                                             <div className="d-flex flex-wrap gap-1">
                                               {course.careers?.slice(0, 3).map((career, idx) => (
                                                 <Badge bg="light" text="dark" key={idx} className="small">{career}</Badge>
@@ -1172,7 +1174,7 @@ const TwelfthGuidance = () => {
                                   ))}
                                 </Row>
                               ) : (
-                                <Alert variant="info"><FaInfoCircle className="me-2" />No Recommended Courses</Alert>
+                                <Alert variant="info"><FaInfoCircle className="me-2" />{language === 'hi' ? "कोई अनुशंसित कोर्स नहीं" : "No Recommended Courses"}</Alert>
                               )}
                             </Tab.Pane>
                             <Tab.Pane eventKey="all">
@@ -1188,7 +1190,7 @@ const TwelfthGuidance = () => {
                                           </div>
                                           <p className="text-muted small mb-3">{getCourseDescription(course.name, course.description)}</p>
                                           <div className="mt-auto">
-                                            <small className="text-muted d-block mb-2">Career Opportunities</small>
+                                            <small className="text-muted d-block mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</small>
                                             <div className="d-flex flex-wrap gap-1">
                                               {course.careers?.slice(0, 3).map((career, idx) => (
                                                 <Badge bg="light" text="dark" key={idx} className="small">{career}</Badge>
@@ -1201,7 +1203,7 @@ const TwelfthGuidance = () => {
                                   ))}
                                 </Row>
                               ) : (
-                                <Alert variant="info"><FaInfoCircle className="me-2" />No Courses Available</Alert>
+                                <Alert variant="info"><FaInfoCircle className="me-2" />{language === 'hi' ? "कोई कोर्स उपलब्ध नहीं" : "No Courses Available"}</Alert>
                               )}
                             </Tab.Pane>
                           </Tab.Content>
@@ -1213,29 +1215,29 @@ const TwelfthGuidance = () => {
                   {/* Additional Guidance */}
                   <Card className="shadow-sm border-0 guidance-card" style={{ borderRadius: '10px' }}>
                     <Card.Body className="p-4">
-                      <h5 className="mb-3"><FaLightbulb className="me-2 text-warning" />Additional Guidance</h5>
+                      <h5 className="mb-3"><FaLightbulb className="me-2 text-warning" />{language === 'hi' ? "अतिरिक्त मार्गदर्शन" : "Additional Guidance"}</h5>
                       <Row>
                         <Col md={6}>
                           <h6>
-                            {selectedStream === 'science' && "Science Stream: Engineering, Medical & Research Pathways"}
-                            {selectedStream === 'commerce' && "Commerce Stream: Business, Finance & Professional Careers"}
-                            {selectedStream === 'arts' && "Arts Stream: Humanities, Creativity & Civil Services"}
-                            {selectedStream === 'computer' && "Computer Science: Technology, Coding & Innovation"}
+                            {selectedStream === 'science' && (language === 'hi' ? "विज्ञान स्ट्रीम: इंजीनियरिंग, मेडिकल और रिसर्च पथ" : "Science Stream: Engineering, Medical & Research Pathways")}
+                            {selectedStream === 'commerce' && (language === 'hi' ? "वाणिज्य स्ट्रीम: बिजनेस, फाइनेंस और प्रोफेशनल करियर" : "Commerce Stream: Business, Finance & Professional Careers")}
+                            {selectedStream === 'arts' && (language === 'hi' ? "कला स्ट्रीम: मानविकी, रचनात्मकता और सिविल सेवा" : "Arts Stream: Humanities, Creativity & Civil Services")}
+                            {selectedStream === 'computer' && (language === 'hi' ? "कंप्यूटर विज्ञान: प्रौद्योगिकी, कोडिंग और नवाचार" : "Computer Science: Technology, Coding & Innovation")}
                           </h6>
                           <ul className="text-muted">
-                            <li>Focus on your chosen stream subjects</li>
-                            <li>Start preparing for entrance exams early</li>
-                            <li>Research career options in your field</li>
-                            <li>Seek guidance from counselors</li>
+                            <li>{language === 'hi' ? "अपनी चुनी हुई स्ट्रीम के विषयों पर ध्यान दें" : "Focus on your chosen stream subjects"}</li>
+                            <li>{language === 'hi' ? "प्रवेश परीक्षाओं की तैयारी जल्दी शुरू करें" : "Start preparing for entrance exams early"}</li>
+                            <li>{language === 'hi' ? "अपने क्षेत्र में करियर विकल्पों पर शोध करें" : "Research career options in your field"}</li>
+                            <li>{language === 'hi' ? "परामर्शदाताओं से मार्गदर्शन लें" : "Seek guidance from counselors"}</li>
                           </ul>
                         </Col>
                         <Col md={6}>
-                          <h6>Career Tips:</h6>
+                          <h6>{language === 'hi' ? "करियर टिप्स:" : "Career Tips:"}</h6>
                           <ul className="text-muted">
-                            <li>Stay updated with latest career trends</li>
-                            <li>Develop soft skills alongside academics</li>
-                            <li>Consider internships for practical experience</li>
-                            <li>Build a strong professional network</li>
+                            <li>{language === 'hi' ? "नवीनतम करियर रुझानों के साथ अपडेट रहें" : "Stay updated with latest career trends"}</li>
+                            <li>{language === 'hi' ? "शिक्षा के साथ-साथ सॉफ्ट स्किल्स विकसित करें" : "Develop soft skills alongside academics"}</li>
+                            <li>{language === 'hi' ? "व्यावहारिक अनुभव के लिए इंटर्नशिप पर विचार करें" : "Consider internships for practical experience"}</li>
+                            <li>{language === 'hi' ? "एक मजबूत पेशेवर नेटवर्क बनाएं" : "Build a strong professional network"}</li>
                           </ul>
                         </Col>
                       </Row>
@@ -1248,11 +1250,11 @@ const TwelfthGuidance = () => {
               {!selectedStream && (
                 <Card className="shadow-sm border-0 instructions-card" style={{ borderRadius: '10px' }}>
                   <Card.Body className="p-4">
-                    <h4>How to Get Guidance</h4>
+                    <h4>{language === 'hi' ? "मार्गदर्शन कैसे प्राप्त करें" : "How to Get Guidance"}</h4>
                     <p className="text-muted mb-0">
-                      <strong>Step 1:</strong> Select your stream and enter your percentage<br />
-                      <strong>Step 2:</strong> Choose your preferred path (College/Job)<br />
-                      <strong>Step 3:</strong> Get personalized course and career recommendations
+                      <strong>{language === 'hi' ? "चरण 1:" : "Step 1:"}</strong> {language === 'hi' ? "अपनी स्ट्रीम चुनें और अपना प्रतिशत दर्ज करें" : "Select your stream and enter your percentage"}<br />
+                      <strong>{language === 'hi' ? "चरण 2:" : "Step 2:"}</strong> {language === 'hi' ? "अपना पसंदीदा पथ चुनें (कॉलेज/नौकरी)" : "Choose your preferred path (College/Job)"}<br />
+                      <strong>{language === 'hi' ? "चरण 3:" : "Step 3:"}</strong> {language === 'hi' ? "व्यक्तिगत कोर्स और करियर अनुशंसाएँ प्राप्त करें" : "Get personalized course and career recommendations"}
                     </p>
                   </Card.Body>
                 </Card>
@@ -1274,18 +1276,18 @@ const TwelfthGuidance = () => {
           {selectedCourse && (
             <div>
               <div className="mb-4">
-                <h6 className="text-muted mb-2">Course Duration</h6>
+                <h6 className="text-muted mb-2">{language === 'hi' ? "कोर्स की अवधि" : "Course Duration"}</h6>
                 <Badge bg="info" className="fs-6">{selectedCourse.duration}</Badge>
               </div>
               
               <div className="mb-4">
-                <h6 className="text-muted mb-2">Description</h6>
+                <h6 className="text-muted mb-2">{language === 'hi' ? "विवरण" : "Description"}</h6>
                 <p>{getCourseDescription(selectedCourse.name, selectedCourse.description)}</p>
               </div>
               
               {selectedCourse.careerPaths && selectedCourse.careerPaths.length > 0 && (
                 <div className="mb-4">
-                  <h6 className="text-muted mb-3"><FaLightbulb className="me-2 text-warning" />Step-by-Step Career Guidance</h6>
+                  <h6 className="text-muted mb-3"><FaLightbulb className="me-2 text-warning" />{language === 'hi' ? "कदम-दर-कदम करियर मार्गदर्शन" : "Step-by-Step Career Guidance"}</h6>
                   <Row>
                     {selectedCourse.careerPaths.map((path, index) => (
                       <Col md={6} key={index} className="mb-3">
@@ -1301,7 +1303,7 @@ const TwelfthGuidance = () => {
                             </div>
                             {selectedCareerPath === path && (
                               <div className="mt-3">
-                                <h6 className="text-muted mb-2">Steps to Achieve</h6>
+                                <h6 className="text-muted mb-2">{language === 'hi' ? "सफलता के चरण" : "Steps to Achieve"}</h6>
                                 <ol className="ps-3 mb-0">
                                   {path.steps?.map((step, idx) => (
                                     <li key={idx} className="mb-1 small">{step}</li>
@@ -1318,7 +1320,7 @@ const TwelfthGuidance = () => {
               )}
               
               <div className="mb-4">
-                <h6 className="text-muted mb-2">Career Opportunities</h6>
+                <h6 className="text-muted mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</h6>
                 <Row>
                   {selectedCourse.careers?.map((career, index) => (
                     <Col md={6} key={index} className="mb-2">
@@ -1328,13 +1330,13 @@ const TwelfthGuidance = () => {
                 </Row>
               </div>
               
-              <Alert variant="info"><FaInfoCircle className="me-2" />Click on any career path to get detailed guidance</Alert>
+              <Alert variant="info"><FaInfoCircle className="me-2" />{language === 'hi' ? "विस्तृत मार्गदर्शन प्राप्त करने के लिए किसी भी करियर पथ पर क्लिक करें" : "Click on any career path to get detailed guidance"}</Alert>
             </div>
           )}
         </Modal.Body>
         <Modal.Footer className="border-0">
-          <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
-          <Button variant="primary" onClick={() => { setShowModal(false); navigate('/UserDashboard') }}>Back to Dashboard</Button>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>{language === 'hi' ? "बंद करें" : "Close"}</Button>
+          <Button variant="primary" onClick={() => { setShowModal(false); navigate('/UserDashboard') }}>{language === 'hi' ? "डैशबोर्ड पर वापस जाएं" : "Back to Dashboard"}</Button>
         </Modal.Footer>
       </Modal>
     </div>

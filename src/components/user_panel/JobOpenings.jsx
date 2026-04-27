@@ -11,6 +11,7 @@ import {
   FaInfoCircle, FaChalkboardTeacher, FaTools 
 } from 'react-icons/fa'
 import '../../assets/css/JobOpenings.css'
+import { useLanguage } from '../all_login/LanguageContext'
 
 const JobOpenings = () => {
   const { accessToken, uniqueId } = useAuth()
@@ -18,13 +19,7 @@ const JobOpenings = () => {
   const location = useLocation()
   
   // --- Layout & Sidebar State ---
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const width = window.innerWidth;
-      return width >= 1024;
-    }
-    return true;
-  });
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   
@@ -42,7 +37,7 @@ const JobOpenings = () => {
   const [errorWorkshops, setErrorWorkshops] = useState(null)
   
   // --- Language State ---
-  const [language, setLanguage] = useState('en')
+  const { language } = useLanguage()
   const isLanguageHindi = language === 'hi'
 
   // --- Tab State ---
@@ -81,20 +76,6 @@ const JobOpenings = () => {
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  // Initialize Language
-  useEffect(() => {
-    const getLanguage = () => {
-      try {
-        const stored = localStorage.getItem('language')
-        if (stored === 'hi' || stored === 'en') {
-          return stored
-        }
-      } catch (e) {}
-      return 'en'
-    }
-    setLanguage(getLanguage())
   }, [])
 
    // Auth Check - redirect if not authenticated
@@ -394,11 +375,11 @@ const JobOpenings = () => {
               <div className="d-flex align-items-center mb-2">
                 <FaBriefcase className="me-1 text-primary" style={{ fontSize: '18px' }} />
                 <h5 className="mb-0 fw-bold job-heading">
-                  {isLanguageHindi ? 'नौकरियां और सेमिनार' : 'Jobs & Seminars'}
+                  {language === 'hi' ? 'नौकरियां और सेमिनार' : 'Jobs & Seminars'}
                 </h5>
               </div>
               <p className="text-muted job-subtitle">
-                {isLanguageHindi 
+                {language === 'hi' 
                   ? 'नई नौकरियों और सेमिनार के अवसरों की खोज करें और अपने करियर को नई ऊँचाइयों तक ले जाएं।' 
                   : 'Explore new job opportunities and seminars and take your career to new heights.'}
               </p>
@@ -410,19 +391,19 @@ const JobOpenings = () => {
               <Nav.Item>
                 <Nav.Link eventKey="jobs" className="job-tab-link">
                   <FaBriefcase className="me-1" />
-                  {isLanguageHindi ? 'नौकरियां' : 'Jobs'}
+                  {language === 'hi' ? 'नौकरियां' : 'Jobs'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="seminars" className="job-tab-link">
                   <FaChalkboardTeacher className="me-1" />
-                  {isLanguageHindi ? 'सेमिनार' : 'Seminars'}
+                  {language === 'hi' ? 'सेमिनार' : 'Seminars'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="workshops" className="job-tab-link">
                   <FaTools className="me-1" />
-                  {isLanguageHindi ? 'वर्कशॉप' : 'Workshops'}
+                  {language === 'hi' ? 'वर्कशॉप' : 'Workshops'}
                 </Nav.Link>
               </Nav.Item>
             </Nav>
@@ -437,7 +418,7 @@ const JobOpenings = () => {
                           <div className="d-flex align-items-center">
                             <FaFilter className="me-1 text-primary" />
                             <span className="fw-semibold me-1 job-filter-select">
-                              {isLanguageHindi ? 'योग्यता:' : 'Qualification:'}
+                              {language === 'hi' ? 'योग्यता:' : 'Qualification:'}
                             </span>
                           </div>
                           <Form.Select 
@@ -446,7 +427,7 @@ const JobOpenings = () => {
                             onChange={(e) => setSelectedQualification(e.target.value)}
                           >
                             <option value="">
-                              {isLanguageHindi ? 'सभी' : 'All'}
+                              {language === 'hi' ? 'सभी' : 'All'}
                             </option>
                             {uniqueQualifications.map((qual, idx) => (
                               <option key={idx} value={qual}>{qual}</option>
@@ -459,7 +440,7 @@ const JobOpenings = () => {
                               className="job-btn"
                               onClick={() => setSelectedQualification('')}
                             >
-                              {isLanguageHindi ? 'साफ़' : 'Clear'}
+                              {language === 'hi' ? 'साफ़' : 'Clear'}
                             </Button>
                           )}
                         </div>
@@ -475,7 +456,7 @@ const JobOpenings = () => {
                   <div className="text-center py-5">
                     <Spinner animation="border" variant="primary" style={{ width: '50px', height: '50px' }} />
                     <p className="mt-3">
-                      {isLanguageHindi ? 'नौकरी के अवसर लोड हो रहे हैं...' : 'Loading job openings...'}
+                      {language === 'hi' ? 'नौकरी के अवसर लोड हो रहे हैं...' : 'Loading job openings...'}
                     </p>
                   </div>
                 ) : filteredJobs.length === 0 ? (
@@ -484,8 +465,8 @@ const JobOpenings = () => {
                       <FaSearch className="text-muted mb-3" style={{ fontSize: '48px' }} />
                       <h5 className="text-muted">
                         {selectedQualification 
-                          ? (isLanguageHindi ? 'इस योग्यता के लिए कोई नौकरी नहीं मिली' : 'No jobs found for this qualification')
-                          : (isLanguageHindi ? 'कोई नौकरी उपलब्ध नहीं है' : 'No job openings available')}
+                          ? (language === 'hi' ? 'इस योग्यता के लिए कोई नौकरी नहीं मिली' : 'No jobs found for this qualification')
+                          : (language === 'hi' ? 'कोई नौकरी उपलब्ध नहीं है' : 'No job openings available')}
                       </h5>
                     </Card.Body>
                   </Card>
@@ -493,8 +474,8 @@ const JobOpenings = () => {
                   <Row className="g-4">
                     {filteredJobs.map((job, index) => {
                       const isExpired = isJobExpired(job.last_date_to_apply)
-                      const title = isLanguageHindi && job.title_hindi ? job.title_hindi : job.title
-                      const descriptions = isLanguageHindi && job.description_hindi ? job.description_hindi : job.description || []
+                      const title = language === 'hi' && job.title_hindi ? job.title_hindi : job.title
+                      const descriptions = language === 'hi' && job.description_hindi ? job.description_hindi : job.description || []
 
                       return (
                         <Col key={job.id || index} xs={12} md={6} lg={4}>
@@ -502,12 +483,12 @@ const JobOpenings = () => {
                             <Card.Body className="d-flex flex-column">
                               <div className="d-flex justify-content-between align-items-start mb-2">
                                 <Badge bg={getJobTypeBadge(job.job_type)} className="job-badge">
-                                  {job.job_type === 'full_time' ? 'Full Time' : 
-                                   job.job_type === 'part_time' ? 'Part Time' : 
-                                   job.job_type === 'internship' ? 'Internship' : 
+                                  {job.job_type === 'full_time' ? (language === 'hi' ? 'पूर्णकालिक' : 'Full Time') : 
+                                   job.job_type === 'part_time' ? (language === 'hi' ? 'अंशकालिक' : 'Part Time') : 
+                                   job.job_type === 'internship' ? (language === 'hi' ? 'इंटर्नशिप' : 'Internship') : 
                                    job.job_type || 'Job'}
                                 </Badge>
-                                {isExpired && <Badge bg="secondary" className="job-badge">Expired</Badge>}
+                                {isExpired && <Badge bg="secondary" className="job-badge">{language === 'hi' ? 'समाप्त' : 'Expired'}</Badge>}
                               </div>
 
                               <h6 className="fw-bold mb-1 job-title">{title}</h6>
@@ -528,7 +509,7 @@ const JobOpenings = () => {
                                 <div className="mb-2">
                                   <small className="text-muted fw-semibold d-block mb-1 job-meta">
                                     <FaGraduationCap className="me-1" />
-                                    {isLanguageHindi ? 'योग्यता:' : 'Qualifications:'}
+                                    {language === 'hi' ? 'योग्यता:' : 'Qualifications:'}
                                   </small>
                                   <div className="d-flex flex-wrap gap-1">
                                     {job.qualifications_required.map((qual, i) => (
@@ -586,20 +567,20 @@ const JobOpenings = () => {
                     <Col xs={12}>
                       <div className="d-flex align-items-center gap-3">
                         <FaFilter className="me-2 text-success" />
-                        <span className="fw-semibold me-2">{isLanguageHindi ? 'पात्रता फ़िल्टर:' : 'Eligibility Filter:'}</span>
+                        <span className="fw-semibold me-2">{language === 'hi' ? 'पात्रता फ़िल्टर:' : 'Eligibility Filter:'}</span>
                         <Form.Select 
                           style={{ width: 'auto', display: 'inline-block' }}
                           value={selectedSeminarEligibility}
                           onChange={(e) => setSelectedSeminarEligibility(e.target.value)}
                         >
-                          <option value="">{isLanguageHindi ? 'सभी पात्रताएं' : 'All Eligibility'}</option>
+                          <option value="">{language === 'hi' ? 'सभी पात्रताएं' : 'All Eligibility'}</option>
                           {uniqueSeminarEligibility.map((elig, idx) => (
                             <option key={idx} value={elig}>{elig}</option>
                           ))}
                         </Form.Select>
                         {selectedSeminarEligibility && (
                           <Button variant="outline-secondary" size="sm" onClick={() => setSelectedSeminarEligibility('')}>
-                            {isLanguageHindi ? 'साफ़ करें' : 'Clear'}
+                            {language === 'hi' ? 'साफ़ करें' : 'Clear'}
                           </Button>
                         )}
                       </div>
@@ -610,19 +591,19 @@ const JobOpenings = () => {
                 {loadingSeminars ? (
                   <div className="text-center py-5">
                     <Spinner animation="border" variant="primary" />
-                    <p className="mt-3">{isLanguageHindi ? 'सेमिनार लोड हो रहे हैं...' : 'Loading seminars...'}</p>
+                    <p className="mt-3">{language === 'hi' ? 'सेमिनार लोड हो रहे हैं...' : 'Loading seminars...'}</p>
                   </div>
                 ) : filteredSeminars.length === 0 ? (
                    <Card className="text-center py-5">
                     <Card.Body>
-                      <h5 className="text-muted">{isLanguageHindi ? 'कोई सेमिनार उपलब्ध नहीं है' : 'No seminars available'}</h5>
+                      <h5 className="text-muted">{language === 'hi' ? 'कोई सेमिनार उपलब्ध नहीं है' : 'No seminars available'}</h5>
                     </Card.Body>
                   </Card>
                 ) : (
                   <Row className="g-4">
                     {filteredSeminars.map((seminar, index) => {
                       const isExpired = isSeminarExpired(seminar.last_date_to_register)
-                      const title = isLanguageHindi && seminar.title_hindi ? seminar.title_hindi : seminar.title
+                      const title = language === 'hi' && seminar.title_hindi ? seminar.title_hindi : seminar.title
                       
                       return (
                         <Col key={seminar.id || index} xs={12} md={6} lg={4}>
@@ -630,9 +611,9 @@ const JobOpenings = () => {
                             <Card.Body className="d-flex flex-column">
                               <div className="d-flex justify-content-between align-items-start mb-2">
                                 <Badge bg={seminar.mode === 'online' ? 'success' : 'primary'}>
-                                  {seminar.mode === 'online' ? 'Online' : 'Offline'}
+                                  {seminar.mode === 'online' ? (language === 'hi' ? 'ऑनलाइन' : 'Online') : (language === 'hi' ? 'ऑफलाइन' : 'Offline')}
                                 </Badge>
-                                {isExpired && <Badge bg="secondary">Expired</Badge>}
+                                {isExpired && <Badge bg="secondary">{language === 'hi' ? 'समाप्त' : 'Expired'}</Badge>}
                               </div>
                               <h5 className="fw-bold mb-2">{title}</h5>
                               <div className="mb-3">
@@ -647,7 +628,7 @@ const JobOpenings = () => {
                                 <div className="mb-3">
                                   <small className="text-muted fw-semibold d-block mb-1">
                                     <FaGraduationCap className="me-1" />
-                                    {isLanguageHindi ? 'पात्रता:' : 'Eligibility:'}
+                                    {language === 'hi' ? 'पात्रता:' : 'Eligibility:'}
                                   </small>
                                   <div className="d-flex flex-wrap gap-1">
                                     {seminar.eligibility.map((elig, i) => (
@@ -662,14 +643,14 @@ const JobOpenings = () => {
                                     {seminar.last_date_to_register && (
                                       <>
                                         <FaClock className="me-1" />
-                                        {isLanguageHindi ? 'अंतिम तिथि: ' : 'Reg. Date: '} 
+                                        {language === 'hi' ? 'अंतिम तिथि: ' : 'Reg. Date: '} 
                                         {formatDate(seminar.last_date_to_register)}
                                       </>
                                     )}
                                   </small>
                                   <div className="d-flex gap-2">
                                     <Button variant="outline-primary" size="sm" onClick={() => handleViewSeminarDetails(seminar)}>
-                                      <FaInfoCircle className="me-1" />{isLanguageHindi ? 'अधिक' : 'More'}
+                                      <FaInfoCircle className="me-1" />{language === 'hi' ? 'अधिक' : 'More'}
                                     </Button>
                                     <Button 
                                       variant={isExpired ? 'secondary' : 'success'} 
@@ -677,7 +658,7 @@ const JobOpenings = () => {
                                       onClick={() => handleRegisterClick(seminar.registration_link)}
                                       disabled={isExpired || !seminar.registration_link}
                                     >
-                                      {isLanguageHindi ? 'रजिस्टर करें' : 'Register'}
+                                      {language === 'hi' ? 'रजिस्टर करें' : 'Register'}
                                     </Button>
                                   </div>
                                 </div>
@@ -700,13 +681,13 @@ const JobOpenings = () => {
                     <Col xs={12}>
                       <div className="d-flex align-items-center gap-3">
                         <FaFilter className="me-2 text-warning" />
-                        <span className="fw-semibold me-2">{isLanguageHindi ? 'पात्रता फ़िल्टर:' : 'Eligibility Filter:'}</span>
+                        <span className="fw-semibold me-2">{language === 'hi' ? 'पात्रता फ़िल्टर:' : 'Eligibility Filter:'}</span>
                         <Form.Select 
                           style={{ width: 'auto', display: 'inline-block' }}
                           value={selectedWorkshopEligibility}
                           onChange={(e) => setSelectedWorkshopEligibility(e.target.value)}
                         >
-                          <option value="">{isLanguageHindi ? 'सभी पात्रताएं' : 'All Eligibility'}</option>
+                          <option value="">{language === 'hi' ? 'सभी पात्रताएं' : 'All Eligibility'}</option>
                           {uniqueWorkshopEligibility.map((elig, idx) => (
                             <option key={idx} value={elig}>{elig}</option>
                           ))}
@@ -724,19 +705,19 @@ const JobOpenings = () => {
                 {loadingWorkshops ? (
                   <div className="text-center py-5">
                     <Spinner animation="border" variant="primary" />
-                    <p className="mt-3">{isLanguageHindi ? 'वर्कशॉप लोड हो रही है...' : 'Loading workshops...'}</p>
+                    <p className="mt-3">{language === 'hi' ? 'वर्कशॉप लोड हो रही है...' : 'Loading workshops...'}</p>
                   </div>
                 ) : filteredWorkshops.length === 0 ? (
                   <Card className="text-center py-5">
                     <Card.Body>
-                      <h5 className="text-muted">{isLanguageHindi ? 'कोई वर्कशॉप उपलब्ध नहीं है' : 'No workshops available'}</h5>
+                      <h5 className="text-muted">{language === 'hi' ? 'कोई वर्कशॉप उपलब्ध नहीं है' : 'No workshops available'}</h5>
                     </Card.Body>
                   </Card>
                 ) : (
                   <Row className="g-4">
                     {filteredWorkshops.map((workshop, index) => {
                       const isExpired = isWorkshopExpired(workshop.last_date_to_register)
-                      const title = isLanguageHindi && workshop.title_hindi ? workshop.title_hindi : workshop.title
+                      const title = language === 'hi' && workshop.title_hindi ? workshop.title_hindi : workshop.title
 
                       return (
                         <Col key={workshop.id || index} xs={12} md={6} lg={4}>
@@ -744,9 +725,9 @@ const JobOpenings = () => {
                             <Card.Body className="d-flex flex-column">
                               <div className="d-flex justify-content-between align-items-start mb-2">
                                 <Badge bg={workshop.mode === 'online' ? 'success' : 'warning'}>
-                                  {workshop.mode === 'online' ? 'Online' : 'Offline'}
+                                  {workshop.mode === 'online' ? (language === 'hi' ? 'ऑनलाइन' : 'Online') : (language === 'hi' ? 'ऑफलाइन' : 'Offline')}
                                 </Badge>
-                                {isExpired && <Badge bg="secondary">Expired</Badge>}
+                                {isExpired && <Badge bg="secondary">{language === 'hi' ? 'समाप्त' : 'Expired'}</Badge>}
                               </div>
                               <h5 className="fw-bold mb-2">{title}</h5>
                               <div className="mb-3">
@@ -761,7 +742,7 @@ const JobOpenings = () => {
                                 <div className="mb-3">
                                   <small className="text-muted fw-semibold d-block mb-1">
                                     <FaGraduationCap className="me-1" />
-                                    {isLanguageHindi ? 'पात्रता:' : 'Eligibility:'}
+                                    {language === 'hi' ? 'पात्रता:' : 'Eligibility:'}
                                   </small>
                                   <div className="d-flex flex-wrap gap-1">
                                     {workshop.eligibility.map((elig, i) => (
@@ -776,14 +757,14 @@ const JobOpenings = () => {
                                     {workshop.last_date_to_register && (
                                       <>
                                         <FaClock className="me-1" />
-                                        {isLanguageHindi ? 'अंतिम तिथि: ' : 'Reg. Date: '} 
+                                        {language === 'hi' ? 'अंतिम तिथि: ' : 'Reg. Date: '} 
                                         {formatDate(workshop.last_date_to_register)}
                                       </>
                                     )}
                                   </small>
                                   <div className="d-flex gap-2">
                                     <Button variant="outline-primary" size="sm" onClick={() => handleViewWorkshopDetails(workshop)}>
-                                      <FaInfoCircle className="me-1" />{isLanguageHindi ? 'अधिक' : 'More'}
+                                      <FaInfoCircle className="me-1" />{language === 'hi' ? 'अधिक' : 'More'}
                                     </Button>
                                     <Button 
                                       variant={isExpired ? 'secondary' : 'warning'} 
@@ -791,7 +772,7 @@ const JobOpenings = () => {
                                       onClick={() => handleRegisterClick(workshop.registration_link)}
                                       disabled={isExpired || !workshop.registration_link}
                                     >
-                                      {isLanguageHindi ? 'रजिस्टर करें' : 'Register'}
+                                      {language === 'hi' ? 'रजिस्टर करें' : 'Register'}
                                     </Button>
                                   </div>
                                 </div>
@@ -815,7 +796,7 @@ const JobOpenings = () => {
       <Modal show={showJobModal} onHide={closeModal} size="lg" centered>
         <Modal.Header closeButton className="job-modal-header">
           <Modal.Title>
-            {selectedJob && (isLanguageHindi && selectedJob.title_hindi ? selectedJob.title_hindi : selectedJob?.title)}
+            {selectedJob && (language === 'hi' && selectedJob.title_hindi ? selectedJob.title_hindi : selectedJob?.title)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -824,42 +805,42 @@ const JobOpenings = () => {
               <div className="mb-4">
                 <div className="d-flex gap-2 mb-3">
                   <Badge bg={getJobTypeBadge(selectedJob.job_type)}>
-                    {selectedJob.job_type === 'full_time' ? 'Full Time' : 
-                     selectedJob.job_type === 'part_time' ? 'Part Time' : 
-                     selectedJob.job_type === 'internship' ? 'Internship' : 
+                    {selectedJob.job_type === 'full_time' ? (language === 'hi' ? 'पूर्णकालिक' : 'Full Time') : 
+                     selectedJob.job_type === 'part_time' ? (language === 'hi' ? 'अंशकालिक' : 'Part Time') : 
+                     selectedJob.job_type === 'internship' ? (language === 'hi' ? 'इंटर्नशिप' : 'Internship') : 
                      selectedJob.job_type || 'Job'}
                   </Badge>
-                  {isJobExpired(selectedJob.last_date_to_apply) && <Badge bg="secondary">Expired</Badge>}
+                  {isJobExpired(selectedJob.last_date_to_apply) && <Badge bg="secondary">{language === 'hi' ? 'समाप्त' : 'Expired'}</Badge>}
                 </div>
                 <div className="row mb-3">
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaMapMarkerAlt className="me-2 text-primary" />
-                      <span><strong>{isLanguageHindi ? 'स्थान:' : 'Location:'}</strong> {selectedJob.location}</span>
+                      <span><strong>{language === 'hi' ? 'स्थान:' : 'Location:'}</strong> {selectedJob.location}</span>
                     </div>
                   </div>
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaClock className="me-2 text-primary" />
-                      <span><strong>{isLanguageHindi ? 'अनुभव:' : 'Experience:'}</strong> {selectedJob.experience_required}</span>
+                      <span><strong>{language === 'hi' ? 'अनुभव:' : 'Experience:'}</strong> {selectedJob.experience_required}</span>
                     </div>
                   </div>
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaMoneyBillWave className="me-2 text-primary" />
-                      <span><strong>{isLanguageHindi ? 'वेतन:' : 'Salary:'}</strong> {selectedJob.salary}</span>
+                      <span><strong>{language === 'hi' ? 'वेतन:' : 'Salary:'}</strong> {selectedJob.salary}</span>
                     </div>
                   </div>
                 </div>
               </div>
-              {(isLanguageHindi ? selectedJob.description_hindi : selectedJob.description)?.length > 0 && (
+              {(language === 'hi' ? selectedJob.description_hindi : selectedJob.description)?.length > 0 && (
                 <div className="mb-4">
                   <h6 className="fw-bold mb-2">
                     <FaInfoCircle className="me-2" />
-                    {isLanguageHindi ? 'जिम्मेदारियाँ और कार्य' : 'Responsibilities & Duties'}
+                    {language === 'hi' ? 'जिम्मेदारियाँ और कार्य' : 'Responsibilities & Duties'}
                   </h6>
                   <ul className="list-unstyled">
-                    {(isLanguageHindi ? selectedJob.description_hindi : selectedJob.description)?.map((desc, i) => (
+                    {(language === 'hi' ? selectedJob.description_hindi : selectedJob.description)?.map((desc, i) => (
                       <li key={i} className="mb-2 d-flex align-items-start">
                         <span className="me-2 text-primary">•</span>
                         <span>{desc}</span>
@@ -872,10 +853,10 @@ const JobOpenings = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal} className="job-btn">{isLanguageHindi ? 'बंद करें' : 'Close'}</Button>
+          <Button variant="secondary" onClick={closeModal} className="job-btn">{language === 'hi' ? 'बंद करें' : 'Close'}</Button>
           {selectedJob && !isJobExpired(selectedJob.last_date_to_apply) && selectedJob.apply_link && (
             <Button variant="primary" onClick={() => handleApplyClick(selectedJob.apply_link)} className="job-btn" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}>
-              <FaExternalLinkAlt className="me-1" />{isLanguageHindi ? 'अभी आवेदन करें' : 'Apply Now'}
+              <FaExternalLinkAlt className="me-1" />{language === 'hi' ? 'अभी आवेदन करें' : 'Apply Now'}
             </Button>
           )}
         </Modal.Footer>
@@ -885,7 +866,7 @@ const JobOpenings = () => {
       <Modal show={showSeminarModal} onHide={closeSeminarModal} size="lg" centered>
         <Modal.Header closeButton className="job-modal-header-success">
           <Modal.Title>
-            {selectedSeminar && (isLanguageHindi && selectedSeminar.title_hindi ? selectedSeminar.title_hindi : selectedSeminar?.title)}
+            {selectedSeminar && (language === 'hi' && selectedSeminar.title_hindi ? selectedSeminar.title_hindi : selectedSeminar?.title)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -894,29 +875,29 @@ const JobOpenings = () => {
               <div className="mb-4">
                 <div className="d-flex gap-2 mb-3">
                   <Badge bg={selectedSeminar.mode === 'online' ? 'success' : 'primary'}>
-                    {selectedSeminar.mode === 'online' ? 'Online' : 'Offline'}
+                    {selectedSeminar.mode === 'online' ? (language === 'hi' ? 'ऑनलाइन' : 'Online') : (language === 'hi' ? 'ऑफलाइन' : 'Offline')}
                   </Badge>
                 </div>
                 <div className="row mb-3">
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaMapMarkerAlt className="me-2 text-success" />
-                      <span><strong>{isLanguageHindi ? 'स्थान:' : 'Location:'}</strong> {selectedSeminar.location}</span>
+                      <span><strong>{language === 'hi' ? 'स्थान:' : 'Location:'}</strong> {selectedSeminar.location}</span>
                     </div>
                   </div>
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaChalkboardTeacher className="me-2 text-success" />
-                      <span><strong>{isLanguageHindi ? 'वक्ता:' : 'Speaker:'}</strong> {selectedSeminar.speaker_name}</span>
+                      <span><strong>{language === 'hi' ? 'वक्ता:' : 'Speaker:'}</strong> {selectedSeminar.speaker_name}</span>
                     </div>
                   </div>
                 </div>
               </div>
-              {(isLanguageHindi ? selectedSeminar.description_hindi : selectedSeminar.description)?.length > 0 && (
+              {(language === 'hi' ? selectedSeminar.description_hindi : selectedSeminar.description)?.length > 0 && (
                 <div className="mb-4">
-                  <h6 className="fw-bold mb-2"><FaInfoCircle className="me-2" />{isLanguageHindi ? 'विषय' : 'Topics'}</h6>
+                  <h6 className="fw-bold mb-2"><FaInfoCircle className="me-2" />{language === 'hi' ? 'विषय' : 'Topics'}</h6>
                   <ul className="list-unstyled">
-                    {(isLanguageHindi ? selectedSeminar.description_hindi : selectedSeminar.description)?.map((desc, i) => (
+                    {(language === 'hi' ? selectedSeminar.description_hindi : selectedSeminar.description)?.map((desc, i) => (
                       <li key={i} className="mb-2 d-flex align-items-start">
                         <span className="me-2 text-success">•</span><span>{desc}</span>
                       </li>
@@ -928,10 +909,10 @@ const JobOpenings = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeSeminarModal}>{isLanguageHindi ? 'बंद करें' : 'Close'}</Button>
+          <Button variant="secondary" onClick={closeSeminarModal}>{language === 'hi' ? 'बंद करें' : 'Close'}</Button>
           {selectedSeminar && !isSeminarExpired(selectedSeminar.last_date_to_register) && selectedSeminar.registration_link && (
             <Button variant="success" onClick={() => handleRegisterClick(selectedSeminar.registration_link)}>
-              <FaExternalLinkAlt className="me-2" />{isLanguageHindi ? 'अभी रजिस्टर करें' : 'Register Now'}
+              <FaExternalLinkAlt className="me-2" />{language === 'hi' ? 'अभी रजिस्टर करें' : 'Register Now'}
             </Button>
           )}
         </Modal.Footer>
@@ -941,7 +922,7 @@ const JobOpenings = () => {
       <Modal show={showWorkshopModal} onHide={closeWorkshopModal} size="lg" centered key={language}>
         <Modal.Header closeButton className="job-modal-header-warning">
           <Modal.Title>
-            {selectedWorkshop && (isLanguageHindi && selectedWorkshop.title_hindi ? selectedWorkshop.title_hindi : selectedWorkshop?.title)}
+            {selectedWorkshop && (language === 'hi' && selectedWorkshop.title_hindi ? selectedWorkshop.title_hindi : selectedWorkshop?.title)}
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -950,29 +931,29 @@ const JobOpenings = () => {
               <div className="mb-4">
                 <div className="d-flex gap-2 mb-3">
                   <Badge bg={selectedWorkshop.mode === 'online' ? 'success' : 'warning'}>
-                    {selectedWorkshop.mode === 'online' ? 'Online' : 'Offline'}
+                    {selectedWorkshop.mode === 'online' ? (language === 'hi' ? 'ऑनलाइन' : 'Online') : (language === 'hi' ? 'ऑफलाइन' : 'Offline')}
                   </Badge>
                 </div>
                 <div className="row mb-3">
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaMapMarkerAlt className="me-2 text-warning" />
-                      <span><strong>{isLanguageHindi ? 'स्थान:' : 'Location:'}</strong> {selectedWorkshop.location}</span>
+                      <span><strong>{language === 'hi' ? 'स्थान:' : 'Location:'}</strong> {selectedWorkshop.location}</span>
                     </div>
                   </div>
                   <div className="col-md-6 mb-2">
                     <div className="d-flex align-items-center">
                       <FaTools className="me-2 text-warning" />
-                      <span><strong>{isLanguageHindi ? 'प्रशिक्षक:' : 'Instructor:'}</strong> {selectedWorkshop.instructor_name}</span>
+                      <span><strong>{language === 'hi' ? 'प्रशिक्षक:' : 'Instructor:'}</strong> {selectedWorkshop.instructor_name}</span>
                     </div>
                   </div>
                 </div>
               </div>
-              {(isLanguageHindi ? selectedWorkshop.description_hindi : selectedWorkshop.description)?.length > 0 && (
+              {(language === 'hi' ? selectedWorkshop.description_hindi : selectedWorkshop.description)?.length > 0 && (
                 <div className="mb-4">
-                  <h6 className="fw-bold mb-2"><FaInfoCircle className="me-2" />{isLanguageHindi ? 'विषय' : 'Topics'}</h6>
+                  <h6 className="fw-bold mb-2"><FaInfoCircle className="me-2" />{language === 'hi' ? 'विषय' : 'Topics'}</h6>
                   <ul className="list-unstyled">
-                    {(isLanguageHindi ? selectedWorkshop.description_hindi : selectedWorkshop.description)?.map((desc, i) => (
+                    {(language === 'hi' ? selectedWorkshop.description_hindi : selectedWorkshop.description)?.map((desc, i) => (
                       <li key={i} className="mb-2 d-flex align-items-start">
                         <span className="me-2 text-warning">•</span><span>{desc}</span>
                       </li>
@@ -984,10 +965,10 @@ const JobOpenings = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={closeWorkshopModal}>{isLanguageHindi ? 'बंद करें' : 'Close'}</Button>
+          <Button variant="secondary" onClick={closeWorkshopModal}>{language === 'hi' ? 'बंद करें' : 'Close'}</Button>
           {selectedWorkshop && !isWorkshopExpired(selectedWorkshop.last_date_to_register) && selectedWorkshop.registration_link && (
             <Button variant="warning" onClick={() => handleRegisterClick(selectedWorkshop.registration_link)}>
-              <FaExternalLinkAlt className="me-2" />{isLanguageHindi ? 'अभी रजिस्टर करें' : 'Register Now'}
+              <FaExternalLinkAlt className="me-2" />{language === 'hi' ? 'अभी रजिस्टर करें' : 'Register Now'}
             </Button>
           )}
         </Modal.Footer>

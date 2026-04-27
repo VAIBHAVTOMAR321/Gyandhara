@@ -7,11 +7,13 @@ import { useNavigate } from 'react-router-dom'
 import { FaArrowLeft, FaPaperPlane, FaHistory, FaClock } from 'react-icons/fa'
 import UserLeftNav from './UserLeftNav'
 import UserHeader from './UserHeader'
+import { useLanguage } from '../all_login/LanguageContext'
 
 
 const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-issue/'
 
 function SendQuery() {
+  const { language } = useLanguage()
   const { uniqueId, accessToken, userRoleType } = useAuth()
   const navigate = useNavigate()
   
@@ -151,19 +153,19 @@ function SendQuery() {
 
   const getStatus = (status) => {
     if (!status || status.trim() === '' || status === 'pending') {
-      return 'Pending'
+      return language === 'hi' ? 'लंबित' : 'Pending'
     }
     if (status.toLowerCase() === 'resolved') {
-      return 'Resolved'
+      return language === 'hi' ? 'हल' : 'Resolved'
     }
     if (status.toLowerCase() === 'completed') {
-      return 'Completed'
+      return language === 'hi' ? 'पूरा' : 'Completed'
     }
     if (status.toLowerCase() === 'rejected') {
-      return 'Rejected'
+      return language === 'hi' ? 'अस्वीकृत' : 'Rejected'
     }
     if (status.toLowerCase() === 'cancelled') {
-      return 'Cancelled'
+      return language === 'hi' ? 'रद्द' : 'Cancelled'
     }
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
   }
@@ -200,7 +202,7 @@ return (
               className="d-flex align-items-center"
             >
               <FaArrowLeft className="me-2" />
-              Back to Dashboard
+              {language === 'hi' ? "डैशबोर्ड पर वापस जाएं" : "Back to Dashboard"}
             </Button>
           </div>
 
@@ -211,7 +213,7 @@ return (
                 <div className="bg-white border-bottom-0 pt-3 px-3">
                   <h5 className="mb-0 d-flex align-items-center">
                     <FaPaperPlane className="me-2 text-primary" />
-                    Raise a Query
+                    {language === 'hi' ? "प्रश्न पूछें" : "Raise a Query"}
                   </h5>
                 </div>
                 <div className="p-3">
@@ -219,40 +221,40 @@ return (
                     <Row>
                       <Col md={6} className="mb-3">
                         <Form.Group>
-                          <Form.Label>Full Name</Form.Label>
+                          <Form.Label>{language === 'hi' ? "पूरा नाम" : "Full Name"}</Form.Label>
                           <Form.Control
                             type="text"
                             name="full_name"
                             value={formData.full_name}
                             onChange={handleInputChange}
-                            placeholder={"Enter your full name"}
+                            placeholder={language === 'hi' ? "अपना पूरा नाम दर्ज करें" : "Enter your full name"}
                             required
                           />
                         </Form.Group>
                       </Col>
                       <Col md={6} className="mb-3">
                         <Form.Group>
-                          <Form.Label>Title</Form.Label>
+                          <Form.Label>{language === 'hi' ? "शीर्षक" : "Title"}</Form.Label>
                           <Form.Control
                             type="text"
                             name="title"
                             value={formData.title}
                             onChange={handleInputChange}
-                            placeholder="Enter query title"
+                            placeholder={language === 'hi' ? "शीर्षक दर्ज करें" : "Enter query title"}
                             required
                           />
                         </Form.Group>
                       </Col>
                        <Col md={6} className="mb-3">
                         <Form.Group>
-                          <Form.Label>Issue Description</Form.Label>
+                          <Form.Label>{language === 'hi' ? "समस्या का विवरण" : "Issue Description"}</Form.Label>
                           <Form.Control
                             as="textarea"
                             rows={4}
                             name="issue"
                             value={formData.issue}
                             onChange={handleInputChange}
-                            placeholder="Describe your issue or query in detail..."
+                            placeholder={language === 'hi' ? "अपनी समस्या या प्रश्न का विस्तार से वर्णन करें..." : "Describe your issue or query in detail..."}
                             required
                           />
                         </Form.Group>
@@ -268,7 +270,7 @@ return (
                         style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}
                       >
                         <FaPaperPlane className="me-2" />
-                        {submitting ? 'Submitting...' : 'Submit Query'}
+                        {submitting ? (language === 'hi' ? 'सबमिट हो रहा है...' : 'Submitting...') : (language === 'hi' ? 'प्रश्न सबमिट करें' : 'Submit Query')}
                       </Button>
                     </div>
                   </Form>
@@ -280,18 +282,18 @@ return (
                 <Card.Header className="bg-white border-bottom-0 pt-3">
                   <h5 className="mb-0 d-flex align-items-center">
                     <FaHistory className="me-2 text-primary" />
-                    My Queries
+                    {language === 'hi' ? "मेरे प्रश्न" : "My Queries"}
                   </h5>
                 </Card.Header>
                 <Card.Body>
                   {loading ? (
                     <div className="text-center py-4">
-                      <p className="text-muted">Loading queries...</p>
+                      <p className="text-muted">{language === 'hi' ? "प्रश्न लोड हो रहे हैं..." : "Loading queries..."}</p>
                     </div>
                   ) : queries.length === 0 ? (
                     <Alert variant="info" className="d-flex align-items-center">
                       <FaClock className="me-2" />
-                      No queries found.
+                      {language === 'hi' ? "कोई प्रश्न नहीं मिला।" : "No queries found."}
                     </Alert>
                   ) : (
                     <>
@@ -300,12 +302,12 @@ return (
                         <Table hover className="mb-0">
                           <thead className="text-white table-thead" >
                             <tr>
-                              <th className="py-3 px-2">ID</th>
-                              <th className="py-3 px-2">Title</th>
-                              <th className="py-3 px-2">Issue</th>
-                              <th className="py-3 px-2">Status</th>
-                              <th className="py-3 px-2">Remark</th>
-                              <th className="py-3 px-2">Date</th>
+                              <th className="py-3 px-2">{language === 'hi' ? "आईडी" : "ID"}</th>
+                              <th className="py-3 px-2">{language === 'hi' ? "शीर्षक" : "Title"}</th>
+                              <th className="py-3 px-2">{language === 'hi' ? "समस्या" : "Issue"}</th>
+                              <th className="py-3 px-2">{language === 'hi' ? "स्थिति" : "Status"}</th>
+                              <th className="py-3 px-2">{language === 'hi' ? "रिमार्क" : "Remark"}</th>
+                              <th className="py-3 px-2">{language === 'hi' ? "दिनांक" : "Date"}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -337,24 +339,24 @@ return (
                               <div className="d-flex justify-content-between align-items-start mb-2">
                                 <div>
                                   <h6 className="mb-1 fw-semibold">{query.title}</h6>
-                                  <small className="text-muted">ID: {query.query_id || query.id}</small>
+                                  <small className="text-muted">{language === 'hi' ? "आईडी" : "ID"}: {query.query_id || query.id}</small>
                                 </div>
                                 <span className={`badge ${getStatusBadgeClass(query.status)}`}>
                                   {getStatus(query.status)}
                                 </span>
                               </div>
                               <div className="mb-2">
-                                <small className="text-muted d-block">Issue:</small>
+                                <small className="text-muted d-block">{language === 'hi' ? "समस्या:" : "Issue:"}</small>
                                 <p className="small mb-0 mt-1">{query.issue}</p>
                               </div>
                               {query.extra_remark && (
                                 <div className="mb-2">
-                                  <small className="text-muted d-block">Remark:</small>
+                                  <small className="text-muted d-block">{language === 'hi' ? "रिमार्क:" : "Remark:"}</small>
                                   <p className="small mb-0 mt-1">{query.extra_remark}</p>
                                 </div>
                               )}
                               <div className="mb-2">
-                                <small className="text-muted d-block">Date:</small>
+                                <small className="text-muted d-block">{language === 'hi' ? "दिनांक:" : "Date:"}</small>
                                 <span className="small">{query.created_at ? new Date(query.created_at).toLocaleDateString() : '-'}</span>
                               </div>
                             </Card.Body>
