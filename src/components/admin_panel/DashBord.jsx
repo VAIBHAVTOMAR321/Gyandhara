@@ -192,10 +192,14 @@ const DashBord = () => {
     event_date_time: '',
     end_date_time: '',
     venue: '',
-    event_type: ''
+    event_type: '',
+    event_name_hindi: '',
+    description_hindi: '',
+    venue_hindi: ''
   })
    const [eventImage, setEventImage] = useState(null)
    const [isEditingEvent, setIsEditingEvent] = useState(false)
+   const [isAddingEvent, setIsAddingEvent] = useState(false)
 
    // State for Performance Score
    const [showPerformanceModal, setShowPerformanceModal] = useState(false)
@@ -489,19 +493,40 @@ const DashBord = () => {
     setShowEventModal(true)
   }
 
+  const handleAddEvent = () => {
+    setEventFormData({
+      event_name: '',
+      description: '',
+      event_date_time: '',
+      end_date_time: '',
+      venue: '',
+      event_type: '',
+      event_name_hindi: '',
+      description_hindi: '',
+      venue_hindi: ''
+    })
+    setEventImage(null)
+    setIsEditingEvent(false)
+    setIsAddingEvent(true)
+  }
+
   const handleEditEvent = (event) => {
     setEventFormData({
       event_id: event.event_id,
       event_name: event.event_name || '',
       description: event.description || '',
+      event_name_hindi: event.event_name_hindi || '',
+      description_hindi: event.description_hindi || '',
       event_date_time: event.event_date_time ? event.event_date_time.slice(0, 16) : '',
       end_date_time: event.end_date_time ? event.end_date_time.slice(0, 16) : '',
       venue: event.venue || '',
+      venue_hindi: event.venue_hindi || '',
       event_type: event.event_type || ''
     })
     setEventImage(null)
     setSelectedEvent(event)
     setIsEditingEvent(true)
+    setIsAddingEvent(false)
     setShowEventModal(false)
   }
 
@@ -510,32 +535,53 @@ const DashBord = () => {
     try {
       const config = getAuthConfig()
       const formData = new FormData()
-      formData.append('event_id', eventFormData.event_id)
+      if (isEditingEvent) {
+        formData.append('event_id', eventFormData.event_id)
+      }
       formData.append('event_name', eventFormData.event_name)
       formData.append('description', eventFormData.description)
+      formData.append('event_name_hindi', eventFormData.event_name_hindi)
+      formData.append('description_hindi', eventFormData.description_hindi)
       formData.append('event_date_time', eventFormData.event_date_time)
       formData.append('end_date_time', eventFormData.end_date_time)
       formData.append('venue', eventFormData.venue)
+      formData.append('venue_hindi', eventFormData.venue_hindi)
       formData.append('event_type', eventFormData.event_type)
       if (eventImage) {
         formData.append('event_image', eventImage)
       }
 
-      await axios.put('https://brjobsedu.com/gyandhara/gyandhara_backend/api/event-item/', formData, {
-        ...config,
-        headers: {
-          ...config.headers,
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-      alert('Event updated successfully!')
+      if (isAddingEvent) {
+        await axios.post('https://brjobsedu.com/gyandhara/gyandhara_backend/api/event-item/', formData, {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        alert('Event added successfully!')
+      } else {
+        await axios.put('https://brjobsedu.com/gyandhara/gyandhara_backend/api/event-item/', formData, {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+        alert('Event updated successfully!')
+      }
+
+      setIsAddingEvent(false)
       setIsEditingEvent(false)
       setEventFormData({
         event_name: '',
         description: '',
+        event_name_hindi: '',
+        description_hindi: '',
         event_date_time: '',
         end_date_time: '',
         venue: '',
+        venue_hindi: '',
         event_type: ''
       })
       setEventImage(null)
@@ -553,12 +599,16 @@ const DashBord = () => {
 
   const cancelEventEdit = () => {
     setIsEditingEvent(false)
+    setIsAddingEvent(false)
     setEventFormData({
       event_name: '',
       description: '',
+      event_name_hindi: '',
+      description_hindi: '',
       event_date_time: '',
       end_date_time: '',
       venue: '',
+      venue_hindi: '',
       event_type: ''
     })
     setEventImage(null)
@@ -3038,13 +3088,18 @@ const DashBord = () => {
         <Button variant="outline-secondary" size="sm" onClick={() => { cancelEventEdit(); handleBackToDashboard() }}>
           <FaArrowLeft /> Dashboard
         </Button>
-        <h4 className="mb-0">Events Management</h4>
+        <div className="d-flex gap-2">
+          <Button variant="primary" size="sm" onClick={handleAddEvent}>
+            <FaPlus className="me-1" /> Add New Event
+          </Button>
+          <h4 className="mb-0">Events Management</h4>
+        </div>
       </div>
 
-      {isEditingEvent && (
+      {(isEditingEvent || isAddingEvent) && (
         <Card className="shadow-sm border-0 mb-4">
-          <Card.Header className="bg-warning text-dark">
-            <FaEdit className="me-2" /> Edit Event
+          <Card.Header className={isEditingEvent ? "bg-warning text-dark" : "bg-primary text-white"}>
+            {isEditingEvent ? <><FaEdit className="me-2" /> Edit Event</> : <><FaPlus className="me-2" /> Add New Event</>}
           </Card.Header>
           <Card.Body>
             <Form onSubmit={handleEventSubmit}>
@@ -3056,6 +3111,16 @@ const DashBord = () => {
                   onChange={(e) => setEventFormData({ ...eventFormData, event_name: e.target.value })}
                   placeholder="e.g. Tech Innovation Summit 2026"
                   required
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Event Name (Hindi)</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={eventFormData.event_name_hindi}
+                  onChange={(e) => setEventFormData({ ...eventFormData, event_name_hindi: e.target.value })}
+                  placeholder="e.g. वार्षिक टेक सम्मेलन 2026"
                 />
               </Form.Group>
 
@@ -3104,6 +3169,16 @@ const DashBord = () => {
               </Form.Group>
 
               <Form.Group className="mb-3">
+                <Form.Label>Venue (Hindi)</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={eventFormData.venue_hindi}
+                  onChange={(e) => setEventFormData({ ...eventFormData, venue_hindi: e.target.value })}
+                  placeholder="e.g. दिल्ली कन्वेंशन सेंटर"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
                 <Form.Label>Description</Form.Label>
                 <Form.Control
                   as="textarea"
@@ -3111,6 +3186,17 @@ const DashBord = () => {
                   value={eventFormData.description}
                   onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })}
                   placeholder="Enter event description"
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Description (Hindi)</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={4}
+                  value={eventFormData.description_hindi}
+                  onChange={(e) => setEventFormData({ ...eventFormData, description_hindi: e.target.value })}
+                  placeholder="हिंदी में विवरण दर्ज करें"
                 />
               </Form.Group>
 
@@ -3135,8 +3221,8 @@ const DashBord = () => {
               </Form.Group>
 
               <div className="d-flex gap-2">
-                <Button variant="warning" type="submit">
-                  <FaEdit className="me-2" /> Update Event
+                <Button variant={isEditingEvent ? "warning" : "primary"} type="submit">
+                  {isEditingEvent ? <><FaEdit className="me-2" /> Update Event</> : <><FaPlus className="me-2" /> Post Event</>}
                 </Button>
                 <Button variant="secondary" onClick={cancelEventEdit}>
                   Cancel
