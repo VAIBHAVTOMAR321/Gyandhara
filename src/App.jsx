@@ -119,7 +119,9 @@ function AppContent() {
         <Route path="/StudentRegistration" element={<StudentRegistration />} />
         <Route path="/register" element={<StudentRegistration />} />
         <Route path="/login" element={<Login />} />
-
+        <Route path="/DashBord" element={<DashBord />} />
+        <Route path="/Offlinecompetition" element={<Offlinecompetition />} />
+        <Route path="UserProfile" element={<UserProfile />} />
         <Route
           path="/UserDashboard"
           element={
@@ -127,14 +129,15 @@ function AppContent() {
               <UserDashboard />
             </ProtectedRoute>
           }
-        /> <Route
+        /> 
+        {/* <Route
           path="/Offlinecompetition"
           element={
             <ProtectedRoute>
               <Offlinecompetition />
             </ProtectedRoute>
           }
-        />
+        /> */}
          <Route
            path="/TwelfthGuidance"
            element={
@@ -153,14 +156,14 @@ function AppContent() {
            }
          />
 
-        <Route
+        {/* <Route
           path="/UserProfile"
           element={
             <ProtectedRoute>
               <UserProfile />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route
           path="/UserTest"
           element={
@@ -290,14 +293,15 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        <Route
+
+        {/* <Route
           path="/DashBord"
           element={
             <ProtectedRoute>
               <DashBord />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route
           path="/SchoolDashBoard"
           element={

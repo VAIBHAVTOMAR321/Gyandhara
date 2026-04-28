@@ -283,7 +283,7 @@ const menuItems = [
   <Offcanvas
   show={(isMobile || isTablet) && sidebarOpen}
   onHide={() => setSidebarOpen(false)}
-  className="mobile-sidebar-user"
+  className="admin-mobile-offcanvas"
   placement="start"
   backdrop={true}
   scroll={false}
@@ -291,12 +291,12 @@ const menuItems = [
 >
   <Offcanvas.Header 
       closeButton 
-      className="br-offcanvas-header"
+      className="admin-offcanvas-header"
     >
       <Offcanvas.Title className="br-off-title">Menu</Offcanvas.Title>
     </Offcanvas.Header>
 
-  <Offcanvas.Body className="br-offcanvas">
+  <Offcanvas.Body className="admin-offcanvas-body">
     <Nav className="flex-column">
       {menuItems.map((item, index) => (
         <div key={index}>

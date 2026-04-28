@@ -740,7 +740,7 @@ border: none !important;
 
 /* Responsive Design */
 /* Mobile Styles */
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
     .user-left-nav {
         transform: translateX(-100%);
         display: none;
@@ -786,7 +786,7 @@ border: none !important;
 
 /* Tablet Styles */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .user-left-nav {
         transform: translateX(0);
         display: flex !important;
@@ -806,7 +806,7 @@ border: none !important;
     }
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
     .user-left-nav {
         transform: translateX(-100%);
         display: none;
@@ -848,14 +848,14 @@ border: none !important;
 }
 
 /* Reset sidebar state when viewport changes */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .user-left-nav {
         transform: translateX(0) !important;
         display: flex !important;
     }
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
     .user-left-nav {
         transform: translateX(-100%) !important;
         display: none !important;
@@ -903,36 +903,46 @@ border: none !important;
 }
 
  /* Mobile Sidebar */
- .mobile-sidebar-user {
+ .user-mobile-offcanvas {
     background: linear-gradient(135deg, #383be8, hsl(25, 92%, 47%)) !important;
  }
 
-.mobile-sidebar-user .nav-item {
+.user-mobile-offcanvas .nav-item {
     color: white;
     padding: 1rem;
 }
 
-.mobile-sidebar-user .nav-item:hover {
+.user-mobile-offcanvas .nav-item:hover {
     background: #10341f;
 }
 
-.mobile-sidebar-user .nav-item.active {
+.user-mobile-offcanvas .nav-item.active {
     background: rgba(255, 255, 255, 0.2);
 }
 
-.mobile-sidebar-user .submenu-container-user {
+.user-mobile-offcanvas .submenu-container-user {
    background: hsl(240, 28%, 43%) !important;
    padding-left: 2rem;
 }
 
-.mobile-sidebar-user .submenu-item {
+.user-mobile-offcanvas .submenu-item {
     color: rgba(255, 255, 255, 0.7);
     padding: 0.5rem 1rem;
 }
 
-.mobile-sidebar-user .submenu-item:hover {
+.user-mobile-offcanvas .submenu-item:hover {
     color: white;
     background: rgba(255, 255, 255, 0.05);
+}
+
+.user-offcanvas-header {
+    background: linear-gradient(135deg, #383be8, #4246e4) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-offcanvas-body {
+    background: linear-gradient(135deg, #4246e4, hsl(25, 92%, 47%)) !important;
+    padding: 0 !important;
 }
 
 /* ==================== NEW ENHANCED DASHBOARD STYLES ==================== */

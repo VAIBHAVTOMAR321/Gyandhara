@@ -742,9 +742,15 @@ border: none !important;
 /* Responsive Design */
 /* Mobile Styles */
 @media (max-width: 767.98px) {
+    /* Hide the desktop sidebar on mobile and tablet views */
     .school-Left {
         transform: translateX(-100%);
-        display: none;
+        display: none !important;
+    }
+    /* Ensure nav-text is always visible within the mobile/tablet offcanvas */
+    .school-mobile-offcanvas .nav-item .nav-text {
+        display: block !important;
+        flex-grow: 1; /* Allow text to take available space */
     }
 
     .sidebar-open {
@@ -787,10 +793,10 @@ border: none !important;
 
 /* Tablet Styles */
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .school-Left {
         transform: translateX(0);
-        display: flex !important;
+        display: flex !important; /* Show desktop sidebar only on desktop */
         /* Override any display:none from mobile */
     }
 
@@ -807,7 +813,7 @@ border: none !important;
     }
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
     .school-Left {
         transform: translateX(-100%);
         display: none;
@@ -849,14 +855,14 @@ border: none !important;
 }
 
 /* Reset sidebar state when viewport changes */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .school-Left {
         transform: translateX(0) !important;
         display: flex !important;
     }
 }
 
-@media (max-width: 767.98px) {
+@media (max-width: 1023.98px) {
     .school-Left {
         transform: translateX(-100%) !important;
         display: none !important;

@@ -247,17 +247,17 @@ const menuItems = [
   <Offcanvas
   show={(isMobile || isTablet) && sidebarOpen}
   onHide={() => setSidebarOpen(false)}
-  className="mobile-sidebar-user"
+  className="user-mobile-offcanvas"
   placement="start"
   backdrop={true}
   scroll={false}
   enforceFocus={false} //  ADD THIS LINE — fixes close button focus issue
 >
-  <Offcanvas.Header closeButton className="br-offcanvas-header">
+  <Offcanvas.Header closeButton className="user-offcanvas-header">
     <Offcanvas.Title className="br-off-title">{language === 'hi' ? "मेनू" : "Menu"}</Offcanvas.Title>
   </Offcanvas.Header>
 
-  <Offcanvas.Body className="br-offcanvas">
+  <Offcanvas.Body className="user-offcanvas-body">
     <Nav className="flex-column">
       {menuItems.map((item, index) => (
         <div key={index}>
