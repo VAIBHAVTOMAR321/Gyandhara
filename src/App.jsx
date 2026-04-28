@@ -7,22 +7,22 @@ import {
   useLocation,
 } from "react-router-dom";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './style.css';
-import 'bootstrap-icons/font/bootstrap-icons.css';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./style.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
-import Home from './components/pages/Home';
-import AboutUs from './components/pages/AboutUs';
-import Footer from './components/footer/Footer';
-import { AuthProvider, useAuth } from './components/all_login/AuthContext';
-import { LanguageProvider } from './components/all_login/LanguageContext';
+import Home from "./components/pages/Home";
+import AboutUs from "./components/pages/AboutUs";
+import Footer from "./components/footer/Footer";
+import { AuthProvider, useAuth } from "./components/all_login/AuthContext";
+import { LanguageProvider } from "./components/all_login/LanguageContext";
 import UserDashboard from "./components/user_panel/UserDashboard";
 import UserProfile from "./components/user_panel/UserProfile";
 import UserTest from "./components/user_panel/UserTest";
-import StudentRegistration from './components/registration/Registration';
-import SchoolStudentRegistration from './components/school_panel/StudentRegistration';
-import SchoolQuizList from './components/school_panel/SchoolQuizList';
-import Login from './components/all_login/Login';
+import StudentRegistration from "./components/registration/Registration";
+import SchoolStudentRegistration from "./components/school_panel/StudentRegistration";
+import SchoolQuizList from "./components/school_panel/SchoolQuizList";
+import Login from "./components/all_login/Login";
 import NavBar from "./components/nav_bar/NavBar";
 import SchoolCompetitions from "./components/user_panel/SchoolCompetitions";
 
@@ -55,15 +55,48 @@ import UserEvents from "./components/user_panel/UserEvents";
 import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
-
 //  Navbar Wrapper (Hide on specific routes)
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/CourseFeedback', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
+  const hideOnRoutes = [
+    "/UserDashboard",
+    "/UserProfile",
+    "/UserTest",
+    "/AdminDashboard",
+    "/SchoolDashBoard",
+    "/DashBord",
+    "/SendQuery",
+    "/SchoolStudentRegistration",
+    "/StudentIssue",
+    "/CourseFeedback",
+    "/SchoolQuiz",
+    "/UserQuiz",
+    "/TenthGuidance",
+    "/TwelfthGuidance",
+    "/OccupationDetails",
+    "/SchoolQuizList",
+    "/GovernmentSchemes",
+    "/TwelfthGuidance",
+    "/GroomingClasses",
+    "/QuizManagement",
+    "/Competition",
+    "/ManageGovtSchemes",
+    "/AddGovtSchemes",
+    "/CreateGroomingClass",
+    "/ManageGroomingClasses",
+    "/JobOpenings",
+    "/UserEvents",
+    "/Offlinecompetition",
+    "/SchoolCompetitions",
+    "/AddJob",
+    "/ManageJobs",
+    "/AddSeminar",
+    "/AddWorkshop",
+  ];
 
-  const shouldHide = hideOnRoutes.some(route =>
-    location.pathname.startsWith(route)
+  const shouldHide = hideOnRoutes.some((route) =>
+    location.pathname.startsWith(route),
   );
 
   if (shouldHide) return null;
@@ -71,22 +104,54 @@ function NavBarWrapper() {
   return <NavBar />;
 }
 
-
 // Footer Wrapper (Hide on specific routes)
 function FooterWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = ['/UserDashboard', '/UserProfile', '/UserTest', '/AdminDashboard', '/SchoolDashBoard', '/DashBord', '/SendQuery', '/SchoolStudentRegistration', '/StudentIssue', '/CourseFeedback', '/SchoolQuiz', '/UserQuiz', '/TenthGuidance', '/TwelfthGuidance', '/OccupationDetails', '/SchoolQuizList', '/GovernmentSchemes', '/TwelfthGuidance', '/GroomingClasses', '/QuizManagement','/Competition', '/ManageGovtSchemes', '/AddGovtSchemes', '/CreateGroomingClass', '/ManageGroomingClasses','/JobOpenings', '/UserEvents', '/Offlinecompetition', '/SchoolCompetitions', '/AddJob', '/ManageJobs', '/AddSeminar', '/AddWorkshop'];
+  const hideOnRoutes = [
+    "/UserDashboard",
+    "/UserProfile",
+    "/UserTest",
+    "/AdminDashboard",
+    "/SchoolDashBoard",
+    "/DashBord",
+    "/SendQuery",
+    "/SchoolStudentRegistration",
+    "/StudentIssue",
+    "/CourseFeedback",
+    "/SchoolQuiz",
+    "/UserQuiz",
+    "/TenthGuidance",
+    "/TwelfthGuidance",
+    "/OccupationDetails",
+    "/SchoolQuizList",
+    "/GovernmentSchemes",
+    "/TwelfthGuidance",
+    "/GroomingClasses",
+    "/QuizManagement",
+    "/Competition",
+    "/ManageGovtSchemes",
+    "/AddGovtSchemes",
+    "/CreateGroomingClass",
+    "/ManageGroomingClasses",
+    "/JobOpenings",
+    "/UserEvents",
+    "/Offlinecompetition",
+    "/SchoolCompetitions",
+    "/AddJob",
+    "/ManageJobs",
+    "/AddSeminar",
+    "/AddWorkshop",
+  ];
 
-  const shouldHide = hideOnRoutes.some(route =>
-    location.pathname.startsWith(route)
+  const shouldHide = hideOnRoutes.some((route) =>
+    location.pathname.startsWith(route),
   );
 
   if (shouldHide) return null;
 
   return <Footer />;
 }
-
 
 // Protected Route
 function ProtectedRoute({ children }) {
@@ -103,7 +168,6 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
-
 //  App Content
 function AppContent() {
   return (
@@ -111,17 +175,12 @@ function AppContent() {
       {/* Navbar conditionally visible */}
       <NavBarWrapper />
 
-
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
-
         <Route path="/StudentRegistration" element={<StudentRegistration />} />
         <Route path="/register" element={<StudentRegistration />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/DashBord" element={<DashBord />} />
-        <Route path="/Offlinecompetition" element={<Offlinecompetition />} />
-        <Route path="UserProfile" element={<UserProfile />} />
         <Route
           path="/UserDashboard"
           element={
@@ -129,41 +188,39 @@ function AppContent() {
               <UserDashboard />
             </ProtectedRoute>
           }
-        /> 
-        {/* <Route
+        />{" "}
+        <Route
           path="/Offlinecompetition"
           element={
             <ProtectedRoute>
               <Offlinecompetition />
             </ProtectedRoute>
           }
-        /> */}
-         <Route
-           path="/TwelfthGuidance"
-           element={
-             <ProtectedRoute>
-               <TwelfthGuidance />
-             </ProtectedRoute>
-           }
-         />
-
-          <Route
-           path="/GovernmentSchemes"
-           element={
-             <ProtectedRoute>
-               <GovernmentSchemes />
-             </ProtectedRoute>
-           }
-         />
-
-        {/* <Route
+        />
+        <Route
+          path="/TwelfthGuidance"
+          element={
+            <ProtectedRoute>
+              <TwelfthGuidance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/GovernmentSchemes"
+          element={
+            <ProtectedRoute>
+              <GovernmentSchemes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/UserProfile"
           element={
             <ProtectedRoute>
               <UserProfile />
             </ProtectedRoute>
           }
-        /> */}
+        />
         <Route
           path="/UserTest"
           element={
@@ -172,7 +229,6 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/JobOpenings"
           element={
@@ -189,14 +245,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-         <Route
-           path="/GroomingClasses"
-           element={
-             <ProtectedRoute>
-               <GroomingClasses />
-             </ProtectedRoute>
-           }
-         />
+        <Route
+          path="/GroomingClasses"
+          element={
+            <ProtectedRoute>
+              <GroomingClasses />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/Competition"
           element={
@@ -253,30 +309,30 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-          <Route
-           path="/StudentIssue"
-           element={
-             <ProtectedRoute>
-               <StudentIssue />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/CourseFeedback"
-           element={
-             <ProtectedRoute>
-               <CourseFeedback />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/QuizManagement"
-           element={
-             <ProtectedRoute>
-               <QuizManageMent />
-             </ProtectedRoute>
-           }
-         />
+        <Route
+          path="/StudentIssue"
+          element={
+            <ProtectedRoute>
+              <StudentIssue />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/CourseFeedback"
+          element={
+            <ProtectedRoute>
+              <CourseFeedback />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/QuizManagement"
+          element={
+            <ProtectedRoute>
+              <QuizManageMent />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/SchoolQuiz"
           element={
@@ -285,7 +341,7 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-<Route
+        <Route
           path="/AdminDashboard"
           element={
             <ProtectedRoute>
@@ -293,15 +349,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
-        {/* <Route
+        <Route
           path="/DashBord"
           element={
             <ProtectedRoute>
               <DashBord />
             </ProtectedRoute>
           }
-        /> */}
+        />
         <Route
           path="/SchoolDashBoard"
           element={
@@ -326,7 +381,6 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/UserQuiz"
           element={
@@ -335,55 +389,55 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-         <Route
-           path="/TenthGuidance"
-           element={
-             <ProtectedRoute>
-               <TenthGuidance />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/AddJob"
-           element={
-             <ProtectedRoute>
-               <AddJob />
-             </ProtectedRoute>
-           }
-         />
-          <Route
-           path="/ManageJobs"
-           element={
-             <ProtectedRoute>
-               <ManageJobs />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/AddSeminar"
-           element={
-             <ProtectedRoute>
-               <AddSeminar />
-             </ProtectedRoute>
-           }
-         />
-          <Route
-           path="/AddWorkshop"
-           element={
-             <ProtectedRoute>
-               <AddWorkshop />
-             </ProtectedRoute>
-           }
-         />
-         <Route
-           path="/OccupationDetails"
-           element={
-             <ProtectedRoute>
-               <OccupationDetails />
-             </ProtectedRoute>
-           }
-         />
-          {/* <Route
+        <Route
+          path="/TenthGuidance"
+          element={
+            <ProtectedRoute>
+              <TenthGuidance />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AddJob"
+          element={
+            <ProtectedRoute>
+              <AddJob />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/ManageJobs"
+          element={
+            <ProtectedRoute>
+              <ManageJobs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AddSeminar"
+          element={
+            <ProtectedRoute>
+              <AddSeminar />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AddWorkshop"
+          element={
+            <ProtectedRoute>
+              <AddWorkshop />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/OccupationDetails"
+          element={
+            <ProtectedRoute>
+              <OccupationDetails />
+            </ProtectedRoute>
+          }
+        />
+        {/* <Route
           path="/TwelfthGuidance"
           element={
             <ProtectedRoute>
@@ -398,7 +452,6 @@ function AppContent() {
     </>
   );
 }
-
 
 // Main App
 function App() {
