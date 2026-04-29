@@ -4,12 +4,14 @@ import axios from "axios";
 import * as XLSX from 'xlsx';
 
 import { useAuth } from "../all_login/AuthContext";
+import { useLanguage } from "../all_login/LanguageContext";
 import SchoolHeader from "./SchoolHeader";
 import SchoolLeftNav from "./SchoolLeftNav";
 import "../../assets/css/userleftnav.css";
 
 const StudentRegistration = () => {
   const { uniqueId: school_uni_id, accessToken } = useAuth();
+  const { language } = useLanguage();
   const fileInputRef = useRef(null);
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -36,6 +38,113 @@ const StudentRegistration = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const content = {
+    en: {
+      title: "Student Aadhaar Registration",
+      singleTab: "Single Registration",
+      bulkTab: "Bulk Excel Upload",
+      listTab: "View Students",
+      fullName: "Full Name",
+      aadhaar: "Aadhaar Number",
+      register: "Register Student",
+      registering: "Registering...",
+      edit: "Edit",
+      delete: "Delete",
+      save: "Save Changes", // Added comma
+      cancel: "Cancel", // Added comma
+      schoolId: "School ID",
+      autoFilled: "Auto-filled from your account",
+      autoFilledSub: "Automatically filled from your login",
+      fullNamePlaceholder: "Enter student's full name",
+      aadhaarPlaceholder: "12-digit Aadhaar number",
+      uploadTitle: "Upload Excel File (.xlsx, .xls, .csv)",
+      downloadTemplate: "Download Template",
+      uploadNote: "File must contain columns: \"aadhaar_no\" and \"full_name\" (or \"name\"). School ID will be auto-attached.",
+      validationErrorMsg: "validation error(s) found. Please fix before submitting.",
+      previewTitle: "Preview",
+      checkingExisting: "Checking for existing students...",
+      alreadyRegisteredBatch: "students already registered.",
+      onlyNewMsg: "Only {count} new students will be registered.",
+      registerNewOnly: "Register {count} New Students Only",
+      submitAll: "Submit All",
+      processingBulk: "Processing bulk upload...",
+      studentList: "Students List",
+      deleteSelected: "Delete Selected",
+      noStudents: "No students registered yet.",
+      createdAt: "Created At",
+      confirmDeleteTitle: "Confirm Delete",
+      deleteMultipleMsg: "Are you sure you want to delete {count} selected students? This action cannot be undone.",
+      deleteSingleMsg: "Are you sure you want to delete this student? This action cannot be undone.",
+      successSingle: "Student registered successfully!",
+      successUpdate: "Student updated successfully",
+      successDeleteSingle: "Student deleted successfully",
+      successDeleteMultiple: "students deleted successfully",
+      errorLoad: "Failed to load students",
+      errorReq: "All fields are required",
+      errorAadhaar12: "Aadhaar must be 12 digits",
+      errorExcelRows: "Excel file must have header row and at least one data row",
+      errorExcelCols: "Excel must contain columns: \"aadhaar_no\" and \"full_name\" (or \"name\")",
+      errorNoRows: "No valid data rows found",
+      errorParse: "Failed to parse Excel file. Please check the format.",
+      errorNoNew: "No new students to register",
+      errorDataSubmit: "No data to submit",
+      errorFixData: "Please fix errors in the data before submitting"
+    },
+    hi: {
+      title: "छात्र आधार पंजीकरण",
+      singleTab: "एकल पंजीकरण",
+      bulkTab: "बल्क एक्सेल अपलोड",
+      listTab: "छात्रों को देखें",
+      fullName: "पूरा नाम",
+      aadhaar: "आधार नंबर",
+      register: "छात्र का पंजीकरण करें",
+      registering: "पंजीकरण हो रहा है...",
+      edit: "संपादित करें",
+      delete: "हटाएं",
+      save: "परिवर्तन सहेजें", // Added comma
+      cancel: "रद्द करें", // Added comma
+      schoolId: "स्कूल आईडी",
+      autoFilled: "आपके खाते से स्वतः भरा गया",
+      autoFilledSub: "आपके लॉगिन से स्वतः भरा गया",
+      fullNamePlaceholder: "छात्र का पूरा नाम दर्ज करें",
+      aadhaarPlaceholder: "12-अंकीय आधार संख्या",
+      uploadTitle: "एक्सेल फ़ाइल अपलोड करें (.xlsx, .xls, .csv)",
+      downloadTemplate: "टेम्प्लेट डाउनलोड करें",
+      uploadNote: "फ़ाइल में कॉलम होने चाहिए: \"aadhaar_no\" और \"full_name\" (या \"name\")। स्कूल आईडी स्वतः संलग्न हो जाएगी।",
+      validationErrorMsg: "सत्यापन त्रुटियाँ मिलीं। कृपया सबमिट करने से पहले ठीक करें।",
+      previewTitle: "पूर्वावलोकन",
+      checkingExisting: "मौजूदा छात्रों की जाँच की जा रही है...",
+      alreadyRegisteredBatch: "छात्र पहले से पंजीकृत हैं।",
+      onlyNewMsg: "केवल {count} नए छात्र पंजीकृत किए जाएंगे।",
+      registerNewOnly: "केवल {count} नए छात्र पंजीकृत करें",
+      submitAll: "सभी सबमिट करें",
+      processingBulk: "बल्क अपलोड संसाधित किया जा रहा है...",
+      studentList: "छात्र सूची",
+      deleteSelected: "चयनित हटाएं",
+      noStudents: "अभी तक कोई छात्र पंजीकृत नहीं है।",
+      createdAt: "बनाया गया",
+      confirmDeleteTitle: "हटाने की पुष्टि करें",
+      deleteMultipleMsg: "क्या आप वाकई {count} चयनित छात्रों को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
+      deleteSingleMsg: "क्या आप वाकई इस छात्र को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
+      successSingle: "छात्र सफलतापूर्वक पंजीकृत!",
+      successUpdate: "छात्र सफलतापूर्वक अपडेट किया गया",
+      successDeleteSingle: "छात्र सफलतापूर्वक हटा दिया गया",
+      successDeleteMultiple: "छात्र सफलतापूर्वक हटा दिए गए",
+      errorLoad: "छात्रों को लोड करने में विफल",
+      errorReq: "सभी फ़ील्ड आवश्यक हैं",
+      errorAadhaar12: "आधार 12 अंकों का होना चाहिए",
+      errorExcelRows: "एक्सेल फ़ाइल में हेडर पंक्ति और कम से कम एक डेटा पंक्ति होनी चाहिए",
+      errorExcelCols: "एक्सेल में कॉलम होने चाहिए: \"aadhaar_no\" और \"full_name\" (या \"name\")",
+      errorNoRows: "कोई वैध डेटा पंक्ति नहीं मिली",
+      errorParse: "एक्सेल फ़ाइल पार्स करने में विफल। कृपया प्रारूप की जाँच करें।",
+      errorNoNew: "पंजीकरण के लिए कोई नया छात्र नहीं है",
+      errorDataSubmit: "सबमिट करने के लिए कोई डेटा नहीं है",
+      errorFixData: "कृपया सबमिट करने से पहले डेटा में त्रुटियों को ठीक करें"
+    }
+  };
+
+  const t = content[language] || content.en;
 
   // Students list state
   const [students, setStudents] = useState([]);
@@ -168,11 +277,11 @@ const StudentRegistration = () => {
 
   const handleEditSubmit = async () => {
     if (!editForm.full_name.trim() || !editForm.aadhaar_no.trim()) {
-      setError('All fields are required');
+        setError(t.errorReq);
       return;
     }
     if (!/^\d{12}$/.test(editForm.aadhaar_no)) {
-      setError('Aadhaar must be 12 digits');
+        setError(t.errorAadhaar12);
       return;
     }
 
@@ -192,12 +301,12 @@ const StudentRegistration = () => {
           'Authorization': `Bearer ${accessToken}`
         } }
       );
-      setSuccess('Student updated successfully');
+      setSuccess(t.successUpdate);
       setShowEditModal(false);
       fetchStudents(currentPage);
     } catch (err) {
       console.error('Edit error:', err);
-      const message = err.response?.data?.message || 'Update failed';
+      const message = err.response?.data?.message || (language === 'hi' ? 'अपडेट विफल' : 'Update failed');
       setError(message);
     } finally {
       setEditLoading(false);
@@ -233,7 +342,7 @@ const StudentRegistration = () => {
             }
           }
         );
-        setSuccess(`${selectedIds.length} students deleted successfully`);
+        setSuccess(`${selectedIds.length} ${t.successDeleteMultiple}`);
         setSelectedIds([]);
       } else {
         await axios.delete(
@@ -246,13 +355,13 @@ const StudentRegistration = () => {
             }
           }
         );
-        setSuccess('Student deleted successfully');
+        setSuccess(t.successDeleteSingle);
       }
       setShowDeleteModal(false);
       fetchStudents(currentPage);
     } catch (err) {
       console.error('Delete error:', err);
-      const message = err.response?.data?.message || 'Delete failed';
+      const message = err.response?.data?.message || (language === 'hi' ? 'हटाना विफल' : 'Delete failed');
       setError(message);
     } finally {
       setDeleteLoading(false);
@@ -298,12 +407,12 @@ const StudentRegistration = () => {
   const validateSingleForm = () => {
     const errors = {};
     if (!singleForm.full_name.trim()) {
-      errors.full_name = 'Full name is required';
+        errors.full_name = t.validation.fullNameReq;
     }
     if (!singleForm.aadhaar_no.trim()) {
-      errors.aadhaar_no = 'Aadhaar number is required';
+        errors.aadhaar_no = t.validation.aadhaarReq;
     } else if (!/^\d{12}$/.test(singleForm.aadhaar_no)) {
-      errors.aadhaar_no = 'Aadhaar must be 12 digits';
+        errors.aadhaar_no = t.errorAadhaar12;
     }
     setSingleErrors(errors);
     return Object.keys(errors).length === 0;
@@ -351,7 +460,7 @@ const StudentRegistration = () => {
         }
       );
 
-      setSuccess('Student registered successfully!');
+      setSuccess(t.successSingle);
       setSingleForm({ full_name: '', aadhaar_no: '' });
 } catch (err) {
       const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || err.response?.data?.message || 'Registration failed. Please try again.';
@@ -381,7 +490,7 @@ const StudentRegistration = () => {
 
     const fileExt = file.name.split('.').pop().toLowerCase();
     if (!['xlsx', 'csv', 'xls'].includes(fileExt)) {
-      setError('Please upload a valid Excel file (.xlsx, .xls, or .csv)');
+      setError(language === 'hi' ? 'कृपया एक वैध एक्सेल फ़ाइल अपलोड करें (.xlsx, .xls, या .csv)' : 'Please upload a valid Excel file (.xlsx, .xls, or .csv)');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -403,7 +512,7 @@ const StudentRegistration = () => {
         const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
         if (jsonData.length < 2) {
-          setError('Excel file must have header row and at least one data row');
+          setError(t.errorExcelRows);
           return;
         }
 
@@ -413,7 +522,7 @@ const StudentRegistration = () => {
         const nameIdx = headers.findIndex(h => h === 'full_name' || h === 'name' || h === 'student name');
 
         if (aadhaarIdx === -1 || nameIdx === -1) {
-          setError('Excel must contain columns: "aadhaar_no" and "full_name" (or "name")');
+          setError(t.errorExcelCols);
           return;
         }
 
@@ -434,7 +543,7 @@ const StudentRegistration = () => {
         }
 
         if (rows.length === 0) {
-          setError('No valid data rows found');
+          setError(t.errorNoRows);
           return;
         }
 
@@ -446,7 +555,7 @@ const StudentRegistration = () => {
         checkExistingStudents(rows);
       } catch (err) {
         console.error('Parse error:', err);
-        setError('Failed to parse Excel file. Please check the format.');
+        setError(t.errorParse);
       }
     };
     reader.readAsBinaryString(file);
@@ -495,7 +604,7 @@ const StudentRegistration = () => {
         rows.forEach((row, idx) => {
           if (batchDuplicates.has(row.aadhaar_no)) {
             if (!existingErrors.find(e => e.index === idx)) {
-              existingErrors.push({ index: idx, message: 'Already registered' });
+              existingErrors.push({ index: idx, message: language === 'hi' ? 'पहले से पंजीकृत' : 'Already registered' });
             }
           }
         });
@@ -517,7 +626,7 @@ const StudentRegistration = () => {
   const handleRegisterNewOnly = async () => {
     const newStudents = getNewStudents();
     if (newStudents.length === 0) {
-      setError('No new students to register');
+      setError(t.errorNoNew);
       return;
     }
 
@@ -556,7 +665,7 @@ const StudentRegistration = () => {
           }
         );
 
-        statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'success', message: 'Registered' };
+        statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'success', message: language === 'hi' ? 'पंजीकृत' : 'Registered' };
         setRowStatuses([...statusResults]);
       } catch (err) {
         const isDuplicate = err.response?.data?.errors?.aadhaar_no?.some(e => 
@@ -564,9 +673,9 @@ const StudentRegistration = () => {
         );
         
         if (isDuplicate) {
-          statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'skipped', message: 'Already exists' };
+          statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'skipped', message: language === 'hi' ? 'पहले से मौजूद है' : 'Already exists' };
         } else {
-          const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || 'Failed';
+          const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || (language === 'hi' ? 'विफल' : 'Failed');
           statusResults[statusIndex] = { ...statusResults[statusIndex], status: 'failed', message };
         }
         setRowStatuses([...statusResults]);
@@ -579,7 +688,7 @@ const StudentRegistration = () => {
     const skippedCount = statusResults.filter(s => s.status === 'skipped').length;
     const failedCount = statusResults.filter(s => s.status === 'failed').length;
     
-    setSuccess(`Completed: ${successCount} registered, ${skippedCount} already exists, ${failedCount} failed`);
+    setSuccess(`${language === 'hi' ? 'पूरा हुआ' : 'Completed'}: ${successCount} ${language === 'hi' ? 'पंजीकृत' : 'registered'}, ${skippedCount} ${language === 'hi' ? 'पहले से मौजूद' : 'already exists'}, ${failedCount} ${language === 'hi' ? 'विफल' : 'failed'}`);
   };
 
   // Validate bulk data (Aadhaar format and duplicates)
@@ -591,16 +700,16 @@ const StudentRegistration = () => {
     rows.forEach((row, idx) => {
       // Check empty aadhaar
       if (!row.aadhaar_no) {
-        errors.push({ index: idx, message: 'Aadhaar number is required' });
+        errors.push({ index: idx, message: t.validation.aadhaarReq });
       } else if (!/^\d{12}$/.test(row.aadhaar_no)) {
-        errors.push({ index: idx, message: 'Aadhaar must be 12 digits' });
+        errors.push({ index: idx, message: t.errorAadhaar12 });
       }
 
       // Check duplicate within batch
       if (row.aadhaar_no) {
         if (aadhaarSet.has(row.aadhaar_no)) {
           duplicates.add(row.aadhaar_no);
-          errors.push({ index: idx, message: 'Duplicate Aadhaar in this batch' });
+          errors.push({ index: idx, message: language === 'hi' ? 'इस बैच में डुप्लीकेट आधार' : 'Duplicate Aadhaar in this batch' });
         } else {
           aadhaarSet.add(row.aadhaar_no);
         }
@@ -613,14 +722,14 @@ const StudentRegistration = () => {
   // Submit bulk registration
   const handleBulkSubmit = async () => {
     if (parsedData.length === 0) {
-      setError('No data to submit');
+      setError(t.errorDataSubmit);
       return;
     }
 
     // Re-validate before submit
     validateBulkData(parsedData);
     if (bulkErrors.length > 0) {
-      setError('Please fix errors in the data before submitting');
+      setError(t.errorFixData);
       return;
     }
 
@@ -657,7 +766,7 @@ const StudentRegistration = () => {
           }
         );
 
-        statusResults[i] = { ...statusResults[i], status: 'success', message: 'Registered' };
+        statusResults[i] = { ...statusResults[i], status: 'success', message: language === 'hi' ? 'पंजीकृत' : 'Registered' };
         setRowStatuses([...statusResults]);
       } catch (err) {
         const isDuplicate = err.response?.data?.errors?.aadhaar_no?.some(e => 
@@ -665,9 +774,9 @@ const StudentRegistration = () => {
         );
         
         if (isDuplicate) {
-          statusResults[i] = { ...statusResults[i], status: 'skipped', message: 'Already exists' };
+          statusResults[i] = { ...statusResults[i], status: 'skipped', message: language === 'hi' ? 'पहले से मौजूद है' : 'Already exists' };
         } else {
-          const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || 'Failed';
+          const message = err.response?.data?.errors?.aadhaar_no?.[0] || err.response?.data?.errors || (language === 'hi' ? 'विफल' : 'Failed');
           statusResults[i] = { ...statusResults[i], status: 'failed', message };
         }
         setRowStatuses([...statusResults]);
@@ -680,7 +789,7 @@ const StudentRegistration = () => {
     const skippedCount = statusResults.filter(s => s.status === 'skipped').length;
     const failedCount = statusResults.filter(s => s.status === 'failed').length;
     
-    setSuccess(`Completed: ${successCount} registered, ${skippedCount} skipped, ${failedCount} failed`);
+    setSuccess(`${language === 'hi' ? 'पूरा हुआ' : 'Completed'}: ${successCount} ${language === 'hi' ? 'पंजीकृत' : 'registered'}, ${skippedCount} ${language === 'hi' ? 'छोड़ा गया' : 'skipped'}, ${failedCount} ${language === 'hi' ? 'विफल' : 'failed'}`);
   };
 
    return (
@@ -699,7 +808,7 @@ const StudentRegistration = () => {
             <Col>
               <Card className="shadow-box">
                 <Card.Body>
-                  <h4 className="mb-4">Student Aadhaar Registration</h4>
+                  <h4 className="mb-4">{t.title}</h4>
 
                   {/* Alert Messages */}
                   {error && (
@@ -720,20 +829,20 @@ const StudentRegistration = () => {
                       className="me-2"
                       onClick={() => handleTabChange('single')}
                     >
-                      Single Registration
+                      {t.singleTab}
                     </Button>
                     <Button
                       variant={activeTab === 'bulk' ? 'primary' : 'outline-primary'}
                       className="me-2"
                       onClick={() => handleTabChange('bulk')}
                     >
-                      Bulk Excel Upload
+                      {t.bulkTab}
                     </Button>
                     <Button
                       variant={activeTab === 'list' ? 'primary' : 'outline-primary'}
                       onClick={() => handleTabChange('list')}
                     >
-                      View Students
+                      {t.listTab}
                     </Button>
                   </div>
 
@@ -743,15 +852,15 @@ const StudentRegistration = () => {
                       <Row className="mb-3">
                         <Col md={6}>
                           <Form.Group>
-                            <Form.Label>School ID <span className="text-danger">*</span></Form.Label>
+                            <Form.Label>{t.schoolId} <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                               type="text"
                               value={school_uni_id || ''}
                               disabled
-                              placeholder="Auto-filled from your account"
+                              placeholder={t.autoFilled}
                             />
                             <Form.Text className="text-muted">
-                              Automatically filled from your login
+                              {t.autoFilledSub}
                             </Form.Text>
                           </Form.Group>
                         </Col>
@@ -760,13 +869,13 @@ const StudentRegistration = () => {
                       <Row className="mb-3">
                         <Col md={6}>
                           <Form.Group>
-                            <Form.Label>Full Name <span className="text-danger">*</span></Form.Label>
+                            <Form.Label>{t.fullName} <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                               type="text"
                               name="full_name"
                               value={singleForm.full_name}
                               onChange={handleSingleChange}
-                              placeholder="Enter student's full name"
+                              placeholder={t.fullNamePlaceholder}
                               isInvalid={!!singleErrors.full_name}
                             />
                             <Form.Control.Feedback type="invalid">
@@ -776,13 +885,13 @@ const StudentRegistration = () => {
                         </Col>
                         <Col md={6}>
                           <Form.Group>
-                            <Form.Label>Aadhaar Number <span className="text-danger">*</span></Form.Label>
+                            <Form.Label>{t.aadhaar} <span className="text-danger">*</span></Form.Label>
                             <Form.Control
                               type="text"
                               name="aadhaar_no"
                               value={singleForm.aadhaar_no}
                               onChange={handleSingleChange}
-                              placeholder="12-digit Aadhaar number"
+                              placeholder={t.aadhaarPlaceholder}
                               maxLength={12}
                               isInvalid={!!singleErrors.aadhaar_no}
                             />
@@ -797,10 +906,10 @@ const StudentRegistration = () => {
                         {loading ? (
                           <>
                             <Spinner animation="border" size="sm" className="me-2" />
-                            Registering...
+                            {t.registering}
                           </>
                         ) : (
-                          'Register Student'
+                          t.register
                         )}
                       </Button>
                     </Form>
@@ -811,7 +920,7 @@ const StudentRegistration = () => {
                     <div>
                       <div className="mb-4">
                         <Form.Group className="mb-3">
-                          <Form.Label>Upload Excel File (.xlsx, .xls, .csv)</Form.Label>
+                          <Form.Label>{t.uploadTitle}</Form.Label>
                           <Form.Control
                             ref={fileInputRef}
                             type="file"
@@ -830,12 +939,11 @@ const StudentRegistration = () => {
                             </Button>
                           </div>
                           <Form.Text className="text-muted">
-                            File must contain columns: "aadhaar_no" and "full_name" (or "name"). 
-                            School ID will be auto-attached.
+                            {t.uploadNote}
                           </Form.Text>
                           {bulkErrors.length > 0 && (
                             <div className="mt-2 text-danger">
-                              {bulkErrors.length} validation error(s) found. Please fix before submitting.
+                              {bulkErrors.length} {t.validationErrorMsg}
                             </div>
                           )}
                         </Form.Group>
@@ -844,15 +952,15 @@ const StudentRegistration = () => {
                       {/* Preview Table */}
                       {previewReady && parsedData.length > 0 && (
                         <div className="mt-4">
-                          <h5>Preview ({parsedData.length} students)</h5>
+                          <h5>{t.previewTitle} ({parsedData.length} {language === 'hi' ? 'छात्र' : 'students'})</h5>
                           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                             <Table striped bordered hover responsive>
                               <thead>
                                 <tr>
                                   <th>#</th>
-                                  <th>Aadhaar Number</th>
-                                  <th>Full Name</th>
-                                  <th>Status</th>
+                                  <th>{t.aadhaar}</th>
+                                  <th>{t.fullName}</th>
+                                  <th>{language === 'hi' ? 'स्थिति' : 'Status'}</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -879,11 +987,11 @@ const StudentRegistration = () => {
                                             )
                                           ) : null
                                         ) : isExisting ? (
-                                          <span className="text-warning">⚠ Already registered</span>
+                                          <span className="text-warning">⚠ {language === 'hi' ? 'पहले से पंजीकृत' : 'Already registered'}</span>
                                         ) : rowError ? (
                                           <span className="text-danger">✗ {rowError.message}</span>
                                         ) : (
-                                          <span className="text-success">✓ New</span>
+                                          <span className="text-success">✓ {language === 'hi' ? 'नया' : 'New'}</span>
                                         )}
                                       </td>
                                     </tr>
@@ -896,20 +1004,20 @@ const StudentRegistration = () => {
                           {checkingExisting && (
                             <div className="mt-3">
                               <Spinner animation="border" size="sm" />
-                              <span className="ms-2">Checking for existing students...</span>
+                              <span className="ms-2">{t.checkingExisting}</span>
                             </div>
                           )}
 
                           {!submittingBulk && !checkingExisting && existingStudents.size > 0 && (
                             <div className="mt-3 alert alert-info">
-                              <strong>{existingStudents.size} students already registered.</strong>
-                              <p className="mb-2">Only {getNewStudents().length} new students will be registered.</p>
+                              <strong>{existingStudents.size} {t.alreadyRegisteredBatch}</strong>
+                              <p className="mb-2">{t.onlyNewMsg.replace('{count}', getNewStudents().length)}</p>
                               <Button 
                                 variant="success" 
                                 onClick={handleRegisterNewOnly}
                                 disabled={getNewStudents().length === 0}
                               >
-                                Register {getNewStudents().length} New Students Only
+                                {t.registerNewOnly.replace('{count}', getNewStudents().length)}
                               </Button>
                             </div>
                           )}
@@ -921,14 +1029,14 @@ const StudentRegistration = () => {
                               disabled={bulkErrors.length > 0}
                               className="mt-3"
                             >
-                              Submit All
+                              {t.submitAll}
                             </Button>
                           )}
 
                           {submittingBulk && (
                             <div className="mt-3">
                               <Spinner animation="border" />
-                              <span className="ms-2">Processing bulk upload...</span>
+                              <span className="ms-2">{t.processingBulk}</span>
                             </div>
                           )}
                         </div>
@@ -940,10 +1048,10 @@ const StudentRegistration = () => {
                   {activeTab === 'list' && (
                     <div className="mt-4">
                       <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h5>Students List ({totalStudents} total)</h5>
+                        <h5>{t.studentList} ({totalStudents} {language === 'hi' ? 'कुल' : 'total'})</h5>
                         {selectedIds.length > 0 && (
                           <Button variant="danger" size="sm" onClick={handleDeleteMultiple}>
-                            Delete Selected ({selectedIds.length})
+                            {t.deleteSelected} ({selectedIds.length})
                           </Button>
                         )}
                       </div>
@@ -951,10 +1059,10 @@ const StudentRegistration = () => {
                       {studentsLoading ? (
                         <div className="text-center py-4">
                           <Spinner animation="border" />
-                          <p className="mt-2">Loading students...</p>
+                          <p className="mt-2">{language === 'hi' ? 'छात्रों को लोड किया जा रहा है...' : 'Loading students...'}</p>
                         </div>
                       ) : students.length === 0 ? (
-                        <Alert variant="info">No students registered yet.</Alert>
+                        <Alert variant="info">{t.noStudents}</Alert>
                       ) : (
                         <>
                           <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
@@ -969,10 +1077,10 @@ const StudentRegistration = () => {
                                     />
                                   </th>
                                   <th>#</th>
-                                  <th>Aadhaar Number</th>
-                                  <th>Full Name</th>
-                                  <th>Created At</th>
-                                  <th>Actions</th>
+                                  <th>{t.aadhaar}</th>
+                                  <th>{t.fullName}</th>
+                                  <th>{t.createdAt}</th>
+                                  <th>{language === 'hi' ? 'कार्य' : 'Actions'}</th>
                                 </tr>
                               </thead>
                               <tbody>
@@ -996,14 +1104,14 @@ const StudentRegistration = () => {
                                         className="me-2"
                                         onClick={() => handleEditClick(student)}
                                       >
-                                        Edit
+                                        {t.edit}
                                       </Button>
                                       <Button
                                         variant="outline-danger"
                                         size="sm"
                                         onClick={() => handleDeleteClick(student.id)}
                                       >
-                                        Delete
+                                        {t.delete}
                                       </Button>
                                     </td>
                                   </tr>
@@ -1028,12 +1136,12 @@ const StudentRegistration = () => {
       {/* Edit Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Student</Modal.Title>
+          <Modal.Title>{language === 'hi' ? 'छात्र को संपादित करें' : 'Edit Student'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3">
-              <Form.Label>Full Name</Form.Label>
+              <Form.Label>{t.fullName}</Form.Label>
               <Form.Control
                 type="text"
                 name="full_name"
@@ -1043,7 +1151,7 @@ const StudentRegistration = () => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Aadhaar Number</Form.Label>
+              <Form.Label>{t.aadhaar}</Form.Label>
               <Form.Control
                 type="text"
                 name="aadhaar_no"
@@ -1057,10 +1165,10 @@ const StudentRegistration = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-            Cancel
+            {t.cancel}
           </Button>
           <Button variant="primary" onClick={handleEditSubmit} disabled={editLoading}>
-            {editLoading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
+            {editLoading ? <Spinner animation="border" size="sm" /> : t.save}
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1068,21 +1176,21 @@ const StudentRegistration = () => {
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
+          <Modal.Title>{t.confirmDeleteTitle}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {deletingMultiple ? (
-            <p>Are you sure you want to delete {selectedIds.length} selected students? This action cannot be undone.</p>
+            <p>{t.deleteMultipleMsg.replace('{count}', selectedIds.length)}</p>
           ) : (
-            <p>Are you sure you want to delete this student? This action cannot be undone.</p>
+            <p>{t.deleteSingleMsg}</p>
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            {t.cancel}
           </Button>
           <Button variant="danger" onClick={confirmDelete} disabled={deleteLoading}>
-            {deleteLoading ? <Spinner animation="border" size="sm" /> : 'Delete'}
+            {deleteLoading ? <Spinner animation="border" size="sm" /> : t.delete}
           </Button>
         </Modal.Footer>
       </Modal>

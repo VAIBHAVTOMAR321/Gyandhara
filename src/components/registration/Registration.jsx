@@ -1,10 +1,123 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../all_login/LanguageContext';
 import './registration.css';
 
 const Registration = () => {
   const [activeTab, setActiveTab] = useState('school');
+  const { language } = useLanguage();
+
+  const content = {
+    en: {
+      title: "Registration",
+      subtitle: "Join Gyandhara - Stream of Knowledge",
+      schoolTab: "School Registration",
+      studentTab: "Student Registration",
+      schoolId: "School ID",
+      state: "State",
+      district: "District",
+      block: "Block",
+      schoolName: "School Name",
+      password: "Password",
+      confirmPassword: "Confirm Password",
+      registerSchool: "Register School",
+      alreadyAccount: "Already have an account? Login here",
+      aadhaarNo: "Aadhaar Number",
+      aadhaarPlaceholder: "12 digits",
+      checkBtn: "Check",
+      verifyingBtn: "Verifying...",
+      changeBtn: "Change",
+      alreadyRegistered: "Already Registered!",
+      alreadyRegisteredMsg: "This Aadhaar number is already associated with a student account.",
+      verifiedDetails: "Verified Aadhaar Details",
+      fullName: "Full Name",
+      mobileLabel: "Mobile Number",
+      mobilePlaceholder: "10 digits",
+      emailLabel: "Email",
+      emailPlaceholder: "Email",
+      classLabel: "Class",
+      selectClass: "Select class",
+      selectSchool: "Select School",
+      additionalInfo: "Additional Information",
+      registerStudentBtn: "Register as Student",
+      registeringBtn: "Registering...",
+      validation: {
+        fullNameReq: "Full name is required",
+        aadhaarReq: "Aadhaar number is required",
+        aadhaar12: "Aadhaar number must be 12 digits",
+        phoneReq: "Phone number is required",
+        phone10: "Phone number must be 10 digits",
+        emailReq: "Email is required",
+        emailValid: "Please enter a valid email",
+        passReq: "Password is required",
+        pass6: "Password must be at least 6 characters",
+        passMatch: "Passwords do not match",
+        classReq: "Please select a class",
+        schoolReq: "School name is required",
+        districtReq: "Please select a district",
+        blockReq: "Please select a block",
+        studentSuccess: "Student Registration successful! You can now login.",
+        schoolSuccess: "School Registration successful! You can now login.",
+        failed: "Registration failed. Please try again."
+      }
+    },
+    hi: {
+      title: "पंजीकरण",
+      subtitle: "Gyandhara से जुड़ें - ज्ञान की धारा",
+      schoolTab: "स्कूल पंजीकरण",
+      studentTab: "छात्र पंजीकरण",
+      schoolId: "स्कूल आईडी",
+      state: "राज्य",
+      district: "जिला",
+      block: "ब्लॉक",
+      schoolName: "स्कूल का नाम",
+      password: "पासवर्ड",
+      confirmPassword: "पासवर्ड की पुष्टि करें",
+      registerSchool: "स्कूल पंजीकृत करें",
+      alreadyAccount: "क्या आपके पास पहले से खाता है? यहाँ लॉगिन करें",
+      aadhaarNo: "आधार नंबर",
+      aadhaarPlaceholder: "12 अंक",
+      checkBtn: "जांचें",
+      verifyingBtn: "सत्यापित किया जा रहा है...",
+      changeBtn: "बदलें",
+      alreadyRegistered: "पहले से पंजीकृत!",
+      alreadyRegisteredMsg: "यह आधार नंबर पहले से ही एक छात्र खाते से जुड़ा हुआ है।",
+      verifiedDetails: "सत्यापित आधार विवरण",
+      fullName: "पूरा नाम",
+      mobileLabel: "मोबाइल नंबर",
+      mobilePlaceholder: "10 अंक",
+      emailLabel: "ईमेल",
+      emailPlaceholder: "ईमेल",
+      classLabel: "कक्षा",
+      selectClass: "कक्षा चुनें",
+      selectSchool: "स्कूल चुनें",
+      additionalInfo: "अतिरिक्त जानकारी",
+      registerStudentBtn: "छात्र के रूप में पंजीकरण करें",
+      registeringBtn: "पंजीकरण हो रहा है...",
+      validation: {
+        fullNameReq: "पूरा नाम आवश्यक है",
+        aadhaarReq: "आधार नंबर आवश्यक है",
+        aadhaar12: "आधार नंबर 12 अंकों का होना चाहिए",
+        phoneReq: "फोन नंबर आवश्यक है",
+        phone10: "फोन नंबर 10 अंकों का होना चाहिए",
+        emailReq: "ईमेल आवश्यक है",
+        emailValid: "कृपया एक वैध ईमेल दर्ज करें",
+        passReq: "पासवर्ड आवश्यक है",
+        pass6: "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
+        passMatch: "पासवर्ड मेल नहीं खाते",
+        classReq: "कृपया एक कक्षा चुनें",
+        schoolReq: "स्कूल का नाम आवश्यक है",
+        districtReq: "कृपया एक जिला चुनें",
+        blockReq: "कृपया एक ब्लॉक चुनें",
+        studentSuccess: "छात्र पंजीकरण सफल! अब आप लॉगिन कर सकते हैं।",
+        schoolSuccess: "स्कूल पंजीकरण सफल! अब आप लॉगिन कर सकते हैं।",
+        failed: "पंजीकरण विफल रहा। कृपया पुनः प्रयास करें।"
+      }
+    }
+  };
+
+  const t = content[language] || content.en;
   
   const [studentData, setStudentData] = useState({
     full_name: '',
@@ -113,11 +226,11 @@ const Registration = () => {
 
     const verifyAadhaar = async () => {
       if (!studentData.aadhaar_no.trim()) {
-        setError('Please enter Aadhaar number');
+        setError(language === 'hi' ? 'कृपया आधार नंबर दर्ज करें' : 'Please enter Aadhaar number');
         return;
       }
       if (!/^\d{12}$/.test(studentData.aadhaar_no)) {
-        setError('Aadhaar number must be 12 digits');
+        setError(t.validation.aadhaar12);
         return;
       }
 
@@ -148,12 +261,12 @@ const Registration = () => {
           setAadhaarVerified(true);
           setAadhaarExists(false);
         } else {
-          setError('No student data found for this Aadhaar number');
+          setError(language === 'hi' ? 'इस आधार नंबर के लिए कोई छात्र डेटा नहीं मिला' : 'No student data found for this Aadhaar number');
         }
       } catch (err) {
         console.error('Aadhaar verification error:', err);
         setError(
-          err.response?.data?.message || 'Failed to verify Aadhaar. Please try again.'
+          err.response?.data?.message || (language === 'hi' ? 'आधार सत्यापित करने में विफल। कृपया पुनः प्रयास करें।' : 'Failed to verify Aadhaar. Please try again.')
         );
       } finally {
         setVerifyingAadhaar(false);
@@ -219,51 +332,51 @@ const Registration = () => {
 
    const validateStudentForm = () => {
      if (!studentData.full_name.trim()) {
-       setError('Full name is required');
+       setError(t.validation.fullNameReq);
        return false;
      }
      if (!studentData.aadhaar_no.trim()) {
-       setError('Aadhaar number is required');
+       setError(t.validation.aadhaarReq);
        return false;
      }
      if (!/^\d{12}$/.test(studentData.aadhaar_no)) {
-       setError('Aadhaar number must be 12 digits');
+       setError(t.validation.aadhaar12);
        return false;
      }
      if (!studentData.phone.trim()) {
-       setError('Phone number is required');
+       setError(t.validation.phoneReq);
        return false;
      }
      if (!/^\d{10}$/.test(studentData.phone)) {
-       setError('Phone number must be 10 digits');
+       setError(t.validation.phone10);
        return false;
      }
      if (!studentData.email.trim()) {
-       setError('Email is required');
+       setError(t.validation.emailReq);
        return false;
      }
      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(studentData.email)) {
-       setError('Please enter a valid email');
+       setError(t.validation.emailValid);
        return false;
      }
      if (!studentData.password) {
-       setError('Password is required');
+       setError(t.validation.passReq);
        return false;
      }
      if (studentData.password.length < 6) {
-       setError('Password must be at least 6 characters');
+       setError(t.validation.pass6);
        return false;
      }
      if (studentData.password !== studentData.confirm_password) {
-       setError('Passwords do not match');
+       setError(t.validation.passMatch);
        return false;
      }
      if (!studentData.class_name) {
-       setError('Please select a class');
+       setError(t.validation.classReq);
        return false;
      }
      if (!studentData.school_name) {
-       setError('School name is required');
+       setError(t.validation.schoolReq);
        return false;
      }
      return true;
@@ -271,31 +384,31 @@ const Registration = () => {
 
   const validateSchoolForm = () => {
     if (!schoolData.school_id.trim()) {
-      setError('School ID is required');
+      setError(t.validation.aadhaarReq); // Reusing logic for required field
       return false;
     }
     if (!schoolData.district) {
-      setError('Please select a district');
+      setError(t.validation.districtReq);
       return false;
     }
     if (!schoolData.block) {
-      setError('Please select a block');
+      setError(t.validation.blockReq);
       return false;
     }
     if (!schoolData.school_name.trim()) {
-      setError('School Name is required');
+      setError(t.validation.schoolReq);
       return false;
     }
     if (!schoolData.password) {
-      setError('Password is required');
+      setError(t.validation.passReq);
       return false;
     }
     if (schoolData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t.validation.pass6);
       return false;
     }
     if (schoolData.password !== schoolData.confirm_password) {
-      setError('Passwords do not match');
+      setError(t.validation.passMatch);
       return false;
     }
     return true;
@@ -337,7 +450,7 @@ const Registration = () => {
         registrationData
       );
 
-      alert('Student Registration successful! You can now login.');
+      alert(t.validation.studentSuccess);
       setStudentData({
         full_name: '',
         aadhaar_no: '',
@@ -354,12 +467,12 @@ const Registration = () => {
       });
       setBlocks([]);
       setAadhaarVerified(false);
-      setSuccess('Student Registration successful! You can now login.');
+      setSuccess(t.validation.studentSuccess);
     } catch (err) {
       console.error('Registration error:', err);
       setError(
         err.response?.data?.message ||
-        'Registration failed. Please try again.'
+        t.validation.failed
       );
     } finally {
       setLoading(false);
@@ -390,7 +503,7 @@ const Registration = () => {
         }
       );
 
-      alert('School Registration successful! You can now login.');
+      alert(t.validation.schoolSuccess);
       setSchoolData({
         school_id: '',
         school_name: '',
@@ -401,12 +514,12 @@ const Registration = () => {
         block: '',
       });
       setBlocks([]);
-      setSuccess('School Registration successful! You can now login.');
+      setSuccess(t.validation.schoolSuccess);
     } catch (err) {
       console.error('Registration error:', err);
       setError(
         err.response?.data?.message ||
-        'Registration failed. Please try again.'
+        t.validation.failed
       );
     } finally {
       setLoading(false);
@@ -417,8 +530,8 @@ const Registration = () => {
     <div className="registration-container">
       <div className="registration-wrapper">
         <div className="registration-header">
-          <h1>Registration</h1>
-          <p className="registration-subtitle">Join Gyandhara - Stream of Knowledge</p>
+          <h1>{t.title}</h1>
+          <p className="registration-subtitle">{t.subtitle}</p>
         </div>
 
         <div className="registration-tabs">
@@ -430,7 +543,7 @@ const Registration = () => {
               setSuccess('');
             }}
           >
-            School Registration
+            {t.schoolTab}
           </button>
           <button 
             className={`tab-btn ${activeTab === 'student' ? 'active' : ''}`}
@@ -457,17 +570,17 @@ const Registration = () => {
               setBlocks([]);
             }}
           >
-            Student Registration
+            {t.studentTab}
           </button>
         </div>
 
         {error && <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>Error!</strong> {error}
+          <strong>{language === 'hi' ? 'त्रुटि!' : 'Error!'}</strong> {error}
           <button type="button" className="btn-close" onClick={() => setError('')}></button>
         </div>}
 
         {success && <div className="alert alert-success alert-dismissible fade show" role="alert">
-          <strong>Success!</strong> {success}
+          <strong>{language === 'hi' ? 'सफलता!' : 'Success!'}</strong> {success}
           <button type="button" className="btn-close" onClick={() => setSuccess('')}></button>
         </div>}
 
@@ -476,7 +589,7 @@ const Registration = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="school_id" className="form-label">
-                  School ID <span className="required">*</span>
+                  {t.schoolId} <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -491,7 +604,7 @@ const Registration = () => {
 
               <div className="form-group">
                 <label htmlFor="state" className="form-label">
-                  State <span className="required">*</span>
+                  {t.state} <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -505,7 +618,7 @@ const Registration = () => {
 
               <div className="form-group">
                 <label htmlFor="district" className="form-label">
-                  District <span className="required">*</span>
+                  {t.district} <span className="required">*</span>
                 </label>
                 <select
                   className="form-control"
@@ -516,7 +629,7 @@ const Registration = () => {
                   disabled={loadingDistricts}
                 >
                   <option value="">
-                    {loadingDistricts ? 'Loading...' : 'Select district'}
+                    {loadingDistricts ? 'Loading...' : (language === 'hi' ? 'जिला चुनें' : 'Select district')}
                   </option>
                   {districts.map((district) => (
                     <option key={district} value={district}>
@@ -528,7 +641,7 @@ const Registration = () => {
 
               <div className="form-group">
                 <label htmlFor="block" className="form-label">
-                  Block <span className="required">*</span>
+                  {t.block} <span className="required">*</span>
                 </label>
                 <select
                   className="form-control"
@@ -539,7 +652,7 @@ const Registration = () => {
                   disabled={!schoolData.district || loadingBlocks}
                 >
                   <option value="">
-                    {loadingBlocks ? 'Loading...' : 'Select block'}
+                    {loadingBlocks ? 'Loading...' : (language === 'hi' ? 'ब्लॉक चुनें' : 'Select block')}
                   </option>
                   {blocks.map((block) => (
                     <option key={block} value={block}>
@@ -553,7 +666,7 @@ const Registration = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="school_name" className="form-label">
-                  School Name <span className="required">*</span>
+                  {t.schoolName} <span className="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -562,13 +675,13 @@ const Registration = () => {
                   name="school_name"
                   value={schoolData.school_name}
                   onChange={handleSchoolChange}
-                  placeholder="School Name"
+                  placeholder={t.schoolName}
                 />
               </div>
 
               <div className="form-group">
                 <label htmlFor="password" className="form-label">
-                  Password <span className="required">*</span>
+                  {t.password} <span className="required">*</span>
                 </label>
                 <input
                   type="password"
@@ -577,13 +690,13 @@ const Registration = () => {
                   name="password"
                   value={schoolData.password}
                   onChange={handleSchoolChange}
-                  placeholder="Min. 6 chars"
+                  placeholder={language === 'hi' ? 'कम से कम 6 अक्षर' : 'Min. 6 chars'}
                 />
               </div>
 
               <div className="form-group">
                 <label htmlFor="confirm_password" className="form-label">
-                  Confirm Password <span className="required">*</span>
+                  {t.confirmPassword} <span className="required">*</span>
                 </label>
                 <input
                   type="password"
@@ -592,7 +705,7 @@ const Registration = () => {
                   name="confirm_password"
                   value={schoolData.confirm_password}
                   onChange={handleSchoolChange}
-                  placeholder="Confirm"
+                  placeholder={language === 'hi' ? 'पुष्टि करें' : 'Confirm'}
                 />
               </div>
             </div>
@@ -605,16 +718,16 @@ const Registration = () => {
               >
                 {loading ? (
                   <>
-                    <span className="spinner"></span> Registering...
+                    <span className="spinner"></span> {language === 'hi' ? 'पंजीकरण हो रहा है...' : 'Registering...'}
                   </>
                 ) : (
-                  'Register School'
+                  t.registerSchool
                 )}
               </button>
             </div>
 
             <p className="login-link">
-              Already have an account? <Link to="/login">Login here</Link>
+              {language === 'hi' ? 'क्या आपके पास पहले से खाता है?' : 'Already have an account?'} <Link to="/login">{language === 'hi' ? 'यहाँ लॉगिन करें' : 'Login here'}</Link>
             </p>
           </form>
         ) : (
@@ -623,7 +736,7 @@ const Registration = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="aadhaar_no" className="form-label">
-                    Aadhaar Number <span className="required">*</span>
+                    {t.aadhaarNo} <span className="required">*</span>
                   </label>
                   <div className="input-with-button">
                     <input
@@ -633,7 +746,7 @@ const Registration = () => {
                       name="aadhaar_no"
                       value={studentData.aadhaar_no}
                       onChange={handleStudentChange}
-                      placeholder="12 digits"
+                      placeholder={t.aadhaarPlaceholder}
                       maxLength="12"
                       disabled={aadhaarVerified || verifyingAadhaar}
                     />
@@ -654,7 +767,7 @@ const Registration = () => {
                           }));
                         }}
                       >
-                        Change
+                        {t.changeBtn}
                       </button>
                     ) : (
                       <button
@@ -663,13 +776,13 @@ const Registration = () => {
                         onClick={verifyAadhaar}
                         disabled={verifyingAadhaar || aadhaarExists === true}
                       >
-                        {verifyingAadhaar ? 'Verifying...' : 'Check'}
+                        {verifyingAadhaar ? t.verifyingBtn : t.checkBtn}
                       </button>
                     )}
                   </div>
                   {aadhaarExists === true && (
                     <div className="alert alert-warning" style={{ marginTop: '6px', padding: '8px 10px', fontSize: '11px' }}>
-                      <strong>Already Registered!</strong> This Aadhaar number is already associated with a student account.
+                      <strong>{t.alreadyRegistered}</strong> {t.alreadyRegisteredMsg}
                     </div>
                   )}
                 </div>
@@ -680,11 +793,11 @@ const Registration = () => {
                 <>
                   {/* Prefilled Information Section - Read Only */}
                   <div className="prefilled-section">
-                    <h3 className="section-title">Verified Aadhaar Details</h3>
+                    <h3 className="section-title">{t.verifiedDetails}</h3>
                     <div className="form-row">
                       <div className="form-group">
                         <label htmlFor="full_name" className="form-label">
-                          Full Name
+                          {t.fullName}
                         </label>
                         <input
                           type="text"
@@ -698,7 +811,7 @@ const Registration = () => {
 
                       <div className="form-group">
                         <label htmlFor="state" className="form-label">
-                          State
+                          {t.state}
                         </label>
                         <input
                           type="text"
@@ -712,7 +825,7 @@ const Registration = () => {
 
                       <div className="form-group">
                         <label htmlFor="district" className="form-label">
-                          District
+                          {t.district}
                         </label>
                         <input
                           type="text"
@@ -726,7 +839,7 @@ const Registration = () => {
 
                       <div className="form-group">
                         <label htmlFor="block" className="form-label">
-                          Block
+                          {t.block}
                         </label>
                         <input
                           type="text"
@@ -742,7 +855,7 @@ const Registration = () => {
                     <div className="form-row">
                       <div className="form-group full-width">
                         <label htmlFor="school_name" className="form-label">
-                          School Name
+                          {t.schoolName}
                         </label>
                         <select
                           className="form-control"
@@ -752,7 +865,7 @@ const Registration = () => {
                           onChange={handleStudentChange}
                           disabled
                         >
-                          <option value="">Select School</option>
+                          <option value="">{t.selectSchool}</option>
                           {schools.map((school) => (
                             <option key={school.school_uni_id} value={school.school_name}>
                               {school.school_name}
@@ -765,11 +878,11 @@ const Registration = () => {
 
                   {/* Additional Information Section - Editable */}
                   <div className="editable-section">
-                    <h3 className="section-title">Additional Information</h3>
+                    <h3 className="section-title">{t.additionalInfo}</h3>
                     <div className="form-row">
                       <div className="form-group">
                         <label htmlFor="phone" className="form-label">
-                          Mobile Number <span className="required">*</span>
+                          {t.mobileLabel} <span className="required">*</span>
                         </label>
                         <input
                           type="text"
@@ -778,14 +891,14 @@ const Registration = () => {
                           name="phone"
                           value={studentData.phone}
                           onChange={handleStudentChange}
-                          placeholder="10 digits"
+                          placeholder={t.mobilePlaceholder}
                           maxLength="10"
                         />
                       </div>
 
                       <div className="form-group">
                         <label htmlFor="email" className="form-label">
-                          Email <span className="required">*</span>
+                          {t.emailLabel} <span className="required">*</span>
                         </label>
                         <input
                           type="email"
@@ -794,7 +907,7 @@ const Registration = () => {
                           name="email"
                           value={studentData.email}
                           onChange={handleStudentChange}
-                          placeholder="Email"
+                          placeholder={t.emailPlaceholder}
                         />
                       </div>
 
@@ -809,7 +922,7 @@ const Registration = () => {
                           name="password"
                           value={studentData.password}
                           onChange={handleStudentChange}
-                          placeholder="Min. 6 chars"
+                          placeholder={language === 'hi' ? 'कम से कम 6 अक्षर' : 'Min. 6 chars'}
                         />
                       </div>
 
@@ -824,7 +937,7 @@ const Registration = () => {
                           name="confirm_password"
                           value={studentData.confirm_password}
                           onChange={handleStudentChange}
-                          placeholder="Confirm"
+                          placeholder={language === 'hi' ? 'पुष्टि करें' : 'Confirm'}
                         />
                       </div>
                     </div>
@@ -832,7 +945,7 @@ const Registration = () => {
                     <div className="form-row">
                       <div className="form-group full-width">
                         <label htmlFor="class_name" className="form-label">
-                          Class <span className="required">*</span>
+                          {t.classLabel} <span className="required">*</span>
                         </label>
                         <select
                           className="form-control"
@@ -841,7 +954,7 @@ const Registration = () => {
                           value={studentData.class_name}
                           onChange={handleStudentChange}
                         >
-                          <option value="">Select class</option>
+                          <option value="">{t.selectClass}</option>
                           {classOptions.map((cls) => (
                             <option key={cls} value={cls}>
                               {cls}
@@ -863,10 +976,10 @@ const Registration = () => {
                  >
                    {loading ? (
                      <>
-                       <span className="spinner"></span> Registering...
+                       <span className="spinner"></span> {t.registeringBtn}
                      </>
                    ) : (
-                     'Register as Student'
+                     t.registerStudentBtn
                    )}
                  </button>
                )}

@@ -10,6 +10,7 @@ function Home() {
 
   const content = {
     en: {
+    platformBadge: "🎓 Gyandhara - Educational Platform",
     heroTitle: "Stream of Knowledge",
   heroSubtitle: "Welcome to Gyandhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, Gyandhara provides the tools you need to succeed.",
   heroImg: heroImg,
@@ -56,10 +57,14 @@ function Home() {
       ],
 
       // CTA
+      readyTitle: "Ready to Join Gyandhara?",
+      readySub: "Start your journey towards career excellence and academic success",
       getStartedBtn: "Get Started Today",
-      learnMoreBtn: "Learn More"
+      learnMoreBtn: "Learn More",
+      signInBtn: "Sign In"
     },
     hi: {
+      platformBadge: "🎓 ज्ञानधारा - शैक्षिक मंच",
       heroTitle: "ज्ञान की धारा",
       heroSubtitle: "Gyandhara में आपका स्वागत है - छात्रों, स्कूलों और प्रशासकों के लिए करियर मार्गदर्शन, कौशल विकास और शैक्षणिक सफलता का शैक्षिक मंच।",
       heroImg: "https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=800&h=400&fit=crop",
@@ -107,8 +112,11 @@ function Home() {
       ],
 
       // CTA
+      readyTitle: "क्या आप ज्ञानधारा से जुड़ने के लिए तैयार हैं?",
+      readySub: "करियर की उत्कृष्टता और शैक्षणिक सफलता की ओर अपनी यात्रा शुरू करें",
       getStartedBtn: "आज शुरुआत करें",
-      learnMoreBtn: "अधिक जानें"
+      learnMoreBtn: "अधिक जानें",
+      signInBtn: "साइन इन करें"
     }
   }
 
@@ -121,7 +129,7 @@ function Home() {
         <section className="hero-section">
           <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
           <div className="hero-content">
-            <div className="hero-badge">🎓 Gyandhara - Educational Platform</div>
+            <div className="hero-badge">{t.platformBadge}</div>
             <h1>{t.heroTitle}</h1>
             <p>{t.heroSubtitle}</p>
             <div className="hero-buttons">
@@ -195,14 +203,14 @@ function Home() {
 
         {/* Final CTA */}
         <section className="final-cta-section">
-          <h2>Ready to Join Gyandhara?</h2>
-          <p>Start your journey towards career excellence and academic success</p>
+          <h2>{t.readyTitle}</h2>
+          <p>{t.readySub}</p>
           <div className="cta-buttons">
             <Link to="/register" className="btn-gyandhara btn-primary-custom btn-lg">
               <i className="bi bi-rocket-fill"></i> {t.getStartedBtn}
             </Link>
             <Link to="/login" className="btn-gyandhara btn-outline-custom btn-lg">
-              <i className="bi bi-box-arrow-in-right"></i> Sign In
+              <i className="bi bi-box-arrow-in-right"></i> {t.signInBtn}
             </Link>
           </div>
         </section>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
+import { useLanguage } from "../all_login/LanguageContext";
 import "../../assets/css/footer.css";
 
 const scrollToTop = () => {
@@ -8,6 +9,47 @@ const scrollToTop = () => {
 };
 
 function Footer() {
+  const { language } = useLanguage();
+
+  const content = {
+    en: {
+      description: "Your comprehensive educational platform delivering knowledge, career guidance, skill development, and academic excellence for students, schools, and administrators",
+      quickLinks: "Quick Links",
+      home: "Home",
+      login: "Login",
+      register: "Register",
+      services: "Services",
+      careerGuidance: "Career Guidance",
+      govSchemes: "Government Schemes",
+      groomingClasses: "Grooming Classes",
+      competitions: "Competitions",
+      jobOpenings: "Job Openings",
+      contactUs: "Contact Us",
+      india: "India",
+      copyright: "© 2026 Gyandhara. All rights reserved. | Designed by BrainRock.",
+      backToTop: "Back to Top"
+    },
+    hi: {
+      description: "छात्रों, स्कूलों और प्रशासकों के लिए ज्ञान, करियर मार्गदर्शन, कौशल विकास और शैक्षणिक उत्कृष्टता प्रदान करने वाला आपका व्यापक शैक्षिक मंच",
+      quickLinks: "त्वरित लिंक",
+      home: "होम",
+      login: "लॉगिन",
+      register: "पंजीकरण",
+      services: "सेवाएं",
+      careerGuidance: "करियर मार्गदर्शन",
+      govSchemes: "सरकारी योजनाएं",
+      groomingClasses: "संवारने की कक्षाएं",
+      competitions: "प्रतियोगिताएं",
+      jobOpenings: "नौकरी के अवसर",
+      contactUs: "हमसे संपर्क करें",
+      india: "भारत",
+      copyright: "© 2026 ज्ञानधारा। सर्वाधिकार सुरक्षित। | BrainRock द्वारा डिज़ाइन किया गया।",
+      backToTop: "ऊपर वापस जाएं"
+    }
+  };
+
+  const t = content[language] || content.en;
+
   return (
     <footer className="footer">
       <div className="footer-container">
@@ -21,39 +63,39 @@ function Footer() {
               </span>
             </div>
             <p className="footer-description">
-              Your comprehensive educational platform delivering knowledge, career guidance, skill development, and academic excellence for students, schools, and administrators
+              {t.description}
             </p>
           </div>
 
           {/* Quick Links */}
           <div className="footer-links-section">
-            <h4 className="footer-section-title">Quick Links</h4>
+            <h4 className="footer-section-title">{t.quickLinks}</h4>
             <ul className="footer-links">
-              <li><Link to="/" className="footer-link" onClick={scrollToTop}>Home</Link></li>
-              <li><Link to="/login" className="footer-link" onClick={scrollToTop}>Login</Link></li>
-              <li><Link to="/StudentRegistration" className="footer-link" onClick={scrollToTop}>Register</Link></li>
+              <li><Link to="/" className="footer-link" onClick={scrollToTop}>{t.home}</Link></li>
+              <li><Link to="/login" className="footer-link" onClick={scrollToTop}>{t.login}</Link></li>
+              <li><Link to="/StudentRegistration" className="footer-link" onClick={scrollToTop}>{t.register}</Link></li>
             </ul>
           </div>
 
           {/* Services */}
           <div className="footer-services-section">
-            <h4 className="footer-section-title">Services</h4>
+            <h4 className="footer-section-title">{t.services}</h4>
             <ul className="footer-links">
-              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Career Guidance</span></li>
-              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Government Schemes</span></li>
-              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Grooming Classes</span></li>
-              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Competitions</span></li>
-              <li><span className="footer-link-text clickable" onClick={scrollToTop}>Job Openings</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>{t.careerGuidance}</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>{t.govSchemes}</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>{t.groomingClasses}</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>{t.competitions}</span></li>
+              <li><span className="footer-link-text clickable" onClick={scrollToTop}>{t.jobOpenings}</span></li>
             </ul>
           </div>
 
           {/* Contact Info */}
            <div className="footer-services-section">
-            <h4 className="footer-section-title">Contact Us</h4>
+            <h4 className="footer-section-title">{t.contactUs}</h4>
             <ul className="footer-links">
               <li><span className="footer-link-text">91-9876543210</span></li>
               <li><span className="footer-link-text">info@gyandhara.edu</span></li>
-              <li><span className="footer-link-text">India</span></li>
+              <li><span className="footer-link-text">{t.india}</span></li>
             </ul>
           </div>
         
@@ -62,11 +104,11 @@ function Footer() {
         {/* Footer Bottom */}
         <div className="footer-bottom">
           <div className="footer-copyright">
-            © 2026 Gyandhara. All rights reserved. | Designed by BrainRock.
+            {t.copyright}
           </div>
           <div className="footer-bottom-links">
             <span className="footer-scroll-top" onClick={scrollToTop}>
-              <i className="bi bi-arrow-up-circle"></i> Back to Top
+              <i className="bi bi-arrow-up-circle"></i> {t.backToTop}
             </span>
           </div>
         </div>
