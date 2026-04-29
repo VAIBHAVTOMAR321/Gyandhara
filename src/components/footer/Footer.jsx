@@ -26,11 +26,11 @@ function Footer() {
       jobOpenings: "Job Openings",
       contactUs: "Contact Us",
       india: "India",
-      copyright: "© 2026 Gyandhara. All rights reserved. | Designed by BrainRock.",
+      copyright: "© 2026 GyanDhara. All rights reserved. | Designed by BrainRock.",
       backToTop: "Back to Top"
     },
     hi: {
-      description: "छात्रों, स्कूलों और प्रशासकों के लिए ज्ञान, करियर मार्गदर्शन, कौशल विकास और शैक्षणिक उत्कृष्टता प्रदान करने वाला आपका व्यापक शैक्षिक मंच",
+      description: "छात्रों, स्कूलों और प्रशासकों के लिए ज्ञान, करियर मार्गदर्शन, कौशल विकास और शैक्षणिक उत्कृष्टता प्रदान करने वाला आपका व्यापक शैक्षिक मंच GyanDhara",
       quickLinks: "त्वरित लिंक",
       home: "होम",
       login: "लॉगिन",
@@ -38,12 +38,12 @@ function Footer() {
       services: "सेवाएं",
       careerGuidance: "करियर मार्गदर्शन",
       govSchemes: "सरकारी योजनाएं",
-      groomingClasses: "संवारने की कक्षाएं",
+      groomingClasses: "व्यक्तित्व विकास कक्षाएं",
       competitions: "प्रतियोगिताएं",
       jobOpenings: "नौकरी के अवसर",
       contactUs: "हमसे संपर्क करें",
       india: "भारत",
-      copyright: "© 2026 ज्ञानधारा। सर्वाधिकार सुरक्षित। | BrainRock द्वारा डिज़ाइन किया गया।",
+      copyright: "© 2026 GyanDhara। सर्वाधिकार सुरक्षित। | BrainRock द्वारा डिज़ाइन किया गया।",
       backToTop: "ऊपर वापस जाएं"
     }
   };

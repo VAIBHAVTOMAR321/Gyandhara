@@ -10,9 +10,9 @@ function Home() {
 
   const content = {
     en: {
-    platformBadge: "🎓 Gyandhara - Educational Platform",
-    heroTitle: "Stream of Knowledge",
-  heroSubtitle: "Welcome to Gyandhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, Gyandhara provides the tools you need to succeed.",
+    platformBadge: "🎓 GyanDhara - Educational Platform",
+    heroTitle: "GyanDhara",
+  heroSubtitle: "Welcome to GyanDhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, GyanDhara provides the tools you need to succeed.",
   heroImg: heroImg,
   exploreBtn: "Explore Now",
   joinBtn: "Register Today",
@@ -35,7 +35,7 @@ function Home() {
 
       // For Schools Section
       schoolTitle: "LMS For Schools 🏫",
-      schoolSubtitle: "Transform your institution's learning experience with Gyandhara's comprehensive platform",
+      schoolSubtitle: "Transform your institution's learning experience with GyanDhara's comprehensive platform",
       schoolFeatures: [
         { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard" },
         { icon: "bi-people-fill", title: "Student Management", desc: "Efficiently manage student registrations and profiles" },
@@ -44,7 +44,7 @@ function Home() {
       ],
       
       // Platform Benefits
-      benefitsTitle: "Why Choose Gyandhara?",
+      benefitsTitle: "Why Choose GyanDhara?",
       benefits: [
         { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, schools, and administrators" },
         { icon: "bi-people-fill", title: "Comprehensive Services", desc: "Career guidance, academic support, and skill development" },
@@ -57,16 +57,16 @@ function Home() {
       ],
 
       // CTA
-      readyTitle: "Ready to Join Gyandhara?",
+      readyTitle: "Ready to Join GyanDhara?",
       readySub: "Start your journey towards career excellence and academic success",
       getStartedBtn: "Get Started Today",
       learnMoreBtn: "Learn More",
       signInBtn: "Sign In"
     },
     hi: {
-      platformBadge: "🎓 ज्ञानधारा - शैक्षिक मंच",
-      heroTitle: "ज्ञान की धारा",
-      heroSubtitle: "ज्ञानधारा में आपका स्वागत है, आपका ऑल-इन-वन शैक्षिक पारिस्थितिकी तंत्र जो शैक्षणिक सीखने और वास्तविक दुनिया की सफलता के बीच की खाई को पाटने के लिए डिज़ाइन किया गया है। हमारा मानना है कि शिक्षा केवल परीक्षा पास करने के बारे में नहीं है; यह एक तेजी से विकसित हो रहे वैश्विक परिदृश्य में पनपने के लिए आवश्यक कौशल, आत्मविश्वास और दिशा प्राप्त करने के बारे में है। चाहे आप नई तकनीकों में महारत हासिल करने के इच्छुक छात्र हों या शैक्षणिक प्रबंधन को सुव्यवस्थित करने का लक्ष्य रखने वाला स्कूल, ज्ञानधारा आपको सफल होने के लिए आवश्यक उपकरण प्रदान करता है।",
+      platformBadge: "🎓 GyanDhara - शैक्षिक मंच",
+      heroTitle: "GyanDhara",
+      heroSubtitle: "GyanDhara में आपका स्वागत है, आपका ऑल-इन-वन शैक्षिक पारिस्थितिकी तंत्र जो शैक्षणिक शिक्षण और वास्तविक दुनिया की सफलता के बीच की खाई को पाटने के लिए डिज़ाइन किया गया है। हमारा मानना है कि शिक्षा केवल परीक्षा पास करने के बारे में नहीं है; यह एक तेजी से विकसित हो रहे वैश्विक परिदृश्य में उन्नति के लिए आवश्यक कौशल, आत्मविश्वास और दिशा प्राप्त करने के बारे में है। चाहे आप नई तकनीकों में महारत हासिल करने के इच्छुक छात्र हों या शैक्षणिक प्रबंधन को सुव्यवस्थित करने का लक्ष्य रखने वाला स्कूल, GyanDhara आपको सफल होने के लिए आवश्यक उपकरण प्रदान करता है।",
       heroImg: heroImg,
       exploreBtn: "अब खोजें",
       joinBtn: "आज पंजीकृत करें",
@@ -75,11 +75,11 @@ function Home() {
       studentTitle: "छात्रों के लिए 🎓",
       studentSubtitle: "व्यापक करियर मार्गदर्शन और सीखने के संसाधनों से अपने भविष्य को सशक्त बनाएं",
       studentFeatures: [
-        { icon: "bi-book", title: "कोर्स कंटेंट", desc: "उच्च गुणवत्ता वाली शैक्षिक सामग्री और संसाधनों तक पहुंच प्राप्त करें" },
+        { icon: "bi-book", title: "पाठ्यक्रम सामग्री", desc: "उच्च गुणवत्ता वाली शैक्षिक सामग्री और संसाधनों तक पहुंच प्राप्त करें" },
         { icon: "bi-trophy-fill", title: "प्रतियोगिताएं", desc: "प्रतियोगिताओं में भाग लें और प्रतिभा प्रदर्शन करें" },
         { icon: "bi-journal-check", title: "करियर मार्गदर्शन", desc: "आपकी शैक्षणिक और करियर यात्रा के लिए विशेषज्ञ मार्गदर्शन" },
-        { icon: "bi-pencil-square", title: "क्विज और टेस्ट", desc: "इंटरैक्टिव क्विज के साथ अपना ज्ञान मूल्यांकन करें" },
-        { icon: "bi-graph-up", title: "संवारने की कक्षाएं", desc: "व्यावसायिक और नरम कौशल विकसित करें" },
+        { icon: "bi-pencil-square", title: "प्रश्नोत्तरी और परीक्षण", desc: "प्रश्नोत्तरी के साथ अपना ज्ञान मूल्यांकन करें" },
+        { icon: "bi-graph-up", title: "व्यक्तित्व विकास कक्षाएं", desc: "व्यावसायिक और सॉफ्ट स्किल्स विकसित करें" },
         { icon: "bi-chat-left-quote-fill", title: "परामर्श", desc: "विशेषज्ञों से व्यक्तिगत करियर परामर्श प्राप्त करें" },
         { icon: "bi-bookmark-check", title: "सरकारी योजनाएं", desc: "शैक्षिक योजनाओं और लाभों के बारे में जानें" },
         { icon: "bi-briefcase-fill", title: "नौकरी के अवसर", desc: "विभिन्न क्षेत्रों में करियर के अवसर खोजें" },
@@ -90,16 +90,16 @@ function Home() {
 
       // For Schools Section
       schoolTitle: "स्कूलों के लिए 🏫",
-      schoolSubtitle: "Gyandhara के व्यापक मंच के साथ अपने संस्थान के शिक्षण अनुभव को बदलें",
+      schoolSubtitle: "GyanDhara के व्यापक मंच के साथ अपने संस्थान के शिक्षण अनुभव को बदलें",
       schoolFeatures: [
         { icon: "bi-house-check", title: "स्कूल पंजीकरण", desc: "अपने संस्थान को पंजीकृत करें और समर्पित डैशबोर्ड प्राप्त करें" },
         { icon: "bi-people-fill", title: "छात्र प्रबंधन", desc: "छात्र पंजीकरण और प्रोफाइल को कुशलतापूर्वक प्रबंधित करें" },
-        { icon: "bi-question-circle-fill", title: "क्विज निर्माण", desc: "अपने छात्रों के लिए क्विज बनाएं और प्रबंधित करें" },
+        { icon: "bi-question-circle-fill", title: "प्रश्नोत्तरी निर्माण", desc: "अपने छात्रों के लिए प्रश्नोत्तरी बनाएं और प्रबंधित करें" },
         { icon: "bi-bar-chart-line-fill", title: "प्रदर्शन ट्रैकिंग", desc: "छात्र की प्रगति और सीखने के परिणामों की निगरानी करें" }
       ],
       
       // Platform Benefits
-      benefitsTitle: "Gyandhara को क्यों चुनें?",
+      benefitsTitle: "GyanDhara को क्यों चुनें?",
       benefits: [
         { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, स्कूलों और प्रशासकों के लिए समर्पित इंटरफेस" },
         { icon: "bi-people-fill", title: "व्यापक सेवाएं", desc: "करियर मार्गदर्शन, शैक्षणिक सहायता और कौशल विकास" },
@@ -112,7 +112,7 @@ function Home() {
       ],
 
       // CTA
-      readyTitle: "क्या आप ज्ञानधारा से जुड़ने के लिए तैयार हैं?",
+      readyTitle: "क्या आप GyanDhara से जुड़ने के लिए तैयार हैं?",
       readySub: "करियर की उत्कृष्टता और शैक्षणिक सफलता की ओर अपनी यात्रा शुरू करें",
       getStartedBtn: "आज शुरुआत करें",
       learnMoreBtn: "अधिक जानें",

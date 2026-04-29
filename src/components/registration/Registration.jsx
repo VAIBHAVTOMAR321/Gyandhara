@@ -11,7 +11,7 @@ const Registration = () => {
   const content = {
     en: {
       title: "Registration",
-      subtitle: "Join Gyandhara - Stream of Knowledge",
+      subtitle: "Skill today, empower tomorrow",
       schoolTab: "School Registration",
       studentTab: "Student Registration",
       schoolId: "School ID",
@@ -64,7 +64,7 @@ const Registration = () => {
     },
     hi: {
       title: "पंजीकरण",
-      subtitle: "Gyandhara से जुड़ें - ज्ञान की धारा",
+      subtitle: "आज कौशल, कल सशक्त",
       schoolTab: "स्कूल पंजीकरण",
       studentTab: "छात्र पंजीकरण",
       schoolId: "स्कूल आईडी",
@@ -91,7 +91,7 @@ const Registration = () => {
       emailPlaceholder: "ईमेल",
       classLabel: "कक्षा",
       selectClass: "कक्षा चुनें",
-      selectSchool: "स्कूल चुनें",
+      selectSchool: "स्कूल का चयन करें",
       additionalInfo: "अतिरिक्त जानकारी",
       registerStudentBtn: "छात्र के रूप में पंजीकरण करें",
       registeringBtn: "पंजीकरण हो रहा है...",
@@ -235,7 +235,7 @@ const Registration = () => {
       }
 
       if (aadhaarExists) {
-        setError('This Aadhaar number is already registered. Please use a different Aadhaar or login.');
+        setError(language === 'hi' ? 'यह आधार नंबर पहले से ही पंजीकृत है। कृपया दूसरा आधार उपयोग करें या लॉगिन करें।' : 'This Aadhaar number is already registered. Please use a different Aadhaar or login.');
         return;
       }
 

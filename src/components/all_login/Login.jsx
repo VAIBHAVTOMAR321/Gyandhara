@@ -23,7 +23,7 @@ const Login = () => {
 
   const content = {
     en: {
-      title: "Gyan Dhara",
+      title: "GyanDhara",
       subtitle: "Building Careers, Shaping Futures",
       welcome: "Welcome Back!",
       welcomeSub: "Continue your learning journey",
@@ -61,7 +61,7 @@ const Login = () => {
       }
     },
     hi: {
-      title: "ज्ञान धारा",
+      title: "GyanDhara",
       subtitle: "करियर बनाना, भविष्य संवारना",
       welcome: "आपका स्वागत है!",
       welcomeSub: "अपनी सीखने की यात्रा जारी रखें",

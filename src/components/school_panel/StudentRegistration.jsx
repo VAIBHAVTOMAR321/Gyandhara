@@ -123,7 +123,7 @@ const StudentRegistration = () => {
       studentList: "छात्र सूची",
       deleteSelected: "चयनित हटाएं",
       noStudents: "अभी तक कोई छात्र पंजीकृत नहीं है।",
-      createdAt: "बनाया गया",
+      createdAt: "पंजीकरण तिथि",
       confirmDeleteTitle: "हटाने की पुष्टि करें",
       deleteMultipleMsg: "क्या आप वाकई {count} चयनित छात्रों को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
       deleteSingleMsg: "क्या आप वाकई इस छात्र को हटाना चाहते हैं? यह क्रिया पूर्ववत नहीं की जा सकती।",
@@ -133,7 +133,7 @@ const StudentRegistration = () => {
       successDeleteMultiple: "छात्र सफलतापूर्वक हटा दिए गए",
       errorLoad: "छात्रों को लोड करने में विफल",
       errorReq: "सभी फ़ील्ड आवश्यक हैं",
-      errorAadhaar12: "आधार 12 अंकों का होना चाहिए",
+      errorAadhaar12: "आधार नंबर 12 अंकों का होना चाहिए",
       errorExcelRows: "एक्सेल फ़ाइल में हेडर पंक्ति और कम से कम एक डेटा पंक्ति होनी चाहिए",
       errorExcelCols: "एक्सेल में कॉलम होने चाहिए: \"aadhaar_no\" और \"full_name\" (या \"name\")",
       errorNoRows: "कोई वैध डेटा पंक्ति नहीं मिली",
@@ -1080,7 +1080,7 @@ const StudentRegistration = () => {
                                   <th>{t.aadhaar}</th>
                                   <th>{t.fullName}</th>
                                   <th>{t.createdAt}</th>
-                                  <th>{language === 'hi' ? 'कार्य' : 'Actions'}</th>
+                                  <th>{language === 'hi' ? 'कार्रवाई' : 'Actions'}</th>
                                 </tr>
                               </thead>
                               <tbody>
