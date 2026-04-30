@@ -4,6 +4,7 @@ import { Container, Row, Col } from 'react-bootstrap'
 import { useLanguage } from '../all_login/LanguageContext'
 import heroImg from "../../assets/images/CBSEimg.png";
 import '../../assets/css/home.css'
+import Logo2 from "../../assets/images/gyandharalogo2.png";
 
 function Home() {
   const { language } = useLanguage()
@@ -132,7 +133,7 @@ function Home() {
             </div>
             <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
             <div className="hero-decoration hero-logo">
-              <i className="bi bi-book-fill"></i>
+           <img src={Logo2} alt="Gyandhara Logo" className="hero-logo" />
             </div>
           </div>
           <div className="hero-content">

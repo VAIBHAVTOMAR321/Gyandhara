@@ -133,6 +133,8 @@
   left: 45%;
   background: linear-gradient(135deg, var(--gd-gradient-warm));
   border-color: var(--gd-orange);
+      background-color: #fff;
+    border-radius: 50px;
 }
 
 .hero-logo i {
