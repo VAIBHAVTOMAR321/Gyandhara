@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import { useLanguage } from "../all_login/LanguageContext";
 import "../../assets/css/navbar.css"
-import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
+import gyandharaLogo from "../../assets/images/gyandharalogo.png";
 
 function NavBar() {
   const [expanded, setExpanded] = useState(false);
@@ -21,9 +21,9 @@ function NavBar() {
             alt="Gyandhara Logo" 
             className="navbar-logo"
           />
-          <span className="brand-text">
+          {/* <span className="brand-text">
             Gyan<span className="brand-highlight">Dhara</span>
-          </span>
+          </span> */}
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="navbar-toggler-custom">

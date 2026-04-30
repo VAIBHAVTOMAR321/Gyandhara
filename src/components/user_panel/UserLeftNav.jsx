@@ -33,7 +33,7 @@ import axios from "axios";
 
 import "../../assets/css/UserLeftNav.css";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import gyandharaLogo from "../../assets/images/gyandharalogo.jpeg";
+import gyandharaLogo from "../../assets/images/gyandharalogo.png";
 import {
   FaInfoCircle,
   FaBullseye,

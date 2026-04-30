@@ -306,6 +306,7 @@
     height: 48px;
     width: auto;
     margin-left: auto;
+    background-color: #fff !important;
 }
 
 .logo-collapsed {
