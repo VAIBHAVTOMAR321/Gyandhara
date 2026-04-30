@@ -592,6 +592,117 @@ background-color: #fff;
   border-color: var(--gd-blue-light);
 }
 
+/* ---- Benefit Card Color Variations ---- */
+
+/* Blue Benefit Cards */
+.benefit-card.card-blue {
+  border-bottom: 5px solid var(--color-blue);
+}
+
+.benefit-card.card-blue::after {
+  background: linear-gradient(90deg, var(--color-blue), transparent);
+}
+
+.benefit-card.card-blue .benefit-icon {
+  background: linear-gradient(135deg, rgba(27, 79, 138, 0.15), rgba(27, 79, 138, 0.08));
+}
+
+.benefit-card.card-blue .benefit-icon i {
+  color: var(--color-blue);
+}
+
+.benefit-card.card-blue h4 {
+  color: var(--color-blue);
+}
+
+.benefit-card.card-blue:hover .benefit-icon {
+  background: linear-gradient(135deg, var(--color-blue), #2E6DB4);
+}
+
+/* Orange Benefit Cards */
+.benefit-card.card-orange {
+  border-bottom: 5px solid var(--color-orange);
+}
+
+.benefit-card.card-orange::after {
+  background: linear-gradient(90deg, var(--color-orange), transparent);
+}
+
+.benefit-card.card-orange .benefit-icon {
+  background: linear-gradient(135deg, rgba(230, 81, 0, 0.15), rgba(230, 81, 0, 0.08));
+}
+
+.benefit-card.card-orange .benefit-icon i {
+  color: var(--color-orange);
+}
+
+.benefit-card.card-orange h4 {
+  color: var(--color-orange);
+}
+
+.benefit-card.card-orange:hover .benefit-icon {
+  background: linear-gradient(135deg, var(--color-orange), #FF8F00);
+}
+
+/* Green Benefit Cards */
+.benefit-card.card-green {
+  border-bottom: 5px solid var(--color-green);
+}
+
+.benefit-card.card-green::after {
+  background: linear-gradient(90deg, var(--color-green), transparent);
+}
+
+.benefit-card.card-green .benefit-icon {
+  background: linear-gradient(135deg, rgba(37, 163, 70, 0.15), rgba(37, 163, 70, 0.08));
+}
+
+.benefit-card.card-green .benefit-icon i {
+  color: var(--color-green);
+}
+
+.benefit-card.card-green h4 {
+  color: var(--color-green);
+}
+
+.benefit-card.card-green:hover .benefit-icon {
+  background: linear-gradient(135deg, var(--color-green), #2E7D32);
+}
+
+/* Purple Benefit Cards */
+.benefit-card.card-purple {
+  border-bottom: 5px solid var(--color-purple);
+}
+
+.benefit-card.card-purple::after {
+  background: linear-gradient(90deg, var(--color-purple), transparent);
+}
+
+.benefit-card.card-purple .benefit-icon {
+  background: linear-gradient(135deg, rgba(123, 44, 191, 0.15), rgba(123, 44, 191, 0.08));
+}
+
+.benefit-card.card-purple .benefit-icon i {
+  color: var(--color-purple);
+}
+
+.benefit-card.card-purple h4 {
+  color: var(--color-purple);
+}
+
+.benefit-card.card-purple:hover .benefit-icon {
+  background: linear-gradient(135deg, var(--color-purple), #9C27B0);
+}
+
+/* Icon color overrides for hover state */
+.benefit-card.card-blue:hover .benefit-icon i,
+.benefit-card.card-orange:hover .benefit-icon i,
+.benefit-card.card-green:hover .benefit-icon i,
+.benefit-card.card-purple:hover .benefit-icon i {
+  color: var(--gd-white);
+  transform: scale(1.15);
+}
+
 .benefit-icon {
   width: 70px;
   height: 70px;

@@ -47,14 +47,14 @@ function Home() {
       // Platform Benefits
       benefitsTitle: "Why Choose GyanDhara?",
       benefits: [
-        { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, schools, and administrators" },
-        { icon: "bi-people-fill", title: "Comprehensive Services", desc: "Career guidance, academic support, and skill development" },
-        { icon: "bi-lightbulb", title: "Career Oriented", desc: "Focus on job opportunities and professional growth" },
-        { icon: "bi-shield-check", title: "Secure & Reliable", desc: "Safe platform for educational and career information" },
-        { icon: "bi-book-half", title: "Multiple Courses", desc: "Access a wide range of academic and skill-based courses" },
-        { icon: "bi-chat-dots-fill", title: "24/7 Text Support", desc: "Round-the-clock text assistance for all your queries" },
-        { icon: "bi-bar-chart-fill", title: "Data Analysis", desc: "Detailed insights and analytics for your learning journey" },
-        { icon: "bi-award-fill", title: "Rewards & Certification", desc: "Get recognized for your success with verified certificates" }
+        { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, schools, and administrators", color: "blue" },
+        { icon: "bi-people-fill", title: "Comprehensive Services", desc: "Career guidance, academic support, and skill development", color: "orange" },
+        { icon: "bi-lightbulb", title: "Career Oriented", desc: "Focus on job opportunities and professional growth", color: "green" },
+        { icon: "bi-shield-check", title: "Secure & Reliable", desc: "Safe platform for educational and career information", color: "purple" },
+        { icon: "bi-book-half", title: "Multiple Courses", desc: "Access a wide range of academic and skill-based courses", color: "blue" },
+        { icon: "bi-chat-dots-fill", title: "24/7 Text Support", desc: "Round-the-clock text assistance for all your queries", color: "orange" },
+        { icon: "bi-bar-chart-fill", title: "Data Analysis", desc: "Detailed insights and analytics for your learning journey", color: "green" },
+        { icon: "bi-award-fill", title: "Rewards & Certification", desc: "Get recognized for your success with verified certificates", color: "purple" }
       ],
 
       // CTA
@@ -101,14 +101,14 @@ function Home() {
       // Platform Benefits
       benefitsTitle: "GyanDhara को क्यों चुनें?",
       benefits: [
-        { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, स्कूलों और प्रशासकों के लिए समर्पित इंटरफेस" },
-        { icon: "bi-people-fill", title: "व्यापक सेवाएं", desc: "करियर मार्गदर्शन, शैक्षणिक सहायता और कौशल विकास" },
-        { icon: "bi-lightbulb", title: "करियर केंद्रित", desc: "नौकरी के अवसरों और व्यावसायिक वृद्धि पर ध्यान केंद्रित" },
-        { icon: "bi-shield-check", title: "सुरक्षित और विश्वसनीय", desc: "शैक्षिक और करियर जानकारी के लिए सुरक्षित मंच" },
-        { icon: "bi-book-half", title: "एकाधिक पाठ्यक्रम", desc: "शैक्षणिक और कौशल-आधारित पाठ्यक्रमों की विस्तृत श्रृंखला तक पहुँचें" },
-        { icon: "bi-chat-dots-fill", title: "24/7 टेक्स्ट सपोर्ट", desc: "आपके सभी प्रश्नों के लिए चौबीसों घंटे टेक्स्ट सहायता" },
-        { icon: "bi-bar-chart-fill", title: "डेटा विश्लेषण", desc: "आपकी सीखने की यात्रा के लिए विस्तृत जानकारी और विश्लेषण" },
-        { icon: "bi-award-fill", title: "पुरस्कार और प्रमाणन", desc: "सत्यापित प्रमाणपत्रों के साथ अपनी सफलता के लिए पहचान प्राप्त करें" }
+        { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, स्कूलों और प्रशासकों के लिए समर्पित इंटरफेस", color: "blue" },
+        { icon: "bi-people-fill", title: "व्यापक सेवाएं", desc: "करियर मार्गदर्शन, शैक्षणिक सहायता और कौशल विकास", color: "orange" },
+        { icon: "bi-lightbulb", title: "करियर केंद्रित", desc: "नौकरी के अवसरों और व्यावसायिक वृद्धि पर ध्यान केंद्रित", color: "green" },
+        { icon: "bi-shield-check", title: "सुरक्षित और विश्वसनीय", desc: "शैक्षिक और करियर जानकारी के लिए सुरक्षित मंच", color: "purple" },
+        { icon: "bi-book-half", title: "एकाधिक पाठ्यक्रम", desc: "शैक्षणिक और कौशल-आधारित पाठ्यक्रमों की विस्तृत श्रृंखला तक पहुँचें", color: "blue" },
+        { icon: "bi-chat-dots-fill", title: "24/7 टेक्स्ट सपोर्ट", desc: "आपके सभी प्रश्नों के लिए चौबीसों घंटे टेक्स्ट सहायता", color: "orange" },
+        { icon: "bi-bar-chart-fill", title: "डेटा विश्लेषण", desc: "आपकी सीखने की यात्रा के लिए विस्तृत जानकारी और विश्लेषण", color: "green" },
+        { icon: "bi-award-fill", title: "पुरस्कार और प्रमाणन", desc: "सत्यापित प्रमाणपत्रों के साथ अपनी सफलता के लिए पहचान प्राप्त करें", color: "purple" }
       ],
 
       // CTA
@@ -196,8 +196,8 @@ function Home() {
             <Row className="g-4">
               {t.benefits.map((benefit, index) => (
                 <Col lg={3} md={6} sm={12} key={index}>
-                  <div className="benefit-card h-100 border-0 shadow-sm">
-                    <div className="benefit-icon">
+                  <div className={`benefit-card card-${benefit.color} h-100 border-0 shadow-sm`}>
+                    <div className={`benefit-icon icon-${benefit.color}`}>
                       <i className={`bi ${benefit.icon}`}></i>
                     </div>
                     <h4>{benefit.title}</h4>
