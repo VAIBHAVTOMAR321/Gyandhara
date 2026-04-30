@@ -338,6 +338,19 @@ const UserTest = () => {
     handleNavFromLeftNav('/UserDashboard')
   }
 
+  const handleNavFromLeftNav = (path) => {
+    if (!testCompleted) {
+      if (navigationAttempts === 0) {
+        alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.');
+        setNavigationAttempts(1);
+      } else {
+        handleTestComplete();
+      }
+    } else {
+      navigate(path);
+    }
+  };
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -564,10 +577,9 @@ const UserTest = () => {
             </Button>
           </div>
         </Modal.Body>
-      </Modal>
-      <NavigationWarningModal />
-    </div>
-  )
+         </Modal>
+      </div>
+   )
 }
 
 export default UserTest
