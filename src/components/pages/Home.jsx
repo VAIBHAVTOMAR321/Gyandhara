@@ -13,7 +13,7 @@ function Home() {
     en: {
     platformBadge: "🎓 GyanDhara - Educational Platform",
     heroTitle: "Objective of GyanDhara",
-  heroSubtitle: "GyanDhara aims to create an inclusive and accessible digital learning ecosystem that empowers students, educators, and institutions. Our objective is to bridge the gap between academic learning and real-world skills by providing quality education, career guidance, and skill development opportunities to help learners achieve their goals and build a better future.",
+  heroSubtitle: "Welcome to GyanDhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, GyanDhara provides the tools you need to succeed.",
   heroImg: heroImg,
   exploreBtn: "Explore Now",
   joinBtn: "Register Today",
@@ -67,7 +67,7 @@ function Home() {
     hi: {
       platformBadge: "🎓 GyanDhara - शैक्षिक मंच",
       heroTitle: "GyanDhara का उद्देश्य",
-      heroSubtitle: "GyanDhara एक समावेशी और सुलभ डिजिटल शिक्षा पारिस्थितिकी तंत्र बनाने का लक्ष्य रखता है जो छात्रों, शिक्षकों और संस्थानों को सशक्त बनाता है। हमारा उद्देश्य गुणवत्तापूर्ण शिक्षा, करियर मार्गदर्शन और कौशल विकास के अवसरों द्वारा शैक्षणिक सीखने और वास्तविक दुनिया के कौशल के बीच की खाई को पाटना है।",
+      heroSubtitle: "GyanDhara में आपका स्वागत है, आपका ऑल-इन-वन शैक्षिक पारिस्थितिकी तंत्र जो शैक्षणिक शिक्षण और वास्तविक दुनिया की सफलता के बीच की खाई को पाटने के लिए डिज़ाइन किया गया है। हमारा मानना है कि शिक्षा केवल परीक्षा पास करने के बारे में नहीं है; यह एक तेजी से विकसित हो रहे वैश्विक परिदृश्य में उन्नति के लिए आवश्यक कौशल, आत्मविश्वास और दिशा प्राप्त करने के बारे में है। चाहे आप नई तकनीकों में महारत हासिल करने के इच्छुक छात्र हों या शैक्षणिक प्रबंधन को सुव्यवस्थित करने का लक्ष्य रखने वाला स्कूल, GyanDhara आपको सफल होने के लिए आवश्यक उपकरण प्रदान करता है।",
       heroImg: heroImg,
       exploreBtn: "अब खोजें",
       joinBtn: "आज पंजीकृत करें",
