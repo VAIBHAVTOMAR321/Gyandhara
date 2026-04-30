@@ -191,7 +191,7 @@ function Home() {
 
         {/* Platform Benefits Section */}
         <section className="benefits-section">
-          <Container>
+        
             <h2 className="section-title text-center mb-5">{t.benefitsTitle}</h2>
             <Row className="g-4">
               {t.benefits.map((benefit, index) => (
@@ -206,7 +206,7 @@ function Home() {
                 </Col>
               ))}
             </Row>
-          </Container>
+        
         </section>
 
         {/* Final CTA */}
