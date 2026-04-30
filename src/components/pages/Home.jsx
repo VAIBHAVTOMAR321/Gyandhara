@@ -190,7 +190,7 @@ function Home() {
         </section>
 
         {/* Platform Benefits Section */}
-        <section className="benefits-section">
+        <section className="benefits-section role-header">
         
             <h2 className="section-title text-center mb-5">{t.benefitsTitle}</h2>
             <Row className="g-4">

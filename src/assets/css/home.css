@@ -296,7 +296,7 @@ background-color: #fff;
 
 .role-header h2 {
   color: var(--gd-blue-dark);
-  font-size: 34px;
+  font-size: 34px !important;
   font-weight: 800;
   margin-bottom: 12px;
   letter-spacing: -0.5px;
