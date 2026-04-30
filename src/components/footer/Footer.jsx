@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import gyandharaLogo from "../../assets/images/gyandharalogo.png";
+import gyandharaLogo from "../../assets/images/gyandharalogo2.png";
 import { useLanguage } from "../all_login/LanguageContext";
 import "../../assets/css/footer.css";
 

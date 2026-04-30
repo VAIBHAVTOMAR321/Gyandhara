@@ -526,7 +526,8 @@ background-color: #fff;
 .benefits-section {
   margin-top: 12px;
   padding: 55px 45px;
-  background: linear-gradient(135deg, var(--gd-gradient-hero) 0%, rgba(255, 255, 255, 1) 100%);
+  background-image: url('../images/school.png');
+  background-size: cover;
   border-radius: var(--gd-radius);
   border: 1px solid var(--gd-border);
   box-shadow: 0 8px 40px rgba(14, 58, 107, 0.08);
@@ -751,7 +752,8 @@ background-color: #fff;
 .final-cta-section {
   /* margin-top: 80px; */
   padding: 60px 50px;
-  background: linear-gradient(135deg, var(--gd-gradient-hero) 0%, rgba(255, 255, 255, 1) 100%);
+  background-image: url('../images/school.png');
+  background-size: cover;
   border-radius: var(--gd-radius);
   border: 1px solid var(--gd-border);
   text-align: center;
