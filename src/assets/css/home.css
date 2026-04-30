@@ -29,8 +29,8 @@
 .home-wrapper {
   background: var(--gd-blue-bg);
   min-height: calc(100vh - 52px);
-  padding: 40px 20px;
-  margin-top: 34px;
+  /* padding: 40px 20px; */
+  margin-top: 64px;
 }
 
 .home-container {
@@ -81,11 +81,11 @@
 }
 
 .hero-image {
-      margin-bottom: 214px;
-    margin-top: 90px;
+      /* margin-bottom: 214px; */
+    /* margin-top: 90px; */
   width: 45%;
   min-width: 350px;
-  height: 360px;
+  /* height: 360px; */
   border-radius: var(--gd-radius);
   object-fit: cover;
   box-shadow: 0 20px 50px rgba(14, 58, 107, 0.18);
@@ -99,6 +99,7 @@
 }
 
 .hero-content {
+  margin-bottom: 124px;
   flex: 1;
   position: relative;
   z-index: 2;
@@ -529,7 +530,7 @@
 .hero-section h1 { animation: heroFadeUp 0.5s ease 0.2s both; }
 .hero-section p { animation: heroFadeUp 0.5s ease 0.3s both; }
 .hero-buttons { animation: heroFadeUp 0.5s ease 0.4s both; }
-.hero-image { animation: heroFadeUp 0.6s ease 0.1s both; }
+.hero-image { animation: heroFadeUp 0.6s ease 0.1s both; margin-top: 90px; margin-bottom: 40px;}
 
 .role-feature-card { animation: heroFadeUp 0.5s ease both; }
 .role-feature-card:nth-child(1) { animation-delay: 0.05s; }
