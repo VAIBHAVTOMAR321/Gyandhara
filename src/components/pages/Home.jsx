@@ -143,7 +143,7 @@ function Home() {
         </div>
 
         {/* For Students Section */}
-        <section className="role-section student-section">
+        <section className="role-section ">
           <div className="role-header">
             <h2>{t.studentTitle}</h2>
             <p>{t.studentSubtitle}</p>
