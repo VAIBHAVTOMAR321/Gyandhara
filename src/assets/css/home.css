@@ -98,6 +98,49 @@
   transform: scale(1.03);
 }
 
+/* Hero Image Wrapper with Decorations */
+.hero-image-wrapper {
+  position: relative;
+  width: 45%;
+  min-width: 350px;
+  flex-shrink: 0;
+}
+
+.hero-decoration {
+  position: absolute;
+  width: 90px;
+  height: 90px;
+  background: var(--gd-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 25px rgba(14, 58, 107, 0.15);
+  border: 3px solid var(--gd-blue);
+}
+
+.hero-decoration i {
+  font-size: 2.2rem;
+  color: var(--gd-blue);
+}
+
+.hero-cap {
+  top: -20px;
+  left: 20%;
+  transform: translateX(-50%);
+}
+
+.hero-logo {
+  bottom: -20px;
+  left: 15%;
+  background: linear-gradient(135deg, var(--gd-gradient-warm));
+  border-color: var(--gd-orange);
+}
+
+.hero-logo i {
+  color: var(--gd-white);
+}
+
 .hero-content {
   margin-bottom: 124px;
   flex: 1;
@@ -347,6 +390,123 @@
   color: var(--gd-blue-dark);
 }
 
+/* ---- Color Variations for Cards ---- */
+:root {
+  --color-blue: #1B4F8A;
+  --color-orange: #E65100;
+  --color-green: #25A346;
+  --color-purple: #7B2CBF;
+  --color-blue-light: #e3f2fd;
+  --color-orange-light: #ffe0b2;
+  --color-green-light: #e8f5e9;
+  --color-purple-light: #f3e5f5;
+}
+
+/* Blue Cards */
+.role-feature-card.card-blue {
+  border-bottom: 5px solid var(--color-blue);
+}
+
+.role-feature-card.card-blue .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, rgba(27, 79, 138, 0.2), rgba(27, 79, 138, 0.1));
+}
+
+.role-feature-card.card-blue .role-feature-icon-wrapper i {
+  color: var(--color-blue);
+}
+
+.role-feature-card.card-blue h4 {
+  color: var(--color-blue);
+}
+
+.role-feature-card.card-blue:hover .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, var(--color-blue), #2E6DB4);
+}
+
+/* Orange Cards */
+.role-feature-card.card-orange {
+  border-bottom: 5px solid var(--color-orange);
+}
+
+.role-feature-card.card-orange .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, rgba(230, 81, 0, 0.2), rgba(230, 81, 0, 0.1));
+}
+
+.role-feature-card.card-orange .role-feature-icon-wrapper i {
+  color: var(--color-orange);
+}
+
+.role-feature-card.card-orange h4 {
+  color: var(--color-orange);
+}
+
+.role-feature-card.card-orange:hover .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, var(--color-orange), #FF8F00);
+}
+
+/* Green Cards */
+.role-feature-card.card-green {
+  border-bottom: 5px solid var(--color-green);
+}
+
+.role-feature-card.card-green .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, rgba(37, 163, 70, 0.2), rgba(37, 163, 70, 0.1));
+}
+
+.role-feature-card.card-green .role-feature-icon-wrapper i {
+  color: var(--color-green);
+}
+
+.role-feature-card.card-green h4 {
+  color: var(--color-green);
+}
+
+.role-feature-card.card-green:hover .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, var(--color-green), #2E7D32);
+}
+
+/* Purple Cards */
+.role-feature-card.card-purple {
+  border-bottom: 5px solid var(--color-purple);
+}
+
+.role-feature-card.card-purple .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, rgba(123, 44, 191, 0.2), rgba(123, 44, 191, 0.1));
+}
+
+.role-feature-card.card-purple .role-feature-icon-wrapper i {
+  color: var(--color-purple);
+}
+
+.role-feature-card.card-purple h4 {
+  color: var(--color-purple);
+}
+
+.role-feature-card.card-purple:hover .role-feature-icon-wrapper {
+  background: linear-gradient(135deg, var(--color-purple), #9C27B0);
+}
+
+/* Icon color overrides for hover state */
+.role-feature-card.card-blue:hover .role-feature-icon-wrapper i,
+.role-feature-card.card-orange:hover .role-feature-icon-wrapper i,
+.role-feature-card.card-green:hover .role-feature-icon-wrapper i,
+.role-feature-card.card-purple:hover .role-feature-icon-wrapper i {
+  color: var(--gd-white);
+}
+
+/* Icon wrapper color classes */
+.icon-blue { background: linear-gradient(135deg, rgba(27, 79, 138, 0.2), rgba(27, 79, 138, 0.1)); }
+.icon-blue i { color: var(--color-blue); }
+
+.icon-orange { background: linear-gradient(135deg, rgba(230, 81, 0, 0.2), rgba(230, 81, 0, 0.1)); }
+.icon-orange i { color: var(--color-orange); }
+
+.icon-green { background: linear-gradient(135deg, rgba(37, 163, 70, 0.2), rgba(37, 163, 70, 0.1)); }
+.icon-green i { color: var(--color-green); }
+
+.icon-purple { background: linear-gradient(135deg, rgba(123, 44, 191, 0.2), rgba(123, 44, 191, 0.1)); }
+.icon-purple i { color: var(--color-purple); }
+
 .role-feature-card p {
   font-size:14px;
  
@@ -540,7 +700,7 @@
 .hero-section h1 { animation: heroFadeUp 0.5s ease 0.2s both; }
 .hero-section p { animation: heroFadeUp 0.5s ease 0.3s both; }
 .hero-buttons { animation: heroFadeUp 0.5s ease 0.4s both; }
-.hero-image { animation: heroFadeUp 0.6s ease 0.1s both; margin-top: 90px; margin-bottom: 40px;}
+.hero-image-wrapper { animation: heroFadeUp 0.6s ease 0.1s both; margin-top: 90px; margin-bottom: 40px;}
 
 .role-feature-card { animation: heroFadeUp 0.5s ease both; }
 .role-feature-card:nth-child(1) { animation-delay: 0.05s; }
@@ -566,6 +726,11 @@
   .hero-section {
     padding: 45px 35px;
     gap: 35px;
+  }
+
+  .hero-image-wrapper {
+    min-width: 300px;
+    width: 45%;
   }
 
   .hero-image {
@@ -599,10 +764,24 @@
     border-radius: 16px;
   }
 
+  .hero-image-wrapper {
+    width: 100%;
+    min-width: unset;
+  }
+
   .hero-image {
     width: 100%;
     min-width: unset;
     height: 240px;
+  }
+
+  .hero-decoration {
+    width: 70px;
+    height: 70px;
+  }
+
+  .hero-decoration i {
+    font-size: 1.8rem;
   }
 
   .hero-content {

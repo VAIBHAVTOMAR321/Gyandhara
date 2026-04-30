@@ -11,8 +11,8 @@ function Home() {
   const content = {
     en: {
     platformBadge: "🎓 GyanDhara - Educational Platform",
-    heroTitle: "GyanDhara",
-  heroSubtitle: "Welcome to GyanDhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, GyanDhara provides the tools you need to succeed.",
+    heroTitle: "Objective of GyanDhara",
+  heroSubtitle: "GyanDhara aims to create an inclusive and accessible digital learning ecosystem that empowers students, educators, and institutions. Our objective is to bridge the gap between academic learning and real-world skills by providing quality education, career guidance, and skill development opportunities to help learners achieve their goals and build a better future.",
   heroImg: heroImg,
   exploreBtn: "Explore Now",
   joinBtn: "Register Today",
@@ -21,26 +21,26 @@ function Home() {
       studentTitle: "LMS For Students 🎓",
       studentSubtitle: "Empower your future with comprehensive career guidance and learning resources",
       studentFeatures: [
-        { icon: "bi-book", title: "Course Content", desc: "Access high-quality educational materials and resources" },
-        { icon: "bi-trophy-fill", title: "Competitions", desc: "Participate in competitions and showcase your talents" },
-        { icon: "bi-journal-check", title: "Career Guidance", desc: "Expert guidance for your academic and career journey" },
-        { icon: "bi-pencil-square", title: "Quiz & Tests", desc: "Assess your knowledge with interactive quizzes" },
-        { icon: "bi-graph-up", title: "Grooming Classes", desc: "Develop professional and soft skills" },
-        { icon: "bi-chat-left-quote-fill", title: "Counseling", desc: "Get personalized career counseling from experts" },
-        { icon: "bi-bookmark-check", title: "Govt Schemes", desc: "Learn about educational schemes and benefits" },
-        { icon: "bi-briefcase-fill", title: "Job Opportunities", desc: "Discover career opportunities across various sectors" },
-        { icon: "bi-calendar-event", title: "Seminar & Workshop", desc: "Attend training events and skill development workshops" },
-        { icon: "bi-camera-video-fill", title: "Live Session", desc: "Join interactive live sessions with experts" }
+        { icon: "bi-book", title: "Course Content", desc: "Access high-quality educational materials and resources", color: "blue" },
+        { icon: "bi-trophy-fill", title: "Competitions", desc: "Participate in competitions and showcase your talents", color: "orange" },
+        { icon: "bi-journal-check", title: "Career Guidance", desc: "Expert guidance for your academic and career journey", color: "green" },
+        { icon: "bi-pencil-square", title: "Quiz & Tests", desc: "Assess your knowledge with interactive quizzes", color: "purple" },
+        { icon: "bi-graph-up", title: "Grooming Classes", desc: "Develop professional and soft skills", color: "blue" },
+        { icon: "bi-chat-left-quote-fill", title: "Counseling", desc: "Get personalized career counseling from experts", color: "orange" },
+        { icon: "bi-bookmark-check", title: "Govt Schemes", desc: "Learn about educational schemes and benefits", color: "green" },
+        { icon: "bi-briefcase-fill", title: "Job Opportunities", desc: "Discover career opportunities across various sectors", color: "blue" },
+        { icon: "bi-calendar-event", title: "Seminar & Workshop", desc: "Attend training events and skill development workshops", color: "purple" },
+        { icon: "bi-camera-video-fill", title: "Live Session", desc: "Join interactive live sessions with experts", color: "orange" }
       ],
 
       // For Schools Section
       schoolTitle: "LMS For Schools 🏫",
       schoolSubtitle: "Transform your institution's learning experience with GyanDhara's comprehensive platform",
       schoolFeatures: [
-        { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard" },
-        { icon: "bi-people-fill", title: "Student Management", desc: "Efficiently manage student registrations and profiles" },
-        { icon: "bi-question-circle-fill", title: "Events And Activities", desc: "Create and manage events and activities for your students" },
-        { icon: "bi-bar-chart-line-fill", title: "Performance Tracking", desc: "Monitor student progress and learning outcomes" }
+        { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard", color: "blue" },
+        { icon: "bi-people-fill", title: "Student Management", desc: "Efficiently manage student registrations and profiles", color: "orange" },
+        { icon: "bi-question-circle-fill", title: "Events And Activities", desc: "Create and manage events and activities for your students", color: "green" },
+        { icon: "bi-bar-chart-line-fill", title: "Performance Tracking", desc: "Monitor student progress and learning outcomes", color: "purple" }
       ],
       
       // Platform Benefits
@@ -65,8 +65,8 @@ function Home() {
     },
     hi: {
       platformBadge: "🎓 GyanDhara - शैक्षिक मंच",
-      heroTitle: "GyanDhara",
-      heroSubtitle: "GyanDhara में आपका स्वागत है, आपका ऑल-इन-वन शैक्षिक पारिस्थितिकी तंत्र जो शैक्षणिक शिक्षण और वास्तविक दुनिया की सफलता के बीच की खाई को पाटने के लिए डिज़ाइन किया गया है। हमारा मानना है कि शिक्षा केवल परीक्षा पास करने के बारे में नहीं है; यह एक तेजी से विकसित हो रहे वैश्विक परिदृश्य में उन्नति के लिए आवश्यक कौशल, आत्मविश्वास और दिशा प्राप्त करने के बारे में है। चाहे आप नई तकनीकों में महारत हासिल करने के इच्छुक छात्र हों या शैक्षणिक प्रबंधन को सुव्यवस्थित करने का लक्ष्य रखने वाला स्कूल, GyanDhara आपको सफल होने के लिए आवश्यक उपकरण प्रदान करता है।",
+      heroTitle: "GyanDhara का उद्देश्य",
+      heroSubtitle: "GyanDhara एक समावेशी और सुलभ डिजिटल शिक्षा पारिस्थितिकी तंत्र बनाने का लक्ष्य रखता है जो छात्रों, शिक्षकों और संस्थानों को सशक्त बनाता है। हमारा उद्देश्य गुणवत्तापूर्ण शिक्षा, करियर मार्गदर्शन और कौशल विकास के अवसरों द्वारा शैक्षणिक सीखने और वास्तविक दुनिया के कौशल के बीच की खाई को पाटना है।",
       heroImg: heroImg,
       exploreBtn: "अब खोजें",
       joinBtn: "आज पंजीकृत करें",
@@ -75,26 +75,26 @@ function Home() {
       studentTitle: "छात्रों के लिए 🎓",
       studentSubtitle: "व्यापक करियर मार्गदर्शन और सीखने के संसाधनों से अपने भविष्य को सशक्त बनाएं",
       studentFeatures: [
-        { icon: "bi-book", title: "पाठ्यक्रम सामग्री", desc: "उच्च गुणवत्ता वाली शैक्षिक सामग्री और संसाधनों तक पहुंच प्राप्त करें" },
-        { icon: "bi-trophy-fill", title: "प्रतियोगिताएं", desc: "प्रतियोगिताओं में भाग लें और प्रतिभा प्रदर्शन करें" },
-        { icon: "bi-journal-check", title: "करियर मार्गदर्शन", desc: "आपकी शैक्षणिक और करियर यात्रा के लिए विशेषज्ञ मार्गदर्शन" },
-        { icon: "bi-pencil-square", title: "प्रश्नोत्तरी और परीक्षण", desc: "प्रश्नोत्तरी के साथ अपना ज्ञान मूल्यांकन करें" },
-        { icon: "bi-graph-up", title: "व्यक्तित्व विकास कक्षाएं", desc: "व्यावसायिक और सॉफ्ट स्किल्स विकसित करें" },
-        { icon: "bi-chat-left-quote-fill", title: "परामर्श", desc: "विशेषज्ञों से व्यक्तिगत करियर परामर्श प्राप्त करें" },
-        { icon: "bi-bookmark-check", title: "सरकारी योजनाएं", desc: "शैक्षिक योजनाओं और लाभों के बारे में जानें" },
-        { icon: "bi-briefcase-fill", title: "नौकरी के अवसर", desc: "विभिन्न क्षेत्रों में करियर के अवसर खोजें" },
-        { icon: "bi-calendar-event", title: "सेमिनार और कार्यशाला", desc: "प्रशिक्षण कार्यक्रमों में भाग लें" },
-        { icon: "bi-camera-video-fill", title: "लाइव सेशन", desc: "विशेषज्ञों के साथ इंटरैक्टिव लाइव सत्रों में शामिल हों" }
+        { icon: "bi-book", title: "पाठ्यक्रम सामग्री", desc: "उच्च गुणवत्ता वाली शैक्षिक सामग्री और संसाधनों तक पहुंच प्राप्त करें", color: "blue" },
+        { icon: "bi-trophy-fill", title: "प्रतियोगिताएं", desc: "प्रतियोगिताओं में भाग लें और प्रतिभा प्रदर्शन करें", color: "orange" },
+        { icon: "bi-journal-check", title: "करियर मार्गदर्शन", desc: "आपकी शैक्षणिक और करियर यात्रा के लिए विशेषज्ञ मार्गदर्शन", color: "green" },
+        { icon: "bi-pencil-square", title: "प्रश्नोत्तरी और परीक्षण", desc: "प्रश्नोत्तरी के साथ अपना ज्ञान मूल्यांकन करें", color: "purple" },
+        { icon: "bi-graph-up", title: "व्यक्तित्व विकास कक्षाएं", desc: "व्यावसायिक और सॉफ्ट स्किल्स विकसित करें", color: "blue" },
+        { icon: "bi-chat-left-quote-fill", title: "परामर्श", desc: "विशेषज्ञों से व्यक्तिगत करियर परामर्श प्राप्त करें", color: "orange" },
+        { icon: "bi-bookmark-check", title: "सरकारी योजनाएं", desc: "शैक्षिक योजनाओं और लाभों के बारे में जानें", color: "green" },
+        { icon: "bi-briefcase-fill", title: "नौकरी के अवसर", desc: "विभिन्न क्षेत्रों में करियर के अवसर खोजें", color: "blue" },
+        { icon: "bi-calendar-event", title: "सेमिनार और कार्यशाला", desc: "प्रशिक्षण कार्यक्रमों में भाग लें", color: "purple" },
+        { icon: "bi-camera-video-fill", title: "लाइव सेशन", desc: "विशेषज्ञों के साथ इंटरैक्टिव लाइव सत्रों में शामिल हों", color: "orange" }
       ],
 
       // For Schools Section
       schoolTitle: "स्कूलों के लिए 🏫",
       schoolSubtitle: "GyanDhara के व्यापक मंच के साथ अपने संस्थान के शिक्षण अनुभव को बदलें",
       schoolFeatures: [
-        { icon: "bi-house-check", title: "स्कूल पंजीकरण", desc: "अपने संस्थान को पंजीकृत करें और समर्पित डैशबोर्ड प्राप्त करें" },
-        { icon: "bi-people-fill", title: "छात्र प्रबंधन", desc: "छात्र पंजीकरण और प्रोफाइल को कुशलतापूर्वक प्रबंधित करें" },
-        { icon: "bi-question-circle-fill", title: "प्रश्नोत्तरी निर्माण", desc: "अपने छात्रों के लिए प्रश्नोत्तरी बनाएं और प्रबंधित करें" },
-        { icon: "bi-bar-chart-line-fill", title: "प्रदर्शन ट्रैकिंग", desc: "छात्र की प्रगति और सीखने के परिणामों की निगरानी करें" }
+        { icon: "bi-house-check", title: "स्कूल पंजीकरण", desc: "अपने संस्थान को पंजीकृत करें और समर्पित डैशबोर्ड प्राप्त करें", color: "blue" },
+        { icon: "bi-people-fill", title: "छात्र प्रबंधन", desc: "छात्र पंजीकरण और प्रोफाइल को कुशलतापूर्वक प्रबंधित करें", color: "orange" },
+        { icon: "bi-question-circle-fill", title: "प्रश्नोत्तरी निर्माण", desc: "अपने छात्रों के लिए प्रश्नोत्तरी बनाएं और प्रबंधित करें", color: "green" },
+        { icon: "bi-bar-chart-line-fill", title: "प्रदर्शन ट्रैकिंग", desc: "छात्र की प्रगति और सीखने के परिणामों की निगरानी करें", color: "purple" }
       ],
       
       // Platform Benefits
@@ -126,7 +126,15 @@ function Home() {
       <div className="home-container">
         {/* Hero Section */}
         <div className="hero-section">
-          <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
+          <div className="hero-image-wrapper">
+            <div className="hero-decoration hero-cap">
+              <i className="bi bi-mortarboard-fill"></i>
+            </div>
+            <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
+            <div className="hero-decoration hero-logo">
+              <i className="bi bi-book-fill"></i>
+            </div>
+          </div>
           <div className="hero-content">
             <div className="hero-badge">{t.platformBadge}</div>
             <h1>{t.heroTitle}</h1>
@@ -150,8 +158,8 @@ function Home() {
           </div>
           <div className="role-features-grid">
             {t.studentFeatures.map((feature, index) => (
-              <div className="role-feature-card" key={index}>
-                <div className="role-feature-icon-wrapper">
+              <div className={`role-feature-card card-${feature.color}`} key={index}>
+                <div className={`role-feature-icon-wrapper icon-${feature.color}`}>
                   <i className={`bi ${feature.icon}`}></i>
                 </div>
                 <h4>{feature.title}</h4>
@@ -169,8 +177,8 @@ function Home() {
           </div>
           <div className="role-features-grid">
             {t.schoolFeatures.map((feature, index) => (
-              <div className="role-feature-card" key={index}>
-                <div className="role-feature-icon-wrapper">
+              <div className={`role-feature-card card-${feature.color}`} key={index}>
+                <div className={`role-feature-icon-wrapper icon-${feature.color}`}>
                   <i className={`bi ${feature.icon}`}></i>
                 </div>
                 <h4>{feature.title}</h4>
