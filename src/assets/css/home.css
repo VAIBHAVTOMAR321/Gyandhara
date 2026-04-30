@@ -106,39 +106,44 @@
 
 .hero-decoration {
   position: absolute;
-  width: 90px;
-  height: 90px;
-  background: var(--gd-white);
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 8px 25px rgba(14, 58, 107, 0.15);
   border: 3px solid var(--gd-blue);
+  background: var(--gd-white);
+  border-radius: 50%;
 }
 
-.hero-decoration i {
-  font-size: 2.2rem;
-  color: var(--gd-blue);
-}
-
-.hero-cap {
+.hero-cap-decoration {
+  width: 70px;
+  height: 70px;
   top: -20px;
   left: 20%;
   transform: translateX(-50%);
 }
 
-.hero-logo {
-  bottom: -20px;
-  left: 45%;
-  background: linear-gradient(135deg, var(--gd-gradient-warm));
-  border-color: var(--gd-orange);
-      background-color: #fff;
-    border-radius: 50px;
+.hero-cap-decoration i {
+  font-size: 2rem;
+  color: var(--gd-blue);
 }
 
-.hero-logo i {
-  color: var(--gd-white);
+.hero-logo-decoration {
+  width: 90px;
+  height: 90px;
+  bottom: -20px;
+  left: 45%;
+  border-radius: 50px;
+  padding: 4px;
+  border-color: var(--gd-orange);
+background-color: #fff;
+}
+
+.hero-logo {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  border-radius: 50%;
 }
 
 .hero-content {

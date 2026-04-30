@@ -128,12 +128,12 @@ function Home() {
         {/* Hero Section */}
         <div className="hero-section">
           <div className="hero-image-wrapper">
-            <div className="hero-decoration hero-cap">
+            <div className="hero-decoration hero-cap-decoration">
               <i className="bi bi-mortarboard-fill"></i>
             </div>
             <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
-            <div className="hero-decoration hero-logo">
-           <img src={Logo2} alt="Gyandhara Logo" className="hero-logo" />
+            <div className="hero-decoration hero-logo-decoration">
+              <img src={Logo2} alt="Gyandhara Logo" className="hero-logo" />
             </div>
           </div>
           <div className="hero-content">
