@@ -83,7 +83,7 @@
 .hero-image {
       /* margin-bottom: 214px; */
     /* margin-top: 90px; */
-  width: 45%;
+ 
   min-width: 350px;
   /* height: 360px; */
   border-radius: var(--gd-radius);
@@ -94,9 +94,7 @@
   transition: transform 0.4s ease;
 }
 
-.hero-image:hover {
-  transform: scale(1.03);
-}
+
 
 /* Hero Image Wrapper with Decorations */
 .hero-image-wrapper {
@@ -729,8 +727,8 @@
   }
 
   .hero-image-wrapper {
-    min-width: 300px;
-    width: 45%;
+    
+    width: 94%;
   }
 
   .hero-image {
