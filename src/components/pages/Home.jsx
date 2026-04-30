@@ -213,12 +213,52 @@ function Home() {
         <section className="final-cta-section">
           <h2>{t.readyTitle}</h2>
           <p>{t.readySub}</p>
-          <div className="cta-buttons">
+          <div className="cta-content">
+            <div className="row g-4">
+              <div className="col-lg-3 col-md-6 sm-12">
+                <div className="benefit-card card-blue h-100 border-0 shadow-sm">
+                  <div className="benefit-icon icon-blue">
+                    <i className="bi bi-lightbulb"></i>
+                  </div>
+                  <h4>Career Guidance</h4>
+                  <p>Get expert advice to shape your professional journey</p>
+                </div>
+              </div>
+              <div className="col-lg-3 col-md-6 sm-12">
+                <div className="benefit-card card-orange h-100 border-0 shadow-sm">
+                  <div className="benefit-icon icon-orange">
+                    <i className="bi bi-book"></i>
+                  </div>
+                  <h4>Learning Resources</h4>
+                  <p>Access comprehensive study materials and courses</p>
+                </div>
+              </div>
+              <div className="col-lg-3 col-md-6 sm-12">
+                <div className="benefit-card card-green h-100 border-0 shadow-sm">
+                  <div className="benefit-icon icon-green">
+                    <i className="bi bi-briefcase"></i>
+                  </div>
+                  <h4>Job Opportunities</h4>
+                  <p>Explore career paths and employment options</p>
+                </div>
+              </div>
+              <div className="col-lg-3 col-md-6 sm-12">
+                <div className="benefit-card card-purple h-100 border-0 shadow-sm">
+                  <div className="benefit-icon icon-purple">
+                    <i className="bi bi-award"></i>
+                  </div>
+                  <h4>Certifications</h4>
+                  <p>Earn recognized credentials for your skills</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="cta-buttons mt-4">
             <Link to="/register" className="btn-gyandhara btn-primary-custom btn-lg">
               <i className="bi bi-rocket-fill"></i> {t.getStartedBtn}
             </Link>
-            <Link to="/login" className="btn-gyandhara btn-outline-custom btn-lg">
-              <i className="bi bi-box-arrow-in-right"></i> {t.signInBtn}
+            <Link to="/login" className="btn-gyandhara btn-outline-custom-btn btn-lg">
+              <i className="bi bi-box-arrow-in-right "></i> {t.signInBtn}
             </Link>
           </div>
         </section>
