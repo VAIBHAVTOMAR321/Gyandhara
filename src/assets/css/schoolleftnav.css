@@ -749,7 +749,7 @@ border: none !important;
     }
     /* Ensure nav-text is always visible within the mobile/tablet offcanvas */
     .school-mobile-offcanvas .nav-item .nav-text {
-        display: block !important;
+        /* display: block !important; */
         flex-grow: 1; /* Allow text to take available space */
     }
 
