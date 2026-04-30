@@ -125,7 +125,7 @@ function Home() {
     <div className="home-wrapper">
       <div className="home-container">
         {/* Hero Section */}
-        <section className="hero-section">
+        <div className="hero-section">
           <img src={t.heroImg} alt="Gyandhara Education" className="hero-image" />
           <div className="hero-content">
             <div className="hero-badge">{t.platformBadge}</div>
@@ -140,7 +140,7 @@ function Home() {
               </Link>
             </div>
           </div>
-        </section>
+        </div>
 
         {/* For Students Section */}
         <section className="role-section student-section">

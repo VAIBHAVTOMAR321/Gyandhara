@@ -30,7 +30,7 @@
   background: var(--gd-blue-bg);
   min-height: calc(100vh - 52px);
   padding: 40px 20px;
-  margin-top: 52px;
+  margin-top: 34px;
 }
 
 .home-container {
@@ -44,16 +44,16 @@
 .hero-section {
   text-align: left;
   padding: 60px 60px;
-  background: var(--gd-gradient-hero);
-  border-radius: var(--gd-radius);
+  background-image: url('../images/aboutus.png');
+  background-size: cover;
   color: var(--gd-text);
   position: relative;
   overflow: hidden;
   display: flex;
   align-items: center;
   gap: 50px;
-  border: 1px solid var(--gd-border);
-  box-shadow: 0 8px 40px rgba(14, 58, 107, 0.08);
+  /* border: 1px solid var(--gd-border);
+  box-shadow: 0 8px 40px rgba(14, 58, 107, 0.08); */
 }
 
 .hero-section::before {
@@ -81,6 +81,8 @@
 }
 
 .hero-image {
+      margin-bottom: 214px;
+    margin-top: 90px;
   width: 45%;
   min-width: 350px;
   height: 360px;
