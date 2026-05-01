@@ -48,6 +48,11 @@ function NavBar() {
                {language === 'hi' ? 'होम' : 'Home'}
              </Nav.Link>
 
+             <Nav.Link as={Link} to="/courses" className="nav-link-item" onClick={() => setExpanded(false)}>
+               <span className="nav-link-dot"></span>
+               {language === 'hi' ? 'कोर्स' : 'Courses'}
+             </Nav.Link>
+
              <Nav.Link as={Link} to="/login" className="nav-link-item" onClick={() => setExpanded(false)}>
                <span className="nav-link-dot"></span>
                {language === 'hi' ? 'लॉगिन' : 'Login'}
