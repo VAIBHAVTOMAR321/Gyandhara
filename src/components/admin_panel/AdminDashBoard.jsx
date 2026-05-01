@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Container, Table, Badge, Spinner, Pagination, Card, Row, Col } from "react-bootstrap";
+import { Container, Table, Badge, Spinner, Pagination, Card, Row, Col, Form, Button } from "react-bootstrap";
 import axios from "axios";
+import { FaSchool } from "react-icons/fa"; // Added import
 import { useAuth } from "../all_login/AuthContext";
 import AdminLeftNav from "./AdminLeftNav";
 import AdminHeader from "./AdminHeader";
@@ -21,14 +22,34 @@ const AdminDashBoard = () => {
   const [students, setStudents] = useState([]);
   const [schools, setSchools] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
+  const [quizParticipants, setQuizParticipants] = useState([]);
+  
+  // Added state for quiz stats
+  const [quizStats, setQuizStats] = useState({
+    totalQuizParticipants: 0,
+    totalQuizAttempts: 0,
+    averageScore: 0,
+    passRate: 0
+  });
+
+  // Added totalQuizParticipants to the stats object
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalSchools: 0,
     totalEnrollments: 0,
-    totalUniqueCourses: 0
+    totalUniqueCourses: 0,
+    totalQuizParticipants: 0
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [showQuizTable, setShowQuizTable] = useState(false);
+  const [quizSchoolFilter, setQuizSchoolFilter] = useState('');
+  const [quizDistrictFilter, setQuizDistrictFilter] = useState('');
+
+  // Added missing states for filters
+  const [selectedDistrict, setSelectedDistrict] = useState('all');
+  const [selectedSchool, setSelectedSchool] = useState('all');
 
   const { accessToken } = useAuth();
 
@@ -60,7 +81,7 @@ const AdminDashBoard = () => {
     setLoading(true);
     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
     try {
-      const [studentsRes, schoolsRes, enrollmentsRes] = await Promise.all([
+      const [studentsRes, schoolsRes, enrollmentsRes, quizRes] = await Promise.all([
         axios.get(
           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
           {
@@ -84,12 +105,21 @@ const AdminDashBoard = () => {
               Authorization: `Bearer ${accessToken}`,
             },
           }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
         )
       ]);
 
       console.log('Students Response:', studentsRes.data);
       console.log('Schools Response:', schoolsRes.data);
       console.log('Enrollments Response:', enrollmentsRes.data);
+      console.log('Quiz Response:', quizRes.data);
 
 
       let studentData = [];
@@ -113,14 +143,45 @@ const AdminDashBoard = () => {
         enrollmentData = enrollmentsRes.data;
       }
 
+      let quizData = [];
+      if (quizRes.data && quizRes.data.data) {
+        quizData = quizRes.data.data;
+      } else if (quizRes.data && Array.isArray(quizRes.data)) {
+        quizData = quizRes.data;
+      }
+
       setStudents(studentData);
       setSchools(schoolData);
       setEnrollments(enrollmentData);
+      setQuizParticipants(quizData);
+      
+      // Calculate quiz statistics
+      const totalQuizParticipants = quizData.length;
+      const totalQuizAttempts = quizData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
+      const totalScore = quizData.reduce((sum, item) => 
+        sum + (item.attempt?.reduce((attemptSum, attempt) => attemptSum + (attempt.score || 0), 0) || 0), 0
+      );
+      const averageScore = totalQuizAttempts > 0 ? (totalScore / totalQuizAttempts).toFixed(1) : 0;
+      const passRate = totalQuizParticipants > 0 
+        ? ((quizData.filter(item => 
+            item.attempt?.some(attempt => attempt.status === 'passed')
+          ).length / totalQuizParticipants) * 100
+        ).toFixed(1) : 0;
+      
+      setQuizStats({
+        totalQuizParticipants,
+        totalQuizAttempts,
+        averageScore,
+        passRate
+      });
+      
+      // Update general stats to include quiz participants
       setStats({
         totalStudents: studentData.length,
         totalSchools: schoolData.length,
         totalEnrollments: enrollmentData.length,
-        totalUniqueCourses: new Set(enrollmentData.map(e => e.course_id)).size
+        totalUniqueCourses: new Set(enrollmentData.map(e => e.course_id)).size,
+        totalQuizParticipants: totalQuizParticipants // Properly setting the count here
       });
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -174,6 +235,187 @@ const AdminDashBoard = () => {
     }
   };
 
+  const renderQuizChart = () => {
+    const districts = ["Almora", "Bageshwar", "Chamoli", "Champawat", "Dehradun", "Haridwar",
+      "Nainital", "Pauri Garhwal", "Pithoragarh", "Rudraprayag", "Tehri Garhwal",
+      "Udham Singh Nagar", "Uttarkashi"];
+    
+    const districtQuizData = districts.map(district => {
+      const participants = quizParticipants.filter(p => p.student?.district === district).length;
+      const attempts = quizParticipants
+        .filter(p => p.student?.district === district)
+        .reduce((sum, p) => sum + (p.attempt?.length || 0), 0);
+      return { district, participants, attempts };
+    });
+    
+    const maxParticipants = Math.max(...districtQuizData.map(d => d.participants), 1);
+    
+    const quizColors = {
+      students: '#4361ee',
+      schools: '#2ecc71', 
+      enrollments: '#f39c12',
+      uniqueCourses: '#e84393',
+      quiz: '#7209b7'
+    };
+    
+    return (
+      <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+        <Card.Body className="p-4">
+          <h5 className="mb-4 fw-bold text-dark d-flex align-items-center">
+            <i className="bi bi-question-diamond me-2" style={{ color: quizColors.quiz }}></i>
+            Quiz Participants Distribution by District
+          </h5>
+          <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div style={{ minWidth: '950px', height: '340px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '20px 10px 70px 10px' }}>
+              {districtQuizData.map((item, index) => {
+                const barHeight = (item.participants / maxParticipants) * 220;
+                const tooltipText = `${item.district}: ${item.participants} participants, ${item.attempts} total attempts`;
+                
+                return (
+                  <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
+                    <div className="fw-bold mb-1" style={{ fontSize: '12px', color: quizColors.quiz, opacity: item.participants > 0 ? 1 : 0.3 }}>
+                      {item.participants}
+                    </div>
+                    <div className="district-bar" 
+                      style={{ 
+                        height: `${barHeight}px`, 
+                        width: '100%', 
+                        maxWidth: '40px', 
+                        background: `linear-gradient(to top, ${quizColors.quiz}, ${quizColors.quiz}aa)`,
+                        borderRadius: '8px 8px 0 0',
+                        transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                        position: 'relative',
+                        boxShadow: '0 4px 15px rgba(114, 9, 183, 0.1)'
+                      }}
+                      title={tooltipText}
+                    ></div>
+                    <div className="position-absolute text-center text-truncate" 
+                      style={{ 
+                        bottom: '-60px', 
+                        width: '130px', 
+                        fontSize: '11px', 
+                        fontWeight: '700',
+                        transform: 'rotate(-30deg)',
+                        transformOrigin: 'top center',
+                        color: '#555',
+                        letterSpacing: '0.2px'
+                      }}
+                    >
+                      {item.district}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
+    );
+  };
+
+  const renderQuizTable = () => {
+    const filteredQuizData = quizParticipants.filter(p => {
+      const matchSchool = !quizSchoolFilter || 
+        (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+      const matchDistrict = !quizDistrictFilter || 
+        (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+      return matchSchool && matchDistrict;
+    });
+
+    const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
+    const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
+
+    return (
+      <Card className="table-card">
+        <Card.Body>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0">Quiz Participants</h5>
+            {/* Note: ShowQuizTable logic is handled by activeTab state now, 
+                but kept this button if you want to toggle just the table view */}
+          </div>
+          
+          <Row className="mb-3">
+            <Col md={4} sm={6}>
+              <Form.Group>
+                <Form.Label>School</Form.Label>
+                <Form.Select
+                  value={quizSchoolFilter}
+                  onChange={(e) => setQuizSchoolFilter(e.target.value)}
+                  size="sm"
+                >
+                  <option value="">All Schools</option>
+                  {uniqueSchools.map((school, i) => (
+                    <option key={i} value={school}>{school}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={4} sm={6}>
+              <Form.Group>
+                <Form.Label>District</Form.Label>
+                <Form.Select
+                  value={quizDistrictFilter}
+                  onChange={(e) => setQuizDistrictFilter(e.target.value)}
+                  size="sm"
+                >
+                  <option value="">All Districts</option>
+                  {uniqueDistricts.map((district, i) => (
+                    <option key={i} value={district}>{district}</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+            </Col>
+          </Row>
+          
+          <div className="table-responsive">
+            <Table striped bordered hover size="sm">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Student</th>
+                  <th>District</th>
+                  <th>School</th>
+                  <th>Quiz</th>
+                  <th>Attempts</th>
+                  <th>Best Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredQuizData.length > 0 ? (
+                  filteredQuizData.map((p, index) => {
+                    const bestAttempt = p.attempt?.reduce((best, curr) => 
+                      (curr.score || 0) > (best.score || 0) ? curr : best, 
+                      p.attempt?.[0] || {}
+                    );
+                    return (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td className="fw-bold">{p.student?.full_name}</td>
+                        <td>{p.student?.district}</td>
+                        <td>{p.student?.school_name}</td>
+                        <td><Badge bg="info">{p.quiz_id}</Badge></td>
+                        <td>{p.attempt?.length || 0}</td>
+                        <td>
+                          <Badge bg={bestAttempt?.status === 'passed' ? 'success' : 'warning'}>
+                            {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
+                          </Badge>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center">No quiz participants found</td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+        </Card.Body>
+      </Card>
+    );
+  };
+
   const statCards = [
     {
       key: "students",
@@ -202,15 +444,37 @@ const AdminDashBoard = () => {
       number: stats.totalUniqueCourses,
       label: "Unique Courses",
       className: "unique-courses"
+    },
+     {
+      key: "quiz-participants",
+      icon: "bi-trophy",
+      number: stats.totalQuizParticipants,
+      label: "Total Quiz Participants",
+      className: "quiz-participants"
     }
   ];
 
-  const renderTable = () => {
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentStudents = students.slice(indexOfFirstItem, indexOfLastItem);
-    const currentSchools = schools.slice(indexOfFirstItem, indexOfLastItem);
-    const currentEnrollments = enrollments.slice(indexOfFirstItem, indexOfLastItem);
+   const renderTable = () => {
+     const indexOfLastItem = currentPage * itemsPerPage;
+     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+     const currentStudents = students.slice(indexOfFirstItem, indexOfLastItem);
+     const currentSchools = schools.slice(indexOfFirstItem, indexOfLastItem);
+     const currentEnrollments = enrollments.slice(indexOfFirstItem, indexOfLastItem);
+     
+     // Use the local filteredQuizData logic inside renderQuizTable, 
+     // but for pagination we need a global filter reference or calculate here.
+     // For simplicity in this component structure, we will rely on renderQuizTable handling its own pagination/filtering
+     // or just use the full list if pagination isn't strictly enforced on the specific quiz view in the original logic.
+     // However, to be consistent:
+     const filteredQuizParticipants = quizParticipants.filter(p => {
+       const matchSchool = !quizSchoolFilter || 
+         (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+       const matchDistrict = !quizDistrictFilter || 
+         (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+       return matchSchool && matchDistrict;
+     });
+     const currentQuizParticipants = filteredQuizParticipants.slice(indexOfFirstItem, indexOfLastItem);
     
     const renderPagination = (totalItems, currentPage) => {
       const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -415,6 +679,9 @@ const AdminDashBoard = () => {
           {renderPagination(enrollments.length, currentPage)}
         </>
       );
+    } else if (activeTab === "quiz-participants") {
+      // Return the custom quiz table
+      return renderQuizTable();
     } else {
       return (
         <div className="text-center py-5 text-muted">
@@ -509,9 +776,9 @@ const AdminDashBoard = () => {
         </Card.Body>
       </Card>
     );
-  };
+   };
 
-  return (
+   return (
     <div className="dashboard-container">
       <AdminLeftNav
         sidebarOpen={sidebarOpen}
@@ -521,180 +788,185 @@ const AdminDashBoard = () => {
       />
       <div className="main-content-dash">
         <AdminHeader toggleSidebar={toggleSidebar} />
-<div className="dashboard-content">
-        <Container fluid className="dashboard-box">
-          {loading ? (
-            <div className="loading-spinner">
-              <Spinner animation="border" variant="primary" />
-            </div>
-          ) : (
-            <>
-                <Row className="g-4 mb-4">
-                  {statCards.map((stat) => (
-                    <Col key={stat.key} lg={3} md={6} sm={12}>
-                      <div
-                        className={`stat-card h-100 mb-0 ${stat.className} ${activeTab === stat.key ? 'active' : ''}`}
-                        onClick={() => {
-                          setActiveTab(stat.key);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        <div className="stat-icon">
-                          <i className={`bi ${stat.icon}`}></i>
-                        </div>
-                        <div className="stat-content card-content-mob-box">
-                          <h2>{stat.number}</h2>
-                          <h6>{stat.label}</h6>
-                        </div>
-                      </div>
-                    </Col>
-                  ))}
-                </Row>
-
-                {activeTab ? (
-                  <>
-                    {renderDistrictChart()}
-
-                    <div className="table-card">
-                      <h4>
-                        {activeTab === "students" && "Student List"}
-                        {activeTab === "schools" && "School List"}
-                        {activeTab === "enrollments" && "Enrollment List"}
-                        {/* {activeTab === "unique-courses" && "Unique Courses Overview"} */}
-                      </h4>
-                      <div className="table-responsive">
-                        {renderTable()}
-                      </div>
-                      <div className="mobile-table-wrapper">
-                        {activeTab === "students" && students.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((student, index) => (
-                          <div key={index} className="mobile-card">
-                            <div className="mobile-card-header">
-                              <span className="mobile-card-id">{student.student_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
-                              <span className={`mobile-status ${student.status || 'pending'}`}>
-                                {student.status || "pending"}
-                              </span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">Name</span>
-                              <span className="mobile-card-value">{student.full_name || "-"}</span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">Aadhaar</span>
-                              <span className="mobile-card-value">{student.aadhaar_no ? `****${student.aadhaar_no.slice(-4)}` : "-"}</span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">Phone</span>
-                              <span className="mobile-card-value">{student.phone || "-"}</span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">Email</span>
-                              <span className="mobile-card-value">{student.email || "-"}</span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">Class</span>
-                              <span className="mobile-card-value">{student.class_name || "-"}</span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">School</span>
-                              <span className="mobile-card-value">{student.school_name || "-"}</span>
-                            </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">District</span>
-                              <span className="mobile-card-value">{student.district || "-"}</span>
-                            </div>
+        <div className="dashboard-content">
+          <Container fluid className="dashboard-box">
+            {loading ? (
+              <div className="loading-spinner">
+                <Spinner animation="border" variant="primary" />
+              </div>
+            ) : (
+              <>
+                  <Row className="g-4 mb-4">
+                    {statCards.map((stat) => (
+                      <Col key={stat.key} lg={3} md={6} sm={12}>
+                        <div
+                          className={`stat-card h-100 mb-0 ${stat.className} ${activeTab === stat.key ? 'active' : ''}`}
+                          onClick={() => {
+                            setActiveTab(stat.key);
+                            setCurrentPage(1);
+                          }}
+                        >
+                          <div className="stat-icon">
+                            <i className={`bi ${stat.icon}`}></i>
                           </div>
-                        ))}
-                        {activeTab === "schools" && schools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((school, index) => (
-                          <div key={index} className="mobile-card">
-                            <div className="mobile-card-header">
-                              <span className="mobile-card-id">{school.school_uni_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span className={`mobile-status ${school.status || 'pending'}`}>
-                                  {school.status || "pending"}
+                          <div className="stat-content card-content-mob-box">
+                            <h2>{stat.number}</h2>
+                            <h6>{stat.label}</h6>
+                          </div>
+                        </div>
+                      </Col>
+                    ))}
+                  </Row>
+
+                 {activeTab ? (
+                   <>
+                     {activeTab === "quiz-participants" ? (
+                       renderQuizChart()
+                     ) : (
+                       renderDistrictChart()
+                     )}
+
+                     <div className="table-card">
+                        <h4>
+                          {activeTab === "students" && "Student List"}
+                          {activeTab === "schools" && "School List"}
+                          {activeTab === "enrollments" && "Enrollment List"}
+                          {activeTab === "quiz-participants" && "Quiz Participants List"}
+                        </h4>
+                        <div className="table-responsive">
+                          {renderTable()}
+                        </div>
+                        {/* Mobile Table Wrapper Logic kept as is for students/schools */}
+                        <div className="mobile-table-wrapper">
+                          {activeTab === "students" && students.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((student, index) => (
+                            <div key={index} className="mobile-card">
+                              <div className="mobile-card-header">
+                                <span className="mobile-card-id">{student.student_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
+                                <span className={`mobile-status ${student.status || 'pending'}`}>
+                                  {student.status || "pending"}
                                 </span>
-                                <select
-                                  className="status-select-mobile form-select form-select-sm"
-                                  value={school.status || "pending"}
-                                  onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
-                                  style={{ cursor: 'pointer', padding: '2px 4px', fontSize: '12px', minWidth: '80px' }}
-                                >
-                                  <option value="pending">Pending</option>
-                                  <option value="approved">Approved</option>
-                                  <option value="rejected">Rejected</option>
-                                </select>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">Name</span>
+                                <span className="mobile-card-value">{student.full_name || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">Aadhaar</span>
+                                <span className="mobile-card-value">{student.aadhaar_no ? `****${student.aadhaar_no.slice(-4)}` : "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">Phone</span>
+                                <span className="mobile-card-value">{student.phone || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">Email</span>
+                                <span className="mobile-card-value">{student.email || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">Class</span>
+                                <span className="mobile-card-value">{student.class_name || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">School</span>
+                                <span className="mobile-card-value">{student.school_name || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">District</span>
+                                <span className="mobile-card-value">{student.district || "-"}</span>
                               </div>
                             </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">School Name</span>
-                              <span className="mobile-card-value">{school.school_name || "-"}</span>
+                          ))}
+                          {activeTab === "schools" && schools.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((school, index) => (
+                            <div key={index} className="mobile-card">
+                              <div className="mobile-card-header">
+                                <span className="mobile-card-id">{school.school_uni_id || `#${(currentPage - 1) * itemsPerPage + index + 1}`}</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span className={`mobile-status ${school.status || 'pending'}`}>
+                                    {school.status || "pending"}
+                                  </span>
+                                  <select
+                                    className="status-select-mobile form-select form-select-sm"
+                                    value={school.status || "pending"}
+                                    onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
+                                    style={{ cursor: 'pointer', padding: '2px 4px', fontSize: '12px', minWidth: '80px' }}
+                                  >
+                                    <option value="pending">Pending</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Rejected</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">School Name</span>
+                                <span className="mobile-card-value">{school.school_name || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">District</span>
+                                <span className="mobile-card-value">{school.district || "-"}</span>
+                              </div>
+                              <div className="mobile-card-row">
+                                <span className="mobile-card-label">State</span>
+                                <span className="mobile-card-value">{school.state || "Uttarakhand"}</span>
+                              </div>
                             </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">District</span>
-                              <span className="mobile-card-value">{school.district || "-"}</span>
+                          ))}
+                          {(activeTab === "students" && students.length === 0) || (activeTab === "schools" && schools.length === 0) ? (
+                            <div className="mobile-card text-center">No data found</div>
+                          ) : null}
+                          {students.length > itemsPerPage && activeTab === "students" && (
+                            <div className="mobile-pagination">
+                              <button 
+                                className="mobile-page-btn" 
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                              >
+                                Previous
+                              </button>
+                              <span className="mobile-page-info">
+                                Page {currentPage} of {Math.ceil(students.length / itemsPerPage)}
+                              </span>
+                              <button 
+                                className="mobile-page-btn"
+                                disabled={currentPage === Math.ceil(students.length / itemsPerPage)}
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                              >
+                                Next
+                              </button>
                             </div>
-                            <div className="mobile-card-row">
-                              <span className="mobile-card-label">State</span>
-                              <span className="mobile-card-value">{school.state || "Uttarakhand"}</span>
+                          )}
+                          {schools.length > itemsPerPage && activeTab === "schools" && (
+                            <div className="mobile-pagination">
+                              <button 
+                                className="mobile-page-btn" 
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                              >
+                                Previous
+                              </button>
+                              <span className="mobile-page-info">
+                                Page {currentPage} of {Math.ceil(schools.length / itemsPerPage)}
+                              </span>
+                              <button 
+                                className="mobile-page-btn"
+                                disabled={currentPage === Math.ceil(schools.length / itemsPerPage)}
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                              >
+                                Next
+                              </button>
                             </div>
-                          </div>
-                        ))}
-                        {(activeTab === "students" && students.length === 0) || (activeTab === "schools" && schools.length === 0) ? (
-                          <div className="mobile-card text-center">No data found</div>
-                        ) : null}
-                        {students.length > itemsPerPage && activeTab === "students" && (
-                          <div className="mobile-pagination">
-                            <button 
-                              className="mobile-page-btn" 
-                              disabled={currentPage === 1}
-                              onClick={() => setCurrentPage(currentPage - 1)}
-                            >
-                              Previous
-                            </button>
-                            <span className="mobile-page-info">
-                              Page {currentPage} of {Math.ceil(students.length / itemsPerPage)}
-                            </span>
-                            <button 
-                              className="mobile-page-btn"
-                              disabled={currentPage === Math.ceil(students.length / itemsPerPage)}
-                              onClick={() => setCurrentPage(currentPage + 1)}
-                            >
-                              Next
-                            </button>
-                          </div>
-                        )}
-                        {schools.length > itemsPerPage && activeTab === "schools" && (
-                          <div className="mobile-pagination">
-                            <button 
-                              className="mobile-page-btn" 
-                              disabled={currentPage === 1}
-                              onClick={() => setCurrentPage(currentPage - 1)}
-                            >
-                              Previous
-                            </button>
-                            <span className="mobile-page-info">
-                              Page {currentPage} of {Math.ceil(schools.length / itemsPerPage)}
-                            </span>
-                            <button 
-                              className="mobile-page-btn"
-                              disabled={currentPage === Math.ceil(schools.length / itemsPerPage)}
-                              onClick={() => setCurrentPage(currentPage + 1)}
-                            >
-                              Next
-                            </button>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-5 text-muted">
+                      <i className="bi bi-arrow-up-circle fs-1 mb-3 d-block"></i>
+                      <h5>Select a summary card above to view detailed reports and graphs</h5>
                     </div>
-                  </>
-                ) : (
-                  <div className="text-center py-5 text-muted">
-                    <i className="bi bi-arrow-up-circle fs-1 mb-3 d-block"></i>
-                    <h5>Select a summary card above to view detailed reports and graphs</h5>
-                  </div>
-                )}
-            </>
-          )}
-        </Container>
+                  )}
+              </>
+            )}
+          </Container>
         </div>
       </div>
     </div>
