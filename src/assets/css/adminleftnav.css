@@ -295,9 +295,11 @@
 }
 
 .logo .header-logo {
-    height: 32px;
-    width: auto;
-    margin-left: auto;
+    height: 42px;
+    width: 42px;
+    margin-left: 12px;
+    border-radius: 28px;
+    padding: 4px;
 }
 
 .logo-collapsed {
@@ -308,8 +310,11 @@
 }
 
 .logo-collapsed .header-logo {
-    height: 30px;
-    width: auto;
+  height: 42px;
+    width: 45px;
+    background-color: #fff;
+    border-radius: 28px;
+    padding: 4px;
 }
 
 .logo-icon {
