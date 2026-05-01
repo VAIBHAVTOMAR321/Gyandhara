@@ -13,6 +13,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 import Home from "./components/pages/Home";
 import AboutUs from "./components/pages/AboutUs";
+import CourseItems from "./components/pages/CourseItems";
 import Footer from "./components/footer/Footer";
 import { AuthProvider, useAuth } from "./components/all_login/AuthContext";
 import { LanguageProvider } from "./components/all_login/LanguageContext";
@@ -196,6 +197,7 @@ function AppContent() {
             </ProtectedRoute>
           }
         />{" "}
+        <Route path="/courses" element={<CourseItems />} />
         <Route
           path="/Offlinecompetition"
           element={
