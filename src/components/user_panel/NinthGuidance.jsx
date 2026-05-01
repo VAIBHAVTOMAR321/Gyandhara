@@ -1,35 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Container, Card, Button, Row, Col, Badge, Form, ProgressBar, Modal, Alert, Tab, Nav } from 'react-bootstrap'
-// FIXED: Added FaChartLine to this import list
-import { 
-  FaGraduationCap, 
-  FaLightbulb, 
-  FaArrowLeft, 
-  FaFlask, 
-  FaCalculator, 
-  FaBook, 
-  FaBalanceScale, 
-  FaBrain, 
-  FaUserTie, 
-  FaWrench, 
-  FaCog, 
-  FaCertificate, 
-  FaCheckCircle, 
-  FaInfoCircle, 
-  FaUniversity, 
-  FaBusinessTime, 
-  FaCode, 
-  FaDna, 
-  FaBookOpen,
-  FaChartLine 
-} from 'react-icons/fa'
+import { Container, Card, Button, Row, Col, Badge, Form, Modal, Alert, Tab, Nav } from 'react-bootstrap'
+import { FaGraduationCap, FaLightbulb, FaArrowLeft, FaFlask, FaCalculator, FaBook, FaBrain, FaWrench, FaSeedling, FaCheckCircle, FaInfoCircle, FaUniversity, FaBookOpen } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 
 import CounselingForm from './CounselingForm'
 import { useAuth } from '../all_login/AuthContext'
 import { useLanguage } from '../all_login/LanguageContext'
-import '../../assets/css/10thclass.css'
+import '../../assets/css/9thclass.css'
 import UserHeader from './UserHeader'
 import UserLeftNav from './UserLeftNav'
 

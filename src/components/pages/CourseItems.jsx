@@ -62,14 +62,12 @@ function CourseItems() {
       
       <Container className="Course-items-header">
         <div className='course-items-header-content'>
-        <h1>Our Courses</h1>
+        <h1 className=''>Our Courses</h1>
         </div>
      
 
       <Container className="course-content">
       
-
-       
 
         {/* Results Count */}
       
