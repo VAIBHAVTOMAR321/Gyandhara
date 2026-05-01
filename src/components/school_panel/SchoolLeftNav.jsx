@@ -82,6 +82,11 @@ const menuItems = [
     label: "OFFLINE COMPETITIONS",
     path: "/Offlinecompetition",
   },
+  {
+    icon: <FaQuestionCircle />,
+    label: "SUPPORT / QUERY",
+    path: "/SchoolSendQuery",
+  },
   ];
 
   //  Auto-close sidebar when switching to mobile or tablet

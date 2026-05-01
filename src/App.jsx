@@ -25,6 +25,7 @@ import SchoolQuizList from "./components/school_panel/SchoolQuizList";
 import Login from "./components/all_login/Login";
 import NavBar from "./components/nav_bar/NavBar";
 import SchoolCompetitions from "./components/user_panel/SchoolCompetitions";
+import SchoolSendQuery from "./components/school_panel/SchoolSendQuery";
 
 import AdminDashBoard from "./components/admin_panel/AdminDashBoard";
 import SchoolDashBoard from "./components/school_panel/SchoolDashBoard";
@@ -94,7 +95,9 @@ function NavBarWrapper() {
     "/ManageJobs",
     "/AddSeminar",
     "/AddWorkshop",
-    "/NinthGuidance"
+    "/NinthGuidance",
+        "/SchoolSendQuery"
+
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -144,7 +147,8 @@ function FooterWrapper() {
     "/ManageJobs",
     "/AddSeminar",
     "/AddWorkshop",
-    "/NinthGuidance"
+    "/NinthGuidance",
+    "/SchoolSendQuery"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -200,6 +204,15 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/SchoolSendQuery"
+  element={
+    <ProtectedRoute allowedRoles={["school"]}> {/* Ensure role matches your app's naming */}
+      <SchoolSendQuery />
+    </ProtectedRoute>
+  }
+/>
+
         <Route
           path="/TwelfthGuidance"
           element={
