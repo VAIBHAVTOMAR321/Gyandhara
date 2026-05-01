@@ -120,12 +120,12 @@ const menuItems = [
     label: " Govt schemes",
     submenu: [
       {
-        label: "Manage Scheme",
+        label: "Add Category",
         path: "/ManageGovtSchemes",
         icon: <FaListUl />,
       },
       {
-        label: "Add Scheme",
+        label: "Add & View Scheme",
         path: "/AddGovtSchemes",
         icon: <FaPlusSquare />,
       },
