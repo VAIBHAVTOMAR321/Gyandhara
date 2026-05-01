@@ -164,7 +164,7 @@ const menuItems = [
   },
   {
     icon: <FaQuestionCircle />,
-    label: "Student Issues",
+    label: "All Queries",
     path: "/StudentIssue",
   },
   //   icon: <FaCalendarAlt />,

@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { Container, Row, Col } from 'react-bootstrap'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Container, Row, Col, Modal, Button } from 'react-bootstrap'
 import { useLanguage } from '../all_login/LanguageContext'
 import heroImg from "../../assets/images/CBSEimg.png";
 import '../../assets/css/home.css'
@@ -8,6 +8,8 @@ import Logo2 from "../../assets/images/gyandharalogo2.png";
 
 function Home() {
   const { language } = useLanguage()
+  const navigate = useNavigate()
+  const [showModal, setShowModal] = useState(false)
 
   const content = {
     en: {
@@ -63,7 +65,11 @@ function Home() {
       readySub: "Start your journey towards career excellence and academic success",
       getStartedBtn: "Get Started Today",
       learnMoreBtn: "Learn More",
-      signInBtn: "Sign In"
+      signInBtn: "Sign In",
+      modalTitle: "Access Restricted",
+      modalMessage: "Please login or register for more information and features.",
+      modalLogin: "Login",
+      modalRegister: "Register Today"
     },
     hi: {
       platformBadge: "🎓 GyanDhara - शैक्षिक मंच",
@@ -118,11 +124,18 @@ function Home() {
       readySub: "करियर की उत्कृष्टता और शैक्षणिक सफलता की ओर अपनी यात्रा शुरू करें",
       getStartedBtn: "आज शुरुआत करें",
       learnMoreBtn: "अधिक जानें",
-      signInBtn: "साइन इन करें"
+      signInBtn: "साइन इन करें",
+      modalTitle: "पहुंच प्रतिबंधित",
+      modalMessage: "अधिक जानकारी और सुविधाओं के लिए कृपया लॉगिन या पंजीकरण करें।",
+      modalLogin: "लॉगिन",
+      modalRegister: "आज ही पंजीकरण करें"
     }
   }
 
   const t = content[language] || content.en
+
+  const handleCardClick = () => setShowModal(true)
+  const handleClose = () => setShowModal(false)
 
   return (
     <div className="home-wrapper">
@@ -161,7 +174,12 @@ function Home() {
           </div>
           <div className="role-features-grid">
             {t.studentFeatures.map((feature, index) => (
-              <div className={`role-feature-card card-${feature.color}`} key={index}>
+              <div 
+                className={`role-feature-card card-${feature.color}`} 
+                key={index} 
+                onClick={handleCardClick}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className={`role-feature-icon-wrapper icon-${feature.color}`}>
                   <i className={`bi ${feature.icon}`}></i>
                 </div>
@@ -180,7 +198,12 @@ function Home() {
           </div>
           <div className="role-features-grid">
             {t.schoolFeatures.map((feature, index) => (
-              <div className={`role-feature-card card-${feature.color}`} key={index}>
+              <div 
+                className={`role-feature-card card-${feature.color}`} 
+                key={index} 
+                onClick={handleCardClick}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className={`role-feature-icon-wrapper icon-${feature.color}`}>
                   <i className={`bi ${feature.icon}`}></i>
                 </div>
@@ -200,7 +223,11 @@ function Home() {
             <Row className="g-4">
                 {t.benefits.map((benefit, index) => (
                     <Col lg={3} md={6} sm={12} key={index}>
-                        <div className={`benefit-card card-${benefit.color} h-100 border-0 shadow-sm`}>
+                        <div 
+                          className={`benefit-card card-${benefit.color} h-100 border-0 shadow-sm`}
+                          onClick={handleCardClick}
+                          style={{ cursor: 'pointer' }}
+                        >
                             <div className={`benefit-icon icon-${benefit.color}`}>
                                 <i className={`bi ${benefit.icon}`}></i>
                             </div>
@@ -228,6 +255,24 @@ function Home() {
           </div>
         </section>
       </div>
+
+      {/* Auth Prompt Modal */}
+      <Modal show={showModal} onHide={handleClose} centered size="sm">
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fs-5 fw-bold text-primary w-100 text-center">{t.modalTitle}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center pt-2">
+          <p className="mb-4 text-muted">{t.modalMessage}</p>
+          <div className="d-grid gap-2">
+            <Button variant="primary" className="rounded-pill py-2" onClick={() => { handleClose(); navigate('/login'); }}>
+              <i className="bi bi-box-arrow-in-right me-2"></i> {t.modalLogin}
+            </Button>
+            <Button variant="outline-primary" className="rounded-pill py-2" onClick={() => { handleClose(); navigate('/register'); }}>
+              <i className="bi bi-person-plus me-2"></i> {t.modalRegister}
+            </Button>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }

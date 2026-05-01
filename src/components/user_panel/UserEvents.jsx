@@ -173,11 +173,6 @@ const UserEvents = () => {
                     {language === 'hi' ? "आगामी" : "Upcoming"} ({counts.upcoming})
                   </Nav.Link>
                 </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="past">
-                    {language === 'hi' ? "पुराने" : "Past"} ({counts.past})
-                  </Nav.Link>
-                </Nav.Item>
               </Nav>
             </Card.Header>
           </Card>
@@ -256,9 +251,9 @@ const UserEvents = () => {
                           
                           <Card.Body className="d-flex flex-column">
                             <div className="mb-3">
-                              <h5 className="mb-2 fw-bold" style={{ color: '#333' }}>{language === 'hi' && event.event_name_hindi ? event.event_name_hindi : event.event_name}</h5>
+                              <h6 className="mb-1 fw-bold" style={{ color: '#333', fontSize: '0.9rem' }}>{language === 'hi' && event.event_name_hindi ? event.event_name_hindi : event.event_name}</h6>
                               {(language === 'hi' ? event.description_hindi || event.description : event.description) && (
-                                <p className="text-muted small mb-0" style={{ lineHeight: '1.5' }}>
+                                <p className="text-muted mb-0" style={{ lineHeight: '1.4', fontSize: '0.8rem' }}>
                                   {(language === 'hi' ? event.description_hindi || event.description : event.description).length > 100 
                                     ? (language === 'hi' ? event.description_hindi || event.description : event.description).substring(0, 100) + '...' 
                                     : (language === 'hi' ? event.description_hindi || event.description : event.description)}
@@ -269,16 +264,16 @@ const UserEvents = () => {
                             <div className="mb-3" style={{ flex: 1 }}>
                               <div className="d-flex align-items-center mb-2">
                                 <div className="d-flex align-items-center text-muted">
-                                  <FaClock className="me-2 text-primary" style={{ fontSize: '14px' }} />
-                                  <small>{language === 'hi' ? "प्रारंभ" : "Start"}: {formatDateTime(event.event_date_time)}</small>
+                                  <FaClock className="me-2 text-primary" style={{ fontSize: '12px' }} />
+                                  <small style={{ fontSize: '0.8rem' }}>{language === 'hi' ? "प्रारंभ" : "Start"}: {formatDateTime(event.event_date_time)}</small>
                                 </div>
                               </div>
                               
                               {event.end_date_time && (
                                 <div className="d-flex align-items-center mb-2">
                                   <div className="d-flex align-items-center text-muted">
-                                    <FaClock className="me-2 text-danger" style={{ fontSize: '14px' }} />
-                                    <small>{language === 'hi' ? "समाप्ति" : "End"}: {formatDateTime(event.end_date_time)}</small>
+                                    <FaClock className="me-2 text-danger" style={{ fontSize: '12px' }} />
+                                    <small style={{ fontSize: '0.8rem' }}>{language === 'hi' ? "समाप्ति" : "End"}: {formatDateTime(event.end_date_time)}</small>
                                   </div>
                                 </div>
                               )}
@@ -286,8 +281,8 @@ const UserEvents = () => {
                               {event.venue && (
                                 <div className="d-flex align-items-center">
                                   <div className="d-flex align-items-center text-muted">
-                                    <FaMapMarkerAlt className="me-2 text-success" style={{ fontSize: '14px' }} />
-                                    <small>{event.venue}</small>
+                                    <FaMapMarkerAlt className="me-2 text-success" style={{ fontSize: '12px' }} />
+                                    <small style={{ fontSize: '0.8rem' }}>{event.venue}</small>
                                   </div>
                                 </div>
                               )}
