@@ -67,6 +67,39 @@ function SendQuery() {
     }
   }
 
+  // Load student profile and auto-fill name from profile data
+  useEffect(() => {
+    const loadStudentProfile = async () => {
+      if (!uniqueId || !accessToken) return
+
+      try {
+        const response = await fetch(
+          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/?student_id=${uniqueId}`,
+          {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        )
+
+        if (response.ok) {
+          const result = await response.json()
+          const profileData = result?.data || result
+          const student = Array.isArray(profileData) ? profileData[0] : profileData
+
+          if (student?.full_name) {
+            setFormData(prev => ({ ...prev, full_name: student.full_name }))
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching student profile:', error)
+      }
+    }
+
+    loadStudentProfile()
+  }, [uniqueId, accessToken])
+
   // Fetch all queries on component mount and initialize student_id from auth
   useEffect(() => {
     if (uniqueId) {
