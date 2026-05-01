@@ -177,6 +177,14 @@ background-color: #fff;
   letter-spacing: -0.5px;
 }
 
+.hero-section h1 span.hero-title-word {
+  color: var(--gd-orange);
+
+  padding-bottom: 4px;
+  display: inline-block;
+  line-height: 1.3;
+}
+
 .hero-section h1 span {
   color: var(--gd-orange);
 }

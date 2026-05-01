@@ -13,6 +13,7 @@ function Home() {
     en: {
     platformBadge: "🎓 GyanDhara - Educational Platform",
     heroTitle: "Objective of GyanDhara",
+     heroTitleHTML: "Objective of <span class=\"hero-title-word\">GyanDhara</span>",
   heroSubtitle: "Welcome to GyanDhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, GyanDhara provides the tools you need to succeed.",
   heroImg: heroImg,
   exploreBtn: "Explore Now",
@@ -67,6 +68,7 @@ function Home() {
     hi: {
       platformBadge: "🎓 GyanDhara - शैक्षिक मंच",
       heroTitle: "GyanDhara का उद्देश्य",
+      heroTitleHTML: "<span class=\"hero-title-word\">GyanDhara</span> का उद्देश्य",
       heroSubtitle: "GyanDhara में आपका स्वागत है, आपका ऑल-इन-वन शैक्षिक पारिस्थितिकी तंत्र जो शैक्षणिक शिक्षण और वास्तविक दुनिया की सफलता के बीच की खाई को पाटने के लिए डिज़ाइन किया गया है। हमारा मानना है कि शिक्षा केवल परीक्षा पास करने के बारे में नहीं है; यह एक तेजी से विकसित हो रहे वैश्विक परिदृश्य में उन्नति के लिए आवश्यक कौशल, आत्मविश्वास और दिशा प्राप्त करने के बारे में है। चाहे आप नई तकनीकों में महारत हासिल करने के इच्छुक छात्र हों या शैक्षणिक प्रबंधन को सुव्यवस्थित करने का लक्ष्य रखने वाला स्कूल, GyanDhara आपको सफल होने के लिए आवश्यक उपकरण प्रदान करता है।",
       heroImg: heroImg,
       exploreBtn: "अब खोजें",
@@ -138,7 +140,7 @@ function Home() {
           </div>
           <div className="hero-content">
             <div className="hero-badge">{t.platformBadge}</div>
-            <h1>{t.heroTitle}</h1>
+            <h1 dangerouslySetInnerHTML={{ __html: t.heroTitleHTML }}></h1>
             <p>{t.heroSubtitle}</p>
             <div className="hero-buttons">
               <Link to="/register" className="btn-gyandhara btn-primary-custom">

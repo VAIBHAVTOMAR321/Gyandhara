@@ -40,7 +40,7 @@ import {
 
 import { useAuth } from "../all_login/AuthContext";
 import "../../assets/css/adminleftnav.css";
-import gyandharaLogo from "../../assets/images/gyandharalogo.png";
+import gyandharaLogo from "../../assets/images/gyandharalogo2.png";
 
 
 
