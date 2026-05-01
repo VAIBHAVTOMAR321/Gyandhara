@@ -2,7 +2,22 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
-
+.Course-items-header{
+  margin-top: 80px !important;
+  
+}
+.course-items-header-content h1 {
+      font-size: 34px;
+    font-weight: 800;
+   
+    color: var(--gd-blue-dark);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+}
+.Course-items-header{
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
 .course-hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;

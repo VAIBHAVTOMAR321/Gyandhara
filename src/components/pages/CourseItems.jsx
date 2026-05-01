@@ -59,12 +59,12 @@ function CourseItems() {
 
   return (
     <div className="course-items-page">
-      <div className="course-hero">
-        <Container>
-          <h1 className="course-hero-title">Explore Our Courses</h1>
-          <p className="course-hero-subtitle">Learn from industry experts and advance your career</p>
-        </Container>
-      </div>
+      
+      <Container className="Course-items-header">
+        <div className='course-items-header-content'>
+        <h1>Our Courses</h1>
+        </div>
+     
 
       <Container className="course-content">
       
@@ -72,13 +72,7 @@ function CourseItems() {
        
 
         {/* Results Count */}
-        <Row className="mb-3">
-          <Col>
-            <p className="results-count">
-              Showing {filteredCourses.length} of {courses.length} courses
-            </p>
-          </Col>
-        </Row>
+      
 
         {/* Courses Grid */}
         {filteredCourses.length > 0 ? (
@@ -115,12 +109,7 @@ function CourseItems() {
                       {course.course_desc?.substring(0, 120)}{course.course_desc?.length > 120 ? '...' : ''}
                     </Card.Text>
                     
-                    <div className="course-meta">
-                      
-                      <span className="course-date">
-                        <i className="bi bi-calendar"></i> {new Date(course.start_date).toLocaleDateString()}
-                      </span>
-                    </div>
+                  
 
                     {course.course_name_hindi && (
                       <div className="course-hindi-info">
@@ -152,6 +141,7 @@ function CourseItems() {
           </Card>
         )}
       </Container>
+     </Container>
     </div>
   )
 }
