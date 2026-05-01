@@ -100,35 +100,62 @@ const SchoolDashBoard = () => {
           ? enrollmentData.filter((e) => e.is_completed)
           : enrollmentData.filter((e) => !e.is_completed);
 
-    const total = filtered.length;
-    const completed = filtered.filter((e) => e.is_completed).length;
+    const studentStatusMap = {};
+    filtered.forEach((e, index) => {
+      const studentKey = e.student_id || e.student_name || `unknown-${index}`;
+      if (!studentStatusMap[studentKey]) {
+        studentStatusMap[studentKey] = {
+          completedCount: 0,
+          totalCount: 0,
+        };
+      }
+      studentStatusMap[studentKey].totalCount += 1;
+      if (e.is_completed) {
+        studentStatusMap[studentKey].completedCount += 1;
+      }
+    });
+
+    const total = Object.keys(studentStatusMap).length;
+    const completed = Object.values(studentStatusMap).filter(
+      (student) => student.completedCount === student.totalCount && student.totalCount > 0,
+    ).length;
     const ongoing = total - completed;
 
     // Unique students
-    const uniqueStudents = new Set(
-      filtered.filter((e) => e.student_id).map((e) => e.student_id),
-    ).size;
+    const uniqueStudents = total;
 
-    // Class distribution
+    // Class distribution by unique students per class
     const classMap = {};
     filtered.forEach((e) => {
       const cls = String(e.class_name || "Unknown");
-      classMap[cls] = (classMap[cls] || 0) + 1;
+      const studentKey = e.student_id || e.student_name || null;
+      if (!classMap[cls]) {
+        classMap[cls] = new Set();
+      }
+      if (studentKey) {
+        classMap[cls].add(studentKey);
+      }
     });
     const classDist = Object.entries(classMap)
-      .sort(([, a], [, b]) => b - a)
-      .map(([cls, count]) => [cls, count]);
+      .map(([cls, studentSet]) => [cls, studentSet.size])
+      .sort(([, a], [, b]) => b - a);
 
-    // Course distribution
+    // Course distribution by unique students per course
     const courseMap = {};
     filtered.forEach((e) => {
       const course = e.course_name || "Unknown Course";
-      courseMap[course] = (courseMap[course] || 0) + 1;
+      const studentKey = e.student_id || e.student_name || null;
+      if (!courseMap[course]) {
+        courseMap[course] = new Set();
+      }
+      if (studentKey) {
+        courseMap[course].add(studentKey);
+      }
     });
     const courseDist = Object.entries(courseMap)
+      .map(([course, studentSet]) => [course, studentSet.size])
       .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-      .map(([course, count]) => [course, count]);
+      .slice(0, 5);
 
     // Average module score
     const avgModuleScore =
@@ -149,6 +176,15 @@ const SchoolDashBoard = () => {
       avgModuleScore,
     };
   };
+
+  const uniqueStudentCount = useMemo(() => {
+    if (!enrollments || enrollments.length === 0) return 0;
+    return new Set(
+      enrollments
+        .filter((e) => e.student_id)
+        .map((e) => e.student_id),
+    ).size;
+  }, [enrollments]);
 
   const analytics = calculateAnalytics(enrollments, moduleProgress);
 
@@ -270,7 +306,7 @@ const SchoolDashBoard = () => {
                       ) : enrollmentError ? (
                         <p className="text-danger small">{enrollmentError}</p>
                       ) : (
-                        <h3 className="text-primary">{enrollments.length}</h3>
+                        <h3 className="text-primary">{uniqueStudentCount}</h3>
                       )}
                     </div>
                     <Button
@@ -287,13 +323,13 @@ const SchoolDashBoard = () => {
                         className="progress-bar bg-success"
                         role="progressbar"
                         style={{
-                          width: `${Math.min(enrollments.length * 10, 100)}%`,
+                          width: `${Math.min(uniqueStudentCount * 10, 100)}%`,
                         }}
-                        aria-valuenow={enrollments.length}
+                        aria-valuenow={uniqueStudentCount}
                         aria-valuemin="0"
                         aria-valuemax="10"
                       >
-                        {enrollments.length}
+                        {uniqueStudentCount}
                       </div>
                     </div>
                     <small className="text-muted">Enrollment Progress</small>
@@ -1272,7 +1308,7 @@ const SchoolDashBoard = () => {
                               Completed
                             </p>
                             <small className="text-success">
-                              {completionRate}% enrollment completion rate
+                              {completionRate}% unique student completion rate
                             </small>
                           </Card.Body>
                         </Card>
@@ -1383,7 +1419,7 @@ const SchoolDashBoard = () => {
                                             100,
                                         )
                                       : 0}
-                                    % of enrollments
+                                    % of unique students
                                   </small>
                                 </div>
                               </div>
@@ -1407,7 +1443,7 @@ const SchoolDashBoard = () => {
                                             100,
                                         )
                                       : 0}
-                                    % of enrollments
+                                    % of unique students
                                   </small>
                                 </div>
                               </div>
@@ -1464,7 +1500,7 @@ const SchoolDashBoard = () => {
                                         ></div>
                                       </div>
                                       <small className="text-muted">
-                                        {percentage}% of enrollments
+                                        {percentage}% of unique students
                                       </small>
                                     </div>
                                   );
@@ -1532,7 +1568,7 @@ const SchoolDashBoard = () => {
                                           ></div>
                                         </div>
                                         <small className="text-muted">
-                                          {percentage}% of total enrollments
+                                          {percentage}% of unique students
                                         </small>
                                       </div>
                                     );
