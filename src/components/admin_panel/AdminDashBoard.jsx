@@ -23,6 +23,7 @@ const AdminDashBoard = () => {
   const [schools, setSchools] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [quizParticipants, setQuizParticipants] = useState([]);
+  const [quizItems, setQuizItems] = useState([]);
   
   // Added state for quiz stats
   const [quizStats, setQuizStats] = useState({
@@ -81,33 +82,17 @@ const AdminDashBoard = () => {
     setLoading(true);
     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
     try {
-      const [studentsRes, schoolsRes, enrollmentsRes, quizRes] = await Promise.all([
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
+      const [quizParticipantsRes, quizItemsRes] = await Promise.all([
         axios.get(
           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -119,7 +104,8 @@ const AdminDashBoard = () => {
       console.log('Students Response:', studentsRes.data);
       console.log('Schools Response:', schoolsRes.data);
       console.log('Enrollments Response:', enrollmentsRes.data);
-      console.log('Quiz Response:', quizRes.data);
+      console.log('Quiz Participants Response:', quizParticipantsRes.data);
+      console.log('Quiz Items Response:', quizItemsRes.data);
 
 
       let studentData = [];
@@ -143,27 +129,35 @@ const AdminDashBoard = () => {
         enrollmentData = enrollmentsRes.data;
       }
 
-      let quizData = [];
-      if (quizRes.data && quizRes.data.data) {
-        quizData = quizRes.data.data;
-      } else if (quizRes.data && Array.isArray(quizRes.data)) {
-        quizData = quizRes.data;
+      let quizParticipantsData = [];
+      if (quizParticipantsRes.data && quizParticipantsRes.data.data) {
+        quizParticipantsData = quizParticipantsRes.data.data;
+      } else if (quizParticipantsRes.data && Array.isArray(quizParticipantsRes.data)) {
+        quizParticipantsData = quizParticipantsRes.data;
+      }
+
+      let quizItemsData = [];
+      if (quizItemsRes.data && quizItemsRes.data.data) {
+        quizItemsData = quizItemsRes.data.data;
+      } else if (quizItemsRes.data && Array.isArray(quizItemsRes.data)) {
+        quizItemsData = quizItemsRes.data;
       }
 
       setStudents(studentData);
       setSchools(schoolData);
       setEnrollments(enrollmentData);
-      setQuizParticipants(quizData);
+      setQuizParticipants(quizParticipantsData);
+      setQuizItems(quizItemsData);
       
       // Calculate quiz statistics
-      const totalQuizParticipants = quizData.length;
-      const totalQuizAttempts = quizData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
-      const totalScore = quizData.reduce((sum, item) => 
+      const totalQuizParticipants = quizParticipantsData.length;
+      const totalQuizAttempts = quizParticipantsData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
+      const totalScore = quizParticipantsData.reduce((sum, item) => 
         sum + (item.attempt?.reduce((attemptSum, attempt) => attemptSum + (attempt.score || 0), 0) || 0), 0
       );
       const averageScore = totalQuizAttempts > 0 ? (totalScore / totalQuizAttempts).toFixed(1) : 0;
       const passRate = totalQuizParticipants > 0 
-        ? ((quizData.filter(item => 
+        ? ((quizParticipantsData.filter(item => 
             item.attempt?.some(attempt => attempt.status === 'passed')
           ).length / totalQuizParticipants) * 100
         ).toFixed(1) : 0;
@@ -437,19 +431,27 @@ const AdminDashBoard = () => {
      );
   };
 
-   const renderQuizTable = () => {
-      const filteredQuizData = quizParticipants.filter(p => {
-        const matchSchool = !quizSchoolFilter || 
-          (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
-        const matchDistrict = !quizDistrictFilter || 
-          (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
-        return matchSchool && matchDistrict;
-      });
- 
-      const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
-      const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
- 
-      return (
+    const renderQuizTable = () => {
+       const filteredQuizData = quizParticipants.filter(p => {
+         const matchSchool = !quizSchoolFilter || 
+           (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+         const matchDistrict = !quizDistrictFilter || 
+           (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+         return matchSchool && matchDistrict;
+       });
+  
+       const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
+       const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
+
+       // Create a lookup map for quiz titles from quizItems
+       const quizTitleMap = {};
+       quizItems.forEach(q => {
+         if (q.id) {
+           quizTitleMap[q.id] = q.title || q.quiz_id || 'Unknown Quiz';
+         }
+       });
+  
+       return (
         <Card className="table-card">
           <Card.Body>
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -547,7 +549,7 @@ const AdminDashBoard = () => {
                          <td className="fw-bold">{p.student?.full_name}</td>
                          <td>{p.student?.district}</td>
                          <td>{p.student?.school_name}</td>
-                         <td><Badge bg="info">{p.quiz_id}</Badge></td>
+                          <td><Badge bg="info">{quizTitleMap[p.quiz_id] || p.quiz_id || 'N/A'}</Badge></td>
                          <td>{p.attempt?.length || 0}</td>
                          <td>
                            <Badge bg={scoreBadgeColor}>
