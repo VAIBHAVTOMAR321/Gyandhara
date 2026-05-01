@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Table, Button, Spinner, Modal, Form, Badge } from 'react-bootstrap'
+import { Container, Row, Col, Card, Table, Button, Spinner, Modal, Form, Badge, Tabs, Tab } from 'react-bootstrap'
 
 import axios from 'axios'
 import '../../assets/css/admindashboard.css'
@@ -9,7 +9,8 @@ import { FaArrowLeft, FaReply, FaCheck, FaTrash, FaChevronDown, FaChevronUp } fr
 import AdminLeftNav from './AdminLeftNav'
 import AdminHeader from './AdminHeader'
 
-const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-issue/'
+const STUDENT_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-issue/'
+const SCHOOL_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-issues/'
 
 const StudentIssue = () => {
   const { accessToken } = useAuth()
@@ -34,6 +35,7 @@ const StudentIssue = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [recordsPerPage] = useState(15)
   const [filterStatus, setFilterStatus] = useState('all')
+  const [activeTab, setActiveTab] = useState('student')
   const [expandedCards, setExpandedCards] = useState({})
 
   // Reply form state
@@ -58,7 +60,7 @@ const StudentIssue = () => {
     if (accessToken) {
       fetchQueries()
     }
-  }, [accessToken])
+  }, [accessToken, activeTab])
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
@@ -72,10 +74,19 @@ const StudentIssue = () => {
     if (searchTerm !== '') {
       filtered = filtered.filter(query => {
         if (!query) return false
-        return (query.full_name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (query.student_id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (query.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (query.query_id || '').toLowerCase().includes(searchTerm.toLowerCase())
+        const search = searchTerm.toLowerCase()
+        if (activeTab === 'student') {
+          return (query.full_name || '').toLowerCase().includes(search) ||
+            (query.student_id || '').toLowerCase().includes(search) ||
+            (query.title || '').toLowerCase().includes(search) ||
+            (query.query_id || '').toLowerCase().includes(search)
+        } else {
+          return (query.school_name || '').toLowerCase().includes(search) ||
+            (query.school_id || '').toLowerCase().includes(search) ||
+            (query.student_uni_id || '').toLowerCase().includes(search) ||
+            (query.title || '').toLowerCase().includes(search) ||
+            (query.query_id || '').toLowerCase().includes(search)
+        }
       })
     }
 
@@ -86,7 +97,7 @@ const StudentIssue = () => {
 
     setFilteredQueries(filtered || [])
     setCurrentPage(1)
-  }, [searchTerm, queries, filterStatus])
+  }, [searchTerm, queries, filterStatus, activeTab])
 
   const fetchQueries = async () => {
     if (!accessToken) {
@@ -96,7 +107,8 @@ const StudentIssue = () => {
     
     try {
       setLoading(true)
-      const response = await axios.get(API_URL, {
+      const url = activeTab === 'student' ? STUDENT_API_URL : SCHOOL_API_URL
+      const response = await axios.get(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
@@ -179,7 +191,8 @@ const StudentIssue = () => {
         status: replyData.status
       }
 
-      await axios.put(API_URL, payload, {
+      const url = activeTab === 'student' ? STUDENT_API_URL : SCHOOL_API_URL
+      await axios.put(url, payload, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
@@ -201,7 +214,8 @@ const StudentIssue = () => {
     }
     
     try {
-      await axios.delete(API_URL, {
+      const url = activeTab === 'student' ? STUDENT_API_URL : SCHOOL_API_URL
+      await axios.delete(url, {
         data: { query_id: selectedQuery.query_id },
         headers: {
           'Authorization': `Bearer ${accessToken}`,
@@ -297,9 +311,14 @@ const StudentIssue = () => {
                 <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
                   <FaArrowLeft /> Dashboard
                 </Button>
-                <h4 className="mb-0">Student Issues / Queries</h4>
+                <h4 className="mb-0">Issues / Queries</h4>
               </div>
             </div>
+
+            <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-3">
+              <Tab eventKey="student" title="Student Queries" />
+              <Tab eventKey="school" title="School Queries" />
+            </Tabs>
 
             <Row>
               <Col xs={12}>
@@ -367,8 +386,8 @@ const StudentIssue = () => {
                           <thead className="bg-primary text-white">
                             <tr>
                               <th className="py-3 px-2">Query ID</th>
-                              <th className="py-3 px-2">Student Name</th>
-                              <th className="py-3 px-2">Student ID</th>
+                              <th className="py-3 px-2">{activeTab === 'student' ? 'Student Name' : 'School Name'}</th>
+                              <th className="py-3 px-2">{activeTab === 'student' ? 'Student ID' : 'School/Uni ID'}</th>
                               <th className="py-3 px-2">Title</th>
                               <th className="py-3 px-2">Issue</th>
                               <th className="py-3 px-2">Status</th>
@@ -381,15 +400,15 @@ const StudentIssue = () => {
                             {currentRecords.length === 0 ? (
                               <tr>
                                 <td colSpan="9" className="text-center py-4 text-muted">
-                                  No queries found
+                                  No {activeTab} queries found
                                 </td>
                               </tr>
                             ) : (
                               currentRecords.map((query) => (
                                 <tr key={query.id}>
                                   <td className="py-3 px-2"><span className="text-muted small fw-medium">{query.query_id}</span></td>
-                                  <td className="py-3 px-2 fw-medium text-dark">{query.full_name}</td>
-                                  <td className="py-3 px-2 small">{query.student_id}</td>
+                                  <td className="py-3 px-2 fw-medium text-dark">{activeTab === 'student' ? query.full_name : query.school_name}</td>
+                                  <td className="py-3 px-2 small">{activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id)}</td>
                                   <td className="py-3 px-2 small">{query.title}</td>
                                   <td className="py-3 px-2 small" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {query.issue}
@@ -444,8 +463,8 @@ const StudentIssue = () => {
                               <Card.Body className="p-3">
                                 <div className="d-flex justify-content-between align-items-start mb-2">
                                   <div>
-                                    <h6 className="mb-1 fw-semibold">{query.full_name}</h6>
-                                    <small className="text-muted">ID: {query.student_id}</small>
+                                    <h6 className="mb-1 fw-semibold">{activeTab === 'student' ? query.full_name : query.school_name}</h6>
+                                    <small className="text-muted">ID: {activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id)}</small>
                                   </div>
                                   {getStatusBadge(query.status)}
                                 </div>
@@ -589,12 +608,12 @@ const StudentIssue = () => {
             <div>
               <Row className="mb-3">
                 <Col md={6} xs={12}>
-                  <p className="mb-1"><strong>Student Name:</strong></p>
-                  <p className="text-muted">{selectedQuery.full_name}</p>
+                  <p className="mb-1"><strong>{activeTab === 'student' ? 'Student Name:' : 'School Name:'}</strong></p>
+                  <p className="text-muted">{activeTab === 'student' ? selectedQuery.full_name : selectedQuery.school_name}</p>
                 </Col>
                 <Col md={6} xs={12}>
-                  <p className="mb-1"><strong>Student ID:</strong></p>
-                  <p className="text-muted">{selectedQuery.student_id}</p>
+                  <p className="mb-1"><strong>{activeTab === 'student' ? 'Student ID:' : 'School/Uni ID:'}</strong></p>
+                  <p className="text-muted">{activeTab === 'student' ? selectedQuery.student_id : (selectedQuery.school_id || selectedQuery.student_uni_id)}</p>
                 </Col>
               </Row>
               <Row className="mb-3">
