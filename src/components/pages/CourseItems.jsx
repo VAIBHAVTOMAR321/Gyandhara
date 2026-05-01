@@ -100,7 +100,7 @@ function CourseItems() {
                   <Card.Body className="course-card-body">
                     <div className="course-category">
                       <Badge bg="primary" className="course-badge">
-                        {course.course_category || 'General'}
+                        {course.course_category || ''}
                       </Badge>
                     </div>
                     <Card.Title className="course-title">{course.course_name}</Card.Title>
