@@ -62,24 +62,11 @@ const UserProfile = () => {
     fetchProfile();
   }, [uniqueId, accessToken]);
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
+   const toggleSidebar = () => {
+     setSidebarOpen(!sidebarOpen);
+   };
 
-  const getStatusClass = (status) => {
-    switch (status?.toLowerCase()) {
-      case "approved":
-        return "status-approved";
-      case "pending":
-        return "status-pending";
-      case "rejected":
-        return "status-rejected";
-      default:
-        return "status-default";
-    }
-  };
-
-  return (
+   return (
     <div className="dashboard-container">
       <UserLeftNav
         sidebarOpen={sidebarOpen}
@@ -109,18 +96,13 @@ const UserProfile = () => {
                           <i className="bi bi-person-fill"></i>
                         )}
                       </div>
-                      <div className="profile-info">
-                        <h2>{profile?.full_name || (language === 'hi' ? "यूजर" : "User")}</h2>
-                        <p className="student-id">
-                          <i className="bi bi-person-badge"></i>
-                          {profile?.student_id}
-                        </p>
-                        <span className={`status-badge ${getStatusClass(profile?.status)}`}>
-                          {profile?.status === 'approved' ? (language === 'hi' ? "स्वीकृत" : "Approved") : 
-                           profile?.status === 'pending' ? (language === 'hi' ? "लंबित" : "Pending") : 
-                           profile?.status === 'rejected' ? (language === 'hi' ? "अस्वीकृत" : "Rejected") : (profile?.status || "N/A")}
-                        </span>
-                      </div>
+                       <div className="profile-info">
+                         <h2>{profile?.full_name || (language === 'hi' ? "यूजर" : "User")}</h2>
+                         <p className="student-id">
+                           <i className="bi bi-person-badge"></i>
+                           {profile?.student_id}
+                         </p>
+                       </div>
                     </div>
                   </Card.Body>
                 </Card>
@@ -139,10 +121,10 @@ const UserProfile = () => {
                         <label>{language === 'hi' ? "पूरा नाम" : "Full Name"}</label>
                         <span>{profile?.full_name || "-"}</span>
                       </div>
-                      <div className="info-item">
-                        <label>{language === 'hi' ? "आधार संख्या" : "Aadhaar Number"}</label>
-                        <span>{profile?.aadhaar_no || "-"}</span>
-                      </div>
+                       <div className="info-item">
+                         <label>{language === 'hi' ? "आधार संख्या" : "Aadhaar Number"}</label>
+                         <span>{profile?.aadhaar_no ? profile.aadhaar_no.length > 4 ? 'xxxx-xxxx-' + profile.aadhaar_no.slice(-4) : profile.aadhaar_no : "-"}</span>
+                       </div>
                       <div className="info-item">
                         <label>{language === 'hi' ? "फोन" : "Phone"}</label>
                         <span>{profile?.phone || "-"}</span>
