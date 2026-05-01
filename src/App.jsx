@@ -197,7 +197,7 @@ function AppContent() {
             </ProtectedRoute>
           }
         />{" "}
-        <Route path="/courses" element={<CourseItems />} />
+        <Route path="/CourseItems" element={<CourseItems />} />
         <Route
           path="/Offlinecompetition"
           element={
