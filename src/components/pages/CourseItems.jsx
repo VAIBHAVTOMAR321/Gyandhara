@@ -104,7 +104,7 @@ function CourseItems() {
                       </Badge>
                     </div>
                     <Card.Title className="course-title">{course.course_name}</Card.Title>
-                    <Card.Title className="course-course-id">{course.course_id}</Card.Title>
+                  
                     <Card.Text className="course-description">
                       {course.course_desc?.substring(0, 120)}{course.course_desc?.length > 120 ? '...' : ''}
                     </Card.Text>
