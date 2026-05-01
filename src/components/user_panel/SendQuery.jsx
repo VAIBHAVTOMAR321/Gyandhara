@@ -261,6 +261,7 @@ return (
                             value={formData.full_name}
                             onChange={handleInputChange}
                             placeholder={language === 'hi' ? "अपना पूरा नाम दर्ज करें" : "Enter your full name"}
+                            disabled
                             required
                           />
                         </Form.Group>
