@@ -23,6 +23,7 @@ const AdminDashBoard = () => {
   const [schools, setSchools] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [quizParticipants, setQuizParticipants] = useState([]);
+  const [quizItems, setQuizItems] = useState([]);
   
   // Added state for quiz stats
   const [quizStats, setQuizStats] = useState({
@@ -81,33 +82,17 @@ const AdminDashBoard = () => {
     setLoading(true);
     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
     try {
-      const [studentsRes, schoolsRes, enrollmentsRes, quizRes] = await Promise.all([
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
+      const [quizParticipantsRes, quizItemsRes] = await Promise.all([
         axios.get(
           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -119,7 +104,8 @@ const AdminDashBoard = () => {
       console.log('Students Response:', studentsRes.data);
       console.log('Schools Response:', schoolsRes.data);
       console.log('Enrollments Response:', enrollmentsRes.data);
-      console.log('Quiz Response:', quizRes.data);
+      console.log('Quiz Participants Response:', quizParticipantsRes.data);
+      console.log('Quiz Items Response:', quizItemsRes.data);
 
 
       let studentData = [];
@@ -143,27 +129,35 @@ const AdminDashBoard = () => {
         enrollmentData = enrollmentsRes.data;
       }
 
-      let quizData = [];
-      if (quizRes.data && quizRes.data.data) {
-        quizData = quizRes.data.data;
-      } else if (quizRes.data && Array.isArray(quizRes.data)) {
-        quizData = quizRes.data;
+      let quizParticipantsData = [];
+      if (quizParticipantsRes.data && quizParticipantsRes.data.data) {
+        quizParticipantsData = quizParticipantsRes.data.data;
+      } else if (quizParticipantsRes.data && Array.isArray(quizParticipantsRes.data)) {
+        quizParticipantsData = quizParticipantsRes.data;
+      }
+
+      let quizItemsData = [];
+      if (quizItemsRes.data && quizItemsRes.data.data) {
+        quizItemsData = quizItemsRes.data.data;
+      } else if (quizItemsRes.data && Array.isArray(quizItemsRes.data)) {
+        quizItemsData = quizItemsRes.data;
       }
 
       setStudents(studentData);
       setSchools(schoolData);
       setEnrollments(enrollmentData);
-      setQuizParticipants(quizData);
+      setQuizParticipants(quizParticipantsData);
+      setQuizItems(quizItemsData);
       
       // Calculate quiz statistics
-      const totalQuizParticipants = quizData.length;
-      const totalQuizAttempts = quizData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
-      const totalScore = quizData.reduce((sum, item) => 
+      const totalQuizParticipants = quizParticipantsData.length;
+      const totalQuizAttempts = quizParticipantsData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
+      const totalScore = quizParticipantsData.reduce((sum, item) => 
         sum + (item.attempt?.reduce((attemptSum, attempt) => attemptSum + (attempt.score || 0), 0) || 0), 0
       );
       const averageScore = totalQuizAttempts > 0 ? (totalScore / totalQuizAttempts).toFixed(1) : 0;
       const passRate = totalQuizParticipants > 0 
-        ? ((quizData.filter(item => 
+        ? ((quizParticipantsData.filter(item => 
             item.attempt?.some(attempt => attempt.status === 'passed')
           ).length / totalQuizParticipants) * 100
         ).toFixed(1) : 0;
@@ -313,108 +307,278 @@ const AdminDashBoard = () => {
     );
   };
 
-  const renderQuizTable = () => {
-    const filteredQuizData = quizParticipants.filter(p => {
-      const matchSchool = !quizSchoolFilter || 
-        (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
-      const matchDistrict = !quizDistrictFilter || 
-        (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
-      return matchSchool && matchDistrict;
-    });
+  const renderRankDistributionChart = () => {
+     const allRanks = quizParticipants.flatMap(p => 
+       p.attempt?.map(a => a.rank).filter(r => r && r > 0) || []
+     ).sort((a, b) => a - b);
 
-    const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
-    const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
+     if (allRanks.length === 0) {
+       return (
+         <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+           <Card.Body className="p-4 text-center text-muted">
+             <i className="bi bi-graph-up fs-1 mb-2 d-block"></i>
+             <p className="mb-0">No rank data available</p>
+           </Card.Body>
+         </Card>
+       );
+     }
+    
+     const minRank = Math.min(...allRanks);
+     const maxRank = Math.max(...allRanks);
+     const totalParticipants = allRanks.length;
 
-    return (
-      <Card className="table-card">
-        <Card.Body>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h5 className="mb-0">Quiz Participants</h5>
-            {/* Note: ShowQuizTable logic is handled by activeTab state now, 
-                but kept this button if you want to toggle just the table view */}
-          </div>
-          
-          <Row className="mb-3">
-            <Col md={4} sm={6}>
-              <Form.Group>
-                <Form.Label>School</Form.Label>
-                <Form.Select
-                  value={quizSchoolFilter}
-                  onChange={(e) => setQuizSchoolFilter(e.target.value)}
-                  size="sm"
-                >
-                  <option value="">All Schools</option>
-                  {uniqueSchools.map((school, i) => (
-                    <option key={i} value={school}>{school}</option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </Col>
-            <Col md={4} sm={6}>
-              <Form.Group>
-                <Form.Label>District</Form.Label>
-                <Form.Select
-                  value={quizDistrictFilter}
-                  onChange={(e) => setQuizDistrictFilter(e.target.value)}
-                  size="sm"
-                >
-                  <option value="">All Districts</option>
-                  {uniqueDistricts.map((district, i) => (
-                    <option key={i} value={district}>{district}</option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
-            </Col>
-          </Row>
-          
-          <div className="table-responsive">
-            <Table striped bordered hover size="sm">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Student</th>
-                  <th>District</th>
-                  <th>School</th>
-                  <th>Quiz</th>
-                  <th>Attempts</th>
-                  <th>Best Score</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredQuizData.length > 0 ? (
-                  filteredQuizData.map((p, index) => {
-                    const bestAttempt = p.attempt?.reduce((best, curr) => 
-                      (curr.score || 0) > (best.score || 0) ? curr : best, 
-                      p.attempt?.[0] || {}
-                    );
-                    return (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td className="fw-bold">{p.student?.full_name}</td>
-                        <td>{p.student?.district}</td>
-                        <td>{p.student?.school_name}</td>
-                        <td><Badge bg="info">{p.quiz_id}</Badge></td>
-                        <td>{p.attempt?.length || 0}</td>
-                        <td>
-                          <Badge bg={bestAttempt?.status === 'passed' ? 'success' : 'warning'}>
-                            {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="text-center">No quiz participants found</td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
-        </Card.Body>
-      </Card>
-    );
+     const rankRanges = [
+       { label: 'Top 10', max: 10, color: '#2ecc71' },
+       { label: '11-50', min: 11, max: 50, color: '#3498db' },
+       { label: '51-100', min: 51, max: 100, color: '#f39c12' },
+       { label: '101+', min: 101, color: '#e74c3c' }
+     ];
+
+     const rankDistribution = rankRanges.map(range => {
+       const count = allRanks.filter(r => {
+         if (range.max && !range.min) return r <= range.max;
+         if (range.min && range.max) return r >= range.min && r <= range.max;
+         if (range.min && !range.max) return r >= range.min;
+         return false;
+       }).length;
+       const percentage = totalParticipants > 0 ? ((count / totalParticipants) * 100).toFixed(1) : 0;
+       return { ...range, count, percentage };
+     });
+
+     const maxCount = Math.max(...rankDistribution.map(r => r.count), 1);
+
+     return (
+       <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+         <Card.Body className="p-4">
+           <h5 className="mb-4 fw-bold text-dark d-flex align-items-center">
+             <i className="bi bi-trophy me-2" style={{ color: '#f39c12' }}></i>
+             Rank Distribution Across All Quiz Attempts
+           </h5>
+           <Row className="mb-3">
+             <Col md={3} sm={6}>
+               <div className="text-center p-3 bg-light rounded-3">
+                 <div className="h4 fw-bold text-primary">{minRank}</div>
+                 <div className="text-muted small">Best Rank</div>
+               </div>
+             </Col>
+             <Col md={3} sm={6}>
+               <div className="text-center p-3 bg-light rounded-3">
+                 <div className="h4 fw-bold text-primary">{maxRank}</div>
+                 <div className="text-muted small">Lowest Rank</div>
+               </div>
+             </Col>
+             <Col md={3} sm={6}>
+               <div className="text-center p-3 bg-light rounded-3">
+                 <div className="h4 fw-bold text-primary">{totalParticipants}</div>
+                 <div className="text-muted small">Total Attempts</div>
+               </div>
+             </Col>
+             <Col md={3} sm={6}>
+               <div className="text-center p-3 bg-light rounded-3">
+                 <div className="h4 fw-bold text-primary">{((totalParticipants > 0 ? allRanks.reduce((a, b) => a + b, 0) / totalParticipants : 0)).toFixed(1)}</div>
+                 <div className="text-muted small">Avg Rank</div>
+               </div>
+             </Col>
+           </Row>
+           <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+             <div style={{ minWidth: '700px', height: '320px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '40px 20px 60px 20px' }}>
+               {rankDistribution.map((item, index) => {
+                 const barHeight = (item.count / maxCount) * 200;
+                 return (
+                   <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
+                     <div className="fw-bold mb-1" style={{ fontSize: '12px', color: item.color, opacity: item.count > 0 ? 1 : 0.3 }}>
+                       {item.count}
+                     </div>
+                     <div className="district-bar" 
+                       style={{ 
+                         height: `${barHeight}px`, 
+                         width: '100%', 
+                         maxWidth: '80px', 
+                         background: `linear-gradient(to top, ${item.color}, ${item.color}aa)`,
+                         borderRadius: '8px 8px 0 0',
+                         transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                         position: 'relative',
+                         boxShadow: `0 4px 15px ${item.color}30`
+                       }}
+                       title={`${item.label}: ${item.count} attempts (${item.percentage}%)`}
+                     ></div>
+                     <div className="position-absolute text-center text-truncate fw-bold" 
+                       style={{ 
+                         bottom: '-50px', 
+                         width: '80px', 
+                         fontSize: '11px',
+                         color: '#333',
+                         letterSpacing: '0.2px'
+                       }}>
+                       {item.label}
+                     </div>
+                     <div className="position-absolute text-center small" 
+                       style={{ 
+                         top: '-20px', 
+                         width: '80px',
+                         fontSize: '10px',
+                         color: '#666'
+                       }}>
+                       {item.percentage}%
+                     </div>
+                   </div>
+                 );
+               })}
+             </div>
+           </div>
+         </Card.Body>
+       </Card>
+     );
   };
+
+    const renderQuizTable = () => {
+       const filteredQuizData = quizParticipants.filter(p => {
+         const matchSchool = !quizSchoolFilter || 
+           (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+         const matchDistrict = !quizDistrictFilter || 
+           (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+         return matchSchool && matchDistrict;
+       });
+  
+       const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
+       const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
+
+       // Create a lookup map for quiz titles from quizItems
+       const quizTitleMap = {};
+       quizItems.forEach(q => {
+         if (q.id) {
+           quizTitleMap[q.id] = q.title || q.quiz_id || 'Unknown Quiz';
+         }
+       });
+  
+       return (
+        <Card className="table-card">
+          <Card.Body>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">Quiz Participants</h5>
+            </div>
+            
+            <Row className="mb-3">
+              <Col md={3} sm={6}>
+                <Form.Group>
+                  <Form.Label>School</Form.Label>
+                  <Form.Select
+                    value={quizSchoolFilter}
+                    onChange={(e) => setQuizSchoolFilter(e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">All Schools</option>
+                    {uniqueSchools.map((school, i) => (
+                      <option key={i} value={school}>{school}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={3} sm={6}>
+                <Form.Group>
+                  <Form.Label>District</Form.Label>
+                  <Form.Select
+                    value={quizDistrictFilter}
+                    onChange={(e) => setQuizDistrictFilter(e.target.value)}
+                    size="sm"
+                  >
+                    <option value="">All Districts</option>
+                    {uniqueDistricts.map((district, i) => (
+                      <option key={i} value={district}>{district}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <div className="score-legend">
+              <span className="score-legend-item">
+                <span className="score-legend-color excellent"></span>
+                Excellent (90-100%)
+              </span>
+              <span className="score-legend-item">
+                <span className="score-legend-color good"></span>
+                Good (75-89%)
+              </span>
+              <span className="score-legend-item">
+                <span className="score-legend-color average"></span>
+                Average (60-74%)
+              </span>
+              <span className="score-legend-item">
+                <span className="score-legend-color needs-improvement"></span>
+                Needs Improvement (0-59%)
+              </span>
+            </div>
+
+            <div className="table-responsive">
+             <Table striped bordered hover size="sm">
+               <thead>
+                 <tr>
+                   <th>#</th>
+                   <th>Student</th>
+                   <th>District</th>
+                   <th>School</th>
+                   <th>Quiz</th>
+                   <th>Attempts</th>
+                   <th>Best Score</th>
+                   <th>Best Rank</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 {filteredQuizData.length > 0 ? (
+                   filteredQuizData.map((p, index) => {
+                     const bestAttempt = p.attempt?.reduce((best, curr) => 
+                       (curr.score || 0) > (best.score || 0) ? curr : best, 
+                       p.attempt?.[0] || {}
+                     );
+                     const bestRank = p.attempt?.reduce((best, curr) => 
+                       curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, 
+                       null
+                     );
+                     const percentage = bestAttempt?.total_questions 
+                       ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1)
+                       : 0;
+                     let scoreBadgeColor = 'warning';
+                     if (percentage >= 90) scoreBadgeColor = 'success';
+                     else if (percentage >= 75) scoreBadgeColor = 'primary';
+                     else if (percentage >= 60) scoreBadgeColor = 'info';
+                     
+                     return (
+                       <tr key={index}>
+                         <td>{index + 1}</td>
+                         <td className="fw-bold">{p.student?.full_name}</td>
+                         <td>{p.student?.district}</td>
+                         <td>{p.student?.school_name}</td>
+                          <td><Badge bg="info">{quizTitleMap[p.quiz_id] || p.quiz_id || 'N/A'}</Badge></td>
+                         <td>{p.attempt?.length || 0}</td>
+                         <td>
+                           <Badge bg={scoreBadgeColor}>
+                             {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
+                             {percentage > 0 && ` (${percentage}%)`}
+                           </Badge>
+                         </td>
+                         <td>
+                           {bestRank ? (
+                             <Badge bg={bestRank <= 10 ? 'success' : bestRank <= 50 ? 'primary' : bestRank <= 100 ? 'warning' : 'danger'}>
+                               #{bestRank}
+                             </Badge>
+                           ) : '-'}
+                         </td>
+                       </tr>
+                     );
+                   })
+                 ) : (
+                   <tr>
+                     <td colSpan="8" className="text-center">No quiz participants found</td>
+                   </tr>
+                 )}
+               </tbody>
+             </Table>
+           </div>
+         </Card.Body>
+       </Card>
+     );
+   };
 
   const statCards = [
     {
@@ -820,13 +984,16 @@ const AdminDashBoard = () => {
 
                  {activeTab ? (
                    <>
-                     {activeTab === "quiz-participants" ? (
-                       renderQuizChart()
-                     ) : (
-                       renderDistrictChart()
-                     )}
+              {activeTab === "quiz-participants" ? (
+                        <>
+                          {renderRankDistributionChart()}
+                          {renderQuizChart()}
+                        </>
+                      ) : (
+                        renderDistrictChart()
+                      )}
 
-                     <div className="table-card">
+              <div className="table-card">
                         <h4>
                           {activeTab === "students" && "Student List"}
                           {activeTab === "schools" && "School List"}

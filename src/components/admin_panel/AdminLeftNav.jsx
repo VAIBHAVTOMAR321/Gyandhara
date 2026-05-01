@@ -196,8 +196,9 @@ const menuItems = [
           {sidebarOpen ? (
             <div className="logo-container">
               <div className="logo">
-                Admin DashBoard
+               
                 <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
+                Admin Dashboard
               </div>
             </div>
           ) : (

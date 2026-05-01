@@ -170,8 +170,9 @@ const menuItems = [
           {sidebarOpen ? (
             <div className="logo-container">
               <div className="logo">
-                {language === 'hi' ? "यूजर डैशबोर्ड" : "User DashBoard"}
+               
                 <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
+                 {language === 'hi' ? "यूजर डैशबोर्ड" : "User DashBoard"}
               </div>
             </div>
           ) : (
