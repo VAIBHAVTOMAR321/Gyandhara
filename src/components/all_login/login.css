@@ -239,7 +239,8 @@
 
 .input-wrapper i {
   position: absolute;
-  left: 13px;
+  left: 0px;
+  bottom: -8px;
   color: #94A3B8;
   font-size: 14px;
   transition: color 0.2s ease;
