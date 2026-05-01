@@ -3768,11 +3768,11 @@ const DashBord = () => {
                <FaChartBar className="me-2" /> Enrollment Analytics Dashboard
              </Modal.Title>
              <div className="d-flex gap-2">
-               <Button variant="light" size="sm" onClick={() => setShowPerformanceModal(true)}>
+               {/* <Button variant="light" size="sm" onClick={() => setShowPerformanceModal(true)}>
                  <FaTrophy className="me-1" /> Performance Ranking
-               </Button>
+               </Button> */}
                <Button variant="outline-light" size="sm" onClick={() => setShowPerformanceHelpModal(true)} title="How is performance calculated?">
-                 ?
+                 Performance Ranking
                </Button>
              </div>
            </Modal.Header>
