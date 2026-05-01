@@ -53,6 +53,7 @@ import AddWorkshop from "./components/admin_panel/AddWorkshop";
 import JobOpenings from "./components/user_panel/JobOpenings";
 import UserEvents from "./components/user_panel/UserEvents";
 import Offlinecompetition from "./components/school_panel/Offlinecompetition";
+import NinthGuidance from "./components/user_panel/NinthGuidance";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 //  Navbar Wrapper (Hide on specific routes)
@@ -93,6 +94,7 @@ function NavBarWrapper() {
     "/ManageJobs",
     "/AddSeminar",
     "/AddWorkshop",
+    "/NinthGuidance"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -142,6 +144,7 @@ function FooterWrapper() {
     "/ManageJobs",
     "/AddSeminar",
     "/AddWorkshop",
+    "/NinthGuidance"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -274,6 +277,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <ManageGovtSchemes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/NinthGuidance"
+          element={
+            <ProtectedRoute>
+              <NinthGuidance />
             </ProtectedRoute>
           }
         />

@@ -84,22 +84,32 @@ const menuItems = [
        label: language === 'hi' ? "प्रोफाइल" : "PROFILE",
        path: "/UserProfile",
      },
-     {
-       icon: <FaChalkboardTeacher />,
-       label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
-       submenu: [
-         {
-           label: language === 'hi' ? "12वीं मार्गदर्शन" : "12th Guidance",
-           path: "/TwelfthGuidance",
-           icon: <FaPlusSquare />,
-         },
+      {
+        icon: <FaChalkboardTeacher />,
+        label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
+        submenu: [
           {
-           label: language === 'hi' ? "10वीं मार्गदर्शन" : "10th Guidance",
-           path: "/TenthGuidance",
-           icon: <FaPlusSquare />,
-         },
-       ],
-     },
+            label: language === 'hi' ? "9वीं मार्गदर्शन" : "9th Guidance",
+            path: "/NinthGuidance",
+            icon: <FaPlusSquare />,
+          },
+          {
+            label: language === 'hi' ? "10वीं मार्गदर्शन" : "10th Guidance",
+            path: "/TenthGuidance",
+            icon: <FaPlusSquare />,
+          },
+          {
+            label: language === 'hi' ? "11वीं मार्गदर्शन" : "11th Guidance",
+            path: "/EleventhGuidance",
+            icon: <FaPlusSquare />,
+          },
+          {
+            label: language === 'hi' ? "12वीं मार्गदर्शन" : "12th Guidance",
+            path: "/TwelfthGuidance",
+            icon: <FaPlusSquare />,
+          },
+        ],
+      },
      {
        icon: <FaTasks />,
        label: language === 'hi' ? "ग्रूमिंग क्लासेस" : "Grooming Classes",
