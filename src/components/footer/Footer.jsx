@@ -58,9 +58,7 @@ function Footer() {
           <div className="footer-brand-section">
             <div className="footer-logo-section">
               <img src={gyandharaLogo} alt="Gyandhara Logo" className="footer-logo" />
-              <span className="footer-brand-text">
-                Gyan<span className="brand-highlight">Dhara</span>
-              </span>
+             
             </div>
             <p className="footer-description">
               {t.description}
