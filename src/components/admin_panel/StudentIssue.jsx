@@ -78,6 +78,8 @@ const StudentIssue = () => {
         if (activeTab === 'student') {
           return (query.full_name || '').toLowerCase().includes(search) ||
             (query.student_id || '').toLowerCase().includes(search) ||
+            (query.school_name || '').toLowerCase().includes(search) ||
+            (query.school_uni_id || '').toLowerCase().includes(search) ||
             (query.title || '').toLowerCase().includes(search) ||
             (query.query_id || '').toLowerCase().includes(search)
         } else {
@@ -388,6 +390,12 @@ const StudentIssue = () => {
                               <th className="py-3 px-2">Query ID</th>
                               <th className="py-3 px-2">{activeTab === 'student' ? 'Student Name' : 'School Name'}</th>
                               <th className="py-3 px-2">{activeTab === 'student' ? 'Student ID' : 'School/Uni ID'}</th>
+                              {activeTab === 'student' && (
+                                <>
+                                  <th className="py-3 px-2">School Name</th>
+                                  <th className="py-3 px-2">School ID</th>
+                                </>
+                              )}
                               <th className="py-3 px-2">Title</th>
                               <th className="py-3 px-2">Issue</th>
                               <th className="py-3 px-2">Status</th>
@@ -399,7 +407,7 @@ const StudentIssue = () => {
                           <tbody>
                             {currentRecords.length === 0 ? (
                               <tr>
-                                <td colSpan="9" className="text-center py-4 text-muted">
+                                <td colSpan={activeTab === 'student' ? 11 : 9} className="text-center py-4 text-muted">
                                   No {activeTab} queries found
                                 </td>
                               </tr>
@@ -409,6 +417,12 @@ const StudentIssue = () => {
                                   <td className="py-3 px-2"><span className="text-muted small fw-medium">{query.query_id}</span></td>
                                   <td className="py-3 px-2 fw-medium text-dark">{activeTab === 'student' ? query.full_name : query.school_name}</td>
                                   <td className="py-3 px-2 small">{activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id)}</td>
+                                  {activeTab === 'student' && (
+                                    <>
+                                      <td className="py-3 px-2 small">{query.school_name || '-'}</td>
+                                      <td className="py-3 px-2 small">{query.school_uni_id || '-'}</td>
+                                    </>
+                                  )}
                                   <td className="py-3 px-2 small">{query.title}</td>
                                   <td className="py-3 px-2 small" style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                     {query.issue}
@@ -465,6 +479,12 @@ const StudentIssue = () => {
                                   <div>
                                     <h6 className="mb-1 fw-semibold">{activeTab === 'student' ? query.full_name : query.school_name}</h6>
                                     <small className="text-muted">ID: {activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id)}</small>
+                                    {activeTab === 'student' && (
+                                      <div className="mt-1 border-top pt-1">
+                                        <small className="text-muted d-block">School: {query.school_name}</small>
+                                        <small className="text-muted d-block">Sch. ID: {query.school_uni_id}</small>
+                                      </div>
+                                    )}
                                   </div>
                                   {getStatusBadge(query.status)}
                                 </div>
@@ -616,6 +636,18 @@ const StudentIssue = () => {
                   <p className="text-muted">{activeTab === 'student' ? selectedQuery.student_id : (selectedQuery.school_id || selectedQuery.student_uni_id)}</p>
                 </Col>
               </Row>
+              {activeTab === 'student' && (
+                <Row className="mb-3">
+                  <Col md={6} xs={12}>
+                    <p className="mb-1"><strong>School Name:</strong></p>
+                    <p className="text-muted">{selectedQuery.school_name}</p>
+                  </Col>
+                  <Col md={6} xs={12}>
+                    <p className="mb-1"><strong>School ID:</strong></p>
+                    <p className="text-muted">{selectedQuery.school_uni_id}</p>
+                  </Col>
+                </Row>
+              )}
               <Row className="mb-3">
                 <Col md={12}>
                   <p className="mb-1"><strong>Title:</strong></p>
