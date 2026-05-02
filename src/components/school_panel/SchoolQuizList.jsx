@@ -401,98 +401,74 @@ const toggleStudentSelection = (studentId) => {
                   {quizzes.map((quiz) => (
                     <Col key={quiz.id} md={6} lg={3} className="mb-3 px-2">
                       <Card className="shadow-sm h-100 quiz-card" style={{ fontSize: '0.75rem' }}>
-                        <Card.Header className="bg-white d-flex justify-content-between align-items-center py-1 px-2">
-                          <Badge bg={isQuizActive(quiz) ? 'success' : 'secondary'} style={{ fontSize: '0.65rem' }}>
+                        <Card.Header className="bg-white d-flex justify-content-between align-items-center py-1 px-2 border-bottom-0">
+                          <Badge pill bg={isQuizActive(quiz) ? 'success' : 'secondary'} style={{ fontSize: '0.6rem' }}>
                             {isQuizActive(quiz) ? 'Active' : 'Inactive'}
                           </Badge>
-                          <small className="text-muted" style={{ fontSize: '0.65rem' }}>{quiz.questions?.length || 0} Qs</small>
+                          <small className="text-muted fw-bold" style={{ fontSize: '0.6rem' }}>{quiz.questions?.length || 0} Questions</small>
                         </Card.Header>
-                        <Card.Body className="p-2">
-                          <Card.Title className="fw-bold mb-0" style={{ fontSize: '0.85rem' }}>{quiz.title}</Card.Title>
+                        <Card.Body className="p-2 pt-0">
+                          <Card.Title className="fw-bold mb-1 text-primary text-truncate" style={{ fontSize: '0.8rem' }} title={quiz.title}>
+                            {quiz.title}
+                          </Card.Title>
                           {quiz.title_hindi && (
-                            <Card.Subtitle className="mb-1 text-muted" style={{ fontSize: '0.7rem' }}>{quiz.title_hindi}</Card.Subtitle>
+                            <Card.Subtitle className="mb-2 text-muted text-truncate" style={{ fontSize: '0.7rem' }}>{quiz.title_hindi}</Card.Subtitle>
                           )}
                           
                           {quiz.description && (
-                            <Card.Text className="text-muted mb-1" style={{ fontSize: '0.7rem', lineHeight: '1.2' }}>
-                              {quiz.description.length > 60 
-                                ? quiz.description.substring(0, 60) + '...' 
+                            <Card.Text className="text-muted mb-2" style={{ fontSize: '0.68rem', lineHeight: '1.2' }}>
+                              {quiz.description.length > 50 
+                                ? quiz.description.substring(0, 50) + '...' 
                                 : quiz.description}
                             </Card.Text>
                           )}
 
-                          <div className="mb-2">
-                            <small className="text-muted d-block mb-0" style={{ fontSize: '0.65rem' }}>
-                              <FaClock className="me-1" size={10} />
-                              Duration:
-                            </small>
-                            <div style={{ fontSize: '0.7rem' }}>
-                              <div><strong>Start:</strong> {formatDate(quiz.start_date_time)}</div>
-                              <div><strong>End:</strong> {formatDate(quiz.end_date_time)}</div>
+                          <div className="mb-2 p-1 bg-light rounded" style={{ fontSize: '0.62rem' }}>
+                            <div className="d-flex align-items-center mb-1">
+                              <FaClock className="me-1 text-secondary" size={9} />
+                              <span className="fw-bold me-1">Start:</span> {formatDate(quiz.start_date_time)}
+                            </div>
+                            <div className="d-flex align-items-center">
+                              <FaClock className="me-1 text-secondary" size={9} />
+                              <span className="fw-bold me-1">End:</span> {formatDate(quiz.end_date_time)}
                             </div>
                           </div>
 
-                          <div className="d-flex align-items-center gap-2 flex-wrap mt-1">
-                            <div>
-                              <small className="text-muted d-block mb-0" style={{ fontSize: '0.65rem' }}>
-                                <FaBook className="me-1" size={10} />
-                                Category:
-                              </small>
-                              <Badge bg="info" style={{ fontSize: '0.65rem' }}>{quiz.quiz_category}</Badge>
+                          <div style={{ fontSize: '0.68rem' }}>
+                            <div className="d-flex align-items-center mb-1">
+                              <FaBook className="me-1 text-info" size={10} />
+                              <span className="text-muted me-1">Category:</span>
+                              <span className="fw-semibold text-truncate">{quiz.quiz_category}</span>
+                              {quiz.total_participants && (
+                                <span className="ms-auto text-muted" style={{ fontSize: '0.6rem' }}>Max: {quiz.total_participants}</span>
+                              )}
                             </div>
-
-                            <div>
-                              <small className="text-muted d-block mb-0" style={{ fontSize: '0.65rem' }}>
-                                <FaUsers className="me-1" size={10} />
-                                Eligible Classes:
-                              </small>
-                              <div className="d-flex flex-wrap gap-1">
-                                {quiz.class_allowed?.map((cls, idx) => {
-                                  const classColors = ['primary', 'success', 'danger', 'warning'];
-                                  const colorIndex = idx % classColors.length;
-                                  return (
-                                    <Badge 
-                                      key={cls} 
-                                      bg={classColors[colorIndex]}
-                                      className="px-1 py-0 rounded-pill fw-semibold"
-                                      style={{
-                                        fontSize: '0.6rem',
-                                        textShadow: '0 1px 1px rgba(0,0,0,0.1)'
-                                      }}
-                                    >
-                                      Class {cls}
-                                    </Badge>
-                                  );
-                                })}
-                              </div>
+                            <div className="d-flex align-items-center">
+                              <FaUsers className="me-1 text-primary" size={10} />
+                              <span className="text-muted me-1">Classes:</span>
+                              <span className="fw-bold text-dark">{quiz.class_allowed?.join(', ')}</span>
                             </div>
                           </div>
-
-                          {quiz.total_participants && (
-                            <div className="mt-2">
-                              <small className="text-muted d-block" style={{ fontSize: '0.75rem' }}>
-                                Max Participants: {quiz.total_participants}
-                              </small>
-                            </div>
-                          )}
                         </Card.Body>
-                        <Card.Footer className="bg-white py-3">
-                          <div className="d-grid gap-1">
+                        <Card.Footer className="bg-white py-2 px-2 border-top-0">
+                          <div className="d-flex gap-1">
                             <Button 
                               variant="primary" 
-                              className="w-100 btn-sm"
+                              className="flex-fill py-1 px-1 border-0"
+                              style={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}
                               onClick={() => handleRegisterClick(quiz)}
                               disabled={!isQuizActive(quiz)}
                             >
-                              Add Students / Register
+                              Register
                             </Button>
                             <Button 
                               variant="outline-info" 
-                              className="w-100 btn-sm"
+                              className="flex-fill py-1 px-1"
+                              style={{ fontSize: '0.65rem', whiteSpace: 'nowrap' }}
                               onClick={() => fetchQuizResults(quiz.quiz_id || quiz.id)}
                               disabled={resultsLoading}
                             >
-                              {resultsLoading ? <Spinner animation="border" size="sm" /> : <><FaTrophy className="me-2" /> View Results</>}
+                              {resultsLoading ? <Spinner animation="border" size="sm" /> : 'Results'}
                             </Button>
                           </div>
                         </Card.Footer>
