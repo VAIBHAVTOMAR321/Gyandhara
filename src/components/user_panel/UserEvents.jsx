@@ -145,35 +145,35 @@ const UserEvents = () => {
         <Container className="dashboard-box mt-3">
           <Row className="mb-4">
             <Col xs={12} className="mt-4">
-              <div className="d-flex align-items-center mb-3">
-                <FaCalendarAlt className="me-2 text-primary" style={{ fontSize: '24px' }} />
-                <h3 className="mb-0 fw-bold">{language === 'hi' ? "कार्यक्रम" : "Events"}</h3>
-              </div>
-              <p className="text-muted">
-                {language === 'hi' ? "आगामी कार्यक्रमों, कार्यशालाओं और सेमिनारों की खोज करें और उनमें भाग लें।" : "Discover and participate in upcoming events, workshops, and seminars."}
-              </p>
+                 <div className="d-flex align-items-center mb-3">
+                   <FaCalendarAlt className="me-2 text-primary" style={{ fontSize: '20px' }} />
+                   <h4 className="mb-0 fw-bold">{language === 'hi' ? "कार्यक्रम" : "Events"}</h4>
+                 </div>
+                 <p className="text-muted" style={{ fontSize: '0.9rem' }}>
+                   {language === 'hi' ? "आगामी कार्यक्रमों, कार्यशालाओं और सेमिनारों की खोज करें और उनमें भाग लें।" : "Discover and participate in upcoming events, workshops, and seminars."}
+                 </p>
             </Col>
           </Row>
 
           <Card className="shadow-sm border-0 mb-4">
             <Card.Header className="bg-light border-bottom py-3">
-              <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => { setActiveTab(key); setCurrentPage(1) }}>
-                <Nav.Item>
-                  <Nav.Link eventKey="all">
-                    {language === 'hi' ? "सभी" : "All"} ({counts.all})
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="active">
-                    {language === 'hi' ? "सक्रिय" : "Active"} ({counts.active})
-                  </Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="upcoming">
-                    {language === 'hi' ? "आगामी" : "Upcoming"} ({counts.upcoming})
-                  </Nav.Link>
-                </Nav.Item>
-              </Nav>
+               <Nav variant="tabs" activeKey={activeTab} onSelect={(key) => { setActiveTab(key); setCurrentPage(1) }} className="mb-0">
+                 <Nav.Item>
+                   <Nav.Link eventKey="all" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
+                     {language === 'hi' ? "सभी" : "All"} ({counts.all})
+                   </Nav.Link>
+                 </Nav.Item>
+                 <Nav.Item>
+                   <Nav.Link eventKey="active" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
+                     {language === 'hi' ? "सक्रिय" : "Active"} ({counts.active})
+                   </Nav.Link>
+                 </Nav.Item>
+                 <Nav.Item>
+                   <Nav.Link eventKey="upcoming" style={{ padding: '6px 12px', fontSize: '0.85rem' }}>
+                     {language === 'hi' ? "आगामी" : "Upcoming"} ({counts.upcoming})
+                   </Nav.Link>
+                 </Nav.Item>
+               </Nav>
             </Card.Header>
           </Card>
 
@@ -249,59 +249,60 @@ const UserEvents = () => {
                             )}
                           </div>
                           
-                          <Card.Body className="d-flex flex-column">
-                            <div className="mb-3">
-                              <h6 className="mb-1 fw-bold" style={{ color: '#333', fontSize: '0.9rem' }}>{language === 'hi' && event.event_name_hindi ? event.event_name_hindi : event.event_name}</h6>
-                              {(language === 'hi' ? event.description_hindi || event.description : event.description) && (
-                                <p className="text-muted mb-0" style={{ lineHeight: '1.4', fontSize: '0.8rem' }}>
-                                  {(language === 'hi' ? event.description_hindi || event.description : event.description).length > 100 
-                                    ? (language === 'hi' ? event.description_hindi || event.description : event.description).substring(0, 100) + '...' 
-                                    : (language === 'hi' ? event.description_hindi || event.description : event.description)}
-                                </p>
-                              )}
-                            </div>
+                           <Card.Body className="d-flex flex-column">
+                             <div className="mb-3">
+                               <h6 className="mb-1 fw-bold" style={{ color: '#333', fontSize: '0.85rem' }}>{language === 'hi' && event.event_name_hindi ? event.event_name_hindi : event.event_name}</h6>
+                               {(language === 'hi' ? event.description_hindi || event.description : event.description) && (
+                                 <p className="text-muted mb-0" style={{ lineHeight: '1.4', fontSize: '0.75rem' }}>
+                                   {(language === 'hi' ? event.description_hindi || event.description : event.description).length > 100 
+                                     ? (language === 'hi' ? event.description_hindi || event.description : event.description).substring(0, 100) + '...' 
+                                     : (language === 'hi' ? event.description_hindi || event.description : event.description)}
+                                 </p>
+                               )}
+                             </div>
 
                             <div className="mb-3" style={{ flex: 1 }}>
-                              <div className="d-flex align-items-center mb-2">
-                                <div className="d-flex align-items-center text-muted">
-                                  <FaClock className="me-2 text-primary" style={{ fontSize: '12px' }} />
-                                  <small style={{ fontSize: '0.8rem' }}>{language === 'hi' ? "प्रारंभ" : "Start"}: {formatDateTime(event.event_date_time)}</small>
-                                </div>
-                              </div>
+                               <div className="d-flex align-items-center mb-2">
+                                 <div className="d-flex align-items-center text-muted">
+                                   <FaClock className="me-2 text-primary" style={{ fontSize: '12px' }} />
+                                   <small style={{ fontSize: '0.7rem' }}>{language === 'hi' ? "प्रारंभ" : "Start"}: {formatDateTime(event.event_date_time)}</small>
+                                 </div>
+                               </div>
                               
-                              {event.end_date_time && (
-                                <div className="d-flex align-items-center mb-2">
-                                  <div className="d-flex align-items-center text-muted">
-                                    <FaClock className="me-2 text-danger" style={{ fontSize: '12px' }} />
-                                    <small style={{ fontSize: '0.8rem' }}>{language === 'hi' ? "समाप्ति" : "End"}: {formatDateTime(event.end_date_time)}</small>
-                                  </div>
-                                </div>
-                              )}
+                               {event.end_date_time && (
+                                 <div className="d-flex align-items-center mb-2">
+                                   <div className="d-flex align-items-center text-muted">
+                                     <FaClock className="me-2 text-danger" style={{ fontSize: '12px' }} />
+                                     <small style={{ fontSize: '0.7rem' }}>{language === 'hi' ? "समाप्ति" : "End"}: {formatDateTime(event.end_date_time)}</small>
+                                   </div>
+                                 </div>
+                               )}
                               
-                              {event.venue && (
-                                <div className="d-flex align-items-center">
-                                  <div className="d-flex align-items-center text-muted">
-                                    <FaMapMarkerAlt className="me-2 text-success" style={{ fontSize: '12px' }} />
-                                    <small style={{ fontSize: '0.8rem' }}>{event.venue}</small>
-                                  </div>
-                                </div>
-                              )}
+                               {event.venue && (
+                                 <div className="d-flex align-items-center">
+                                   <div className="d-flex align-items-center text-muted">
+                                     <FaMapMarkerAlt className="me-2 text-success" style={{ fontSize: '12px' }} />
+                                     <small style={{ fontSize: '0.7rem' }}>{event.venue}</small>
+                                   </div>
+                                 </div>
+                               )}
                             </div>
 
                             <div className="mt-auto pt-3">
-                              <Button
-                                variant="outline-primary"
-                                className="w-100 d-flex align-items-center justify-content-center"
-                                onClick={() => handleViewEvent(event)}
-                                style={{ 
-                                  borderRadius: '8px',
-                                  fontWeight: '600',
-                                  padding: '10px 16px'
-                                }}
-                              >
-                                <FaEye className="me-2" />
-                                {language === 'hi' ? "विवरण देखें" : "View Details"}
-                              </Button>
+                                 <Button
+                                   variant="outline-primary"
+                                   className="w-100 d-flex align-items-center justify-content-center"
+                                   onClick={() => handleViewEvent(event)}
+                                   style={{ 
+                                     borderRadius: '8px',
+                                     fontWeight: '600',
+                                     padding: '8px 14px',
+                                     fontSize: '0.85rem'
+                                   }}
+                                 >
+                                   <FaEye className="me-2" style={{ fontSize: '14px' }} />
+                                   {language === 'hi' ? "विवरण देखें" : "View Details"}
+                                 </Button>
                             </div>
                           </Card.Body>
                         </Card>
@@ -312,36 +313,39 @@ const UserEvents = () => {
               
               {filteredEvents.length > eventsPerPage && (
                 <div className="d-flex justify-content-between align-items-center mt-4">
-                  <div className="text-muted">
-                    {language === 'hi' ? "दिखाया जा रहा है" : "Showing"} {((currentPage - 1) * eventsPerPage) + 1}-{Math.min(currentPage * eventsPerPage, filteredEvents.length)} {language === 'hi' ? "कुल" : "of"} {filteredEvents.length} {language === 'hi' ? "कार्यक्रम" : "events"}
-                  </div>
+                   <div className="text-muted" style={{ fontSize: '0.85rem' }}>
+                     {language === 'hi' ? "दिखाया जा रहा है" : "Showing"} {((currentPage - 1) * eventsPerPage) + 1}-{Math.min(currentPage * eventsPerPage, filteredEvents.length)} {language === 'hi' ? "कुल" : "of"} {filteredEvents.length} {language === 'hi' ? "कार्यक्रम" : "events"}
+                   </div>
                   <div className="d-flex align-items-center gap-2">
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      disabled={currentPage === 1}
-                      onClick={() => setCurrentPage(currentPage - 1)}
-                    >
-                      {language === 'hi' ? "पिछला" : "Previous"}
-                    </Button>
-                    {Array.from({ length: Math.ceil(filteredEvents.length / eventsPerPage) }, function(_, i) { return i + 1 }).map(function(page) { return (
-                      <Button
-                        key={page}
-                        variant={currentPage === page ? 'primary' : 'outline-primary'}
-                        size="sm"
-                        onClick={() => setCurrentPage(page)}
-                      >
-                        {page}
-                      </Button>
-                    ); })}
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      disabled={currentPage === Math.ceil(filteredEvents.length / eventsPerPage)}
-                      onClick={() => setCurrentPage(currentPage + 1)}
-                    >
-                      {language === 'hi' ? "अगला" : "Next"}
-                    </Button>
+                     <Button
+                       variant="outline-primary"
+                       size="sm"
+                       disabled={currentPage === 1}
+                       onClick={() => setCurrentPage(currentPage - 1)}
+                       style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                     >
+                       {language === 'hi' ? "पिछला" : "Previous"}
+                     </Button>
+                     {Array.from({ length: Math.ceil(filteredEvents.length / eventsPerPage) }, function(_, i) { return i + 1 }).map(function(page) { return (
+                       <Button
+                         key={page}
+                         variant={currentPage === page ? 'primary' : 'outline-primary'}
+                         size="sm"
+                         onClick={() => setCurrentPage(page)}
+                         style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                       >
+                         {page}
+                       </Button>
+                     ); })}
+                     <Button
+                       variant="outline-primary"
+                       size="sm"
+                       disabled={currentPage === Math.ceil(filteredEvents.length / eventsPerPage)}
+                       onClick={() => setCurrentPage(currentPage + 1)}
+                       style={{ fontSize: '0.8rem', padding: '4px 10px' }}
+                     >
+                       {language === 'hi' ? "अगला" : "Next"}
+                     </Button>
                   </div>
                 </div>
               )}
@@ -381,12 +385,12 @@ const UserEvents = () => {
                
               <h4 className="mb-3">{language === 'hi' && selectedEvent.event_name_hindi ? selectedEvent.event_name_hindi : selectedEvent.event_name}</h4>
                 
-              {(language === 'hi' ? selectedEvent.description_hindi || selectedEvent.description : selectedEvent.description) && (
-                <div className="mb-4">
-                  <h6 className="text-muted mb-2">{language === 'hi' ? "विवरण" : "Description"}</h6>
-                  <p className="">{language === 'hi' ? selectedEvent.description_hindi || selectedEvent.description : selectedEvent.description}</p>
-                </div>
-              )}
+                 {(language === 'hi' ? selectedEvent.description_hindi || selectedEvent.description : selectedEvent.description) && (
+                   <div className="mb-4">
+                     <h6 className="text-muted mb-2">{language === 'hi' ? "विवरण" : "Description"}</h6>
+                     <p className="" style={{ fontSize: '0.95rem' }}>{language === 'hi' ? selectedEvent.description_hindi || selectedEvent.description : selectedEvent.description}</p>
+                   </div>
+                 )}
               
               <Row className="mb-4">
                 <Col md={6}>
@@ -394,7 +398,7 @@ const UserEvents = () => {
                     <h6 className="text-muted mb-2">
                       <FaClock className="me-2" /> {language === 'hi' ? "प्रारंभ तिथि और समय" : "Start Date & Time"}
                     </h6>
-                    <p className="mb-0 fw-semibold">{formatDateTime(selectedEvent.event_date_time)}</p>
+                     <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem' }}>{formatDateTime(selectedEvent.event_date_time)}</p>
                   </div>
                 </Col>
                 <Col md={6}>
@@ -402,9 +406,9 @@ const UserEvents = () => {
                     <h6 className="text-muted mb-2">
                       <FaClock className="me-2" /> {language === 'hi' ? "समाप्ति तिथि और समय" : "End Date & Time"}
                     </h6>
-                    <p className="mb-0 fw-semibold">
-                      {selectedEvent.end_date_time ? formatDateTime(selectedEvent.end_date_time) : 'N/A'}
-                    </p>
+                     <p className="mb-0 fw-semibold" style={{ fontSize: '0.9rem' }}>
+                       {selectedEvent.end_date_time ? formatDateTime(selectedEvent.end_date_time) : 'N/A'}
+                     </p>
                   </div>
                 </Col>
               </Row>
@@ -418,11 +422,11 @@ const UserEvents = () => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>
-            {language === 'hi' ? "बंद करें" : "Close"}
-          </Button>
-        </Modal.Footer>
+           <Modal.Footer>
+             <Button variant="secondary" onClick={closeModal} style={{ fontSize: '0.85rem', padding: '6px 12px' }}>
+               {language === 'hi' ? "बंद करें" : "Close"}
+             </Button>
+           </Modal.Footer>
       </Modal>
     </div>
   )
