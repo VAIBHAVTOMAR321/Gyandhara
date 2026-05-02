@@ -63,28 +63,28 @@ const SchoolLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
 const menuItems = [
   {
     icon: <FaTachometerAlt />,
-    label: "DASHBOARD",
+    label: "DashBorad",
     path: "/SchoolDashBoard",
     active: true,
   },
   {
     icon: <FaUsers />,
-    label: "ADD STUDENTS",
+    label: "Add Student",
     path: "/SchoolStudentRegistration",
   },
   {
     icon: <FaGraduationCap />,
-    label: "QUIZ COMPETITIONS",
+    label: "Quiz Participants",
     path: "/SchoolQuizList",
   },
   {
     icon: <FaUsers />,
-    label: "OFFLINE COMPETITIONS",
+    label: "Offline Competition",
     path: "/Offlinecompetition",
   },
   {
     icon: <FaQuestionCircle />,
-    label: "SUPPORT / QUERY",
+    label: "Send Query",
     path: "/SchoolSendQuery",
   },
   ];
