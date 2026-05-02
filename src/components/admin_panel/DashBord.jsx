@@ -1394,6 +1394,141 @@ const DashBord = () => {
       setEnrollmentSelectedClasses([])
     }
 
+    // Export to PDF
+    const exportToPDF = () => {
+      try {
+        const doc = new jsPDF({ orientation: 'landscape' })
+        const pageWidth = doc.internal.pageSize.getWidth()
+        const pageHeight = doc.internal.pageSize.getHeight()
+        const margin = 8
+        const availableWidth = pageWidth - (margin * 2)
+        
+        // Title
+        doc.setFontSize(14)
+        doc.text('Enrollment Details Report', margin, 12)
+        doc.setFontSize(9)
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, margin, 18)
+        doc.text(`Total Records: ${filteredEnrollments.length}`, margin, 23)
+        
+        // Column definitions (Excluding Action)
+        const headers = ['#', 'Student ID', 'Name', 'School Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status', 'Cert ID']
+        const colWidths = [8, 25, 35, 40, 15, 20, 45, 35, 25, 32]
+        const totalWidth = colWidths.reduce((a, b) => a + b, 0)
+        
+        // Scale columns to fit available width
+        const scaleFactor = availableWidth / totalWidth
+        const scaledColWidths = colWidths.map(w => w * scaleFactor)
+        
+        let y = 28
+        const startX = margin
+        const rowHeight = 5.5
+        const headerHeight = 6.5
+        
+        // Function to draw a row
+        const drawRow = (cells, yPos, isHeader = false) => {
+          let x = startX
+          const rowHeightToUse = isHeader ? headerHeight : rowHeight
+          
+          if (isHeader) {
+            doc.setFillColor(41, 128, 185)
+            doc.rect(startX, yPos - 4, availableWidth, rowHeightToUse, 'F')
+            doc.setTextColor(255, 255, 255)
+            doc.setFontSize(7.5)
+          } else {
+            doc.setTextColor(0, 0, 0)
+            doc.setFontSize(6.5)
+            // Draw alternating row colors
+            if (cells[0] % 2 === 0) {
+              doc.setFillColor(240, 245, 250)
+              doc.rect(startX, yPos - 4, availableWidth, rowHeightToUse, 'F')
+            }
+          }
+          
+          cells.forEach((cell, i) => {
+            let text = typeof cell === 'string' ? cell : String(cell)
+            const colWidth = scaledColWidths[i]
+            
+            const maxChars = Math.floor(colWidth / 1.8)
+            if (text.length > maxChars) {
+              text = text.substring(0, maxChars - 1) + '..'
+            }
+            
+            doc.setDrawColor(200, 200, 200)
+            doc.rect(x, yPos - 4, colWidth, rowHeightToUse)
+            doc.text(text, x + 1.5, yPos + (isHeader ? 0.5 : 0.3), { maxWidth: colWidth - 3 })
+            x += colWidth
+          })
+          
+          doc.setTextColor(0, 0, 0)
+          return yPos + rowHeightToUse
+        }
+        
+        y = drawRow(headers, y, true) + 1
+        
+        filteredEnrollments.forEach((enrollment, index) => {
+          if (y > pageHeight - 15) {
+            doc.addPage()
+            y = 12
+            y = drawRow(headers, y, true) + 1
+          }
+          
+          const cells = [
+            index + 1,
+            (enrollment.student_id || '-'),
+            (enrollment.student_name || '-'),
+            (enrollment.school_name || '-'),
+            (enrollment.class_name || '-'),
+            (enrollment.course_id || '-'),
+            (enrollment.course_name || '-'),
+            enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleDateString() : '-',
+            enrollment.is_completed ? 'Completed' : 'Ongoing',
+            (enrollment.certificate_id || '-')
+          ]
+          
+          y = drawRow(cells, y)
+        })
+        
+        const totalPages = doc.internal.getNumberOfPages()
+        for (let i = 1; i <= totalPages; i++) {
+          doc.setPage(i)
+          doc.setFontSize(7)
+          doc.setTextColor(150, 150, 150)
+          doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin - 20, pageHeight - 5)
+        }
+        
+        doc.save('enrollment-details.pdf')
+      } catch (error) {
+        console.error('PDF export error:', error)
+        alert('Failed to generate PDF. Error: ' + error.message)
+      }
+    }
+
+    // Export to Excel
+    const exportToExcel = () => {
+      try {
+        const data = filteredEnrollments.map((enrollment, index) => ({
+          '#': index + 1,
+          'Student ID': enrollment.student_id || '-',
+          'Student Name': enrollment.student_name || '-',
+          'School Name': enrollment.school_name || '-',
+          'Class': enrollment.class_name || '-',
+          'Course ID': enrollment.course_id || '-',
+          'Course Name': enrollment.course_name || '-',
+          'Enrolled At': enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-',
+          'Status': enrollment.is_completed ? 'Completed' : 'Ongoing',
+          'Certificate ID': enrollment.certificate_id || '-'
+        }))
+        
+        const ws = XLSX.utils.json_to_sheet(data)
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, 'Enrollment Details')
+        XLSX.writeFile(wb, 'enrollment-details.xlsx')
+      } catch (error) {
+        console.error('Excel export error:', error)
+        alert('Failed to generate Excel file.')
+      }
+    }
+
     return (
     <div className="fade-in">
       <div className="d-flex justify-content-between align-items-center mb-4 page-header">
@@ -1508,7 +1643,15 @@ const DashBord = () => {
        <Card className="shadow-sm border-0">
          <Card.Header className="bg-primary text-white d-flex justify-content-between align-items-center">
            <span><FaUsers className="me-2" /> Enrollment Details</span>
-           <Badge bg="light" text="dark">{filteredEnrollments.length} Records</Badge>
+          <div className="d-flex gap-2 align-items-center">
+            <Badge bg="light" text="dark" className="d-flex align-items-center h-100">{filteredEnrollments.length} Records</Badge>
+            <Button variant="light" size="sm" onClick={exportToPDF}>
+              <FaFilePdf className="me-1" /> Export PDF
+            </Button>
+            <Button variant="success" size="sm" onClick={exportToExcel}>
+              <FaFileExcel className="me-1" /> Export Excel
+            </Button>
+          </div>
          </Card.Header>
          <Card.Body>
            {loading ? (
