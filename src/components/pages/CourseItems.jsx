@@ -129,7 +129,7 @@ function CourseItems() {
                         {course.course_category || ''}
                       </Badge>
                     </div>
-                    <Card.Title className="course-title">
+                    <Card.Title className="">
                       {language === 'hi' && course.course_name_hindi ? course.course_name_hindi : course.course_name}
                     </Card.Title>
                   
