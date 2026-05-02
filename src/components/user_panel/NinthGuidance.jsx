@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Container, Card, Button, Row, Col, Badge, Form, Modal, Alert, Tab, Nav } from 'react-bootstrap'
-import { FaGraduationCap, FaLightbulb, FaArrowLeft, FaFlask, FaCalculator, FaBook, FaBrain, FaWrench, FaSeedling, FaCheckCircle, FaInfoCircle, FaUniversity, FaBookOpen } from 'react-icons/fa'
+import { FaGraduationCap, FaLightbulb, FaArrowLeft, FaFlask, FaCalculator, FaBook, FaBrain, FaWrench, FaSeedling, FaCheckCircle, FaInfoCircle, FaUniversity, FaBookOpen, FaChartLine } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 import CounselingForm from './CounselingForm'
 import { useAuth } from '../all_login/AuthContext'
