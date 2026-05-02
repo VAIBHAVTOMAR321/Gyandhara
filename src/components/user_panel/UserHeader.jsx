@@ -320,15 +320,20 @@ function UserHeader({ toggleSidebar }) {
           </Col>
           
           <Col xs="auto">
-             <div className="header-actions">
-               {/* Language Toggle */}
-               <div className="btn-group me-2" role="group">
+             <div className="header-actions d-flex align-items-center">
+               
+               {/* Language Toggle - Visible on all screens now */}
+               <div className="btn-group me-1 me-sm-2" role="group">
                  <Button
                    variant={language === 'hi' ? "dark" : "outline-dark"}
                    size="sm"
                    onClick={() => setLanguage('hi')}
                    className="fw-semibold"
-                   style={language === 'hi' ? { backgroundColor: 'black', borderColor: 'black', color: 'white' } : {}}
+                   style={{
+                      ...(language === 'hi' ? { backgroundColor: 'black', borderColor: 'black', color: 'white' } : {}),
+                      fontSize: '0.75rem', // Smaller font on mobile to fit
+                      padding: '0.25rem 0.5rem'
+                   }}
                  >
                    हिन्दी
                  </Button>
@@ -337,31 +342,63 @@ function UserHeader({ toggleSidebar }) {
                    size="sm"
                    onClick={() => setLanguage('en')}
                    className="fw-semibold"
-                   style={language === 'en' ? { backgroundColor: 'black', borderColor: 'black', color: 'white' } : {}}
+                   style={{
+                      ...(language === 'en' ? { backgroundColor: 'black', borderColor: 'black', color: 'white' } : {}),
+                      fontSize: '0.75rem', // Smaller font on mobile to fit
+                      padding: '0.25rem 0.5rem'
+                   }}
                  >
                    EN
                  </Button>
                </div>
-               <Button
-                  style={{ background: "#383be8", borderColor: "#383be8", color: "#fff" }}
-                  className="me-2"
+
+               {/* Grooming Class Button - Visible on all screens now */}
+               <div
                   onClick={() => navigate("/GroomingClasses")}
-                >
+                  style={{
+                    background: "#383be8",
+                    color: "#fff",
+                    padding: "4px 10px", // Tighter padding
+                    borderRadius: "6px",
+                    fontSize: "0.7rem", // Smaller font on mobile
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    display: "inline-block",
+                    marginRight: "8px",
+                    whiteSpace: "nowrap",
+                    textAlign: "center"
+                  }}
+               >
                   {language === 'hi' ? "ग्रूमिंग क्लास" : "Grooming Class"}
-                </Button>
+               </div>
+
                {/* Notifications Dropdown */}
               <Dropdown
                 show={showNotificationDropdown}
                 onToggle={(isOpen) => setShowNotificationDropdown(isOpen)}
                 align="end"
+                className="me-2"
               >
-                <Dropdown.Toggle variant="light" className="notification-btn">
-                  <FaBell />
-                  {unreadCount > 0 && (
-                    <Badge pill bg="danger" className="notification-badge">
-                      {unreadCount}
-                    </Badge>
-                  )}
+                <Dropdown.Toggle variant="light" className="notification-btn border-0 bg-transparent">
+                  <div style={{ position: 'relative', display: 'inline-block' }}>
+                    <FaBell size={20} />
+                    {unreadCount > 0 && (
+                      <Badge 
+                        pill 
+                        bg="danger" 
+                        className="notification-badge" 
+                        style={{ 
+                          position: 'absolute', 
+                          top: '4px', 
+                          right: '-8px',
+                          fontSize: '0.6rem',
+                          transform: 'translate(50%, -50%)'
+                        }}
+                      >
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </div>
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu
@@ -502,12 +539,11 @@ function UserHeader({ toggleSidebar }) {
               <Dropdown align="end">
                 <Dropdown.Toggle
                   variant="light"
-                  className="user-profile-btn"
+                  className="user-profile-btn d-flex align-items-center"
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
+                    gap: "4px",
                     border: "1px solid #e5e7eb",
+                    padding: "2px 6px",
                   }}
                 >
                   {getUserPhotoUrl() ? (
@@ -517,16 +553,17 @@ function UserHeader({ toggleSidebar }) {
                       className="user-avatar"
                       onError={handleImageError}
                       style={{
-                        width: 36,
-                        height: 36,
+                        width: 28,
+                        height: 28,
                         objectFit: "cover",
                       }}
                       alt="User"
                     />
                   ) : (
-                    <FaUserCircle style={{ fontSize: 32, color: "rgb(250 93 77)" }} />
+                    <FaUserCircle style={{ fontSize: 24, color: "rgb(250 93 77)" }} />
                   )}
-                  <span style={{ fontWeight: 500, fontSize: "0.9rem" }}>
+                  {/* Name hidden on mobile to save space for other buttons, but Avatar remains visible */}
+                  <span style={{ fontWeight: 500, fontSize: "0.85rem" }} className="d-none d-md-inline">
                     {getDisplayName()}
                   </span>
                 </Dropdown.Toggle>

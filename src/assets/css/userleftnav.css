@@ -3,6 +3,7 @@
     height: 40px !important;
     object-fit: cover;
 }
+
 .dashboard-content {
   background: #fff;
   padding: 20px;
@@ -520,7 +521,9 @@
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 2px !important;
+    padding: 0px !important;
+
 }
 
 /* .notification-btn {
