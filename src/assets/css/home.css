@@ -100,7 +100,7 @@
 .hero-image-wrapper {
   position: relative;
   width: 45%;
-  min-width: 350px;
+  min-width: 100%;
   flex-shrink: 0;
 }
 
