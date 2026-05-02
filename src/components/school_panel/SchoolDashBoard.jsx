@@ -93,7 +93,7 @@ const SchoolDashBoard = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [quizLoading, setQuizLoading] = useState(true);
   const [quizError, setQuizError] = useState("");
-  const [showQuizListModal, setShowQuizListModal] = useState(false);
+  const [showQuizDetails, setShowQuizDetails] = useState(false);
   
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [quizParticipants, setQuizParticipants] = useState([]);
@@ -469,10 +469,10 @@ const SchoolDashBoard = () => {
                     </div>
                     <Button
                       variant="outline-info"
-                      onClick={() => setShowQuizListModal(true)}
+                      onClick={() => setShowQuizDetails(!showQuizDetails)}
                       disabled={quizzes.length === 0}
                     >
-                      {showQuizListModal ? "Hide List" : "View Quizzes"}
+                      {showQuizDetails ? "Hide List" : "View Quizzes"}
                     </Button>
                   </div>
                   <div className="mt-3">
@@ -499,7 +499,7 @@ const SchoolDashBoard = () => {
             <Row className="mt-3">
               <Col>
                 <Card className="shadow-box">
-                  <Card.Header className="d-flex justify-content-between align-items-center">
+                  <Card.Header className="bg-primary bg-opacity-10 d-flex justify-content-between align-items-center">
                     <h5>Enrolled Students</h5>
                     <Button
                       variant="primary"
@@ -514,7 +514,7 @@ const SchoolDashBoard = () => {
                       <Spinner animation="border" />
                     ) : enrollments.length > 0 ? (
                       <Table striped bordered hover responsive>
-                        <thead>
+                        <thead className="table-primary">
                           <tr>
                             <th>#</th>
                             <th>Student Name</th>
@@ -578,76 +578,67 @@ const SchoolDashBoard = () => {
             </Row>
           )}
 
-          {/* Quiz List Modal */}
-          <Modal
-            show={showQuizListModal}
-            onHide={() => setShowQuizListModal(false)}
-            size="xl"
-            centered
-            className="quiz-list-modal"
-          >
-             <Modal.Header
-              closeButton
-              className="bg-gradient text-white py-1 px-3"
-              style={{
-                background: "linear-gradient(135deg, #6f42c1 0%, #9b59b6 100%)",
-              }}
-            >
-              <Modal.Title className="d-flex align-items-center gap-2 fs-6">
-                <FaClipboardList className="me-2" />
-                All Available Quizzes
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body className="p-2">
-               {quizLoading ? (
-                  <div className="text-center py-4"><Spinner animation="border" /></div>
-                ) : (
-                  <Table striped bordered hover responsive size="sm">
-                    <thead className="table-light">
-                      <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Category</th>
-                        <th>Questions</th>
-                        <th>Start Date</th>
-                        <th>Status</th>
-                        <th className="text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {quizzes.map((quiz) => (
-                        <tr key={quiz.id}>
-                          <td><Badge bg="secondary">{quiz.quiz_id}</Badge></td>
-                          <td className="fw-bold">{quiz.title}</td>
-                          <td>{quiz.quiz_category}</td>
-                          <td>{quiz.number_of_questions}</td>
-                          <td>{new Date(quiz.start_date_time).toLocaleDateString()}</td>
-                          <td>
-                            {quiz.is_active ? (
-                              <Badge bg="success">Active</Badge>
-                            ) : (
-                              <Badge bg="secondary">Inactive</Badge>
-                            )}
-                          </td>
-                          <td className="text-center">
-                            <Button
-                              variant="outline-primary"
-                              size="sm"
-                              onClick={() => handleViewParticipants(quiz)}
-                            >
-                              <FaEye className="me-1" /> View & Analysis
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowQuizListModal(false)}>Close</Button>
-            </Modal.Footer>
-          </Modal>
+          {/* Quiz Details Section */}
+          {showQuizDetails && (
+            <Row className="mt-3">
+              <Col>
+                <Card className="shadow-box">
+                  <Card.Header className="bg-warning bg-opacity-10 d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0 d-flex align-items-center gap-2">
+                      <FaClipboardList className="text-primary" />
+                      All Available Quizzes
+                    </h5>
+                  </Card.Header>
+                  <Card.Body>
+                    {quizLoading ? (
+                      <div className="text-center py-4"><Spinner animation="border" /></div>
+                    ) : (
+                      <Table striped bordered hover responsive size="sm">
+                        <thead className="table-warning">
+                          <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Questions</th>
+                            <th>Start Date</th>
+                            <th>Status</th>
+                            <th className="text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {quizzes.map((quiz) => (
+                            <tr key={quiz.id}>
+                              <td><Badge bg="secondary">{quiz.quiz_id}</Badge></td>
+                              <td className="fw-bold">{quiz.title}</td>
+                              <td>{quiz.quiz_category}</td>
+                              <td>{quiz.number_of_questions}</td>
+                              <td>{new Date(quiz.start_date_time).toLocaleDateString()}</td>
+                              <td>
+                                {quiz.is_active ? (
+                                  <Badge bg="success">Active</Badge>
+                                ) : (
+                                  <Badge bg="secondary">Inactive</Badge>
+                                )}
+                              </td>
+                              <td className="text-center">
+                                <Button
+                                  variant="outline-primary"
+                                  size="sm"
+                                  onClick={() => handleViewParticipants(quiz)}
+                                >
+                                  <FaEye className="me-1" /> View & Analysis
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </Table>
+                    )}
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          )}
 
           {/* Participant Analysis & Graph Modal */}
           <Modal
@@ -884,14 +875,14 @@ const SchoolDashBoard = () => {
 
                          {/* Detailed Participants Table */}
                          <Card className="shadow-sm">
-                             <Card.Header className="bg-white d-flex justify-content-between align-items-center">
+                             <Card.Header className="bg-info bg-opacity-25 d-flex justify-content-between align-items-center">
                                  <h6 className="mb-0 fw-bold">Participant Details</h6>
                                  <Badge bg="secondary">Total: {schoolParticipants.length}</Badge>
                              </Card.Header>
                              <Card.Body className="p-0">
                                  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                      <Table striped hover responsive size="sm" className="mb-0">
-                                         <thead className="sticky-top bg-light">
+                                         <thead className="sticky-top table-info">
                                              <tr>
                                                  <th>Rank</th>
                                                  <th>Student Name</th>
