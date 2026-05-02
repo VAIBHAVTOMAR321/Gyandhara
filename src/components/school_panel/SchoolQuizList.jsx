@@ -412,7 +412,7 @@ const toggleStudentSelection = (studentId) => {
                             {quiz.title}
                           </Card.Title>
                           {quiz.title_hindi && (
-                            <Card.Subtitle className="mb-2 text-muted text-truncate" style={{ fontSize: '0.7rem' }}>{quiz.title_hindi}</Card.Subtitle>
+                            <Card.Subtitle className=" text-muted " style={{ fontSize: '0.7rem' }}>{quiz.title_hindi}</Card.Subtitle>
                           )}
                           
                           {quiz.description && (
