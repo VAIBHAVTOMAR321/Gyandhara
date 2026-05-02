@@ -178,7 +178,7 @@
 }
 
 .role-tab.active {
-  border-color: transparent;
+  /* border-color: transparent; */
   background: linear-gradient(135deg, #1B4F8A 0%, #E65100 100%);
   color: white;
   box-shadow: 0 4px 14px rgba(230, 81, 0, 3);
