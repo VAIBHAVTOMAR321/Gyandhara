@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Spinner, Modal, Form, Badge, Alert } from 'react-bootstrap'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Container, Row, Col, Card, Button, Spinner, Modal, Form, Badge, Alert, Table } from 'react-bootstrap'
 import axios from 'axios'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowLeft, FaCalendar, FaUsers, FaClock, FaBook, FaCheck, FaTimes } from 'react-icons/fa'
+import { FaArrowLeft, FaCalendar, FaUsers, FaClock, FaBook, FaCheck, FaTimes, FaTrophy, FaBuilding, FaMedal } from 'react-icons/fa'
 import SchoolLeftNav from './SchoolLeftNav'
 import SchoolHeader from './SchoolHeader'
 
 const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-competition-items/'
+const API_URL_RANK = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz/rank/'
+const API_URL_SCHOOL_RANK = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz/school-rank/'
 const API_URL_REGISTRATION = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-competition-participants/'
 const API_URL_STUDENTS = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-schoolwise/'
 
@@ -47,6 +49,11 @@ const SchoolQuizList = () => {
    const [selectedClassFilter, setSelectedClassFilter] = useState('all')
    const [showRegistered, setShowRegistered] = useState(true)
    const [maxParticipants, setMaxParticipants] = useState(null)
+   const [showResultsModal, setShowResultsModal] = useState(false)
+   const [resultsLoading, setResultsLoading] = useState(false)
+   const [quizResults, setQuizResults] = useState(null)
+   const [resultsSchoolFilter, setResultsSchoolFilter] = useState('all')
+   const [schoolRanks, setSchoolRanks] = useState(null)
 
   useEffect(() => {
     const handleResize = () => {
@@ -59,6 +66,21 @@ const SchoolQuizList = () => {
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
+
+  const schoolStats = useMemo(() => {
+    if (!quizResults || !Array.isArray(quizResults)) return []
+    const stats = {}
+    quizResults.forEach(item => {
+      const schoolName = item.school?.school_name || 'Unknown School'
+      stats[schoolName] = (stats[schoolName] || 0) + 1
+    })
+    return Object.entries(stats).map(([name, count]) => ({ name, count }))
+  }, [quizResults])
+
+  const uniqueSchoolsCount = useMemo(() => {
+    if (!quizResults || !Array.isArray(quizResults)) return 0
+    return new Set(quizResults.map(r => r.school?.school_uni_id)).size
+  }, [quizResults])
 
   useEffect(() => {
     if (accessToken) {
@@ -161,6 +183,35 @@ const SchoolQuizList = () => {
         console.error('Error checking registrations:', error)
       }
       return []
+    }
+
+    const fetchQuizResults = async (quizId) => {
+      setResultsLoading(true)
+      setError('')
+      try {
+        const [studentRes, schoolRes] = await Promise.all([
+          axios.get(`${API_URL_RANK}?quiz_id=${quizId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          }),
+          axios.get(`${API_URL_SCHOOL_RANK}?quiz_id=${quizId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` }
+          })
+        ])
+
+        if (studentRes.data.success) {
+          setQuizResults(studentRes.data.data)
+        }
+        if (schoolRes.data.success) {
+          setSchoolRanks(schoolRes.data.data)
+          setResultsSchoolFilter('all')
+          setShowResultsModal(true)
+        }
+      } catch (error) {
+        console.error('Error fetching quiz results:', error)
+        setError('Failed to fetch quiz results. Please try again.')
+      } finally {
+        setResultsLoading(false)
+      }
     }
 
 const handleRegisterClick = async (quiz) => {
@@ -426,14 +477,24 @@ const toggleStudentSelection = (studentId) => {
                           )}
                         </Card.Body>
                         <Card.Footer className="bg-white py-3">
-                          <Button 
-                            variant="primary" 
-                            className="w-100"
-                            onClick={() => handleRegisterClick(quiz)}
-                            disabled={!isQuizActive(quiz)}
-                          >
-                            Add Students / Register
-                          </Button>
+                          <div className="d-grid gap-2">
+                            <Button 
+                              variant="primary" 
+                              className="w-100"
+                              onClick={() => handleRegisterClick(quiz)}
+                              disabled={!isQuizActive(quiz)}
+                            >
+                              Add Students / Register
+                            </Button>
+                            <Button 
+                              variant="outline-info" 
+                              className="w-100"
+                              onClick={() => fetchQuizResults(quiz.quiz_id || quiz.id)}
+                              disabled={resultsLoading}
+                            >
+                              {resultsLoading ? <Spinner animation="border" size="sm" /> : <><FaTrophy className="me-2" /> View Results</>}
+                            </Button>
+                          </div>
                         </Card.Footer>
                       </Card>
                     </Col>
@@ -696,6 +757,129 @@ const toggleStudentSelection = (studentId) => {
              </>
            )}
          </Modal.Footer>
+      </Modal>
+
+      {/* Results Modal */}
+      <Modal show={showResultsModal} onHide={() => setShowResultsModal(false)} size="xl" centered>
+        <Modal.Header closeButton className="py-2 px-3">
+          <Modal.Title className="fw-semibold fs-6 d-flex align-items-center">
+            <FaTrophy className="text-warning me-2" /> Quiz Results & Standings
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-3">
+          {quizResults && (
+            <>
+              <Row className="mb-4 g-3">
+                <Col xs={6}>
+                  <Card className="bg-light border-0 text-center py-2">
+                    <Card.Body className="p-2">
+                      <FaUsers className="mb-1 text-primary" size={20} />
+                      <h5 className="mb-0 fw-bold">{quizResults.length}</h5>
+                      <div className="text-muted" style={{ fontSize: '0.7rem' }}>Participants</div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+                <Col xs={6}>
+                  <Card className="bg-light border-0 text-center py-2">
+                    <Card.Body className="p-2">
+                      <FaBuilding className="mb-1 text-success" size={20} />
+                      <h5 className="mb-0 fw-bold">{uniqueSchoolsCount}</h5>
+                      <div className="text-muted" style={{ fontSize: '0.7rem' }}>Schools</div>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              </Row>
+
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="fw-bold mb-0 small d-flex align-items-center">
+                  <FaMedal className="text-warning me-2" /> 
+                  {resultsSchoolFilter === 'all' ? 'Top 10 Global Rankers' : `Top Rankers - ${resultsSchoolFilter}`}
+                </h6>
+                <Form.Group className="d-flex align-items-center">
+                  <Form.Label className="mb-0 me-2 small fw-bold text-muted">School Filter:</Form.Label>
+                  <Form.Select 
+                    size="sm" 
+                    style={{ width: '250px', fontSize: '0.75rem' }}
+                    value={resultsSchoolFilter} 
+                    onChange={(e) => setResultsSchoolFilter(e.target.value)}
+                  >
+                    <option value="all">All Schools (Overall Standings)</option>
+                    {schoolStats.map((school, idx) => (
+                      <option key={idx} value={school.name}>{school.name}</option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </div>
+              <div className="table-responsive mb-4">
+                <Table bordered hover size="sm" className="small align-middle mb-0">
+                  <thead className="table-dark">
+                    <tr style={{ fontSize: '0.75rem' }}>
+                      <th style={{ width: '60px' }}>Rank</th>
+                      <th>Student Info</th>
+                      <th>School</th>
+                      <th className="text-center">Score</th>
+                      <th className="text-center">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {quizResults
+                      .filter(ranker => resultsSchoolFilter === 'all' || ranker.school?.school_name === resultsSchoolFilter)
+                      .slice(0, 10)
+                      .map((ranker, idx) => (
+                        <tr key={idx} className={resultsSchoolFilter === 'all' && idx < 3 ? 'table-warning' : ''}>
+                          <td className="fw-bold text-center">#{ranker.rank}</td>
+                          <td>
+                            <div className="fw-bold">{ranker.student?.full_name}</div>
+                            <div className="text-muted" style={{ fontSize: '0.7rem' }}>{ranker.student?.student_id}</div>
+                          </td>
+                          <td className="text-truncate" style={{ maxWidth: '150px', fontSize: '0.75rem' }}>
+                            {ranker.school?.school_name}
+                          </td>
+                          <td className="text-center fw-bold">{ranker.score}</td>
+                          <td className="text-center">
+                            <Badge bg={ranker.status === 'passed' ? 'success' : 'danger'} style={{ fontSize: '0.65rem' }}>
+                              {ranker.status?.toUpperCase()}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </Table>
+              </div>
+
+              <h6 className="fw-bold mb-2 small d-flex align-items-center">
+                <FaBuilding className="text-info me-2" /> School Performance & Rankings
+              </h6>
+              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                <Table bordered hover size="sm" className="small mb-0">
+                  <thead className="bg-light">
+                    <tr style={{ fontSize: '0.75rem' }}>
+                      <th className="text-center" style={{ width: '60px' }}>Rank</th>
+                      <th>School Name</th>
+                      <th className="text-center" style={{ width: '100px' }}>Students</th>
+                      <th className="text-center" style={{ width: '100px' }}>Avg. Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {schoolRanks?.map((item, idx) => (
+                      <tr key={idx} className={item.school?.school_uni_id === school_uni_id ? 'table-danger' : ''}>
+                        <td className="text-center fw-bold">#{item.rank}</td>
+                        <td style={{ fontSize: '0.75rem' }}>{item.school?.school_name}</td>
+                        <td className="text-center fw-bold">{item.total_students}</td>
+                        <td className="text-center fw-bold text-primary">{item.avg_score?.toFixed(1)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="py-2 px-3">
+          <Button variant="secondary" onClick={() => setShowResultsModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
     </>
   )
