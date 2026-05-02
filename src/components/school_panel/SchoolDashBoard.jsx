@@ -35,6 +35,11 @@ import {
   FaGraduationCap,
   FaTasks,
   FaCalendarCheck,
+  FaTrophy,
+  FaClipboardList,
+  FaAward,
+  FaStar,
+  FaTimesCircle,
 } from "react-icons/fa";
 
 import { useAuth } from "../all_login/AuthContext";
@@ -43,7 +48,6 @@ import SchoolLeftNav from "./SchoolLeftNav";
 
 const SchoolDashBoard = () => {
   // Device width state
-
   const [sidebarOpen, setSidebarOpen] = useState(() => {
     if (typeof window !== "undefined") {
       const width = window.innerWidth;
@@ -57,27 +61,46 @@ const SchoolDashBoard = () => {
   const [error, setError] = useState("");
   const [profile, setProfile] = useState(null);
   const [queries, setQueries] = useState([]);
+  
   // Always call hooks at the top level
   const { user, accessToken, uniqueId } = useAuth();
+
   // Service requests state
   const [serviceLoading, setServiceLoading] = useState(true);
   const [serviceError, setServiceError] = useState("");
   const [serviceRequests, setServiceRequests] = useState([]);
+
   // Enrollments state
   const [enrollments, setEnrollments] = useState([]);
   const [enrollmentLoading, setEnrollmentLoading] = useState(true);
   const [enrollmentError, setEnrollmentError] = useState("");
+
   // Module progress state
   const [moduleProgress, setModuleProgress] = useState([]);
   const [moduleLoading, setModuleLoading] = useState(true);
   const [moduleError, setModuleError] = useState("");
+
   const [showDetails, setShowDetails] = useState(false);
   const [showModuleModal, setShowModuleModal] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState(null);
   const [selectedEnrollment, setSelectedEnrollment] = useState(null);
+
   // Analytics state
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
   const [analyticsStatusFilter, setAnalyticsStatusFilter] = useState("all");
+
+  // --- NEW QUIZ STATE ---
+  const [quizzes, setQuizzes] = useState([]);
+  const [quizLoading, setQuizLoading] = useState(true);
+  const [quizError, setQuizError] = useState("");
+  const [showQuizListModal, setShowQuizListModal] = useState(false);
+  
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [quizParticipants, setQuizParticipants] = useState([]);
+  const [participantLoading, setParticipantLoading] = useState(false);
+  const [participantError, setParticipantError] = useState("");
+  const [showParticipantModal, setShowParticipantModal] = useState(false);
+  // ----------------------
 
   // Calculate analytics from enrollment data
   const calculateAnalytics = (enrollmentData, moduleData) => {
@@ -121,10 +144,8 @@ const SchoolDashBoard = () => {
     ).length;
     const ongoing = total - completed;
 
-    // Unique students
     const uniqueStudents = total;
 
-    // Class distribution by unique students per class
     const classMap = {};
     filtered.forEach((e) => {
       const cls = String(e.class_name || "Unknown");
@@ -140,7 +161,6 @@ const SchoolDashBoard = () => {
       .map(([cls, studentSet]) => [cls, studentSet.size])
       .sort(([, a], [, b]) => b - a);
 
-    // Course distribution by unique students per course
     const courseMap = {};
     filtered.forEach((e) => {
       const course = e.course_name || "Unknown Course";
@@ -157,7 +177,6 @@ const SchoolDashBoard = () => {
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
 
-    // Average module score
     const avgModuleScore =
       moduleData && moduleData.length > 0
         ? Math.round(
@@ -200,6 +219,39 @@ const SchoolDashBoard = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // --- NEW: Fetch Quizzes ---
+  useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        setQuizLoading(true);
+        // Fetching all quizzes. Note: The API provided doesn't explicitly require auth in the snippet, 
+        // but we include it for consistency with the rest of the app.
+        const response = await axios.get(
+          `https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/`,
+          {
+             headers: {
+                Authorization: `Bearer ${accessToken}`, 
+             }
+          }
+        );
+        if (response.data.success) {
+          setQuizzes(response.data.data);
+        } else {
+          setQuizError("Failed to load quizzes");
+        }
+      } catch (err) {
+        console.error("Quiz API Error:", err);
+        setQuizError("Error fetching quizzes");
+      } finally {
+        setQuizLoading(false);
+      }
+    };
+    
+    if (accessToken) {
+        fetchQuizzes();
+    }
+  }, [accessToken]);
+
   // Fetch enrollments and module progress
   useEffect(() => {
     if (accessToken && uniqueId) {
@@ -207,7 +259,6 @@ const SchoolDashBoard = () => {
         // Fetch enrollments
         try {
           setEnrollmentLoading(true);
-          console.log("Fetching enrollments for school_uni_id:", uniqueId);
           const enrollmentResponse = await axios.get(
             `https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/?school_uni_id=${uniqueId}`,
             {
@@ -216,7 +267,6 @@ const SchoolDashBoard = () => {
               },
             },
           );
-          console.log("Enrollment API Response:", enrollmentResponse.data);
           if (enrollmentResponse.data.success) {
             setEnrollments(enrollmentResponse.data.data);
           } else {
@@ -232,7 +282,6 @@ const SchoolDashBoard = () => {
         // Fetch module progress
         try {
           setModuleLoading(true);
-          console.log("Fetching module progress for school_uni_id:", uniqueId);
           const moduleResponse = await axios.get(
             `https://brjobsedu.com/gyandhara/gyandhara_backend/api/module-progress-unpaid/?school_uni_id=${uniqueId}`,
             {
@@ -241,7 +290,6 @@ const SchoolDashBoard = () => {
               },
             },
           );
-          console.log("Module Progress API Response:", moduleResponse.data);
           if (moduleResponse.data.success) {
             setModuleProgress(moduleResponse.data.data);
           } else {
@@ -255,13 +303,50 @@ const SchoolDashBoard = () => {
         }
       };
       fetchData();
-    } else {
-      console.log("Missing accessToken or uniqueId:", {
-        accessToken: !!accessToken,
-        uniqueId,
-      });
     }
   }, [accessToken, uniqueId]);
+
+   // --- NEW: Fetch Participants for a specific Quiz ---
+   const handleViewParticipants = async (quiz) => {
+     setSelectedQuiz(quiz);
+     setParticipantLoading(true);
+     setParticipantError("");
+     setShowParticipantModal(true);
+ 
+     try {
+       const response = await axios.get(
+         `https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/?quiz_id=${quiz.quiz_id}`,
+         {
+           headers: {
+             Authorization: `Bearer ${accessToken}`,
+           },
+         }
+       );
+       if (response.data.status) {
+         setQuizParticipants(response.data.data);
+       } else {
+         setParticipantError("No participants found.");
+       }
+     } catch (err) {
+       console.error("Participant API Error:", err);
+       setParticipantError("Failed to load participants.");
+     } finally {
+       setParticipantLoading(false);
+     }
+   };
+
+   // Filter participants to only show those from the logged-in school
+   const schoolParticipants = useMemo(() => {
+     if (!quizParticipants || quizParticipants.length === 0 || !uniqueId) {
+       return [];
+     }
+     return quizParticipants.filter(p => {
+       // Match by school_id or school_name from the student object
+       const studentSchoolId = p.student?.school_id || p.student?.school_uni_id;
+       const studentSchoolName = p.student?.school_name;
+       return studentSchoolId === uniqueId || studentSchoolName === profile?.school_name;
+     });
+   }, [quizParticipants, uniqueId, profile]);
 
   const toggleSidebar = () => {
     if (isMobile || isTablet) {
@@ -282,19 +367,19 @@ const SchoolDashBoard = () => {
       <div className="main-content-dash">
         <SchoolHeader toggleSidebar={toggleSidebar} />
 
-        {/*  Add container with shadow */}
         <Container className="dashboard-box mt-3">
           <Row className="mb-4 align-items-center">
             <Col>
               <h4 className="font-weight-bold">School Dashboard</h4>
               <p className="text-muted mb-0">
-                Manage student enrollments and track progress
+                Manage student enrollments, track progress, and view quiz analytics
               </p>
             </Col>
             <Col className="text-end"></Col>
           </Row>
 
           <Row>
+            {/* Total Students Card */}
             <Col md={6} lg={4}>
               <Card className="shadow-box">
                 <Card.Body>
@@ -316,7 +401,6 @@ const SchoolDashBoard = () => {
                       {showDetails ? "Hide Details" : "View Details"}
                     </Button>
                   </div>
-                  {/* Simple Graph */}
                   <div className="mt-3">
                     <div className="progress" style={{ height: "20px" }}>
                       <div
@@ -337,21 +421,56 @@ const SchoolDashBoard = () => {
                 </Card.Body>
               </Card>
             </Col>
+
+            {/* NEW: All Quizzes Card */}
+            <Col md={6} lg={4}>
+              <Card className="shadow-box" style={{ borderLeft: "4px solid #6f42c1" }}>
+                <Card.Body>
+                  <div className="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h5>All Quizzes</h5>
+                      {quizLoading ? (
+                        <Spinner animation="border" size="sm" />
+                      ) : quizError ? (
+                        <p className="text-danger small">{quizError}</p>
+                      ) : (
+                        <h3 className="text-info">{quizzes.length}</h3>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline-info"
+                      onClick={() => setShowQuizListModal(true)}
+                      disabled={quizzes.length === 0}
+                    >
+                      {showQuizListModal ? "Hide List" : "View Quizzes"}
+                    </Button>
+                  </div>
+                  <div className="mt-3">
+                    <div className="progress" style={{ height: "20px" }}>
+                      <div
+                        className="progress-bar bg-info"
+                        role="progressbar"
+                        style={{
+                          width: "100%",
+                        }}
+                      >
+                        Active Quizzes
+                      </div>
+                    </div>
+                    <small className="text-muted">Available Assessment</small>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
           </Row>
 
-          {/* Expandable Details Section */}
+          {/* Expandable Details Section for Students */}
           {showDetails && (
             <Row className="mt-3">
               <Col>
                 <Card className="shadow-box">
                   <Card.Header className="d-flex justify-content-between align-items-center">
                     <h5>Enrolled Students</h5>
-                    {/* <Button
-                      variant="outline-secondary"
-                      onClick={() => setShowModuleModal(true)}
-                    >
-                      View Module Progress
-                    </Button> */}
                     <Button
                       variant="primary"
                       onClick={() => setShowAnalyticsModal(true)}
@@ -429,7 +548,316 @@ const SchoolDashBoard = () => {
             </Row>
           )}
 
-          {/* Module Progress Modal */}
+          {/* Quiz List Modal */}
+          <Modal
+            show={showQuizListModal}
+            onHide={() => setShowQuizListModal(false)}
+            size="xl"
+            centered
+            className="quiz-list-modal"
+          >
+             <Modal.Header
+              closeButton
+              className="bg-gradient text-white py-1 px-3"
+              style={{
+                background: "linear-gradient(135deg, #6f42c1 0%, #9b59b6 100%)",
+              }}
+            >
+              <Modal.Title className="d-flex align-items-center gap-2 fs-6">
+                <FaClipboardList className="me-2" />
+                All Available Quizzes
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="p-2">
+               {quizLoading ? (
+                  <div className="text-center py-4"><Spinner animation="border" /></div>
+                ) : (
+                  <Table striped bordered hover responsive size="sm">
+                    <thead className="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Questions</th>
+                        <th>Start Date</th>
+                        <th>Status</th>
+                        <th className="text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {quizzes.map((quiz) => (
+                        <tr key={quiz.id}>
+                          <td><Badge bg="secondary">{quiz.quiz_id}</Badge></td>
+                          <td className="fw-bold">{quiz.title}</td>
+                          <td>{quiz.quiz_category}</td>
+                          <td>{quiz.number_of_questions}</td>
+                          <td>{new Date(quiz.start_date_time).toLocaleDateString()}</td>
+                          <td>
+                            {quiz.is_active ? (
+                              <Badge bg="success">Active</Badge>
+                            ) : (
+                              <Badge bg="secondary">Inactive</Badge>
+                            )}
+                          </td>
+                          <td className="text-center">
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => handleViewParticipants(quiz)}
+                            >
+                              <FaEye className="me-1" /> View & Analysis
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={() => setShowQuizListModal(false)}>Close</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Participant Analysis & Graph Modal */}
+          <Modal
+            show={showParticipantModal}
+            onHide={() => setShowParticipantModal(false)}
+            size="xl"
+            centered
+            className="participant-analysis-modal"
+          >
+             <Modal.Header
+              closeButton
+              className="bg-gradient text-white py-1 px-3"
+              style={{
+                background: "linear-gradient(135deg, #2c3e50 0%, #000000 100%)",
+              }}
+            >
+              <Modal.Title className="d-flex align-items-center gap-2 fs-6">
+                <FaTrophy className="me-2 text-warning" />
+                Quiz Performance Analytics
+                {selectedQuiz && <Badge bg="light" text="dark" className="ms-2">{selectedQuiz.title}</Badge>}
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body className="p-3 bg-light">
+                {participantLoading ? (
+                    <div className="text-center py-5">
+                        <Spinner animation="border" variant="primary" />
+                        <p className="text-muted mt-2">Fetching participant data...</p>
+                    </div>
+                ) : participantError ? (
+                    <Alert variant="danger">{participantError}</Alert>
+                ) : (
+                    <>
+                         {/* Analytics Summary Section */}
+                         <Row className="g-3 mb-4">
+                              <Col md={3}>
+                                 <Card className="shadow-sm border-0 h-100 bg-white">
+                                     <Card.Body className="text-center p-3">
+                                         <FaUsers className="text-primary mb-2 fs-4" />
+                                         <h3 className="fw-bold mb-0">{schoolParticipants.length}</h3>
+                                         <small className="text-muted">Total Participants</small>
+                                     </Card.Body>
+                                 </Card>
+                              </Col>
+                              <Col md={3}>
+                                 <Card className="shadow-sm border-0 h-100 bg-white">
+                                     <Card.Body className="text-center p-3">
+                                         <FaCheckCircle className="text-success mb-2 fs-4" />
+                                         <h3 className="fw-bold mb-0">
+                                             {schoolParticipants.filter(p => p.attempt[0]?.status === 'passed').length}
+                                         </h3>
+                                         <small className="text-muted">Passed Students</small>
+                                     </Card.Body>
+                                 </Card>
+                              </Col>
+                              <Col md={3}>
+                                 <Card className="shadow-sm border-0 h-100 bg-white">
+                                     <Card.Body className="text-center p-3">
+                                         <FaTrophy className="text-warning mb-2 fs-4" />
+                                         <h3 className="fw-bold mb-0">
+                                             {schoolParticipants.length > 0 ? Math.min(...schoolParticipants.map(p => p.attempt[0]?.rank).filter(r=>r)) : '-'}
+                                         </h3>
+                                         <small className="text-muted">Best Rank</small>
+                                     </Card.Body>
+                                 </Card>
+                              </Col>
+                              <Col md={3}>
+                                 <Card className="shadow-sm border-0 h-100 bg-white">
+                                     <Card.Body className="text-center p-3">
+                                         <FaChartBar className="text-info mb-2 fs-4" />
+                                         <h3 className="fw-bold mb-0">
+                                             {schoolParticipants.length > 0 
+                                                 ? Math.round(schoolParticipants.reduce((acc, curr) => acc + (curr.attempt[0]?.score || 0), 0) / schoolParticipants.length)
+                                                 : 0}%
+                                         </h3>
+                                         <small className="text-muted">Average Score</small>
+                                     </Card.Body>
+                                 </Card>
+                              </Col>
+                         </Row>
+
+                        <Row className="mb-4">
+                             {/* Pass/Fail Chart */}
+                             <Col md={6}>
+                                 <Card className="shadow-sm h-100">
+                                     <Card.Header className="bg-white fw-bold small">Pass / Fail Ratio</Card.Header>
+                                     <Card.Body className="d-flex align-items-center justify-content-around">
+                                         <div style={{ width: '120px', height: '120px', position: 'relative' }}>
+                                             <svg viewBox="0 0 36 36" className="circular-chart text-success" style={{ width: '100%', height: '100%', transform: 'rotate(-90deg)' }}>
+                                                 <path className="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" strokeWidth="3.8" />
+                                                 <path 
+                                                     className="circle" 
+                                                     strokeDasharray={
+                                                         schoolParticipants.length > 0 
+                                                         ? `${(schoolParticipants.filter(p => p.attempt[0]?.status === 'passed').length / schoolParticipants.length) * 100}, 100` 
+                                                         : "0, 100"
+                                                     } 
+                                                     d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" 
+                                                     fill="none" 
+                                                     stroke="#28a745" 
+                                                     strokeWidth="3.8" 
+                                                 />
+                                             </svg>
+                                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: 'bold' }}>
+                                                 {schoolParticipants.length > 0 
+                                                     ? Math.round((schoolParticipants.filter(p => p.attempt[0]?.status === 'passed').length / schoolParticipants.length) * 100)
+                                                     : 0}%
+                                             </div>
+                                         </div>
+                                         <div>
+                                             <div className="d-flex align-items-center mb-2">
+                                                 <span style={{ width: '12px', height: '12px', background: '#28a745', borderRadius: '50%', display: 'inline-block', marginRight: '8px' }}></span>
+                                                 <span>Passed: {schoolParticipants.filter(p => p.attempt[0]?.status === 'passed').length}</span>
+                                             </div>
+                                             <div className="d-flex align-items-center">
+                                                 <span style={{ width: '12px', height: '12px', background: '#dc3545', borderRadius: '50%', display: 'inline-block', marginRight: '8px' }}></span>
+                                                 <span>Failed: {schoolParticipants.filter(p => p.attempt[0]?.status === 'failed').length}</span>
+                                             </div>
+                                         </div>
+                                     </Card.Body>
+                                 </Card>
+                             </Col>
+
+                             {/* Score Distribution Bar Chart */}
+                             <Col md={6}>
+                                 <Card className="shadow-sm h-100">
+                                     <Card.Header className="bg-white fw-bold small">Score Distribution</Card.Header>
+                                     <Card.Body className="d-flex flex-column justify-content-end">
+                                         <div className="d-flex justify-content-between align-items-end h-100 gap-2 px-3">
+                                             {/* Generate simple bars based on score ranges */}
+                                             {[
+                                                 { label: '0-20%', color: '#dc3545' },
+                                                 { label: '21-40%', color: '#fd7e14' },
+                                                 { label: '41-60%', color: '#ffc107' },
+                                                 { label: '61-80%', color: '#20c997' },
+                                                 { label: '81-100%', color: '#28a745' }
+                                             ].map((range, idx) => {
+                                                 const total = schoolParticipants.length;
+                                                 // Calculate count in range roughly
+                                                 const count = schoolParticipants.filter(p => {
+                                                     const s = p.attempt[0]?.score || 0;
+                                                     if (idx === 0) return s <= 20;
+                                                     if (idx === 1) return s > 20 && s <= 40;
+                                                     if (idx === 2) return s > 40 && s <= 60;
+                                                     if (idx === 3) return s > 60 && s <= 80;
+                                                     return s > 80;
+                                                 }).length;
+                                                 const height = total > 0 ? (count / total) * 100 : 0;
+                                                  
+                                                 return (
+                                                     <div key={idx} className="d-flex flex-column align-items-center" style={{ flex: 1 }}>
+                                                         <div 
+                                                             style={{ 
+                                                                 width: '100%', 
+                                                                 height: `${Math.max(height, 2)}%`, // min height for visibility
+                                                                 background: range.color,
+                                                                 borderRadius: '4px 4px 0 0',
+                                                                 minHeight: '4px',
+                                                                 transition: 'height 0.5s'
+                                                             }}
+                                                             title={`${count} students`}
+                                                         ></div>
+                                                         <small className="mt-1" style={{ fontSize: '10px' }}>{range.label}</small>
+                                                         <small className="fw-bold">{count}</small>
+                                                     </div>
+                                                 );
+                                             })}
+                                         </div>
+                                     </Card.Body>
+                                 </Card>
+                             </Col>
+                        </Row>
+
+                         {/* Detailed Participants Table */}
+                         <Card className="shadow-sm">
+                             <Card.Header className="bg-white d-flex justify-content-between align-items-center">
+                                 <h6 className="mb-0 fw-bold">Participant Details</h6>
+                                 <Badge bg="secondary">Total: {schoolParticipants.length}</Badge>
+                             </Card.Header>
+                             <Card.Body className="p-0">
+                                 <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                                     <Table striped hover responsive size="sm" className="mb-0">
+                                         <thead className="sticky-top bg-light">
+                                             <tr>
+                                                 <th>Rank</th>
+                                                 <th>Student Name</th>
+                                                 <th>School</th>
+                                                 <th>Score</th>
+                                                 <th>Status</th>
+                                                 <th>Date</th>
+                                             </tr>
+                                         </thead>
+                                         <tbody>
+                                             {schoolParticipants.map((p) => (
+                                                 <tr key={p.id}>
+                                                     <td className="text-center">
+                                                         {p.attempt[0]?.rank === 1 ? (
+                                                             <Badge bg="warning" text="dark"><FaAward className="me-1"/> 1st</Badge>
+                                                         ) : (
+                                                             <span className="fw-bold">#{p.attempt[0]?.rank || '-'}</span>
+                                                         )}
+                                                     </td>
+                                                     <td>
+                                                         <div className="fw-bold">{p.student.full_name}</div>
+                                                         <small className="text-muted">{p.student.email}</small>
+                                                     </td>
+                                                     <td>{p.student.school_name}</td>
+                                                     <td>
+                                                         <ProgressBar 
+                                                             now={p.attempt[0]?.score || 0} 
+                                                             variant={p.attempt[0]?.status === 'passed' ? 'success' : 'danger'}
+                                                             style={{ height: '6px' }}
+                                                             label={`${p.attempt[0]?.score}/${p.attempt[0]?.total_questions}`}
+                                                         />
+                                                     </td>
+                                                     <td>
+                                                         {p.attempt[0]?.status === 'passed' ? (
+                                                             <span className="text-success fw-bold"><FaCheckCircle /> Passed</span>
+                                                         ) : (
+                                                             <span className="text-danger fw-bold"><FaTimesCircle /> Failed</span>
+                                                         )}
+                                                     </td>
+                                                     <td>
+                                                         {new Date(p.attempt[0]?.submitted_at).toLocaleDateString()}
+                                                     </td>
+                                                 </tr>
+                                             ))}
+                                         </tbody>
+                                     </Table>
+                                 </div>
+                             </Card.Body>
+                         </Card>
+                    </>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowParticipantModal(false)}>Close</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Module Progress Modal (Existing) */}
           <Modal
             show={showModuleModal}
             onHide={() => {
@@ -567,7 +995,6 @@ const SchoolDashBoard = () => {
                     );
                   }
 
-                  // Calculate statistics
                   const totalModules = filteredProgress.length;
                   const completedModules = filteredProgress.filter(
                     (p) => p.module_status === "completed",
@@ -596,14 +1023,12 @@ const SchoolDashBoard = () => {
                   const minScore = scoredModules.length > 0 
                     ? Math.min(...scoredModules.map((p) => p.test_score)) : 0;
 
-                  // Sort by score for better visualization
                   const sortedProgress = [...filteredProgress].sort(
                     (a, b) => (b.test_score || 0) - (a.test_score || 0),
                   );
 
                   return (
                     <>
-                      {/* Statistics Cards */}
                       <Row className="g-1 mb-2">
                         <Col xs={6} sm={3}>
                           <Card className="shadow-sm border-0 h-100">
@@ -665,7 +1090,6 @@ const SchoolDashBoard = () => {
                         </Col>
                       </Row>
 
-                      {/* Overall Progress & Score Analysis */}
                       <Row className="g-2 mb-2">
                         <Col md={7}>
                           <Card className="shadow-sm border-0 h-100">
@@ -887,7 +1311,6 @@ const SchoolDashBoard = () => {
                         </Col>
                       </Row>
 
-                      {/* Module Score Bar Chart */}
                       <Card className="shadow-sm border-0 mb-2">
                         <Card.Header className="bg-light py-1">
                           <h6 className="mb-0 fw-bold extra-small">
@@ -997,7 +1420,6 @@ const SchoolDashBoard = () => {
                         </Card.Body>
                       </Card>
 
-                      {/* Detailed Module List */}
                       <Card className="shadow-sm border-0">
                         <Card.Header className="d-flex justify-content-between align-items-center bg-light py-1">
                           <h6 className="mb-0 fw-bold d-flex align-items-center gap-2 extra-small">
@@ -1181,7 +1603,7 @@ const SchoolDashBoard = () => {
             </Modal.Footer>
           </Modal>
 
-          {/* Analytics Modal */}
+          {/* Analytics Modal (Existing) */}
           <Modal
             show={showAnalyticsModal}
             onHide={() => setShowAnalyticsModal(false)}
@@ -1208,7 +1630,6 @@ const SchoolDashBoard = () => {
 
                 return (
                   <div>
-                    {/* Header Actions */}
                     <div className="mb-4">
                       <h4 className="mb-1 fw-bold text-primary">
                         Analytics Overview
@@ -1219,7 +1640,6 @@ const SchoolDashBoard = () => {
                       </p>
                     </div>
 
-                    {/* Status Filter */}
                     <Row className="mb-4">
                       <Col md={6}>
                         <Form.Group>
@@ -1278,7 +1698,6 @@ const SchoolDashBoard = () => {
                       </Col>
                     </Row>
 
-                    {/* Summary Cards */}
                     <Row className="g-3 mb-4">
                       <Col xs={12} sm={4}>
                         <Card className="shadow-sm border-0 h-100">
@@ -1334,7 +1753,6 @@ const SchoolDashBoard = () => {
                       </Col>
                     </Row>
 
-                    {/* Status Distribution Chart */}
                     <Card className="shadow-sm border-0 mb-4">
                       <Card.Header className="bg-light">
                         <h6 className="mb-0 fw-bold">
@@ -1349,7 +1767,6 @@ const SchoolDashBoard = () => {
                               className="d-flex justify-content-center position-relative"
                               style={{ height: "200px" }}
                             >
-                              {/* Donut chart using SVG */}
                               <svg
                                 width="200"
                                 height="200"
@@ -1453,7 +1870,6 @@ const SchoolDashBoard = () => {
                       </Card.Body>
                     </Card>
 
-                    {/* Class & Course Distribution */}
                     <Row className="g-3 mb-4">
                       <Col md={6}>
                         <Card className="shadow-sm border-0 h-100">
@@ -1585,7 +2001,6 @@ const SchoolDashBoard = () => {
                       </Col>
                     </Row>
 
-                    {/* Module Performance */}
                     <Card className="shadow-sm border-0">
                       <Card.Header className="bg-secondary text-white">
                         <h6 className="mb-0 fw-bold">
