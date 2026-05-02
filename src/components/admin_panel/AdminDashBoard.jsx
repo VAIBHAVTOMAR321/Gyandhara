@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Container, Table, Badge, Spinner, Pagination, Card, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
-import { FaSchool } from "react-icons/fa"; // Added import
+import { FaSchool, FaFilePdf, FaFileExcel } from "react-icons/fa"; // Added import
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import { useAuth } from "../all_login/AuthContext";
 import AdminLeftNav from "./AdminLeftNav";
 import AdminHeader from "./AdminHeader";
@@ -833,6 +836,134 @@ const AdminDashBoard = () => {
      );
   };
 
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF({ orientation: 'landscape' });
+      let title = "";
+      let headers = [];
+      let data = [];
+
+      if (activeTab === 'students') {
+        title = "Student List Report";
+        headers = [['#', 'Student ID', 'Name', 'Aadhaar', 'Phone', 'Email', 'Class', 'School', 'District', 'Status']];
+        data = students.map((s, i) => [
+          i + 1,
+          s.student_id || '-',
+          s.full_name || '-',
+          s.aadhaar_no ? `****${s.aadhaar_no.slice(-4)}` : '-',
+          s.phone || '-',
+          s.email || '-',
+          s.class_name || '-',
+          s.school_name || '-',
+          s.district || '-',
+          s.status || 'pending'
+        ]);
+      } else if (activeTab === 'schools') {
+        title = "School List Report";
+        headers = [['#', 'School ID', 'School Name', 'District', 'State', 'Status']];
+        data = schools.map((s, i) => [
+          i + 1,
+          s.school_uni_id || '-',
+          s.school_name || '-',
+          s.district || '-',
+          s.state || 'Uttarakhand',
+          s.status || 'pending'
+        ]);
+      } else if (activeTab === 'enrollments') {
+        title = "Enrollment List Report";
+        headers = [['#', 'Student ID', 'Student Name', 'School Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status']];
+        data = enrollments.map((e, i) => [
+          i + 1,
+          e.student_id || '-',
+          e.student_name || '-',
+          e.school_name || '-',
+          e.class_name || '-',
+          e.course_id || '-',
+          e.course_name || '-',
+          e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-',
+          e.is_completed ? 'Completed' : 'Ongoing'
+        ]);
+      } else if (activeTab === 'quiz-participants') {
+        title = "Quiz Participants Report";
+        headers = [['#', 'Student', 'District', 'School', 'Quiz ID', 'Participants', 'Attempts', 'Best Score', 'Best Rank']];
+        const filteredQuizData = quizParticipants.filter(p => {
+          const matchSchool = !quizSchoolFilter || (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+          const matchDistrict = !quizDistrictFilter || (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+          return matchSchool && matchDistrict;
+        });
+        data = filteredQuizData.map((p, i) => {
+          const bestAttempt = p.attempt?.reduce((best, curr) => (curr.score || 0) > (best.score || 0) ? curr : best, p.attempt?.[0] || {});
+          const bestRank = p.attempt?.reduce((best, curr) => curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, null);
+          const percentage = bestAttempt?.total_questions ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1) : 0;
+          return [
+            i + 1,
+            p.student?.full_name || '-',
+            p.student?.district || '-',
+            p.student?.school_name || '-',
+            p.quiz_id || '-',
+            quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length,
+            p.attempt?.length || 0,
+            `${bestAttempt?.score || 0}/${bestAttempt?.total_questions || 0} (${percentage}%)`,
+            bestRank ? `#${bestRank}` : '-'
+          ];
+        });
+      }
+
+      doc.setFontSize(14);
+      doc.text(title, 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
+      autoTable(doc, { 
+        startY: 28, 
+        head: headers, 
+        body: data, 
+        theme: 'grid', 
+        styles: { fontSize: 8 }, 
+        headStyles: { fillColor: [67, 97, 238], textColor: 255 } 
+      });
+      doc.save(`${activeTab || 'admin'}-report.pdf`);
+    } catch (error) {
+      console.error("PDF Export failed:", error);
+      alert("Failed to generate PDF. Check console for details.");
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      let title = "";
+      let data = [];
+      if (activeTab === 'students') {
+        title = "Student_List";
+        data = students.map((s, i) => ({ '#': i + 1, 'Student ID': s.student_id || '-', 'Name': s.full_name || '-', 'Aadhaar': s.aadhaar_no ? `****${s.aadhaar_no.slice(-4)}` : '-', 'Phone': s.phone || '-', 'Email': s.email || '-', 'Class': s.class_name || '-', 'School': s.school_name || '-', 'District': s.district || '-', 'Status': s.status || 'pending' }));
+      } else if (activeTab === 'schools') {
+        title = "School_List";
+        data = schools.map((s, i) => ({ '#': i + 1, 'School ID': s.school_uni_id || '-', 'School Name': s.school_name || '-', 'District': s.district || '-', 'State': s.state || 'Uttarakhand', 'Status': s.status || 'pending' }));
+      } else if (activeTab === 'enrollments') {
+        title = "Enrollment_List";
+        data = enrollments.map((e, i) => ({ '#': i + 1, 'Student ID': e.student_id || '-', 'Student Name': e.student_name || '-', 'School Name': e.school_name || '-', 'Class': e.class_name || '-', 'Course ID': e.course_id || '-', 'Course Name': e.course_name || '-', 'Enrolled At': e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-', 'Status': e.is_completed ? 'Completed' : 'Ongoing' }));
+      } else if (activeTab === 'quiz-participants') {
+        title = "Quiz_Participants";
+        const filteredQuizData = quizParticipants.filter(p => {
+          const matchSchool = !quizSchoolFilter || (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+          const matchDistrict = !quizDistrictFilter || (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+          return matchSchool && matchDistrict;
+        });
+        data = filteredQuizData.map((p, i) => {
+          const bestAttempt = p.attempt?.reduce((best, curr) => (curr.score || 0) > (best.score || 0) ? curr : best, p.attempt?.[0] || {});
+          const bestRank = p.attempt?.reduce((best, curr) => curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, null);
+          const percentage = bestAttempt?.total_questions ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1) : 0;
+          return { '#': i + 1, 'Student': p.student?.full_name || '-', 'District': p.student?.district || '-', 'School': p.student?.school_name || '-', 'Quiz ID': p.quiz_id || '-', 'Participants': quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length, 'Attempts': p.attempt?.length || 0, 'Best Score': `${bestAttempt?.score || 0}/${bestAttempt?.total_questions || 0} (${percentage}%)`, 'Best Rank': bestRank ? `#${bestRank}` : '-' };
+        });
+      }
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, title);
+      XLSX.writeFile(wb, `${title}.xlsx`);
+    } catch (error) {
+      console.error("Excel Export failed:", error);
+    }
+  };
+
    const renderQuizTable = () => {
       const filteredQuizData = quizParticipants.filter(p => {
         const matchSchool = !quizSchoolFilter || 
@@ -1410,12 +1541,22 @@ const AdminDashBoard = () => {
                       )}
 
               <div className="table-card">
-                        <h4>
-                          {activeTab === "students" && "Student List"}
-                          {activeTab === "schools" && "School List"}
-                          {activeTab === "enrollments" && "Enrollment List"}
-                          {activeTab === "quiz-participants" && "Quiz Participants List"}
-                        </h4>
+                        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                          <h4 className="mb-0">
+                            {activeTab === "students" && "Student List"}
+                            {activeTab === "schools" && "School List"}
+                            {activeTab === "enrollments" && "Enrollment List"}
+                            {activeTab === "quiz-participants" && "Quiz Participants List"}
+                          </h4>
+                          <div className="d-flex gap-2">
+                            <Button variant="outline-primary" size="sm" onClick={exportToPDF}>
+                              <FaFilePdf className="me-1" /> Export PDF
+                            </Button>
+                            <Button variant="outline-success" size="sm" onClick={exportToExcel}>
+                              <FaFileExcel className="me-1" /> Export Excel
+                            </Button>
+                          </div>
+                        </div>
                         <div className="table-responsive">
                           {renderTable()}
                         </div>
