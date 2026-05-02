@@ -93,7 +93,7 @@ const NinthGuidance = () => {
       id: 'foundation-science', 
       name: language === 'hi' ? 'विज्ञान फाउंडेशन' : 'Science Foundation', 
       icon: <FaFlask />, 
-      focus: language === 'hi' ? 'भौतिकी, रसायन विज्ञान, जीव विज्ञान' : 'Physics, Chemistry, Biology',
+      focus: language === 'hi' ? 'गणित, भौतिकी, रसायन विज्ञान, जीव विज्ञान' : 'Mathematics, Physics, Chemistry, Biology',
       description: language === 'hi' ? '10वीं के लिए मजबूत विज्ञान अवधारणाएं' : 'Strong science concepts for 10th'
     }, 
     { 
@@ -124,6 +124,7 @@ const NinthGuidance = () => {
       'foundation-science': {
         title: language === 'hi' ? 'विज्ञान फाउंडेशन प्लान' : 'Science Foundation Plan',
         subjects: [
+          { name: language === 'hi' ? 'गणित (Mathematics)' : 'Mathematics', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'संख्या पद्धति, बीजगणित, ज्यामिति, सांख्यिकी' : 'Number Systems, Algebra, Geometry, Statistics' },
           { name: language === 'hi' ? 'भौतिकी (Physics)' : 'Physics', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'गति, ऊर्जा, प्रकाश, विद्युत' : 'Motion, Energy, Light, Electricity' },
           { name: language === 'hi' ? 'रसायन विज्ञान (Chemistry)' : 'Chemistry', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'रासायनिक अभिक्रिया, तत्व, यौगिक' : 'Chemical reactions, Elements, Compounds' },
           { name: language === 'hi' ? 'जीव विज्ञान (Biology)' : 'Biology', importance: language === 'hi' ? 'मध्यम' : 'Medium', topics: language === 'hi' ? 'कोशिका, पोषण, श्वसन' : 'Cell, Nutrition, Respiration' }
