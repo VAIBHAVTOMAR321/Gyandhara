@@ -2,12 +2,39 @@ import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Button, Badge, Spinner, Form } from 'react-bootstrap'
 import axios from 'axios'
 import '../../assets/css/courseitems.css'
+import { useLanguage } from '../all_login/LanguageContext'
 
 function CourseItems() {
+  const { language } = useLanguage()
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
+
+  const content = {
+    en: {
+      title: "Our Courses",
+      loading: "Loading courses...",
+      noResults: "No courses found",
+      noMatch: (term) => `No courses match "${term}"`,
+      noAvailable: "No courses available at the moment",
+      clearFilters: "Clear Filters",
+      unpaid: "Unpaid",
+      paid: "Paid"
+    },
+    hi: {
+      title: "हमारे पाठ्यक्रम",
+      loading: "पाठ्यक्रम लोड हो रहे हैं...",
+      noResults: "कोई पाठ्यक्रम नहीं मिला",
+      noMatch: (term) => `"${term}" से मेल खाने वाला कोई पाठ्यक्रम नहीं मिला`,
+      noAvailable: "फिलहाल कोई पाठ्यक्रम उपलब्ध नहीं है",
+      clearFilters: "फ़िल्टर साफ़ करें",
+      unpaid: "अवैतनिक",
+      paid: "सशुल्क"
+    }
+  }
+
+  const t = content[language] || content.en
 
   useEffect(() => {
     fetchCourses()
@@ -33,9 +60,9 @@ function CourseItems() {
   const getStatusBadge = (status) => {
     switch(status) {
       case 'unpaid':
-        return <Badge bg="warning" className="status-badge">Unpaid</Badge>
+        return <Badge bg="warning" className="status-badge">{t.unpaid}</Badge>
       case 'paid':
-        return <Badge bg="success" className="status-badge">Paid</Badge>
+        return <Badge bg="success" className="status-badge">{t.paid}</Badge>
       default:
         return <Badge bg="secondary" className="status-badge">{status}</Badge>
     }
@@ -43,7 +70,8 @@ function CourseItems() {
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.course_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.course_desc?.toLowerCase().includes(searchTerm.toLowerCase())
+                         course.course_desc?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         course.course_name_hindi?.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = filter === 'all' || course.course_status === filter
     return matchesSearch && matchesFilter
   })
@@ -52,7 +80,7 @@ function CourseItems() {
     return (
       <div className="course-loading">
         <Spinner animation="border" variant="primary" />
-        <p>Loading courses...</p>
+        <p>{t.loading}</p>
       </div>
     )
   }
@@ -62,7 +90,7 @@ function CourseItems() {
       
       <Container className="Course-items-header">
         <div className='course-items-header-content'>
-        <h1 className=''>Our Courses</h1>
+        <h1 className=''>{t.title}</h1>
         </div>
      
 
@@ -101,20 +129,21 @@ function CourseItems() {
                         {course.course_category || ''}
                       </Badge>
                     </div>
-                    <Card.Title className="course-title">{course.course_name}</Card.Title>
+                    <Card.Title className="">
+                      {language === 'hi' && course.course_name_hindi ? course.course_name_hindi : course.course_name}
+                    </Card.Title>
                   
                     <Card.Text className="course-description">
-                      {course.course_desc?.substring(0, 120)}{course.course_desc?.length > 120 ? '...' : ''}
+                      {language === 'hi' && course.course_desc_hindi 
+                        ? (course.course_desc_hindi.length > 120 ? course.course_desc_hindi.substring(0, 120) + '...' : course.course_desc_hindi)
+                        : (course.course_desc?.length > 120 ? course.course_desc.substring(0, 120) + '...' : course.course_desc)}
                     </Card.Text>
                     
-                  
-
-                    {course.course_name_hindi && (
+                    {language !== 'hi' && course.course_name_hindi && (
                       <div className="course-hindi-info">
                         <small className="text-muted">{course.course_name_hindi}</small>
                       </div>
                     )}
-
                
                   </Card.Body>
                 </Card>
@@ -125,15 +154,15 @@ function CourseItems() {
           <Card className="no-results-card">
             <Card.Body className="text-center py-5">
               <i className="bi bi-search display-4 text-muted mb-3"></i>
-              <h4>No courses found</h4>
+              <h4>{t.noResults}</h4>
               <p className="text-muted">
-                {searchTerm ? `No courses match "${searchTerm}"` : 'No courses available at the moment'}
+                {searchTerm ? t.noMatch(searchTerm) : t.noAvailable}
               </p>
               <Button variant="outline-primary" onClick={() => {
                 setSearchTerm('')
                 setFilter('all')
               }}>
-                Clear Filters
+                {t.clearFilters}
               </Button>
             </Card.Body>
           </Card>
