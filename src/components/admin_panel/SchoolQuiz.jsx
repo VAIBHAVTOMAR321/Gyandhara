@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Spinner, Modal, Form, Badge } from 'react-bootstrap'
+import { Container, Row, Col, Card, Button, Spinner, Modal, Form, Badge, Table } from 'react-bootstrap'
 
 import axios from 'axios'
 import '../../assets/css/admindashboard.css'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaChevronDown, FaChevronUp, FaTimes } from 'react-icons/fa'
+import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaChevronDown, FaChevronUp, FaTimes, FaEye } from 'react-icons/fa'
 import AdminLeftNav from './AdminLeftNav'
 import AdminHeader from './AdminHeader'
 
@@ -36,6 +36,12 @@ const SchoolQuiz = () => {
   const [filterStatus, setFilterStatus] = useState('all')
   const [expandedCards, setExpandedCards] = useState({})
   const [isEditing, setIsEditing] = useState(false)
+
+  // State for Rank Modal
+  const [showRankModal, setShowRankModal] = useState(false)
+  const [rankData, setRankData] = useState([])
+  const [rankLoading, setRankLoading] = useState(false)
+  const [modalSchoolFilter, setModalSchoolFilter] = useState('all')
 
   const [quizForm, setQuizForm] = useState({
     title: '',
@@ -139,13 +145,35 @@ const SchoolQuiz = () => {
         }
       })
 
+      let fetchedQuizzes = []
       if (response.data && response.data.data) {
-        setQuizzes(response.data.data)
-        setFilteredQuizzes(response.data.data)
+        fetchedQuizzes = response.data.data
       } else if (Array.isArray(response.data)) {
-        setQuizzes(response.data)
-        setFilteredQuizzes(response.data)
+        fetchedQuizzes = response.data
       }
+
+      // Enrich quiz data with accurate participant count from the rank API
+      const enrichedQuizzes = await Promise.all(
+        fetchedQuizzes.map(async (quiz) => {
+          try {
+            const rankRes = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz/rank/?quiz_id=${quiz.quiz_id}`, {
+              headers: {
+                'Authorization': `Bearer ${accessToken}`
+              }
+            })
+            let actualCount = 0
+            if (rankRes.data && rankRes.data.success && rankRes.data.data?.length > 0) {
+              actualCount = rankRes.data.data[0].participant_count || 0
+            }
+            return { ...quiz, participant_count: actualCount }
+          } catch (e) {
+            return { ...quiz, participant_count: 0 }
+          }
+        })
+      )
+
+      setQuizzes(enrichedQuizzes)
+      setFilteredQuizzes(enrichedQuizzes)
     } catch (error) {
       console.error('Error fetching quizzes:', error)
       setQuizzes([])
@@ -232,6 +260,30 @@ const SchoolQuiz = () => {
   const handleDelete = (quiz) => {
     setSelectedQuiz(quiz)
     setShowDeleteModal(true)
+  }
+
+  const handleViewRanks = async (quiz) => {
+    setSelectedQuiz(quiz)
+    setShowRankModal(true)
+    setModalSchoolFilter('all')
+    setRankLoading(true)
+    try {
+      const response = await axios.get(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz/rank/?quiz_id=${quiz.quiz_id}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      })
+      if (response.data && response.data.success) {
+        setRankData(response.data.data)
+      } else {
+        setRankData([])
+      }
+    } catch (error) {
+      console.error('Error fetching quiz ranks:', error)
+      setRankData([])
+    } finally {
+      setRankLoading(false)
+    }
   }
 
   const handleClearFilters = () => {
@@ -556,6 +608,7 @@ const SchoolQuiz = () => {
                               <th className="py-3 px-2">Schools</th>
                               <th className="py-3 px-2">Participants</th>
                               <th className="py-3 px-2">Questions</th>
+                              <th className="py-3 px-2">Participated</th>
                               <th className="py-3 px-2">Start Date</th>
                               <th className="py-3 px-2">End Date</th>
                               <th className="py-3 px-2">Status</th>
@@ -597,6 +650,11 @@ const SchoolQuiz = () => {
                                   <td className="py-3 px-2 small">
                                     {quiz.questions?.length || 0}
                                   </td>
+                                  <td className="py-3 px-2 small text-center">
+                                    <Badge bg="secondary">
+                                      {quiz.participant_count || 0}
+                                    </Badge>
+                                  </td>
                                   <td className="py-3 px-2 small">
                                     {formatDate(quiz.start_date_time)}
                                   </td>
@@ -614,6 +672,16 @@ const SchoolQuiz = () => {
                                   </td>
                                   <td className="py-3 px-2 text-end">
                                     <div className="d-flex gap-2 justify-content-end">
+                                      <Button
+                                        variant="outline-primary"
+                                        size="sm"
+                                        className=""
+                                        style={{ padding: "4px 10px" }}
+                                        onClick={() => handleViewRanks(quiz)}
+                                        title="View Participants & Ranks"
+                                      >
+                                        <FaEye /> View
+                                      </Button>
                                       <Button
                                         variant="info"
                                         size="sm"
@@ -703,6 +771,15 @@ const SchoolQuiz = () => {
 
                                 <div className="mb-2">
                                   <small className="text-muted d-block">
+                                    Participated:
+                                  </small>
+                                  <span className="small fw-medium">
+                                    {quiz.participant_count || 0}
+                                  </span>
+                                </div>
+
+                                <div className="mb-2">
+                                  <small className="text-muted d-block">
                                     Questions:
                                   </small>
                                   <span className="small fw-medium">
@@ -720,6 +797,14 @@ const SchoolQuiz = () => {
                                 </div>
 
                                 <div className="d-flex gap-2 mt-3 pt-3 border-top">
+                                  <Button
+                                    variant="outline-primary"
+                                    size="sm"
+                                    className="flex-fill"
+                                    onClick={() => handleViewRanks(quiz)}
+                                  >
+                                    <FaEye className="me-1" /> View
+                                  </Button>
                                   <Button
                                     variant="outline-primary"
                                     size="sm"
@@ -1233,6 +1318,103 @@ const SchoolQuiz = () => {
           </Button>
           <Button variant="danger" onClick={confirmDelete}>
             <FaTrash className="me-1" /> Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Rank Details Modal */}
+      <Modal show={showRankModal} onHide={() => setShowRankModal(false)} size="lg" centered>
+        <Modal.Header closeButton className="border-bottom py-2 px-3">
+          <Modal.Title className="fw-semibold fs-6">
+            Participants & Rankings - {selectedQuiz?.title}
+            {!rankLoading && rankData.length > 0 && <Badge bg="secondary" className="ms-2">{rankData[0]?.participant_count || rankData.length} Participated</Badge>}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="">
+          {rankLoading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" variant="primary" />
+              <p className="mt-2 small text-muted">Fetching participation details...</p>
+            </div>
+          ) : rankData.length === 0 ? (
+            <div className="text-center py-4 text-muted small">
+              No student participation data found for this quiz.
+            </div>
+          ) : (
+            <>
+            <div className="mb-3 p-2 border rounded bg-light">
+              <Row className="align-items-center g-2">
+                <Col md={6}>
+                  <Form.Group className="d-flex align-items-center">
+                    <Form.Label className="mb-0 me-2 fw-medium small text-nowrap">Filter by School:</Form.Label>
+                    <Form.Select 
+                      size="sm" 
+                      value={modalSchoolFilter} 
+                      onChange={(e) => setModalSchoolFilter(e.target.value)}
+                    >
+                      <option value="all">All Participating Schools</option>
+                      {[...new Set(rankData.map(item => item.school?.school_name))]
+                        .filter(Boolean)
+                        .sort()
+                        .map(name => (
+                          <option key={name} value={name}>{name}</option>
+                        ))
+                      }
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+            </div>
+            <div className="d-flex flex-wrap gap-2 mb-3">
+              <Badge bg="primary" className="py-2 px-3">
+                Total Students: {modalSchoolFilter === 'all' ? (rankData[0]?.participant_count || rankData.length) : rankData.filter(item => item.school?.school_name === modalSchoolFilter).length}
+              </Badge>
+              <Badge bg="info" className="py-2 px-3">
+                Total Schools: {new Set(rankData.map(item => item.school?.school_uni_id)).size}
+              </Badge>
+            </div>
+            <div className="table-responsive">
+              <Table striped bordered hover responsive size="sm" className="mb-0">
+                <thead className="bg-light">
+                  <tr>
+                    <th className="py-2">Rank</th>
+                    <th className="py-2">Student Name</th>
+                    <th className="py-2">Student ID</th>
+                    <th className="py-2">School</th>
+                    <th className="py-2">Score</th>
+                    <th className="py-2">Status</th>
+                    <th className="py-2">Submitted At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rankData
+                    .filter(item => modalSchoolFilter === 'all' || item.school?.school_name === modalSchoolFilter)
+                    .map((item, idx) => (
+                    <tr key={idx}>
+                      <td className="py-2"><Badge bg={item.rank <= 3 ? "success" : "info"}>#{item.rank || (idx + 1)}</Badge></td>
+                      <td className="py-2 fw-medium">{item.student?.full_name}</td>
+                      <td className="py-2 small">{item.student?.student_id}</td>
+                      <td className="py-2 small">{item.school?.school_name}</td>
+                      <td className="py-2 fw-bold text-primary">{item.score}</td>
+                      <td className="py-2">
+                        <Badge bg={item.status === 'passed' ? 'success' : 'danger'}>
+                          {item.status || 'failed'}
+                        </Badge>
+                      </td>
+                      <td className="py-2 small">
+                        {item.submitted_at ? new Date(item.submitted_at).toLocaleString('en-IN') : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </div>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="border-top py-2 px-3">
+          <Button variant="secondary" onClick={() => setShowRankModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
