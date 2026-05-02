@@ -366,12 +366,12 @@ const toggleStudentSelection = (studentId) => {
           <SchoolHeader toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="dashboard-content">
             <Container className="dashboard-box">
-<div className="d-flex justify-content-between align-items-center mb-4 page-header">
+<div className="d-flex justify-content-between align-items-center mb-2 page-header">
                  <div className="d-flex align-items-center all-en-box gap-3">
                    <Button variant="outline-secondary" size="sm" onClick={() => navigate('/SchoolDashBoard')} className="me-2">
                      <FaArrowLeft /> <span className="small">Dashboard</span>
                    </Button>
-                   <h4 className="mb-0 small">Quiz Competitions</h4>
+                   <h5 className="mb-0 small fw-bold">Quiz Competitions</h5>
                  </div>
                  <span className="text-muted small">
                    {quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''} available
@@ -399,51 +399,51 @@ const toggleStudentSelection = (studentId) => {
               ) : (
                 <Row>
                   {quizzes.map((quiz) => (
-                    <Col key={quiz.id} md={6} lg={4} className="mb-4">
-                      <Card className="shadow-sm h-100 quiz-card" style={{ fontSize: '0.85rem' }}>
-                        <Card.Header className="bg-white d-flex justify-content-between align-items-center py-2">
-                          <Badge bg={isQuizActive(quiz) ? 'success' : 'secondary'} className="small">
+                    <Col key={quiz.id} md={6} lg={3} className="mb-3 px-2">
+                      <Card className="shadow-sm h-100 quiz-card" style={{ fontSize: '0.75rem' }}>
+                        <Card.Header className="bg-white d-flex justify-content-between align-items-center py-1 px-2">
+                          <Badge bg={isQuizActive(quiz) ? 'success' : 'secondary'} style={{ fontSize: '0.65rem' }}>
                             {isQuizActive(quiz) ? 'Active' : 'Inactive'}
                           </Badge>
-                          <small className="text-muted" style={{ fontSize: '0.75rem' }}>{quiz.questions?.length || 0} Questions</small>
+                          <small className="text-muted" style={{ fontSize: '0.65rem' }}>{quiz.questions?.length || 0} Qs</small>
                         </Card.Header>
-                        <Card.Body>
-                          <Card.Title className="h6 mb-1">{quiz.title}</Card.Title>
+                        <Card.Body className="p-2">
+                          <Card.Title className="fw-bold mb-0" style={{ fontSize: '0.85rem' }}>{quiz.title}</Card.Title>
                           {quiz.title_hindi && (
-                            <Card.Subtitle className="mb-1 text-muted small">{quiz.title_hindi}</Card.Subtitle>
+                            <Card.Subtitle className="mb-1 text-muted" style={{ fontSize: '0.7rem' }}>{quiz.title_hindi}</Card.Subtitle>
                           )}
                           
                           {quiz.description && (
-                            <Card.Text className="small text-muted mb-1" style={{ fontSize: '0.8rem' }}>
-                              {quiz.description.length > 100 
-                                ? quiz.description.substring(0, 100) + '...' 
+                            <Card.Text className="text-muted mb-1" style={{ fontSize: '0.7rem', lineHeight: '1.2' }}>
+                              {quiz.description.length > 60 
+                                ? quiz.description.substring(0, 60) + '...' 
                                 : quiz.description}
                             </Card.Text>
                           )}
 
-                          <div className="mb-3">
-                            <small className="text-muted d-block mb-0" style={{ fontSize: '0.75rem' }}>
-                              <FaClock className="me-1" />
+                          <div className="mb-2">
+                            <small className="text-muted d-block mb-0" style={{ fontSize: '0.65rem' }}>
+                              <FaClock className="me-1" size={10} />
                               Duration:
                             </small>
-                            <div className="small" style={{ fontSize: '0.8rem' }}>
+                            <div style={{ fontSize: '0.7rem' }}>
                               <div><strong>Start:</strong> {formatDate(quiz.start_date_time)}</div>
                               <div><strong>End:</strong> {formatDate(quiz.end_date_time)}</div>
                             </div>
                           </div>
 
-                          <div className="d-flex align-items-center gap-2 flex-wrap">
+                          <div className="d-flex align-items-center gap-2 flex-wrap mt-1">
                             <div>
-                              <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
-                                <FaBook className="me-1" />
+                              <small className="text-muted d-block mb-0" style={{ fontSize: '0.65rem' }}>
+                                <FaBook className="me-1" size={10} />
                                 Category:
                               </small>
-                              <Badge bg="info" className="small">{quiz.quiz_category}</Badge>
+                              <Badge bg="info" style={{ fontSize: '0.65rem' }}>{quiz.quiz_category}</Badge>
                             </div>
 
                             <div>
-                              <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
-                                <FaUsers className="me-1" />
+                              <small className="text-muted d-block mb-0" style={{ fontSize: '0.65rem' }}>
+                                <FaUsers className="me-1" size={10} />
                                 Eligible Classes:
                               </small>
                               <div className="d-flex flex-wrap gap-1">
@@ -454,9 +454,9 @@ const toggleStudentSelection = (studentId) => {
                                     <Badge 
                                       key={cls} 
                                       bg={classColors[colorIndex]}
-                                      className="px-2 py-1 rounded-pill fw-semibold"
+                                      className="px-1 py-0 rounded-pill fw-semibold"
                                       style={{
-                                        fontSize: '0.7rem',
+                                        fontSize: '0.6rem',
                                         textShadow: '0 1px 1px rgba(0,0,0,0.1)'
                                       }}
                                     >
