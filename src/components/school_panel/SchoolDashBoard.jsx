@@ -397,7 +397,7 @@ const SchoolDashBoard = () => {
       <div className="main-content-dash">
         <SchoolHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           <Row className="mb-4 align-items-center">
             <Col>
               <h4 className="font-weight-bold">School Dashboard</h4>
