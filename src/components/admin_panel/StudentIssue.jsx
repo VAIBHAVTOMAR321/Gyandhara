@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Table, Button, Spinner, Modal, Form, Badge, Tabs, Tab } from 'react-bootstrap'
 
 import axios from 'axios'
+import * as XLSX from 'xlsx'
+import jsPDF from 'jspdf'
+import { autoTable } from 'jspdf-autotable'
 import '../../assets/css/admindashboard.css'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -272,6 +275,76 @@ const StudentIssue = () => {
     }
   }
 
+  const downloadExcel = () => {
+    const dataToExport = filteredQueries.map(query => ({
+      'Query ID': query.query_id,
+      [activeTab === 'student' ? 'Student Name' : 'School Name']: activeTab === 'student' ? query.full_name : query.school_name,
+      [activeTab === 'student' ? 'Student ID' : 'School/Uni ID']: activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id),
+      ...(activeTab === 'student' ? {
+        'School Name': query.school_name || '-',
+        'School ID': query.school_uni_id || '-'
+      } : {}),
+      'Title': query.title,
+      'Issue': query.issue,
+      'Status': query.status || 'pending',
+      'Extra Remark': query.extra_remark || '-',
+      'Date': formatDate(query.created_at)
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, `${activeTab === 'student' ? 'Student' : 'School'} Queries`)
+    XLSX.writeFile(wb, `${activeTab}_queries_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  const downloadPDF = () => {
+    const doc = new jsPDF()
+
+    const tableColumn = [
+      'Query ID',
+      activeTab === 'student' ? 'Student Name' : 'School Name',
+      activeTab === 'student' ? 'Student ID' : 'School/Uni ID',
+      ...(activeTab === 'student' ? ['School Name', 'School ID'] : []),
+      'Title',
+      'Issue',
+      'Status',
+      'Extra Remark',
+      'Date'
+    ]
+
+    const tableRows = filteredQueries.map(query => [
+      query.query_id,
+      activeTab === 'student' ? query.full_name : query.school_name,
+      activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id),
+      ...(activeTab === 'student' ? [query.school_name || '-', query.school_uni_id || '-'] : []),
+      query.title,
+      query.issue,
+      query.status || 'pending',
+      query.extra_remark || '-',
+      formatDate(query.created_at)
+    ])
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    })
+
+    doc.text(`${activeTab === 'student' ? 'Student' : 'School'} Queries Report`, 14, 15)
+    doc.save(`${activeTab}_queries_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
+
   if (loading) {
     return (
       <div className="dashboard-container">
@@ -370,17 +443,36 @@ const StudentIssue = () => {
                     </Card.Body>
                   </Card>
 
-                  <Card className="table-card border">
-                    <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center paid-btn gap-2">
-                        <h5 className="mb-0 fw-semibold">
-                          All Queries
-                        </h5>
-                      </div>
-                      <span className="text-muted small">
-                        Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredQueries.length)} of {filteredQueries.length} records
-                      </span>
-                    </Card.Header>
+                   <Card className="table-card border">
+                     <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
+                       <div className="d-flex align-items-center paid-btn gap-2">
+                         <h5 className="mb-0 fw-semibold">
+                           All Queries
+                         </h5>
+                         <Button
+                           variant="outline-success"
+                           size="sm"
+                           onClick={downloadExcel}
+                           className="ms-2"
+                           title="Download Excel"
+                         >
+                           <i className="bi bi-file-earmark-excel me-1"></i>
+                           Excel
+                         </Button>
+                         <Button
+                           variant="outline-danger"
+                           size="sm"
+                           onClick={downloadPDF}
+                           title="Download PDF"
+                         >
+                           <i className="bi bi-file-earmark-pdf me-1"></i>
+                           PDF
+                         </Button>
+                       </div>
+                       <span className="text-muted small">
+                         Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredQueries.length)} of {filteredQueries.length} records
+                       </span>
+                     </Card.Header>
                     <Card.Body className="p-0">
                       {/* Desktop Table View */}
                       <div className="table-responsive d-none d-lg-block">
