@@ -93,7 +93,7 @@ function CourseItems() {
     <div className="course-items-page">
       
       <div className="course-hero-banner mt-5 mb-1" >
-        <Container>
+        <Container className='box-shadow p-4 rounded-3 ' style={{ backgroundColor: 'rgba(255, 255, 255, 0.9) ',  }}>
           <Row className="justify-content-center text-center">
             <Col lg={8}>
               <div className=" mt-4 text-black" style={{ fontSize: '1.8rem' }}>{t.title}</div>
@@ -119,10 +119,7 @@ function CourseItems() {
               </div>
             </Col>
           </Row>
-        </Container>
-      </div>
-
-      <Container className="course-content">
+          <Container className="course-content">
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h5 className="mb-0 text-muted small fw-bold">
             {t.resultsFound(filteredCourses.length)}
@@ -210,6 +207,10 @@ function CourseItems() {
           </Card>
         )}
       </Container>
+        </Container>
+      </div>
+
+      
 
       {/* Auth Prompt Modal */}
       <Modal show={showModal} onHide={handleClose} centered size="sm">
