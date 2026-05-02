@@ -6,7 +6,7 @@ import UserLeftNav from './UserLeftNav'
 import "../../assets/css/UserDashboard.css"
 import "../../assets/css/userleftnav.css"
 import { renderContentWithLineBreaks } from '../../utils/contentRenderer.jsx'
-import { FaBook, FaCheckCircle, FaClock, FaEye, FaLock, FaUnlock, FaQuestionCircle, FaArrowLeft, FaFileAlt, FaImage, FaGraduationCap, FaChalkboardTeacher, FaCertificate, FaStar, FaPlay, FaAward, FaCalendarCheck, FaCrown, FaLayerGroup, FaExchangeAlt } from 'react-icons/fa'
+import { FaBook, FaCheckCircle, FaClock, FaEye, FaLock, FaUnlock, FaQuestionCircle, FaArrowLeft, FaFileAlt, FaImage, FaGraduationCap, FaChalkboardTeacher, FaCertificate, FaStar, FaPlay, FaAward, FaCalendarCheck, FaCrown, FaLayerGroup, FaExchangeAlt, FaUsers, FaTrophy } from 'react-icons/fa'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import { useLocation, useNavigate } from 'react-router-dom'
 import axios from 'axios'

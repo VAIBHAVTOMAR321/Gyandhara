@@ -26,13 +26,16 @@ const AdminDashBoard = () => {
   const [schools, setSchools] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [quizParticipants, setQuizParticipants] = useState([]);
-  
+  const [quizItems, setQuizItems] = useState([]);
+   
   // Added state for quiz stats
   const [quizStats, setQuizStats] = useState({
     totalQuizParticipants: 0,
     totalQuizAttempts: 0,
     averageScore: 0,
-    passRate: 0
+    passRate: 0,
+    totalQuizzes: 0,
+    activeQuizzes: 0
   });
 
   // Added totalQuizParticipants to the stats object
@@ -88,54 +91,63 @@ const AdminDashBoard = () => {
     }
   }, [accessToken]);
 
-  const fetchData = async () => {
-    if (!accessToken) {
-      console.log('No access token, waiting...');
-      return;
-    }
-    
-    setLoading(true);
-    console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
-    try {
-      const [studentsRes, schoolsRes, enrollmentsRes, quizRes] = await Promise.all([
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        ),
-        axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        )
-      ]);
+   const fetchData = async () => {
+     if (!accessToken) {
+       console.log('No access token, waiting...');
+       return;
+     }
+     
+     setLoading(true);
+     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
+     try {
+       const [studentsRes, schoolsRes, enrollmentsRes, quizRes, quizItemsRes] = await Promise.all([
+         axios.get(
+           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
+           {
+             headers: {
+               Authorization: `Bearer ${accessToken}`,
+             },
+           }
+         ),
+         axios.get(
+           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
+           {
+             headers: {
+               Authorization: `Bearer ${accessToken}`,
+             },
+           }
+         ),
+         axios.get(
+           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/',
+           {
+             headers: {
+               Authorization: `Bearer ${accessToken}`,
+             },
+           }
+         ),
+         axios.get(
+           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
+           {
+             headers: {
+               Authorization: `Bearer ${accessToken}`,
+             },
+           }
+         ),
+         axios.get(
+           'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/',
+           {
+             headers: {
+               Authorization: `Bearer ${accessToken}`,
+             },
+           }
+         )
+       ]);
 
-      console.log('Students Response:', studentsRes.data);
-      console.log('Schools Response:', schoolsRes.data);
-      console.log('Enrollments Response:', enrollmentsRes.data);
-      console.log('Quiz Response:', quizRes.data);
+       console.log('Students Response:', studentsRes.data);
+       console.log('Schools Response:', schoolsRes.data);
+       console.log('Enrollments Response:', enrollmentsRes.data);
+       console.log('Quiz Response:', quizRes.data);
+       console.log('Quiz Items Response:', quizItemsRes.data);
 
 
       let studentData = [];
@@ -159,46 +171,59 @@ const AdminDashBoard = () => {
         enrollmentData = enrollmentsRes.data;
       }
 
-      let quizData = [];
-      if (quizRes.data && quizRes.data.data) {
-        quizData = quizRes.data.data;
-      } else if (quizRes.data && Array.isArray(quizRes.data)) {
-        quizData = quizRes.data;
-      }
+       let quizData = [];
+       if (quizRes.data && quizRes.data.data) {
+         quizData = quizRes.data.data;
+       } else if (quizRes.data && Array.isArray(quizRes.data)) {
+         quizData = quizRes.data;
+       }
 
-      setStudents(studentData);
-      setSchools(schoolData);
-      setEnrollments(enrollmentData);
-      setQuizParticipants(quizData);
-      
-      // Calculate quiz statistics
-      const totalQuizParticipants = quizData.length;
-      const totalQuizAttempts = quizData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
-      const totalScore = quizData.reduce((sum, item) => 
-        sum + (item.attempt?.reduce((attemptSum, attempt) => attemptSum + (attempt.score || 0), 0) || 0), 0
-      );
-      const averageScore = totalQuizAttempts > 0 ? (totalScore / totalQuizAttempts).toFixed(1) : 0;
-      const passRate = totalQuizParticipants > 0 
-        ? ((quizData.filter(item => 
-            item.attempt?.some(attempt => attempt.status === 'passed')
-          ).length / totalQuizParticipants) * 100
-        ).toFixed(1) : 0;
-      
-      setQuizStats({
-        totalQuizParticipants,
-        totalQuizAttempts,
-        averageScore,
-        passRate
-      });
-      
-      // Update general stats to include quiz participants
-      setStats({
-        totalStudents: studentData.length,
-        totalSchools: schoolData.length,
-        totalEnrollments: enrollmentData.length,
-        totalUniqueCourses: new Set(enrollmentData.map(e => e.course_id)).size,
-        totalQuizParticipants: totalQuizParticipants // Properly setting the count here
-      });
+       let quizItemsData = [];
+       if (quizItemsRes.data && quizItemsRes.data.data) {
+         quizItemsData = quizItemsRes.data.data;
+       } else if (quizItemsRes.data && Array.isArray(quizItemsRes.data)) {
+         quizItemsData = quizItemsRes.data;
+       }
+
+       setStudents(studentData);
+       setSchools(schoolData);
+       setEnrollments(enrollmentData);
+       setQuizParticipants(quizData);
+       setQuizItems(quizItemsData);
+       
+       // Calculate quiz statistics
+       const totalQuizParticipants = quizData.length;
+       const totalQuizAttempts = quizData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
+       const totalScore = quizData.reduce((sum, item) => 
+         sum + (item.attempt?.reduce((attemptSum, attempt) => attemptSum + (attempt.score || 0), 0) || 0), 0
+       );
+       const averageScore = totalQuizAttempts > 0 ? (totalScore / totalQuizAttempts).toFixed(1) : 0;
+       const passRate = totalQuizParticipants > 0 
+         ? ((quizData.filter(item => 
+             item.attempt?.some(attempt => attempt.status === 'passed')
+           ).length / totalQuizParticipants) * 100
+         ).toFixed(1) : 0;
+       
+       const totalQuizzes = quizItemsData.length;
+       const activeQuizzes = quizItemsData.filter(q => q.is_active).length;
+       
+       setQuizStats({
+         totalQuizParticipants,
+         totalQuizAttempts,
+         averageScore,
+         passRate,
+         totalQuizzes,
+         activeQuizzes
+       });
+       
+       // Update general stats to include quiz participants
+       setStats({
+         totalStudents: studentData.length,
+         totalSchools: schoolData.length,
+         totalEnrollments: enrollmentData.length,
+         totalUniqueCourses: new Set(enrollmentData.map(e => e.course_id)).size,
+         totalQuizParticipants: totalQuizParticipants // Properly setting the count here
+       });
     } catch (err) {
       console.error("Error fetching data:", err);
       console.error("Error response:", err.response);
@@ -346,7 +371,7 @@ const AdminDashBoard = () => {
             <div style={{ minWidth: '950px', height: '340px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '20px 10px 70px 10px' }}>
               {districtQuizData.map((item, index) => {
                 const barHeight = (item.participants / maxParticipants) * 220;
-                const tooltipText = `${item.district}: ${item.participants} participants, ${item.attempts} total attempts`;
+                const tooltipText = `${item.district}: ${item.participants} participants, ${item.attempts} Total Participation`;
                 
                 return (
                   <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
@@ -472,7 +497,7 @@ const AdminDashBoard = () => {
                    title="Click to view all quiz attempts"
                  >
                    <div className="h4 fw-bold text-primary">{totalParticipants}</div>
-                   <div className="text-muted small">Total Attempts</div>
+                   <div className="text-muted small">Total Participation</div>
                  </div>
                </Col>
                <Col md={3} sm={6}>
@@ -743,20 +768,23 @@ const AdminDashBoard = () => {
           </Modal.Footer>
         </Modal>
 
-        <Modal
-          show={showQuizModal}
-          onHide={() => setShowQuizModal(false)}
-          centered
-          size="md"
-          contentClassName="quiz-participants-modal"
-          backdropClassName="modal-backdrop-custom"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              <i className="bi bi-people-fill me-2"></i>
-              Quiz Participants - {selectedQuiz}
-            </Modal.Title>
-          </Modal.Header>
+         <Modal
+           show={showQuizModal}
+           onHide={() => setShowQuizModal(false)}
+           centered
+           size="md"
+           contentClassName="quiz-participants-modal"
+           backdropClassName="modal-backdrop-custom"
+         >
+           <Modal.Header closeButton>
+             <Modal.Title>
+               <i className="bi bi-people-fill me-2"></i>
+               Quiz Participants - {selectedQuiz}
+               <span className="ms-2 badge bg-secondary">
+                 {getQuizParticipants(selectedQuiz).length} participant(s)
+               </span>
+             </Modal.Title>
+           </Modal.Header>
           <Modal.Body>
             {getQuizParticipants(selectedQuiz).length > 0 ? (
               <div className="table-responsive">
@@ -834,8 +862,203 @@ const AdminDashBoard = () => {
          </Card.Body>
        </Card>
      );
-  };
+   };
+  
+  const renderQuizItemsRankDistribution = () => {
+    // Get all quiz attempts with ranks from quizParticipants
+    const allRanks = quizParticipants.flatMap(p => 
+      p.attempt?.map(a => ({ 
+        rank: a.rank, 
+        quiz_id: p.quiz_id,
+        student_name: p.student?.full_name,
+        score: a.score,
+        total_questions: a.total_questions
+      })).filter(a => a.rank && a.rank > 0) || []
+    ).sort((a, b) => a.rank - b.rank);
 
+    if (allRanks.length === 0) {
+      return (
+        <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+          <Card.Body className="p-4 text-center text-muted">
+            <i className="bi bi-graph-up fs-1 mb-2 d-block"></i>
+            <p className="mb-0">No rank data available for quizzes</p>
+          </Card.Body>
+        </Card>
+      );
+    }
+
+    const minRank = Math.min(...allRanks.map(a => a.rank));
+    const maxRank = Math.max(...allRanks.map(a => a.rank));
+    const totalAttempts = allRanks.length;
+
+    const rankRanges = [
+      { label: 'Top 10', max: 10, color: '#2ecc71' },
+      { label: '11-50', min: 11, max: 50, color: '#3498db' },
+      { label: '51-100', min: 51, max: 100, color: '#f39c12' },
+      { label: '101+', min: 101, color: '#e74c3c' }
+    ];
+
+    const rankDistribution = rankRanges.map(range => {
+      const count = allRanks.filter(a => {
+        if (range.max && !range.min) return a.rank <= range.max;
+        if (range.min && range.max) return a.rank >= range.min && a.rank <= range.max;
+        if (range.min && !range.max) return a.rank >= range.min;
+        return false;
+      }).length;
+      const percentage = totalAttempts > 0 ? ((count / totalAttempts) * 100).toFixed(1) : 0;
+      return { ...range, count, percentage };
+    });
+
+    const maxCount = Math.max(...rankDistribution.map(r => r.count), 1);
+
+    return (
+      <Card className="mb-4 shadow-sm border-0 rounded-4 overflow-hidden">
+        <Card.Body className="p-4">
+          <h5 className="mb-4 fw-bold text-dark d-flex align-items-center">
+            <i className="bi bi-trophy me-2" style={{ color: '#f39c12' }}></i>
+            Rank Distribution Across All Quizzes
+          </h5>
+            <Row className="mb-3">
+              <Col md={3} sm={6}>
+                <div
+                  className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                  onClick={() => openRankModal(minRank)}
+                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                  title="Click to view students with best rank"
+                >
+                  <div className="h4 fw-bold text-primary">{minRank}</div>
+                  <div className="text-muted small">Best Rank</div>
+                </div>
+              </Col>
+              <Col md={3} sm={6}>
+                <div
+                  className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                  onClick={() => openRankModal(maxRank)}
+                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                  title="Click to view students with lowest rank"
+                >
+                  <div className="h4 fw-bold text-primary">{maxRank}</div>
+                  <div className="text-muted small">Lowest Rank</div>
+                </div>
+              </Col>
+              <Col md={3} sm={6}>
+                <div
+                  className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                  onClick={() => {
+                    setSelectedRank('all-attempts');
+                    setShowRankModal(true);
+                  }}
+                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                  title="Click to view all quiz attempts"
+                >
+                  <div className="h4 fw-bold text-primary">{totalAttempts}</div>
+                  <div className="text-muted small">Total Participation</div>
+                </div>
+              </Col>
+              <Col md={3} sm={6}>
+                <div
+                  className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                  onClick={() => {
+                    const avg = totalAttempts > 0 ? allRanks.reduce((a, b) => a + b.rank, 0) / totalAttempts : 0;
+                    const avgRounded = Math.round(avg);
+                    openRankRangeModal(`Avg (${avgRounded-10}–${avgRounded+10})`, avgRounded - 10, avgRounded + 10);
+                  }}
+                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                  title="Click to view students around average rank"
+                >
+                  <div className="h4 fw-bold text-primary">{((totalAttempts > 0 ? allRanks.reduce((a, b) => a + b.rank, 0) / totalAttempts : 0)).toFixed(1)}</div>
+                  <div className="text-muted small">Avg Rank</div>
+                </div>
+              </Col>
+            </Row>
+          <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+             <div style={{ minWidth: '700px', height: '320px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '40px 20px 60px 20px' }}>
+               {rankDistribution.map((item, index) => {
+                 const barHeight = (item.count / maxCount) * 200;
+
+                 // Get tooltip content showing top students with quiz IDs
+                 const participantsInRange = allRanks.filter(a => {
+                   if (item.min && item.max) return a.rank >= item.min && a.rank <= item.max;
+                   if (item.max && !item.min) return a.rank <= item.max;
+                   if (item.min && !item.max) return a.rank >= item.min;
+                   return false;
+                 });
+
+                 const tooltipLines = participantsInRange.slice(0, 5).map(a => {
+                   return `${a.student_name || 'Unknown'} - ${a.quiz_id} (Rank: ${a.rank}, Score: ${a.score}/${a.total_questions})`;
+                 });
+
+                 if (participantsInRange.length > 5) {
+                   tooltipLines.push(`...and ${participantsInRange.length - 5} more`);
+                 }
+
+                 const tooltipText = tooltipLines.length > 0 ? tooltipLines.join('\n') : `${item.label}: ${item.count} attempts`;
+
+                 return (
+                   <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
+                     <div
+                       className="fw-bold mb-1 clickable-rank-count"
+                       style={{
+                         fontSize: '12px',
+                         color: item.color,
+                         opacity: item.count > 0 ? 1 : 0.3,
+                         cursor: 'pointer',
+                         transition: 'transform 0.2s'
+                       }}
+                       onClick={() => {
+                         if (item.count > 0) {
+                           openRankRangeModal(item.label, item.min, item.max);
+                         }
+                       }}
+                       title={`Click to view all ${item.label} rank holders`}
+                     >
+                       {item.count}
+                     </div>
+                     <div
+                       className="district-bar"
+                       style={{
+                         height: `${barHeight}px`,
+                         width: '100%',
+                         maxWidth: '80px',
+                         background: `linear-gradient(to top, ${item.color}, ${item.color}aa)`,
+                         borderRadius: '8px 8px 0 0',
+                         transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                         position: 'relative',
+                         boxShadow: `0 4px 15px ${item.color}30`,
+                         cursor: 'pointer'
+                       }}
+                       title={tooltipText}
+                     ></div>
+                    <div className="position-absolute text-center text-truncate fw-bold" 
+                      style={{ 
+                        bottom: '-50px', 
+                        width: '80px', 
+                        fontSize: '11px',
+                        color: '#333',
+                        letterSpacing: '0.2px'
+                      }}>
+                      {item.label}
+                    </div>
+                    <div className="position-absolute text-center small" 
+                      style={{ 
+                        top: '-20px', 
+                        width: '80px',
+                        fontSize: '10px',
+                        color: '#666'
+                      }}>
+                      {item.percentage}%
+        </div>
+  
+                   </div>
+                 );
+               })}
+             </div>
+           </div>
+        </Card.Body>
+      </Card>
+    );
+  };
+  
   const exportToPDF = () => {
     try {
       const doc = new jsPDF({ orientation: 'landscape' });
@@ -883,31 +1106,44 @@ const AdminDashBoard = () => {
           e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-',
           e.is_completed ? 'Completed' : 'Ongoing'
         ]);
-      } else if (activeTab === 'quiz-participants') {
-        title = "Quiz Participants Report";
-        headers = [['#', 'Student', 'District', 'School', 'Quiz ID', 'Participants', 'Attempts', 'Best Score', 'Best Rank']];
-        const filteredQuizData = quizParticipants.filter(p => {
-          const matchSchool = !quizSchoolFilter || (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
-          const matchDistrict = !quizDistrictFilter || (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
-          return matchSchool && matchDistrict;
-        });
-        data = filteredQuizData.map((p, i) => {
-          const bestAttempt = p.attempt?.reduce((best, curr) => (curr.score || 0) > (best.score || 0) ? curr : best, p.attempt?.[0] || {});
-          const bestRank = p.attempt?.reduce((best, curr) => curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, null);
-          const percentage = bestAttempt?.total_questions ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1) : 0;
-          return [
-            i + 1,
-            p.student?.full_name || '-',
-            p.student?.district || '-',
-            p.student?.school_name || '-',
-            p.quiz_id || '-',
-            quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length,
-            p.attempt?.length || 0,
-            `${bestAttempt?.score || 0}/${bestAttempt?.total_questions || 0} (${percentage}%)`,
-            bestRank ? `#${bestRank}` : '-'
-          ];
-        });
-      }
+       } else if (activeTab === 'quiz-participants') {
+         title = "Quiz Participants Report";
+         headers = [['#', 'Student', 'District', 'School', 'Quiz ID', 'Participants', 'Attempts', 'Best Score', 'Best Rank']];
+         const filteredQuizData = quizParticipants.filter(p => {
+           const matchSchool = !quizSchoolFilter || (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+           const matchDistrict = !quizDistrictFilter || (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+           return matchSchool && matchDistrict;
+         });
+         data = filteredQuizData.map((p, i) => {
+           const bestAttempt = p.attempt?.reduce((best, curr) => (curr.score || 0) > (best.score || 0) ? curr : best, p.attempt?.[0] || {});
+           const bestRank = p.attempt?.reduce((best, curr) => curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, null);
+           const percentage = bestAttempt?.total_questions ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1) : 0;
+           return [
+             i + 1,
+             p.student?.full_name || '-',
+             p.student?.district || '-',
+             p.student?.school_name || '-',
+             p.quiz_id || '-',
+             quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length,
+             p.attempt?.length || 0,
+             `${bestAttempt?.score || 0}/${bestAttempt?.total_questions || 0} (${percentage}%)`,
+             bestRank ? `#${bestRank}` : '-'
+           ];
+         });
+       } else if (activeTab === 'quiz-items') {
+         title = "Quiz Items Report";
+         headers = [['#', 'Quiz ID', 'Title', 'Category', 'Questions', 'Status', 'Start Date', 'End Date']];
+         data = quizItems.map((q, i) => [
+           i + 1,
+           q.quiz_id || '-',
+           q.title || '-',
+           q.quiz_category || '-',
+           q.number_of_questions || 0,
+           q.is_active ? 'Active' : 'Inactive',
+           q.start_date_time ? new Date(q.start_date_time).toLocaleDateString() : '-',
+           q.end_date_time ? new Date(q.end_date_time).toLocaleDateString() : '-'
+         ]);
+       }
 
       doc.setFontSize(14);
       doc.text(title, 14, 15);
@@ -1075,17 +1311,17 @@ const AdminDashBoard = () => {
                           <td className="fw-bold">{p.student?.full_name}</td>
                           <td>{p.student?.district}</td>
                           <td>{p.student?.school_name}</td>
-                          <td>
-                            <Badge
-                              bg="info"
-                              className="clickable-rank-badge"
-                              onClick={() => openQuizModal(p.quiz_id)}
-                              style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                              title="Click to view all participants"
-                            >
-                              {p.quiz_id}
-                            </Badge>
-                          </td>
+                           <td>
+                             <Badge
+                               bg="info"
+                               className="clickable-rank-badge"
+                               onClick={() => openQuizModal(p.quiz_id)}
+                               style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                               title={`Click to view all ${quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length} participant(s)`}
+                             >
+                               {p.quiz_id}
+                             </Badge>
+                           </td>
                           <td className="text-center">
                             <Badge bg="secondary" style={{ fontSize: '0.85rem' }}>
                               {quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length}
@@ -1156,251 +1392,313 @@ const AdminDashBoard = () => {
       label: "Unique Courses",
       className: "unique-courses"
     },
-     {
+    {
       key: "quiz-participants",
       icon: "bi-trophy",
       number: stats.totalQuizParticipants,
       label: "Total Quiz Participants",
       className: "quiz-participants"
+    },
+   
+   
+    {
+      key: "quiz-items",
+      icon: "bi-journal-text",
+      number: quizStats.totalQuizzes,
+      label: "Total Quizzes",
+      className: "total-quizzes"
     }
   ];
 
    const renderTable = () => {
-     const indexOfLastItem = currentPage * itemsPerPage;
-     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+      const indexOfLastItem = currentPage * itemsPerPage;
+      const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-     const currentStudents = students.slice(indexOfFirstItem, indexOfLastItem);
-     const currentSchools = schools.slice(indexOfFirstItem, indexOfLastItem);
-     const currentEnrollments = enrollments.slice(indexOfFirstItem, indexOfLastItem);
+      const currentStudents = students.slice(indexOfFirstItem, indexOfLastItem);
+      const currentSchools = schools.slice(indexOfFirstItem, indexOfLastItem);
+      const currentEnrollments = enrollments.slice(indexOfFirstItem, indexOfLastItem);
+      
+      // Use the local filteredQuizData logic inside renderQuizTable, 
+      // but for pagination we need a global filter reference or calculate here.
+      // For simplicity in this component structure, we will rely on renderQuizTable handling its own pagination/filtering
+      // or just use the full list if pagination isn't strictly enforced on the specific quiz view in the original logic.
+      // However, to be consistent:
+      const filteredQuizParticipants = quizParticipants.filter(p => {
+        const matchSchool = !quizSchoolFilter || 
+          (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+        const matchDistrict = !quizDistrictFilter || 
+          (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+        return matchSchool && matchDistrict;
+      });
+      const currentQuizParticipants = filteredQuizParticipants.slice(indexOfFirstItem, indexOfLastItem);
      
-     // Use the local filteredQuizData logic inside renderQuizTable, 
-     // but for pagination we need a global filter reference or calculate here.
-     // For simplicity in this component structure, we will rely on renderQuizTable handling its own pagination/filtering
-     // or just use the full list if pagination isn't strictly enforced on the specific quiz view in the original logic.
-     // However, to be consistent:
-     const filteredQuizParticipants = quizParticipants.filter(p => {
-       const matchSchool = !quizSchoolFilter || 
-         (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
-       const matchDistrict = !quizDistrictFilter || 
-         (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
-       return matchSchool && matchDistrict;
-     });
-     const currentQuizParticipants = filteredQuizParticipants.slice(indexOfFirstItem, indexOfLastItem);
-    
-    const renderPagination = (totalItems, currentPage) => {
-      const totalPages = Math.ceil(totalItems / itemsPerPage);
-      if (totalPages <= 1) return null;
-      
-      const items = [];
-      const maxVisiblePages = 5;
-      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      
-      if (endPage - startPage + 1 < maxVisiblePages) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-      }
-      
-      items.push(
-        <Pagination.Prev 
-          key="prev" 
-          disabled={currentPage === 1} 
-          onClick={() => setCurrentPage(currentPage - 1)} 
-        />
-      );
-      
-      if (startPage > 1) {
-        items.push(<Pagination.Item key={1} onClick={() => setCurrentPage(1)}>{1}</Pagination.Item>);
-        if (startPage > 2) items.push(<Pagination.Ellipsis key="start-ellipsis" disabled />);
-      }
-      
-      for (let i = startPage; i <= endPage; i++) {
-        items.push(
-          <Pagination.Item 
-            key={i} 
-            active={i === currentPage} 
-            onClick={() => setCurrentPage(i)}
-          >
-            {i}
-          </Pagination.Item>
-        );
-      }
-      
-      if (endPage < totalPages) {
-        if (endPage < totalPages - 1) items.push(<Pagination.Ellipsis key="end-ellipsis" disabled />);
-        items.push(<Pagination.Item key={totalPages} onClick={() => setCurrentPage(totalPages)}>{totalPages}</Pagination.Item>);
-      }
-      
-      items.push(
-        <Pagination.Next 
-          key="next" 
-          disabled={currentPage === totalPages} 
-          onClick={() => setCurrentPage(currentPage + 1)} 
-        />
-      );
-      
-      return <div className="pagination-wrapper"><Pagination>{items}</Pagination></div>;
-    };
+     const renderPagination = (totalItems, currentPage) => {
+       const totalPages = Math.ceil(totalItems / itemsPerPage);
+       if (totalPages <= 1) return null;
+       
+       const items = [];
+       const maxVisiblePages = 5;
+       let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+       let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+       
+       if (endPage - startPage + 1 < maxVisiblePages) {
+         startPage = Math.max(1, endPage - maxVisiblePages + 1);
+       }
+       
+       items.push(
+         <Pagination.Prev 
+           key="prev" 
+           disabled={currentPage === 1} 
+           onClick={() => setCurrentPage(currentPage - 1)} 
+         />
+       );
+       
+       if (startPage > 1) {
+         items.push(<Pagination.Item key={1} onClick={() => setCurrentPage(1)}>{1}</Pagination.Item>);
+         if (startPage > 2) items.push(<Pagination.Ellipsis key="start-ellipsis" disabled />);
+       }
+       
+       for (let i = startPage; i <= endPage; i++) {
+         items.push(
+           <Pagination.Item 
+             key={i} 
+             active={i === currentPage} 
+             onClick={() => setCurrentPage(i)}
+           >
+             {i}
+           </Pagination.Item>
+         );
+       }
+       
+       if (endPage < totalPages) {
+         if (endPage < totalPages - 1) items.push(<Pagination.Ellipsis key="end-ellipsis" disabled />);
+         items.push(<Pagination.Item key={totalPages} onClick={() => setCurrentPage(totalPages)}>{totalPages}</Pagination.Item>);
+       }
+       
+       items.push(
+         <Pagination.Next 
+           key="next" 
+           disabled={currentPage === totalPages} 
+           onClick={() => setCurrentPage(currentPage + 1)} 
+         />
+       );
+       
+       return <div className="pagination-wrapper"><Pagination>{items}</Pagination></div>;
+     };
 
-    if (activeTab === "students") {
-      return (
-        <>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Student ID</th>
-                <th>Name</th>
-                <th>Aadhaar</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Class</th>
-                <th>School</th>
-                <th>District</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentStudents.length > 0 ? (
-                currentStudents.map((student, index) => (
-                  <tr key={index}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td>{student.student_id || "-"}</td>
-                    <td>{student.full_name || "-"}</td>
-                    <td>{student.aadhaar_no ? `****${student.aadhaar_no.slice(-4)}` : "-"}</td>
-                    <td>{student.phone || "-"}</td>
-                    <td>{student.email || "-"}</td>
-                    <td>{student.class_name || "-"}</td>
-                    <td>{student.school_name || "-"}</td>
-                    <td>{student.district || "-"}</td>
-                    <td>
-                      <Badge bg={student.status === "approved" ? "success" : student.status === "rejected" ? "danger" : "warning"}>
-                        {student.status || "pending"}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="10" className="text-center">No students found</td>
-                </tr>
-              )}
-            </tbody>
-          </Table>
-          {renderPagination(students.length, currentPage)}
-        </>
-      );
-    } else if (activeTab === "schools") {
-      return (
-        <>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>School ID</th>
-                <th>School Name</th>
-                <th>District</th>
-                <th>State</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentSchools.length > 0 ? (
-                currentSchools.map((school, index) => (
-                  <tr key={index}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td>{school.school_uni_id || "-"}</td>
-                    <td>{school.school_name || "-"}</td>
-                    <td>{school.district || "-"}</td>
-                    <td>{school.state || "Uttarakhand"}</td>
-                       <td>
-                         <Badge bg={school.status === "approved" ? "success" : school.status === "rejected" ? "danger" : "warning"}>
-                           {school.status || "pending"}
-                         </Badge>
-                       </td>
-                       <td>
-                         <select
-                           className="status-select form-select form-select-sm"
-                           value={school.status || "pending"}
-                           onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
-                           style={{ cursor: 'pointer', minWidth: '120px' }}
-                         >
-                           <option value="pending">Pending</option>
-                           <option value="approved">Approved</option>
-                           <option value="rejected">Rejected</option>
-                         </select>
-                       </td>
-                  </tr>
-                ))
-              ) : (
+     if (activeTab === "students") {
+       return (
+         <>
+           <Table striped bordered hover responsive>
+             <thead>
+               <tr>
+                 <th>#</th>
+                 <th>Student ID</th>
+                 <th>Name</th>
+                 <th>Aadhaar</th>
+                 <th>Phone</th>
+                 <th>Email</th>
+                 <th>Class</th>
+                 <th>School</th>
+                 <th>District</th>
+                 <th>Status</th>
+               </tr>
+             </thead>
+             <tbody>
+               {currentStudents.length > 0 ? (
+                 currentStudents.map((student, index) => (
+                   <tr key={index}>
+                     <td>{indexOfFirstItem + index + 1}</td>
+                     <td>{student.student_id || "-"}</td>
+                     <td>{student.full_name || "-"}</td>
+                     <td>{student.aadhaar_no ? `****${student.aadhaar_no.slice(-4)}` : "-"}</td>
+                     <td>{student.phone || "-"}</td>
+                     <td>{student.email || "-"}</td>
+                     <td>{student.class_name || "-"}</td>
+                     <td>{student.school_name || "-"}</td>
+                     <td>{student.district || "-"}</td>
+                     <td>
+                       <Badge bg={student.status === "approved" ? "success" : student.status === "rejected" ? "danger" : "warning"}>
+                         {student.status || "pending"}
+                       </Badge>
+                     </td>
+                   </tr>
+                 ))
+               ) : (
                  <tr>
-                   <td colSpan="7" className="text-center">No schools found</td>
+                   <td colSpan="10" className="text-center">No students found</td>
                  </tr>
-              )}
-            </tbody>
-          </Table>
-          {renderPagination(schools.length, currentPage)}
-        </>
-      );
-    } else if (activeTab === "enrollments") {
-      return (
-        <>
-          <Table striped bordered hover responsive>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Student ID</th>
-                <th>Student Name</th>
-                <th>School Name</th>
-                <th>Class</th>
-                <th>Course ID</th>
-                <th>Course Name</th>
-                <th>Enrolled At</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentEnrollments.length > 0 ? (
-                currentEnrollments.map((enrollment, index) => (
-                  <tr key={index}>
-                    <td>{indexOfFirstItem + index + 1}</td>
-                    <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
-                    <td className="fw-bold">{enrollment.student_name}</td>
-                    <td>{enrollment.school_name || '-'}</td>
-                    <td><Badge bg="info">{enrollment.class_name || '-'}</Badge></td>
-                    <td><Badge bg="info">{enrollment.course_id}</Badge></td>
-                    <td>{enrollment.course_name}</td>
-                    <td className="small">
-                      {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-'}
-                    </td>
-                    <td>
-                      <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
-                        {enrollment.is_completed ? 'Completed' : 'Ongoing'}
-                      </Badge>
-                    </td>
+               )}
+             </tbody>
+           </Table>
+           {renderPagination(students.length, currentPage)}
+         </>
+       );
+     } else if (activeTab === "schools") {
+       return (
+         <>
+           <Table striped bordered hover responsive>
+             <thead>
+               <tr>
+                 <th>#</th>
+                 <th>School ID</th>
+                 <th>School Name</th>
+                 <th>District</th>
+                 <th>State</th>
+                 <th>Status</th>
+                 <th>Actions</th>
+               </tr>
+             </thead>
+             <tbody>
+               {currentSchools.length > 0 ? (
+                 currentSchools.map((school, index) => (
+                   <tr key={index}>
+                     <td>{indexOfFirstItem + index + 1}</td>
+                     <td>{school.school_uni_id || "-"}</td>
+                     <td>{school.school_name || "-"}</td>
+                     <td>{school.district || "-"}</td>
+                     <td>{school.state || "Uttarakhand"}</td>
+                        <td>
+                          <Badge bg={school.status === "approved" ? "success" : school.status === "rejected" ? "danger" : "warning"}>
+                            {school.status || "pending"}
+                          </Badge>
+                        </td>
+                        <td>
+                          <select
+                            className="status-select form-select form-select-sm"
+                            value={school.status || "pending"}
+                            onChange={(e) => handleStatusChange(school.school_uni_id, e.target.value)}
+                            style={{ cursor: 'pointer', minWidth: '120px' }}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                          </select>
+                        </td>
+                   </tr>
+                 ))
+               ) : (
+                  <tr>
+                    <td colSpan="7" className="text-center">No schools found</td>
                   </tr>
-                ))
-              ) : (
+               )}
+             </tbody>
+           </Table>
+           {renderPagination(schools.length, currentPage)}
+         </>
+       );
+     } else if (activeTab === "enrollments") {
+       return (
+         <>
+           <Table striped bordered hover responsive>
+             <thead>
+               <tr>
+                 <th>#</th>
+                 <th>Student ID</th>
+                 <th>Student Name</th>
+                 <th>School Name</th>
+                 <th>Class</th>
+                 <th>Course ID</th>
+                 <th>Course Name</th>
+                 <th>Enrolled At</th>
+                 <th>Status</th>
+               </tr>
+             </thead>
+             <tbody>
+               {currentEnrollments.length > 0 ? (
+                 currentEnrollments.map((enrollment, index) => (
+                   <tr key={index}>
+                     <td>{indexOfFirstItem + index + 1}</td>
+                     <td><Badge bg="secondary">{enrollment.student_id}</Badge></td>
+                     <td className="fw-bold">{enrollment.student_name}</td>
+                     <td>{enrollment.school_name || '-'}</td>
+                     <td><Badge bg="info">{enrollment.class_name || '-'}</Badge></td>
+                     <td><Badge bg="info">{enrollment.course_id}</Badge></td>
+                     <td>{enrollment.course_name}</td>
+                     <td className="small">
+                       {enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-'}
+                     </td>
+                     <td>
+                       <Badge bg={enrollment.is_completed ? 'success' : 'warning'}>
+                         {enrollment.is_completed ? 'Completed' : 'Ongoing'}
+                       </Badge>
+                     </td>
+                   </tr>
+                 ))
+               ) : (
+                 <tr>
+                   <td colSpan="9" className="text-center">No enrollments found</td>
+                 </tr>
+               )}
+             </tbody>
+           </Table>
+           {renderPagination(enrollments.length, currentPage)}
+         </>
+       );
+     } else if (activeTab === "quiz-participants") {
+       // Return the custom quiz table
+       return renderQuizTable();
+      } else if (activeTab === "quiz-items") {
+        // New: Quiz Items Table with Rank Distribution
+        const currentQuizItems = quizItems.slice(indexOfFirstItem, indexOfLastItem);
+        return (
+          <>
+            {/* Rank Distribution Chart for Quiz Items */}
+            {renderQuizItemsRankDistribution()}
+            
+            <Table striped bordered hover responsive>
+              <thead>
                 <tr>
-                  <td colSpan="9" className="text-center">No enrollments found</td>
+                  <th>#</th>
+                  <th>Quiz ID</th>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Questions</th>
+                  <th>Status</th>
+                  <th>Start Date</th>
+                  <th>End Date</th>
                 </tr>
-              )}
-            </tbody>
-          </Table>
-          {renderPagination(enrollments.length, currentPage)}
-        </>
-      );
-    } else if (activeTab === "quiz-participants") {
-      // Return the custom quiz table
-      return renderQuizTable();
-    } else {
-      return (
-        <div className="text-center py-5 text-muted">
-          {/* <p>This tab displays district-wise unique course distribution in the graph above.</p> */}
-        </div>
-      );
-    }
-  };
+              </thead>
+              <tbody>
+                {currentQuizItems.length > 0 ? (
+                  currentQuizItems.map((quiz, index) => (
+                    <tr key={index}>
+                      <td>{indexOfFirstItem + index + 1}</td>
+                      <td><Badge bg="info">{quiz.quiz_id || '-'}</Badge></td>
+                      <td className="fw-bold">{quiz.title || '-'}</td>
+                      <td><Badge bg="secondary">{quiz.quiz_category || '-'}</Badge></td>
+                      <td>{quiz.number_of_questions || 0}</td>
+                      <td>
+                        <Badge bg={quiz.is_active ? "success" : "secondary"}>
+                          {quiz.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                      </td>
+                      <td className="small">
+                        {quiz.start_date_time ? new Date(quiz.start_date_time).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="small">
+                        {quiz.end_date_time ? new Date(quiz.end_date_time).toLocaleDateString() : '-'}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="8" className="text-center">No quiz items found</td>
+                  </tr>
+                )}
+              </tbody>
+            </Table>
+            {renderPagination(quizItems.length, currentPage)}
+          </>
+        );
+      } else {
+       return (
+         <div className="text-center py-5 text-muted">
+           {/* <p>This tab displays district-wise unique course distribution in the graph above.</p> */}
+         </div>
+       );
+     }
+   };
 
   const renderDistrictChart = () => {
     const districts = [
@@ -1529,37 +1827,38 @@ const AdminDashBoard = () => {
                     ))}
                   </Row>
 
-                 {activeTab ? (
-                   <>
-              {activeTab === "quiz-participants" ? (
-                        <>
-                          {renderRankDistributionChart()}
-                          {renderQuizChart()}
-                        </>
-                      ) : (
-                        renderDistrictChart()
-                      )}
+                  {activeTab ? (
+                    <>
+               {activeTab === "quiz-participants" ? (
+                         <>
+                           {renderRankDistributionChart()}
+                           {renderQuizChart()}
+                         </>
+                       ) : (
+                         renderDistrictChart()
+                       )}
 
-              <div className="table-card">
-                        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                          <h4 className="mb-0">
-                            {activeTab === "students" && "Student List"}
-                            {activeTab === "schools" && "School List"}
-                            {activeTab === "enrollments" && "Enrollment List"}
-                            {activeTab === "quiz-participants" && "Quiz Participants List"}
-                          </h4>
-                          <div className="d-flex gap-2">
-                            <Button variant="outline-primary" size="sm" onClick={exportToPDF}>
-                              <FaFilePdf className="me-1" /> Export PDF
-                            </Button>
-                            <Button variant="outline-success" size="sm" onClick={exportToExcel}>
-                              <FaFileExcel className="me-1" /> Export Excel
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="table-responsive">
-                          {renderTable()}
-                        </div>
+               <div className="table-card">
+                         <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                           <h4 className="mb-0">
+                             {activeTab === "students" && "Student List"}
+                             {activeTab === "schools" && "School List"}
+                             {activeTab === "enrollments" && "Enrollment List"}
+                             {activeTab === "quiz-participants" && "Quiz Participants List"}
+                             {activeTab === "quiz-items" && "Quiz Items List"}
+                           </h4>
+                           <div className="d-flex gap-2">
+                             <Button variant="outline-primary" size="sm" onClick={exportToPDF}>
+                               <FaFilePdf className="me-1" /> Export PDF
+                             </Button>
+                             <Button variant="outline-success" size="sm" onClick={exportToExcel}>
+                               <FaFileExcel className="me-1" /> Export Excel
+                             </Button>
+                           </div>
+                         </div>
+                         <div className="table-responsive">
+                           {renderTable()}
+                         </div>
                         {/* Mobile Table Wrapper Logic kept as is for students/schools */}
                         <div className="mobile-table-wrapper">
                           {activeTab === "students" && students.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((student, index) => (
