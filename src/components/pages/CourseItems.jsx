@@ -93,10 +93,10 @@ function CourseItems() {
     <div className="course-items-page">
       
       <div className="course-hero-banner mt-5 mb-1" >
-        <Container className='box-shadow p-4 rounded-3 ' style={{ backgroundColor: 'rgba(255, 255, 255, 0.9) ',  }}>
+        <Container className='box-shadow p-4 rounded-3 ' style={{ backgroundColor: 'rgba(255, 255, 255, 0.9) ',marginTop:'80px' }}>
           <Row className="justify-content-center text-center">
             <Col lg={8}>
-              <div className=" mt-4 text-black" style={{ fontSize: '1.8rem' }}>{t.title}</div>
+              <div className="mb-3 text-black" style={{ fontSize: '1.8rem' }}>{t.title}</div>
               <div className="search-filter-container p-3 bg-white shadow-lg rounded-pill d-flex align-items-center">
                 <div className="flex-grow-1 d-flex align-items-center px-3 border-end">
                   <FaSearch className="text-muted me-2" />
