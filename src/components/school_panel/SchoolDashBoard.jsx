@@ -102,6 +102,10 @@ const SchoolDashBoard = () => {
   const [showParticipantModal, setShowParticipantModal] = useState(false);
   // ----------------------
 
+  // School Rank state
+  const [schoolRanks, setSchoolRanks] = useState([]);
+  const [schoolRankLoading, setSchoolRankLoading] = useState(false);
+
   // Calculate analytics from enrollment data
   const calculateAnalytics = (enrollmentData, moduleData) => {
     if (!enrollmentData || enrollmentData.length === 0) {
@@ -333,6 +337,9 @@ const SchoolDashBoard = () => {
      } finally {
        setParticipantLoading(false);
      }
+
+     // Fetch school rankings for this quiz
+     fetchSchoolRanks(quiz.quiz_id);
    };
 
    // Filter participants to only show those from the logged-in school
@@ -353,6 +360,29 @@ const SchoolDashBoard = () => {
       setSidebarOpen(!sidebarOpen);
     } else {
       setSidebarOpen(!sidebarOpen);
+    }
+  };
+
+  // Fetch school ranks for a specific quiz
+  const fetchSchoolRanks = async (quizId) => {
+    try {
+      setSchoolRankLoading(true);
+      const response = await axios.get(
+        `https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-event/school-rank/?quiz_id=${quizId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      if (response.data.status) {
+        setSchoolRanks(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching school ranks:', error);
+      setSchoolRanks([]);
+    } finally {
+      setSchoolRankLoading(false);
     }
   };
 
@@ -622,7 +652,10 @@ const SchoolDashBoard = () => {
           {/* Participant Analysis & Graph Modal */}
           <Modal
             show={showParticipantModal}
-            onHide={() => setShowParticipantModal(false)}
+            onHide={() => {
+              setShowParticipantModal(false);
+              setSchoolRanks([]);
+            }}
             size="xl"
             centered
             className="participant-analysis-modal"
@@ -789,6 +822,65 @@ const SchoolDashBoard = () => {
                                  </Card>
                              </Col>
                         </Row>
+
+                         {/* School Rankings Table */}
+                         <Card className="shadow-sm mb-4">
+                             <Card.Header className="bg-warning text-dark d-flex justify-content-between align-items-center">
+                                 <h6 className="mb-0 fw-bold">
+                                     <FaTrophy className="me-2" />
+                                     School Rankings
+                                 </h6>
+                                 <Badge bg="dark">Quiz: {selectedQuiz?.title}</Badge>
+                             </Card.Header>
+                             <Card.Body className="p-0">
+                                 {schoolRankLoading ? (
+                                     <div className="text-center py-4">
+                                         <Spinner animation="border" variant="primary" />
+                                         <p className="text-muted mt-2">Loading school rankings...</p>
+                                     </div>
+                                 ) : schoolRanks.length > 0 ? (
+                                     <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                                         <Table striped bordered hover responsive className="mb-0">
+                                             <thead className="table-dark">
+                                                 <tr>
+                                                     <th className="text-center" style={{ width: '80px' }}>Rank</th>
+                                                     <th>School Name</th>
+                                                     <th className="text-center">School ID</th>
+                                                     <th className="text-center">Avg Score</th>
+                                                     <th className="text-center">Students</th>
+                                                 </tr>
+                                             </thead>
+                                             <tbody>
+                                                 {schoolRanks.map((schoolRank, idx) => {
+                                                     const isCurrentSchool = schoolRank.school.school_uni_id === uniqueId;
+                                                     return (
+                                                         <tr key={idx} style={{ backgroundColor: isCurrentSchool ? '#dc3545' : 'inherit', color: isCurrentSchool ? 'white' : 'inherit' }}>
+                                                             <td className="text-center fw-bold">
+                                                                 {schoolRank.rank === 1 ? '🥇' : schoolRank.rank === 2 ? '🥈' : schoolRank.rank === 3 ? '🥉' : `#${schoolRank.rank}`}
+                                                             </td>
+                                                             <td>
+                                                                 <div className="fw-bold">
+                                                                     {schoolRank.school.school_name}
+                                                                     {isCurrentSchool && <Badge bg="light" text="dark" className="ms-2">Your School</Badge>}
+                                                                 </div>
+                                                             </td>
+                                                             <td className="text-center">{schoolRank.school.school_uni_id}</td>
+                                                             <td className="text-center fw-bold">{schoolRank.avg_score}</td>
+                                                             <td className="text-center">{schoolRank.total_students}</td>
+                                                         </tr>
+                                                     );
+                                                 })}
+                                             </tbody>
+                                         </Table>
+                                     </div>
+                                 ) : (
+                                     <div className="text-center py-4">
+                                         <FaTrophy className="text-muted fs-1 mb-3" />
+                                         <p className="text-muted mb-0">No school ranking data available</p>
+                                     </div>
+                                 )}
+                             </Card.Body>
+                         </Card>
 
                          {/* Detailed Participants Table */}
                          <Card className="shadow-sm">
