@@ -302,7 +302,7 @@ function AppContent() {
               <NinthGuidance />
             </ProtectedRoute>
           }
-        />
+        /> 
         <Route
           path="/AddGovtSchemes"
           element={
