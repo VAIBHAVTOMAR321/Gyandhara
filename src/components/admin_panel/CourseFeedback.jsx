@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Form } from 'react-bootstrap'
 import axios from 'axios'
+import * as XLSX from 'xlsx'
+import jsPDF from 'jspdf'
+import { autoTable } from 'jspdf-autotable'
 import '../../assets/css/admindashboard.css'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -159,6 +162,60 @@ const CourseFeedback = () => {
     )
   }
 
+  const downloadExcel = () => {
+    const dataToExport = filteredFeedbacks.map(feedback => ({
+      'Course ID': feedback.course_id,
+      'Course Name': feedback.course_name,
+      'Average Rating': feedback.average_rating,
+      'Total Feedback Count': feedback.feedback_count,
+      'Total Stars': feedback.total_stars,
+      'Total Questions': feedback.total_questions
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Course Feedback')
+    XLSX.writeFile(wb, `course_feedback_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  const downloadPDF = () => {
+    const doc = new jsPDF()
+
+    const tableColumn = [
+      'Course ID',
+      'Course Name',
+      'Average Rating',
+      'Total Feedback Count'
+    ]
+
+    const tableRows = filteredFeedbacks.map(feedback => [
+      feedback.course_id,
+      feedback.course_name,
+      feedback.average_rating,
+      feedback.feedback_count
+    ])
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    })
+
+    doc.text('Course Feedback Report', 14, 15)
+    doc.save(`course_feedback_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
+
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage
@@ -258,17 +315,36 @@ const CourseFeedback = () => {
                     </Card.Body>
                   </Card>
 
-                  <Card className="table-card border">
-                    <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
-                      <div className="d-flex align-items-center paid-btn gap-2">
-                        <h5 className="mb-0 fw-semibold">
-                          All Feedbacks
-                        </h5>
-                      </div>
-                      <span className="text-muted small">
-                        Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredFeedbacks.length)} of {filteredFeedbacks.length} records
-                      </span>
-                    </Card.Header>
+                   <Card className="table-card border">
+                     <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
+                       <div className="d-flex align-items-center paid-btn gap-2">
+                         <h5 className="mb-0 fw-semibold">
+                           All Feedbacks
+                         </h5>
+                         <Button
+                           variant="outline-success"
+                           size="sm"
+                           onClick={downloadExcel}
+                           className="ms-2"
+                           title="Download Excel"
+                         >
+                           <i className="bi bi-file-earmark-excel me-1"></i>
+                           Excel
+                         </Button>
+                         <Button
+                           variant="outline-danger"
+                           size="sm"
+                           onClick={downloadPDF}
+                           title="Download PDF"
+                         >
+                           <i className="bi bi-file-earmark-pdf me-1"></i>
+                           PDF
+                         </Button>
+                       </div>
+                       <span className="text-muted small">
+                         Showing {indexOfFirstRecord + 1} to {Math.min(indexOfLastRecord, filteredFeedbacks.length)} of {filteredFeedbacks.length} records
+                       </span>
+                     </Card.Header>
                     <Card.Body className="p-0">
                       {/* Desktop Table View */}
                       <div className="table-responsive d-none d-lg-block">

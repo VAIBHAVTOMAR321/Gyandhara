@@ -3,6 +3,9 @@ import { Container, Row, Col, Card, Button, Modal, Form, Badge, Table, Spinner }
 import AdminLeftNav from './AdminLeftNav'
 import AdminHeader from './AdminHeader'
 import axios from 'axios'
+import * as XLSX from 'xlsx'
+import jsPDF from 'jspdf'
+import { autoTable } from 'jspdf-autotable'
 import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaArrowLeft } from 'react-icons/fa'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -141,9 +144,66 @@ const QuizManageMent = () => {
 
   const formatDateTime = (dateTimeStr) => {
     if (!dateTimeStr) return ''
-    return dateTimeStr.includes(':') && !dateTimeStr.match(/:\d{2}:\d{2}/) 
-      ? dateTimeStr + ':00' 
+    return dateTimeStr.includes(':') && !dateTimeStr.match(/:\d{2}:\d{2}/)
+      ? dateTimeStr + ':00'
       : dateTimeStr
+  }
+
+  const downloadExcel = () => {
+    const dataToExport = quizzes.map(quiz => ({
+      'ID': quiz.quiz_id,
+      'Title': quiz.title,
+      'Activity Type': quiz.quiz_category,
+      'Questions': quiz.number_of_questions || 0,
+      'Status': quiz.is_active ? 'Active' : 'Inactive',
+      'Created At': quiz.created_at ? new Date(quiz.created_at).toLocaleDateString('en-IN') : '',
+      'Updated At': quiz.updated_at ? new Date(quiz.updated_at).toLocaleDateString('en-IN') : ''
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Quiz Management')
+    XLSX.writeFile(wb, `quiz_management_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  const downloadPDF = () => {
+    const doc = new jsPDF()
+
+    const tableColumn = [
+      'ID',
+      'Title',
+      'Activity Type',
+      'Questions',
+      'Status'
+    ]
+
+    const tableRows = quizzes.map(quiz => [
+      quiz.quiz_id,
+      quiz.title,
+      quiz.quiz_category,
+      quiz.number_of_questions || 0,
+      quiz.is_active ? 'Active' : 'Inactive'
+    ])
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    })
+
+    doc.text('Quiz Management Report', 14, 15)
+    doc.save(`quiz_management_${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
   const handleSubmit = async (e) => {
@@ -358,17 +418,36 @@ const QuizManageMent = () => {
             <Container fluid className="dashboard-box">
               <Card className="shadow-sm mb-4">
                 <Card.Body>
-                  <div className="d-flex justify-content-between align-items-center mb-4 page-header">
-                    <div className="d-flex align-items-center all-en-box gap-3">
-                      <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
-                        <FaArrowLeft /> Dashboard
-                      </Button>
-                      <h4 className="mb-0">Quiz Management</h4>
-                    </div>
-                    <Button variant="primary" onClick={openCreateModal}>
-                      <FaPlus className="me-2" /> Create Quiz
-                    </Button>
-                  </div>
+                   <div className="d-flex justify-content-between align-items-center mb-4 page-header">
+                     <div className="d-flex align-items-center all-en-box gap-3">
+                       <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
+                         <FaArrowLeft /> Dashboard
+                       </Button>
+                       <h4 className="mb-0">Quiz Management</h4>
+                       <Button
+                         variant="outline-success"
+                         size="sm"
+                         onClick={downloadExcel}
+                         className="ms-2"
+                         title="Download Excel"
+                       >
+                         <i className="bi bi-file-earmark-excel me-1"></i>
+                         Excel
+                       </Button>
+                       <Button
+                         variant="outline-danger"
+                         size="sm"
+                         onClick={downloadPDF}
+                         title="Download PDF"
+                       >
+                         <i className="bi bi-file-earmark-pdf me-1"></i>
+                         PDF
+                       </Button>
+                     </div>
+                     <Button variant="primary" onClick={openCreateModal}>
+                       <FaPlus className="me-2" /> Create Quiz
+                     </Button>
+                   </div>
 
                   <Table responsive hover className="table-card">
                     <thead>
