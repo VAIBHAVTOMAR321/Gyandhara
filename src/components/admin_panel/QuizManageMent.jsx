@@ -3,7 +3,10 @@ import { Container, Row, Col, Card, Button, Modal, Form, Badge, Table, Spinner }
 import AdminLeftNav from './AdminLeftNav'
 import AdminHeader from './AdminHeader'
 import axios from 'axios'
-import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaArrowLeft } from 'react-icons/fa'
+import { FaPlus, FaEdit, FaTrash, FaEye, FaTimes, FaArrowLeft, FaFilePdf, FaFileExcel } from 'react-icons/fa'
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import '../../assets/css/admindashboard.css'
@@ -271,6 +274,59 @@ const QuizManageMent = () => {
     setShowViewModal(true)
   }
 
+  const downloadPDF = () => {
+    try {
+      const doc = new jsPDF({ orientation: 'landscape' });
+      const title = "Quiz Management Report";
+      const headers = [['ID', 'Title', 'Activity Type', 'Questions', 'Status']];
+      const data = quizzes.map(quiz => [
+        quiz.quiz_id || '-',
+        quiz.title || '-',
+        quiz.quiz_category || '-',
+        quiz.number_of_questions || 0,
+        quiz.is_active ? 'Active' : 'Inactive'
+      ]);
+
+      doc.setFontSize(14);
+      doc.text(title, 14, 15);
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 22);
+      
+      autoTable(doc, { 
+        startY: 28, 
+        head: headers, 
+        body: data, 
+        theme: 'grid', 
+        styles: { fontSize: 10 }, 
+        headStyles: { fillColor: [67, 97, 238], textColor: 255 } 
+      });
+      
+      doc.save(`quiz-management-report.pdf`);
+    } catch (error) {
+      console.error("PDF Export failed:", error);
+      alert("Failed to generate PDF. Check console for details.");
+    }
+  };
+
+  const downloadExcel = () => {
+    try {
+      const dataToExport = quizzes.map(quiz => ({
+        'ID': quiz.quiz_id || '-',
+        'Title': quiz.title || '-',
+        'Activity Type': quiz.quiz_category || '-',
+        'Questions': quiz.number_of_questions || 0,
+        'Status': quiz.is_active ? 'Active' : 'Inactive'
+      }));
+
+      const ws = XLSX.utils.json_to_sheet(dataToExport);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Quizzes");
+      XLSX.writeFile(wb, `quiz_list_${new Date().toISOString().split('T')[0]}.xlsx`);
+    } catch (error) {
+      console.error("Excel Export failed:", error);
+    }
+  };
+
   const handleDelete = async (quiz) => {
     if (!window.confirm(`Are you sure you want to delete "${quiz.title}"?`)) return
 
@@ -365,9 +421,17 @@ const QuizManageMent = () => {
                       </Button>
                       <h4 className="mb-0">Quiz Management</h4>
                     </div>
-                    <Button variant="primary" onClick={openCreateModal}>
-                      <FaPlus className="me-2" /> Create Quiz
-                    </Button>
+                    <div className="d-flex gap-2">
+                      <Button variant="outline-danger" size="sm" onClick={downloadPDF}>
+                        <FaFilePdf className="me-1" /> PDF
+                      </Button>
+                      <Button variant="outline-success" size="sm" onClick={downloadExcel}>
+                        <FaFileExcel className="me-1" /> Excel
+                      </Button>
+                      <Button variant="primary" onClick={openCreateModal}>
+                        <FaPlus className="me-2" /> Create Quiz
+                      </Button>
+                    </div>
                   </div>
 
                   <Table responsive hover className="table-card">
