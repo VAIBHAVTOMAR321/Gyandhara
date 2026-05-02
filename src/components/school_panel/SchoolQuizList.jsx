@@ -315,17 +315,17 @@ const toggleStudentSelection = (studentId) => {
           <SchoolHeader toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
           <div className="dashboard-content">
             <Container className="dashboard-box">
-              <div className="d-flex justify-content-between align-items-center mb-4 page-header">
-                <div className="d-flex align-items-center all-en-box gap-3">
-                  <Button variant="outline-secondary" size="sm" onClick={() => navigate('/SchoolDashBoard')} className="me-2">
-                    <FaArrowLeft /> Dashboard
-                  </Button>
-                  <h4 className="mb-0">Quiz Competitions</h4>
-                </div>
-                <span className="text-muted">
-                  {quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''} available
-                </span>
-              </div>
+<div className="d-flex justify-content-between align-items-center mb-4 page-header">
+                 <div className="d-flex align-items-center all-en-box gap-3">
+                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/SchoolDashBoard')} className="me-2">
+                     <FaArrowLeft /> <span className="small">Dashboard</span>
+                   </Button>
+                   <h4 className="mb-0 small">Quiz Competitions</h4>
+                 </div>
+                 <span className="text-muted small">
+                   {quizzes.length} quiz{quizzes.length !== 1 ? 'zes' : ''} available
+                 </span>
+               </div>
 
               {error && (
                 <Alert variant="danger" dismissible onClose={() => setError('')}>
@@ -351,19 +351,19 @@ const toggleStudentSelection = (studentId) => {
                     <Col key={quiz.id} md={6} lg={4} className="mb-4">
                       <Card className="shadow-sm h-100 quiz-card">
                         <Card.Header className="bg-white d-flex justify-content-between align-items-center py-3">
-                          <Badge bg={isQuizActive(quiz) ? 'success' : 'secondary'}>
+                          <Badge bg={isQuizActive(quiz) ? 'success' : 'secondary'} className="small">
                             {isQuizActive(quiz) ? 'Active' : 'Inactive'}
                           </Badge>
-                          <small className="text-muted">{quiz.questions?.length || 0} Questions</small>
+                          <small className="text-muted" style={{ fontSize: '0.75rem' }}>{quiz.questions?.length || 0} Questions</small>
                         </Card.Header>
                         <Card.Body>
-                          <Card.Title className="h5 mb-2">{quiz.title}</Card.Title>
+                          <Card.Title className="h6 mb-2">{quiz.title}</Card.Title>
                           {quiz.title_hindi && (
                             <Card.Subtitle className="mb-3 text-muted small">{quiz.title_hindi}</Card.Subtitle>
                           )}
                           
                           {quiz.description && (
-                            <Card.Text className="small text-muted mb-3">
+                            <Card.Text className="small text-muted mb-3" style={{ fontSize: '0.8rem' }}>
                               {quiz.description.length > 100 
                                 ? quiz.description.substring(0, 100) + '...' 
                                 : quiz.description}
@@ -371,52 +371,55 @@ const toggleStudentSelection = (studentId) => {
                           )}
 
                           <div className="mb-3">
-                            <small className="text-muted d-block mb-1">
+                            <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
                               <FaClock className="me-1" />
                               Duration:
                             </small>
-                            <div className="small">
+                            <div className="small" style={{ fontSize: '0.8rem' }}>
                               <div><strong>Start:</strong> {formatDate(quiz.start_date_time)}</div>
                               <div><strong>End:</strong> {formatDate(quiz.end_date_time)}</div>
                             </div>
                           </div>
 
-                          <div className="mb-3">
-                            <small className="text-muted d-block mb-1">
-                              <FaBook className="me-1" />
-                              Category:
-                            </small>
-                            <Badge bg="info">{quiz.quiz_category}</Badge>
-                          </div>
+                          <div className="d-flex align-items-center gap-4 flex-wrap">
+                            <div>
+                              <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
+                                <FaBook className="me-1" />
+                                Category:
+                              </small>
+                              <Badge bg="info" className="small">{quiz.quiz_category}</Badge>
+                            </div>
 
-                          <div>
-                            <small className="text-muted d-block mb-2">
-                              <FaUsers className="me-1" />
-                              Eligible Classes:
-                            </small>
-                            <div className="d-flex flex-wrap gap-2">
-                              {quiz.class_allowed?.map((cls, idx) => {
-                                const classColors = ['primary', 'success', 'danger', 'warning'];
-                                const colorIndex = idx % classColors.length;
-                                return (
-                                  <Badge 
-                                    key={cls} 
-                                    bg={classColors[colorIndex]}
-                                    className="px-3 py-2 rounded-pill fw-semibold"
-                                    style={{
-                                      fontSize: '0.85rem',
-                                      textShadow: '0 1px 2px rgba(0,0,0,0.2)'
-                                    }}
-                                  >
-                                    Class {cls}
-                                  </Badge>
-                                );
-                              })}
+                            <div>
+                              <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
+                                <FaUsers className="me-1" />
+                                Eligible Classes:
+                              </small>
+                              <div className="d-flex flex-wrap gap-1">
+                                {quiz.class_allowed?.map((cls, idx) => {
+                                  const classColors = ['primary', 'success', 'danger', 'warning'];
+                                  const colorIndex = idx % classColors.length;
+                                  return (
+                                    <Badge 
+                                      key={cls} 
+                                      bg={classColors[colorIndex]}
+                                      className="px-2 py-1 rounded-pill fw-semibold"
+                                      style={{
+                                        fontSize: '0.7rem',
+                                        textShadow: '0 1px 1px rgba(0,0,0,0.1)'
+                                      }}
+                                    >
+                                      Class {cls}
+                                    </Badge>
+                                  );
+                                })}
+                              </div>
                             </div>
                           </div>
+
                           {quiz.total_participants && (
                             <div className="mt-2">
-                              <small className="text-muted d-block">
+                              <small className="text-muted d-block" style={{ fontSize: '0.75rem' }}>
                                 Max Participants: {quiz.total_participants}
                               </small>
                             </div>
@@ -445,22 +448,22 @@ const toggleStudentSelection = (studentId) => {
       {/* Registration Modal */}
       <Modal show={showRegisterModal} onHide={() => setShowRegisterModal(false)} centered size="lg">
         <Modal.Header closeButton className="border-bottom py-2 px-3">
-          <Modal.Title className="fw-semibold fs-6">
+          <Modal.Title className="fw-semibold fs-6 small">
             Register Students for Quiz
           </Modal.Title>
         </Modal.Header>
          <Modal.Body className="">
            {selectedQuiz && (
              <>
-<Alert variant="info" className="mb-3">
-                  <strong>Quiz:</strong> {selectedQuiz.title}<br />
-                  <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
-                  <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
-                  {maxParticipants && (
-                    <><br />
-                    <strong>Max Participants:</strong> {maxParticipants}</>
-                  )}
-                </Alert>
+<Alert variant="info" className="mb-3 small">
+                           <strong>Quiz:</strong> {selectedQuiz.title}<br />
+                           <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
+                           <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
+                           {maxParticipants && (
+                             <><br />
+                             <strong>Max Participants:</strong> {maxParticipants}</>
+                           )}
+                         </Alert>
 
                {error && (
                  <Alert variant="danger" dismissible onClose={() => setError('')}>
@@ -495,7 +498,8 @@ const toggleStudentSelection = (studentId) => {
                             setSelectedStudents([])
                             setError('')
                           }}
-                          style={{ width: '200px' }}
+                          style={{ width: '200px', fontSize: '0.85rem' }}
+                          size="sm"
                         >
                           <option value="all">All Classes</option>
                           {selectedQuiz.class_allowed?.map(cls => {
@@ -505,7 +509,7 @@ const toggleStudentSelection = (studentId) => {
                             )
                           })}
                         </Form.Select>
-                      <small className="text-muted ms-2">
+                      <small className="text-muted ms-2 small">
                         Showing eligible students only
                       </small>
                     </div>
@@ -580,63 +584,63 @@ const toggleStudentSelection = (studentId) => {
                       </div>
                     </div>
 
-                    <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                      <table className="table table-bordered table-hover">
-                        <thead className="bg-light">
-                          <tr>
-                            <th style={{ width: '40px' }}>Select</th>
-                            <th>Student ID</th>
-                            <th>Full Name</th>
-                            <th>Class</th>
-                            <th>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {allStudentsFlat
-                            .filter(student => {
-                              const studentClassNum = normalizeClass(student.class_name)
-                              // Only show students from eligible classes
-                              const isEligible = selectedQuiz.class_allowed?.some(allowed => 
-                                normalizeClass(allowed) === studentClassNum
-                              )
-                              // Apply class filter
-                              const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
-                              const classMatch = filterNum === null || studentClassNum === filterNum
-                              return isEligible && classMatch
-                            })
-                            .map((student) => {
-                              const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
-                              const isRegistered = registeredList.includes(student.student_id)
-                              const isSelected = selectedStudents.includes(student.student_id)
-                              return (
-                                <tr key={student.student_id} className={isSelected ? 'table-primary' : ''}>
-                                  <td>
-                                    <Form.Check
-                                      type="checkbox"
-                                      checked={isSelected}
-                                      onChange={() => toggleStudentSelection(student.student_id)}
-                                    />
-                                  </td>
-                                  <td>{student.student_id}</td>
-                                  <td>{student.full_name}</td>
-                                  <td>
-                                    <Badge bg="secondary">{student.class_name}</Badge>
-                                  </td>
-                                  <td>
-                                    {isRegistered ? (
-                                      <Badge bg="success">
-                                        <FaCheck className="me-1" /> Registered
-                                      </Badge>
-                                    ) : (
-                                      <Badge bg="secondary">Not Registered</Badge>
-                                    )}
-                                  </td>
-                                </tr>
-                              )
-                            })}
-                        </tbody>
-                      </table>
-                    </div>
+<div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                       <table className="table table-bordered table-hover table-sm">
+                         <thead className="bg-light">
+                           <tr>
+                             <th style={{ width: '40px', fontSize: '0.75rem' }}>Select</th>
+                             <th style={{ fontSize: '0.75rem' }}>Student ID</th>
+                             <th style={{ fontSize: '0.75rem' }}>Full Name</th>
+                             <th style={{ fontSize: '0.75rem' }}>Class</th>
+                             <th style={{ fontSize: '0.75rem' }}>Status</th>
+                           </tr>
+                         </thead>
+                         <tbody>
+                           {allStudentsFlat
+                             .filter(student => {
+                               const studentClassNum = normalizeClass(student.class_name)
+                               // Only show students from eligible classes
+                               const isEligible = selectedQuiz.class_allowed?.some(allowed => 
+                                 normalizeClass(allowed) === studentClassNum
+                               )
+                               // Apply class filter
+                               const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
+                               const classMatch = filterNum === null || studentClassNum === filterNum
+                               return isEligible && classMatch
+                             })
+                             .map((student) => {
+                               const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
+                               const isRegistered = registeredList.includes(student.student_id)
+                               const isSelected = selectedStudents.includes(student.student_id)
+                               return (
+                                 <tr key={student.student_id} className={isSelected ? 'table-primary' : ''}>
+                                   <td>
+                                     <Form.Check
+                                       type="checkbox"
+                                       checked={isSelected}
+                                       onChange={() => toggleStudentSelection(student.student_id)}
+                                     />
+                                   </td>
+                                   <td style={{ fontSize: '0.8rem' }}>{student.student_id}</td>
+                                   <td style={{ fontSize: '0.8rem' }}>{student.full_name}</td>
+                                   <td>
+                                     <Badge bg="secondary" className="small">{student.class_name}</Badge>
+                                   </td>
+                                   <td>
+                                     {isRegistered ? (
+                                       <Badge bg="success" className="small">
+                                         <FaCheck className="me-1" /> Registered
+                                       </Badge>
+                                     ) : (
+                                       <Badge bg="secondary" className="small">Not Registered</Badge>
+                                     )}
+                                   </td>
+                                 </tr>
+                               )
+                             })}
+                         </tbody>
+                       </table>
+                     </div>
                   </>
                )}
              </>
