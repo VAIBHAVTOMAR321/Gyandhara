@@ -98,11 +98,11 @@ const menuItems = [
             path: "/TenthGuidance",
             icon: <FaPlusSquare />,
           },
-          {
-            label: language === 'hi' ? "11वीं मार्गदर्शन" : "11th Guidance",
-            path: "/EleventhGuidance",
-            icon: <FaPlusSquare />,
-          },
+          // {
+          //   label: language === 'hi' ? "11वीं मार्गदर्शन" : "11th Guidance",
+          //   path: "/EleventhGuidance",
+          //   icon: <FaPlusSquare />,
+          // },
           {
             label: language === 'hi' ? "12वीं मार्गदर्शन" : "12th Guidance",
             path: "/TwelfthGuidance",
