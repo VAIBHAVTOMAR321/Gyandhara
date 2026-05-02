@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { Container, Row, Col, Card, Button, Form, Alert, Table, Spinner, Modal, Pagination } from "react-bootstrap";
 import axios from "axios";
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
+import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
 
 import { useAuth } from "../all_login/AuthContext";
 import { useLanguage } from "../all_login/LanguageContext";
@@ -402,6 +405,52 @@ const StudentRegistration = () => {
     }
     return items;
   };
+
+  // Download Excel for students
+  const downloadStudentsExcel = () => {
+    const dataToExport = students.map((student, index) => ({
+      '#': index + 1,
+      'Aadhaar Number': student.aadhaar_no,
+      'Full Name': student.full_name,
+      'Date Created': student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Students')
+    XLSX.writeFile(wb, `students_${school_uni_id}_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  // Download PDF for students
+  const downloadStudentsPDF = () => {
+    const doc = new jsPDF()
+
+    const tableColumn = [
+      '#',
+      'Aadhaar Number',
+      'Full Name',
+      'Date Created'
+    ]
+
+    const tableRows = students.map((student, index) => [
+      index + 1,
+      student.aadhaar_no,
+      student.full_name,
+      student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'
+    ])
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    })
+
+    doc.text('Students Report', 14, 15)
+    doc.save(`students_${school_uni_id}_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
 
   // Single form validation
   const validateSingleForm = () => {
@@ -1049,11 +1098,31 @@ const StudentRegistration = () => {
                     <div className="mt-4">
                       <div className="d-flex justify-content-between align-items-center mb-3">
                         <h5>{t.studentList} ({totalStudents} {language === 'hi' ? 'कुल' : 'total'})</h5>
-                        {selectedIds.length > 0 && (
-                          <Button variant="danger" size="sm" onClick={handleDeleteMultiple}>
-                            {t.deleteSelected} ({selectedIds.length})
+                        <div className="d-flex gap-2 align-items-center">
+                          <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={downloadStudentsExcel}
+                            title="Download Excel"
+                            disabled={students.length === 0}
+                          >
+                            <FaFileExcel className="me-1" /> Excel
                           </Button>
-                        )}
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={downloadStudentsPDF}
+                            title="Download PDF"
+                            disabled={students.length === 0}
+                          >
+                            <FaFilePdf className="me-1" /> PDF
+                          </Button>
+                          {selectedIds.length > 0 && (
+                            <Button variant="danger" size="sm" onClick={handleDeleteMultiple}>
+                              {t.deleteSelected} ({selectedIds.length})
+                            </Button>
+                          )}
+                        </div>
                       </div>
 
                       {studentsLoading ? (

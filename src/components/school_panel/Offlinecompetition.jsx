@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Container, Row, Col, Card, Button, Spinner, Alert, Modal, Table, Form } from "react-bootstrap";
 import axios from "axios";
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 import "../../assets/css/userleftnav.css";
+import { FaFileExcel, FaFilePdf } from 'react-icons/fa';
 
 import { useAuth } from "../all_login/AuthContext";
 import SchoolHeader from "./SchoolHeader";
@@ -281,6 +285,56 @@ const Offlinecompetition = () => {
     setParticipants([]);
   };
 
+  // --- Export Functions ---
+  const downloadExcel = () => {
+    const dataToExport = competitions.map((comp, index) => ({
+      '#': index + 1,
+      'Title': comp.title,
+      'Title (Hindi)': comp.title_hindi || '',
+      'Location': comp.location || '',
+      'Date & Time': comp.comp_date_time ? new Date(comp.comp_date_time).toLocaleString() : '-',
+      'School ID': comp.school_uni_id || '',
+      'Description': comp.description || ''
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Offline Competitions')
+    XLSX.writeFile(wb, `offline_competitions_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
+  const downloadPDF = () => {
+    const doc = new jsPDF()
+
+    const tableColumn = [
+      '#',
+      'Title',
+      'Location',
+      'Date & Time',
+      'School ID'
+    ]
+
+    const tableRows = competitions.map((comp, index) => [
+      index + 1,
+      comp.title,
+      comp.location || '',
+      comp.comp_date_time ? new Date(comp.comp_date_time).toLocaleString() : '-',
+      comp.school_uni_id || ''
+    ])
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+      alternateRowStyles: { fillColor: [245, 245, 245] }
+    })
+
+    doc.text('Offline Competitions Report', 14, 15)
+    doc.save(`offline_competitions_${new Date().toISOString().split('T')[0]}.pdf`)
+  }
+
 return (
   <div className="dashboard-container">
     <SchoolLeftNav
@@ -301,7 +355,23 @@ return (
               Manage school offline events and competitions
             </p>
           </Col>
-          <Col className="text-end">
+          <Col className="text-end d-flex justify-content-end gap-2 align-items-center">
+            <Button
+              variant="outline-success"
+              size="sm"
+              onClick={downloadExcel}
+              title="Download Excel"
+            >
+              <FaFileExcel className="me-1" /> Excel
+            </Button>
+            <Button
+              variant="outline-danger"
+              size="sm"
+              onClick={downloadPDF}
+              title="Download PDF"
+            >
+              <FaFilePdf className="me-1" /> PDF
+            </Button>
             <Button
               variant="primary"
               onClick={() => {
