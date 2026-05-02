@@ -9,7 +9,7 @@
 .course-items-header-content h1 {
       font-size: 34px;
     font-weight: 800;
-   
+    margin-top: 12px !important;
     color: var(--gd-blue-dark);
     line-height: 1.15;
     letter-spacing: -0.5px;

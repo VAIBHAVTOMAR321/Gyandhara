@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Table, Badge, Spinner, Pagination, Card, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Table, Badge, Spinner, Pagination, Card, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import axios from "axios";
 import { FaSchool } from "react-icons/fa"; // Added import
 import { useAuth } from "../all_login/AuthContext";
@@ -23,7 +23,6 @@ const AdminDashBoard = () => {
   const [schools, setSchools] = useState([]);
   const [enrollments, setEnrollments] = useState([]);
   const [quizParticipants, setQuizParticipants] = useState([]);
-  const [quizItems, setQuizItems] = useState([]);
   
   // Added state for quiz stats
   const [quizStats, setQuizStats] = useState({
@@ -52,7 +51,20 @@ const AdminDashBoard = () => {
   const [selectedDistrict, setSelectedDistrict] = useState('all');
   const [selectedSchool, setSelectedSchool] = useState('all');
 
-  const { accessToken } = useAuth();
+  // Modal states for student details
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [showStudentModal, setShowStudentModal] = useState(false);
+  const [loadingStudent, setLoadingStudent] = useState(false);
+
+   // Modal states for quiz participants
+   const [selectedQuiz, setSelectedQuiz] = useState(null);
+   const [showQuizModal, setShowQuizModal] = useState(false);
+
+   // Modal state for rank participants
+   const [selectedRank, setSelectedRank] = useState(null);
+   const [showRankModal, setShowRankModal] = useState(false);
+
+   const { accessToken } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -82,9 +94,9 @@ const AdminDashBoard = () => {
     setLoading(true);
     console.log('Fetching data with token:', accessToken.substring(0, 20) + '...');
     try {
-      const [quizParticipantsRes, quizItemsRes] = await Promise.all([
+      const [studentsRes, schoolsRes, enrollmentsRes, quizRes] = await Promise.all([
         axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-reg/',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -92,7 +104,23 @@ const AdminDashBoard = () => {
           }
         ),
         axios.get(
-          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/',
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/enrollment-unpaid/',
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        ),
+        axios.get(
+          'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -104,8 +132,7 @@ const AdminDashBoard = () => {
       console.log('Students Response:', studentsRes.data);
       console.log('Schools Response:', schoolsRes.data);
       console.log('Enrollments Response:', enrollmentsRes.data);
-      console.log('Quiz Participants Response:', quizParticipantsRes.data);
-      console.log('Quiz Items Response:', quizItemsRes.data);
+      console.log('Quiz Response:', quizRes.data);
 
 
       let studentData = [];
@@ -129,35 +156,27 @@ const AdminDashBoard = () => {
         enrollmentData = enrollmentsRes.data;
       }
 
-      let quizParticipantsData = [];
-      if (quizParticipantsRes.data && quizParticipantsRes.data.data) {
-        quizParticipantsData = quizParticipantsRes.data.data;
-      } else if (quizParticipantsRes.data && Array.isArray(quizParticipantsRes.data)) {
-        quizParticipantsData = quizParticipantsRes.data;
-      }
-
-      let quizItemsData = [];
-      if (quizItemsRes.data && quizItemsRes.data.data) {
-        quizItemsData = quizItemsRes.data.data;
-      } else if (quizItemsRes.data && Array.isArray(quizItemsRes.data)) {
-        quizItemsData = quizItemsRes.data;
+      let quizData = [];
+      if (quizRes.data && quizRes.data.data) {
+        quizData = quizRes.data.data;
+      } else if (quizRes.data && Array.isArray(quizRes.data)) {
+        quizData = quizRes.data;
       }
 
       setStudents(studentData);
       setSchools(schoolData);
       setEnrollments(enrollmentData);
-      setQuizParticipants(quizParticipantsData);
-      setQuizItems(quizItemsData);
+      setQuizParticipants(quizData);
       
       // Calculate quiz statistics
-      const totalQuizParticipants = quizParticipantsData.length;
-      const totalQuizAttempts = quizParticipantsData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
-      const totalScore = quizParticipantsData.reduce((sum, item) => 
+      const totalQuizParticipants = quizData.length;
+      const totalQuizAttempts = quizData.reduce((sum, item) => sum + (item.attempt?.length || 0), 0);
+      const totalScore = quizData.reduce((sum, item) => 
         sum + (item.attempt?.reduce((attemptSum, attempt) => attemptSum + (attempt.score || 0), 0) || 0), 0
       );
       const averageScore = totalQuizAttempts > 0 ? (totalScore / totalQuizAttempts).toFixed(1) : 0;
       const passRate = totalQuizParticipants > 0 
-        ? ((quizParticipantsData.filter(item => 
+        ? ((quizData.filter(item => 
             item.attempt?.some(attempt => attempt.status === 'passed')
           ).length / totalQuizParticipants) * 100
         ).toFixed(1) : 0;
@@ -186,6 +205,67 @@ const AdminDashBoard = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchStudentDetail = (studentId) => {
+    const student = students.find(s => s.student_id === studentId);
+    if (student) {
+      setSelectedStudent(student);
+      setShowStudentModal(true);
+    } else {
+      alert('Student details not found');
+    }
+  };
+
+  const getStudentQuizHistory = () => {
+    if (!selectedStudent) return [];
+    return quizParticipants.filter(p => p.student?.student_id === selectedStudent.student_id);
+  };
+
+  const getQuizParticipants = (quizId) => {
+    return quizParticipants.filter(p => p.quiz_id === quizId);
+  };
+
+  const openQuizModal = (quizId) => {
+    setSelectedQuiz(quizId);
+    setShowQuizModal(true);
+  };
+
+  const openRankModal = (rank) => {
+    setSelectedRank(rank);
+    setShowRankModal(true);
+  };
+
+  const openRankRangeModal = (rangeLabel, minRank, maxRank) => {
+    setSelectedRank({ rangeLabel, minRank, maxRank });
+    setShowRankModal(true);
+  };
+
+  const closeRankModal = () => {
+    setShowRankModal(false);
+    setSelectedRank(null);
+  };
+
+  const getStudentsWithRank = (rankOrRange) => {
+    if (typeof rankOrRange === 'object') {
+      const { minRank, maxRank } = rankOrRange;
+      return quizParticipants.filter(p =>
+        p.attempt?.some(attempt => {
+          const r = attempt.rank;
+          if (minRank !== undefined && maxRank !== undefined) return r >= minRank && r <= maxRank;
+          if (maxRank !== undefined && minRank === undefined) return r <= maxRank;
+          if (minRank !== undefined && maxRank === undefined) return r >= minRank;
+          return false;
+        })
+      );
+    }
+    return quizParticipants.filter(p =>
+      p.attempt?.some(attempt => attempt.rank === rankOrRange)
+    );
+  };
+
+  const getAllQuizAttempts = () => {
+    return quizParticipants;
   };
 
   const toggleSidebar = () => {
@@ -354,54 +434,125 @@ const AdminDashBoard = () => {
              <i className="bi bi-trophy me-2" style={{ color: '#f39c12' }}></i>
              Rank Distribution Across All Quiz Attempts
            </h5>
-           <Row className="mb-3">
-             <Col md={3} sm={6}>
-               <div className="text-center p-3 bg-light rounded-3">
-                 <div className="h4 fw-bold text-primary">{minRank}</div>
-                 <div className="text-muted small">Best Rank</div>
-               </div>
-             </Col>
-             <Col md={3} sm={6}>
-               <div className="text-center p-3 bg-light rounded-3">
-                 <div className="h4 fw-bold text-primary">{maxRank}</div>
-                 <div className="text-muted small">Lowest Rank</div>
-               </div>
-             </Col>
-             <Col md={3} sm={6}>
-               <div className="text-center p-3 bg-light rounded-3">
-                 <div className="h4 fw-bold text-primary">{totalParticipants}</div>
-                 <div className="text-muted small">Total Attempts</div>
-               </div>
-             </Col>
-             <Col md={3} sm={6}>
-               <div className="text-center p-3 bg-light rounded-3">
-                 <div className="h4 fw-bold text-primary">{((totalParticipants > 0 ? allRanks.reduce((a, b) => a + b, 0) / totalParticipants : 0)).toFixed(1)}</div>
-                 <div className="text-muted small">Avg Rank</div>
-               </div>
-             </Col>
-           </Row>
+             <Row className="mb-3">
+               <Col md={3} sm={6}>
+                 <div
+                   className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                   onClick={() => openRankModal(minRank)}
+                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                   title="Click to view students with best rank"
+                 >
+                   <div className="h4 fw-bold text-primary">{minRank}</div>
+                   <div className="text-muted small">Best Rank</div>
+                 </div>
+               </Col>
+               <Col md={3} sm={6}>
+                 <div
+                   className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                   onClick={() => openRankModal(maxRank)}
+                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                   title="Click to view students with lowest rank"
+                 >
+                   <div className="h4 fw-bold text-primary">{maxRank}</div>
+                   <div className="text-muted small">Lowest Rank</div>
+                 </div>
+               </Col>
+               <Col md={3} sm={6}>
+                 <div
+                   className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                   onClick={() => {
+                     // Show all quiz attempts/participants
+                     setSelectedRank('all-attempts');
+                     setShowRankModal(true);
+                   }}
+                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                   title="Click to view all quiz attempts"
+                 >
+                   <div className="h4 fw-bold text-primary">{totalParticipants}</div>
+                   <div className="text-muted small">Total Attempts</div>
+                 </div>
+               </Col>
+               <Col md={3} sm={6}>
+                 <div
+                   className="text-center p-3 bg-light rounded-3 clickable-rank-card"
+                   onClick={() => {
+                     // Show students around average rank (avg ± 10)
+                     const avg = totalParticipants > 0 ? allRanks.reduce((a, b) => a + b, 0) / totalParticipants : 0;
+                     const avgRounded = Math.round(avg);
+                     openRankRangeModal(`Avg (${avgRounded-10}–${avgRounded+10})`, avgRounded - 10, avgRounded + 10);
+                   }}
+                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                   title="Click to view students around average rank"
+                 >
+                   <div className="h4 fw-bold text-primary">{((totalParticipants > 0 ? allRanks.reduce((a, b) => a + b, 0) / totalParticipants : 0)).toFixed(1)}</div>
+                   <div className="text-muted small">Avg Rank</div>
+                 </div>
+               </Col>
+             </Row>
            <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-             <div style={{ minWidth: '700px', height: '320px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '40px 20px 60px 20px' }}>
-               {rankDistribution.map((item, index) => {
-                 const barHeight = (item.count / maxCount) * 200;
-                 return (
-                   <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
-                     <div className="fw-bold mb-1" style={{ fontSize: '12px', color: item.color, opacity: item.count > 0 ? 1 : 0.3 }}>
-                       {item.count}
-                     </div>
-                     <div className="district-bar" 
-                       style={{ 
-                         height: `${barHeight}px`, 
-                         width: '100%', 
-                         maxWidth: '80px', 
-                         background: `linear-gradient(to top, ${item.color}, ${item.color}aa)`,
-                         borderRadius: '8px 8px 0 0',
-                         transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                         position: 'relative',
-                         boxShadow: `0 4px 15px ${item.color}30`
-                       }}
-                       title={`${item.label}: ${item.count} attempts (${item.percentage}%)`}
-                     ></div>
+              <div style={{ minWidth: '700px', height: '320px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '40px 20px 60px 20px' }}>
+                {rankDistribution.map((item, index) => {
+                  const barHeight = (item.count / maxCount) * 200;
+
+                  // Get tooltip content showing top students with quiz IDs
+                  const participantsInRange = quizParticipants.filter(p =>
+                    p.attempt?.some(att => {
+                      const r = att.rank;
+                      if (item.min && item.max) return r >= item.min && r <= item.max;
+                      if (item.max && !item.min) return r <= item.max;
+                      if (item.min && !item.max) return r >= item.min;
+                      return false;
+                    })
+                  );
+
+                  const tooltipLines = participantsInRange.slice(0, 5).map(p => {
+                    const bestRank = p.attempt?.reduce((best, curr) =>
+                      curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, null
+                    );
+                    return `${p.student?.full_name || 'Unknown'} - ${p.quiz_id} (Rank: ${bestRank || 'N/A'})`;
+                  });
+
+                  if (participantsInRange.length > 5) {
+                    tooltipLines.push(`...and ${participantsInRange.length - 5} more`);
+                  }
+
+                  const tooltipText = tooltipLines.length > 0 ? tooltipLines.join('\n') : `${item.label}: ${item.count} attempts`;
+
+                  return (
+                    <div key={index} className="flex-grow-1 d-flex flex-column align-items-center position-relative" style={{ width: '0' }}>
+                      <div
+                        className="fw-bold mb-1 clickable-rank-count"
+                        style={{
+                          fontSize: '12px',
+                          color: item.color,
+                          opacity: item.count > 0 ? 1 : 0.3,
+                          cursor: 'pointer',
+                          transition: 'transform 0.2s'
+                        }}
+                        onClick={() => {
+                          if (item.count > 0) {
+                            openRankRangeModal(item.label, item.min, item.max);
+                          }
+                        }}
+                        title={`Click to view all ${item.label} rank holders`}
+                      >
+                        {item.count}
+                      </div>
+                      <div
+                        className="district-bar"
+                        style={{
+                          height: `${barHeight}px`,
+                          width: '100%',
+                          maxWidth: '80px',
+                          background: `linear-gradient(to top, ${item.color}, ${item.color}aa)`,
+                          borderRadius: '8px 8px 0 0',
+                          transition: 'height 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                          position: 'relative',
+                          boxShadow: `0 4px 15px ${item.color}30`,
+                          cursor: 'pointer'
+                        }}
+                        title={tooltipText}
+                      ></div>
                      <div className="position-absolute text-center text-truncate fw-bold" 
                        style={{ 
                          bottom: '-50px', 
@@ -420,8 +571,259 @@ const AdminDashBoard = () => {
                          color: '#666'
                        }}>
                        {item.percentage}%
-                     </div>
-                   </div>
+       </div>
+
+        <Modal
+          show={showStudentModal}
+          onHide={() => setShowStudentModal(false)}
+          centered
+          size="md"
+          contentClassName="student-detail-modal"
+          backdropClassName="modal-backdrop-custom"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="bi bi-person-circle me-2"></i>
+              Student Details
+            </Modal.Title>
+          </Modal.Header>
+         <Modal.Body>
+           {loadingStudent ? (
+             <div className="text-center p-4">
+               <Spinner animation="border" variant="primary" />
+               <p className="mt-2">Loading student details...</p>
+             </div>
+            ) : selectedStudent ? (
+              <div>
+                <div className="mb-4">
+                  <h6 className="modal-section-title">Personal Information</h6>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Student ID:</span>
+                      <span className="student-info-value">{selectedStudent.student_id || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Full Name:</span>
+                      <span className="student-info-value">{selectedStudent.full_name || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Email:</span>
+                      <span className="student-info-value">{selectedStudent.email || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Phone:</span>
+                      <span className="student-info-value">{selectedStudent.phone || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>District:</span>
+                      <span className="student-info-value">{selectedStudent.district || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>School Name:</span>
+                      <span className="student-info-value">{selectedStudent.school_name || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>School ID:</span>
+                      <span className="student-info-value">{selectedStudent.school_uni_id || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Aadhaar No:</span>
+                      <span className="student-info-value">{selectedStudent.aadhaar_no ? `****${selectedStudent.aadhaar_no.slice(-4)}` : '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Class:</span>
+                      <span className="student-info-value">{selectedStudent.class_name || '-'}</span>
+                    </div>
+                  </div>
+                  <div className="student-info-row">
+                    <div className="d-flex">
+                      <span className="student-info-label" style={{width: '140px'}}>Status:</span>
+                      <span className="student-info-value">
+                        <Badge bg={selectedStudent.status === "approved" ? "success" : selectedStudent.status === "rejected" ? "danger" : "warning"}>
+                          {selectedStudent.status || "pending"}
+                        </Badge>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h6 className="modal-section-title">Quiz Participation History</h6>
+                  {getStudentQuizHistory().length > 0 ? (
+                    <div className="table-responsive quiz-history-table">
+                      <Table striped bordered hover size="sm">
+                        <thead>
+                          <tr>
+                            <th>Quiz ID</th>
+                            <th>Attempts</th>
+                            <th>Best Score</th>
+                            <th>Best Rank</th>
+                            <th>Last Attempt</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {getStudentQuizHistory().map((quizParticipant, index) => {
+                            const bestAttempt = quizParticipant.attempt?.reduce((best, curr) =>
+                              (curr.score || 0) > (best.score || 0) ? curr : best,
+                              quizParticipant.attempt?.[0] || {}
+                            );
+                            const bestRank = quizParticipant.attempt?.reduce((best, curr) =>
+                              curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best,
+                              null
+                            );
+                            const lastAttempt = quizParticipant.attempt?.[quizParticipant.attempt.length - 1];
+                            const percentage = bestAttempt?.total_questions
+                              ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1)
+                              : 0;
+
+                            return (
+                              <tr key={index}>
+                                <td><Badge bg="info">{quizParticipant.quiz_id}</Badge></td>
+                                <td>{quizParticipant.attempt?.length || 0}</td>
+                                <td>
+                                  <Badge bg={
+                                    percentage >= 90 ? 'success' :
+                                    percentage >= 75 ? 'primary' :
+                                    percentage >= 60 ? 'info' : 'warning'
+                                  }>
+                                    {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
+                                    {percentage > 0 && ` (${percentage}%)`}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  {bestRank ? (
+                                    <Badge bg={bestRank <= 10 ? 'success' : bestRank <= 50 ? 'primary' : bestRank <= 100 ? 'warning' : 'danger'}>
+                                      #{bestRank}
+                                    </Badge>
+                                  ) : '-'}
+                                </td>
+                                <td className="small">
+                                  {lastAttempt?.submitted_at
+                                    ? new Date(lastAttempt.submitted_at).toLocaleString()
+                                    : '-'}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <p className="text-center text-muted">No quiz participation history found</p>
+                  )}
+                </div>
+              </div>
+            ) : (
+             <p className="text-center text-muted">No student data available</p>
+           )}
+         </Modal.Body>
+         <Modal.Footer>
+           <Button variant="secondary" onClick={() => setShowStudentModal(false)}>
+             Close
+           </Button>
+          </Modal.Footer>
+        </Modal>
+
+        <Modal
+          show={showQuizModal}
+          onHide={() => setShowQuizModal(false)}
+          centered
+          size="md"
+          contentClassName="quiz-participants-modal"
+          backdropClassName="modal-backdrop-custom"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="bi bi-people-fill me-2"></i>
+              Quiz Participants - {selectedQuiz}
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {getQuizParticipants(selectedQuiz).length > 0 ? (
+              <div className="table-responsive">
+                <Table striped bordered hover size="sm">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Student Name</th>
+                      <th>District</th>
+                      <th>School</th>
+                      <th>Attempts</th>
+                      <th>Best Score</th>
+                      <th>Best Rank</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getQuizParticipants(selectedQuiz).map((participant, index) => {
+                      const bestAttempt = participant.attempt?.reduce((best, curr) =>
+                        (curr.score || 0) > (best.score || 0) ? curr : best,
+                        participant.attempt?.[0] || {}
+                      );
+                      const bestRank = participant.attempt?.reduce((best, curr) =>
+                        curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best,
+                        null
+                      );
+                      const percentage = bestAttempt?.total_questions
+                        ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1)
+                        : 0;
+
+                      return (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td className="fw-bold">{participant.student?.full_name || '-'}</td>
+                          <td>{participant.student?.district || '-'}</td>
+                          <td>{participant.student?.school_name || '-'}</td>
+                          <td>{participant.attempt?.length || 0}</td>
+                          <td>
+                            <Badge bg={
+                              percentage >= 90 ? 'success' :
+                              percentage >= 75 ? 'primary' :
+                              percentage >= 60 ? 'info' : 'warning'
+                            }>
+                              {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
+                              {percentage > 0 && ` (${percentage}%)`}
+                            </Badge>
+                          </td>
+                          <td>
+                            {bestRank ? (
+                              <Badge bg={bestRank <= 10 ? 'success' : bestRank <= 50 ? 'primary' : bestRank <= 100 ? 'warning' : 'danger'}>
+                                #{bestRank}
+                              </Badge>
+                            ) : '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </div>
+            ) : (
+              <p className="text-center text-muted">No participants found for this quiz</p>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowQuizModal(false)}>
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </div>
                  );
                })}
              </div>
@@ -431,27 +833,19 @@ const AdminDashBoard = () => {
      );
   };
 
-    const renderQuizTable = () => {
-       const filteredQuizData = quizParticipants.filter(p => {
-         const matchSchool = !quizSchoolFilter || 
-           (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
-         const matchDistrict = !quizDistrictFilter || 
-           (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
-         return matchSchool && matchDistrict;
-       });
-  
-       const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
-       const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
-
-       // Create a lookup map for quiz titles from quizItems
-       const quizTitleMap = {};
-       quizItems.forEach(q => {
-         if (q.id) {
-           quizTitleMap[q.id] = q.title || q.quiz_id || 'Unknown Quiz';
-         }
-       });
-  
-       return (
+   const renderQuizTable = () => {
+      const filteredQuizData = quizParticipants.filter(p => {
+        const matchSchool = !quizSchoolFilter || 
+          (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
+        const matchDistrict = !quizDistrictFilter || 
+          (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
+        return matchSchool && matchDistrict;
+      });
+ 
+      const uniqueSchools = [...new Set(quizParticipants.map(p => p.student?.school_name).filter(Boolean))];
+      const uniqueDistricts = [...new Set(quizParticipants.map(p => p.student?.district).filter(Boolean))];
+ 
+      return (
         <Card className="table-card">
           <Card.Body>
             <div className="d-flex justify-content-between align-items-center mb-3">
@@ -512,18 +906,19 @@ const AdminDashBoard = () => {
 
             <div className="table-responsive">
              <Table striped bordered hover size="sm">
-               <thead>
-                 <tr>
-                   <th>#</th>
-                   <th>Student</th>
-                   <th>District</th>
-                   <th>School</th>
-                   <th>Quiz</th>
-                   <th>Attempts</th>
-                   <th>Best Score</th>
-                   <th>Best Rank</th>
-                 </tr>
-               </thead>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    <th>District</th>
+                    <th>School</th>
+                    <th>Quiz</th>
+                    <th>Participants</th>
+                    <th>Attempts</th>
+                    <th>Best Score</th>
+                    <th>Best Rank</th>
+                  </tr>
+                </thead>
                <tbody>
                  {filteredQuizData.length > 0 ? (
                    filteredQuizData.map((p, index) => {
@@ -543,34 +938,55 @@ const AdminDashBoard = () => {
                      else if (percentage >= 75) scoreBadgeColor = 'primary';
                      else if (percentage >= 60) scoreBadgeColor = 'info';
                      
-                     return (
-                       <tr key={index}>
-                         <td>{index + 1}</td>
-                         <td className="fw-bold">{p.student?.full_name}</td>
-                         <td>{p.student?.district}</td>
-                         <td>{p.student?.school_name}</td>
-                          <td><Badge bg="info">{quizTitleMap[p.quiz_id] || p.quiz_id || 'N/A'}</Badge></td>
-                         <td>{p.attempt?.length || 0}</td>
-                         <td>
-                           <Badge bg={scoreBadgeColor}>
-                             {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
-                             {percentage > 0 && ` (${percentage}%)`}
-                           </Badge>
-                         </td>
-                         <td>
-                           {bestRank ? (
-                             <Badge bg={bestRank <= 10 ? 'success' : bestRank <= 50 ? 'primary' : bestRank <= 100 ? 'warning' : 'danger'}>
-                               #{bestRank}
-                             </Badge>
-                           ) : '-'}
-                         </td>
-                       </tr>
+                      return (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td className="fw-bold">{p.student?.full_name}</td>
+                          <td>{p.student?.district}</td>
+                          <td>{p.student?.school_name}</td>
+                          <td>
+                            <Badge
+                              bg="info"
+                              className="clickable-rank-badge"
+                              onClick={() => openQuizModal(p.quiz_id)}
+                              style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                              title="Click to view all participants"
+                            >
+                              {p.quiz_id}
+                            </Badge>
+                          </td>
+                          <td className="text-center">
+                            <Badge bg="secondary" style={{ fontSize: '0.85rem' }}>
+                              {quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length}
+                            </Badge>
+                          </td>
+                          <td>{p.attempt?.length || 0}</td>
+                          <td>
+                            <Badge bg={scoreBadgeColor}>
+                              {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
+                              {percentage > 0 && ` (${percentage}%)`}
+                            </Badge>
+                          </td>
+                          <td>
+                            {bestRank ? (
+                              <Badge
+                                bg={bestRank <= 10 ? 'success' : bestRank <= 50 ? 'primary' : bestRank <= 100 ? 'warning' : 'danger'}
+                                className="clickable-rank-badge"
+                                onClick={() => p.student?.student_id && fetchStudentDetail(p.student.student_id)}
+                                style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                                title="Click to view student details"
+                              >
+                                #{bestRank}
+                              </Badge>
+                            ) : '-'}
+                          </td>
+                        </tr>
                      );
                    })
                  ) : (
-                   <tr>
-                     <td colSpan="8" className="text-center">No quiz participants found</td>
-                   </tr>
+                    <tr>
+                      <td colSpan="9" className="text-center">No quiz participants found</td>
+                    </tr>
                  )}
                </tbody>
              </Table>
@@ -1133,10 +1549,229 @@ const AdminDashBoard = () => {
                   )}
               </>
             )}
-          </Container>
-        </div>
-      </div>
-    </div>
+           </Container>
+         </div>
+       </div>
+
+       {/* Rank Participants Modal */}
+       <Modal
+         show={showRankModal}
+         onHide={closeRankModal}
+         centered
+         size="md"
+         contentClassName="rank-participants-modal"
+         backdropClassName="modal-backdrop-custom"
+       >
+          <Modal.Header closeButton>
+            <Modal.Title>
+              <i className="bi bi-trophy-fill me-2"></i>
+              {typeof selectedRank === 'object' && selectedRank?.rangeLabel ?
+                `Students with Rank ${selectedRank.rangeLabel}`
+              : selectedRank === 'all-attempts' ?
+                `All Quiz Attempts (${quizParticipants.length} participants)`
+              : `Students with Rank #${selectedRank}`
+              }
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {selectedRank && (() => {
+              // Handle "All Attempts" view
+              if (selectedRank === 'all-attempts') {
+                const allAttempts = getAllQuizAttempts();
+                if (allAttempts.length > 0) {
+                  return (
+                    <div>
+                      <p className="text-muted mb-3">
+                        Showing all <strong>{allAttempts.length}</strong> quiz participant(s) with their attempts
+                      </p>
+                      <div className="table-responsive">
+                        <Table striped bordered hover size="sm">
+                          <thead>
+                            <tr>
+                              <th>#</th>
+                              <th>Student Name</th>
+                              <th>District</th>
+                              <th>School</th>
+                              <th>Quiz ID</th>
+                              <th>Attempts</th>
+                              <th>Best Score</th>
+                              <th>Best Rank</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {allAttempts.map((participant, index) => {
+                              const bestAttempt = participant.attempt?.reduce((best, curr) =>
+                                (curr.score || 0) > (best.score || 0) ? curr : best,
+                                participant.attempt?.[0] || {}
+                              );
+                              const bestRank = participant.attempt?.reduce((best, curr) =>
+                                curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best,
+                                null
+                              );
+                              const percentage = bestAttempt?.total_questions
+                                ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1)
+                                : 0;
+                              const scoreBadgeColor = percentage >= 90 ? 'success' :
+                                                    percentage >= 75 ? 'primary' :
+                                                    percentage >= 60 ? 'info' : 'warning';
+
+                              return (
+                                <tr key={index}>
+                                  <td>{index + 1}</td>
+                                  <td className="fw-bold">{participant.student?.full_name || '-'}</td>
+                                  <td>{participant.student?.district || '-'}</td>
+                                  <td>{participant.student?.school_name || '-'}</td>
+                                  <td><Badge bg="info">{participant.quiz_id}</Badge></td>
+                                  <td>{participant.attempt?.length || 0}</td>
+                                  <td>
+                                    <Badge bg={scoreBadgeColor}>
+                                      {bestAttempt?.score || 0}/{bestAttempt?.total_questions || 0}
+                                      {percentage > 0 && ` (${percentage}%)`}
+                                    </Badge>
+                                  </td>
+                                  <td>
+                                    {bestRank ? (
+                                      <Badge bg={bestRank <= 10 ? 'success' : bestRank <= 50 ? 'primary' : bestRank <= 100 ? 'warning' : 'danger'}>
+                                        #{bestRank}
+                                      </Badge>
+                                    ) : '-'}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </Table>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return <p className="text-center text-muted">No quiz attempts found</p>;
+                }
+              }
+
+              // Handle rank-based views (exact rank or range)
+              const studentsWithRank = getStudentsWithRank(selectedRank);
+
+              if (studentsWithRank.length > 0) {
+                const uniqueStudents = studentsWithRank.reduce((acc, curr) => {
+                  if (!acc.find(s => s.student?.student_id === curr.student?.student_id)) {
+                    acc.push(curr);
+                  }
+                  return acc;
+                }, []).sort((a, b) => {
+                  let aRank, bRank;
+                  if (typeof selectedRank === 'object') {
+                    aRank = a.attempt?.find(att => {
+                      const r = att.rank;
+                      return r >= selectedRank.minRank && r <= selectedRank.maxRank;
+                    })?.rank || 0;
+                    bRank = b.attempt?.find(att => {
+                      const r = att.rank;
+                      return r >= selectedRank.minRank && r <= selectedRank.maxRank;
+                    })?.rank || 0;
+                  } else {
+                    aRank = a.attempt?.find(att => att.rank === selectedRank)?.rank || 0;
+                    bRank = b.attempt?.find(att => att.rank === selectedRank)?.rank || 0;
+                  }
+                  const aScore = a.attempt?.find(att => att.rank === aRank)?.score || 0;
+                  const bScore = b.attempt?.find(att => att.rank === bRank)?.score || 0;
+                  return aRank !== bRank ? aRank - bRank : bScore - aScore;
+                });
+
+                return (
+                  <div>
+                    {typeof selectedRank === 'object' && selectedRank?.rangeLabel ? (
+                      <p className="text-muted mb-3">
+                        Found <strong>{studentsWithRank.length}</strong> attempt(s) with Rank {selectedRank.rangeLabel} from <strong>{uniqueStudents.length}</strong> student(s)
+                      </p>
+                    ) : selectedRank === 'all-attempts' ? null : (
+                      <p className="text-muted mb-3">
+                        Found <strong>{studentsWithRank.length}</strong> attempt(s) with Rank #{selectedRank} from <strong>{uniqueStudents.length}</strong> student(s)
+                      </p>
+                    )}
+                    <div className="table-responsive">
+                      <Table striped bordered hover size="sm">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Student Name</th>
+                            <th>District</th>
+                            <th>School</th>
+                            <th>Quiz ID</th>
+                            <th>Score</th>
+                            <th>Rank</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {uniqueStudents.map((participant, index) => {
+                            let rankAttempt;
+                            if (typeof selectedRank === 'object') {
+                              rankAttempt = participant.attempt?.find(att => {
+                                const r = att.rank;
+                                return r >= selectedRank.minRank && r <= selectedRank.maxRank;
+                              });
+                            } else {
+                              rankAttempt = participant.attempt?.find(att => att.rank === selectedRank);
+                            }
+
+                            const percentage = rankAttempt?.total_questions
+                              ? ((rankAttempt.score / rankAttempt.total_questions) * 100).toFixed(1)
+                              : 0;
+                            const scoreBadgeColor = percentage >= 90 ? 'success' :
+                                                  percentage >= 75 ? 'primary' :
+                                                  percentage >= 60 ? 'info' : 'warning';
+
+                            return (
+                              <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td className="fw-bold">{participant.student?.full_name || '-'}</td>
+                                <td>{participant.student?.district || '-'}</td>
+                                <td>{participant.student?.school_name || '-'}</td>
+                                <td><Badge bg="info">{participant.quiz_id}</Badge></td>
+                                <td>
+                                  <Badge bg={scoreBadgeColor}>
+                                    {rankAttempt?.score || 0}/{rankAttempt?.total_questions || 0}
+                                    {percentage > 0 && ` (${percentage}%)`}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <Badge bg={
+                                    rankAttempt?.rank <= 10 ? 'success' :
+                                    rankAttempt?.rank <= 50 ? 'primary' :
+                                    rankAttempt?.rank <= 100 ? 'warning' : 'danger'
+                                  }>
+                                    #{rankAttempt?.rank || '-'}
+                                  </Badge>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </Table>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <p className="text-center text-muted">
+                    {typeof selectedRank === 'object' && selectedRank?.rangeLabel
+                      ? `No students found with Rank ${selectedRank.rangeLabel}`
+                      : selectedRank === 'all-attempts'
+                      ? `No quiz attempts found`
+                      : `No students found with Rank #${selectedRank}`
+                    }
+                  </p>
+                );
+              }
+            })()}
+          </Modal.Body>
+         <Modal.Footer>
+           <Button variant="secondary" onClick={closeRankModal}>
+             Close
+           </Button>
+         </Modal.Footer>
+       </Modal>
+     </div>
   );
 };
 

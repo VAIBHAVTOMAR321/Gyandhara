@@ -798,3 +798,573 @@
 .module-score-bar:hover {
   filter: brightness(1.1);
 }
+
+/* Quiz Score Badge Colors */
+.score-badge-excellent {
+  background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+  color: white !important;
+}
+
+.score-badge-good {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  color: white !important;
+}
+
+.score-badge-average {
+  background: linear-gradient(135deg, #f39c12, #e67e22) !important;
+  color: white !important;
+}
+
+.score-badge-needs-improvement {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white !important;
+}
+
+/* Rank Badge */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.rank-badge-top10 {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
+  color: white;
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.rank-badge-top50 {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+}
+
+.rank-badge-top100 {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+  box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.rank-badge-100plus {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Quiz Stats Cards */
+.quiz-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.quiz-stat-mini-card {
+  background: white;
+  border-radius: 10px;
+  padding: 15px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-top: 4px solid #7209b7;
+}
+
+.quiz-stat-mini-card .stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #7209b7;
+}
+
+.quiz-stat-mini-card .stat-label {
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 4px;
+}
+
+/* Score Legend */
+.score-legend {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.score-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+.score-legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.score-legend-color.excellent { background: #2ecc71; }
+.score-legend-color.good { background: #3498db; }
+.score-legend-color.average { background: #f39c12; }
+.score-legend-color.needs-improvement { background: #e74c3c; }
+
+@media (max-width: 768px) {
+  .quiz-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .score-legend {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .quiz-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Quiz Table Score Cell */
+.quiz-score-cell {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Clickable Rank Badge */
+.clickable-rank-badge {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.clickable-rank-badge:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.clickable-rank-badge:active {
+  transform: scale(1.08);
+}
+
+/* Clickable Rank Count in Graph */
+.clickable-rank-count {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.clickable-rank-count:hover {
+  transform: scale(1.2);
+  text-decoration: underline;
+}
+
+.district-bar {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.district-bar:hover {
+  filter: brightness(1.1);
+}
+
+/* Clickable Rank Card */
+.clickable-rank-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clickable-rank-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.clickable-rank-card:active {
+  transform: translateY(-1px);
+}
+
+
+/* District Chart Tooltip Enhancement */
+.district-bar[title] {
+  cursor: help;
+}
+
+/* Quiz Participants Header */
+.quiz-participants-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.quiz-participants-header h5 {
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Responsive adjustments for quiz table */
+@media (max-width: 768px) {
+  .quiz-participants-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Student Detail Modal Styles */
+.student-detail-modal {
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.student-detail-modal .modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border: none !important;
+  padding: 20px 24px !important;
+}
+
+.student-detail-modal .modal-header .btn-close {
+  filter: invert(1) !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.2s !important;
+}
+
+.student-detail-modal .modal-header .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.student-detail-modal .modal-title {
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+  color: white !important;
+}
+
+.student-detail-modal .modal-body {
+  padding: 24px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  background: white !important;
+}
+
+.student-detail-modal .modal-footer {
+  border: none !important;
+  padding: 16px 24px 20px !important;
+  background: #f8f9fa !important;
+}
+
+.student-detail-modal .modal-footer .btn {
+  padding: 8px 24px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+/* Quiz Participants Modal */
+.quiz-participants-modal {
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.quiz-participants-modal .modal-header {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+  color: white !important;
+  border: none !important;
+  padding: 20px 24px !important;
+}
+
+.quiz-participants-modal .modal-header .btn-close {
+  filter: invert(1) !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.2s !important;
+}
+
+.quiz-participants-modal .modal-header .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.quiz-participants-modal .modal-title {
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+  color: white !important;
+}
+
+.quiz-participants-modal .modal-body {
+  padding: 24px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  background: white !important;
+}
+
+.quiz-participants-modal .modal-footer {
+  border: none !important;
+  padding: 16px 24px 20px !important;
+  background: #f8f9fa !important;
+}
+
+.quiz-participants-modal .modal-footer .btn {
+  padding: 8px 24px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+/* Rank Participants Modal */
+.rank-participants-modal {
+  background: white !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+  border: none !important;
+  overflow: hidden;
+}
+
+.rank-participants-modal .modal-header {
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%) !important;
+  color: white !important;
+  border: none !important;
+  padding: 20px 24px !important;
+}
+
+.rank-participants-modal .modal-header .btn-close {
+  filter: invert(1) !important;
+  opacity: 0.8 !important;
+  transition: opacity 0.2s !important;
+}
+
+.rank-participants-modal .modal-header .btn-close:hover {
+  opacity: 1 !important;
+}
+
+.rank-participants-modal .modal-title {
+  font-weight: 600 !important;
+  font-size: 1.25rem !important;
+  color: white !important;
+}
+
+.rank-participants-modal .modal-body {
+  padding: 24px !important;
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  background: white !important;
+}
+
+.rank-participants-modal .modal-footer {
+  border: none !important;
+  padding: 16px 24px 20px !important;
+  background: #f8f9fa !important;
+}
+
+.rank-participants-modal .modal-footer .btn {
+  padding: 8px 24px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+.rank-participants-modal .table {
+  font-size: 0.9rem;
+}
+
+.rank-participants-modal .table thead th {
+  background: #f8f9fa;
+  font-weight: 600;
+  padding: 10px 8px;
+  border: none;
+  color: #555;
+}
+
+.rank-participants-modal .table tbody td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-color: #f0f0f0;
+}
+
+.rank-participants-modal .table tbody tr:hover {
+  background-color: #fff8e1;
+}
+
+/* Custom Backdrop - Light gray instead of black */
+.modal-backdrop-custom {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px);
+}
+
+/* Ensure modal dialog has proper styling */
+.student-detail-modal.modal-content,
+.quiz-participants-modal.modal-content,
+.rank-participants-modal.modal-content {
+  border: none !important;
+  border-radius: 12px !important;
+}
+
+/* Responsive modal adjustments */
+@media (max-width: 768px) {
+  .student-detail-modal .modal-body,
+  .quiz-participants-modal .modal-body,
+  .rank-participants-modal .modal-body {
+    padding: 16px !important;
+  }
+
+  .student-detail-modal .modal-header,
+  .quiz-participants-modal .modal-header,
+  .rank-participants-modal .modal-header {
+    padding: 16px 20px !important;
+  }
+
+  .student-detail-modal .modal-title,
+  .quiz-participants-modal .modal-title,
+  .rank-participants-modal .modal-title {
+    font-size: 1.1rem !important;
+  }
+
+  .student-info-label {
+    font-size: 0.85rem !important;
+    width: 120px !important;
+  }
+
+  .student-info-value {
+    font-size: 0.85rem !important;
+  }
+
+  .modal-section-title {
+    font-size: 1rem !important;
+  }
+
+  .quiz-history-table {
+    font-size: 0.8rem !important;
+  }
+
+  .quiz-history-table thead th {
+    padding: 8px 4px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .quiz-history-table tbody td {
+    padding: 8px 4px !important;
+  }
+
+  .rank-participants-modal .table {
+    font-size: 0.8rem !important;
+  }
+
+  .rank-participants-modal .table thead th {
+    font-size: 0.75rem !important;
+    padding: 8px 4px !important;
+  }
+
+  .rank-participants-modal .table tbody td {
+    padding: 8px 4px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .student-detail-modal .modal-dialog,
+  .quiz-participants-modal .modal-dialog,
+  .rank-participants-modal .modal-dialog {
+    margin: 10px !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  .student-detail-modal .modal-body,
+  .quiz-participants-modal .modal-body,
+  .rank-participants-modal .modal-body {
+    padding: 12px !important;
+  }
+
+  .student-detail-modal .modal-title,
+  .quiz-participants-modal .modal-title,
+  .rank-participants-modal .modal-title {
+    font-size: 1rem !important;
+  }
+}
+
+/* Student Info Row Styling */
+.student-info-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.student-info-row:last-child {
+  border-bottom: none;
+}
+
+.student-info-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.student-info-value {
+  color: #333;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Quiz History Table in Modal */
+.quiz-history-table {
+  margin-top: 16px;
+}
+
+.quiz-history-table thead th {
+  background: #f8f9fa;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 12px 8px;
+  border: none;
+  color: #555;
+}
+
+.quiz-history-table tbody td {
+  padding: 12px 8px;
+  vertical-align: middle;
+  font-size: 0.85rem;
+  border-color: #f0f0f0;
+}
+
+.modal-section-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #667eea;
+  display: inline-block;
+}
+
+/* Quiz Participants Table in Modal */
+.quiz-participants-modal .table {
+  font-size: 0.9rem;
+}
+
+.quiz-participants-modal .table thead th {
+  background: #f8f9fa;
+  font-weight: 600;
+  padding: 10px 8px;
+  border: none;
+  color: #555;
+  white-space: nowrap;
+}
+
+.quiz-participants-modal .table tbody td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-color: #f0f0f0;
+}
+
+.quiz-participants-modal .table tbody tr:hover {
+  background-color: #f8f9ff;
+}
