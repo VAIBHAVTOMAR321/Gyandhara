@@ -400,21 +400,21 @@ const toggleStudentSelection = (studentId) => {
                 <Row>
                   {quizzes.map((quiz) => (
                     <Col key={quiz.id} md={6} lg={4} className="mb-4">
-                      <Card className="shadow-sm h-100 quiz-card">
-                        <Card.Header className="bg-white d-flex justify-content-between align-items-center py-3">
+                      <Card className="shadow-sm h-100 quiz-card" style={{ fontSize: '0.85rem' }}>
+                        <Card.Header className="bg-white d-flex justify-content-between align-items-center py-2">
                           <Badge bg={isQuizActive(quiz) ? 'success' : 'secondary'} className="small">
                             {isQuizActive(quiz) ? 'Active' : 'Inactive'}
                           </Badge>
                           <small className="text-muted" style={{ fontSize: '0.75rem' }}>{quiz.questions?.length || 0} Questions</small>
                         </Card.Header>
                         <Card.Body>
-                          <Card.Title className="h6 mb-2">{quiz.title}</Card.Title>
+                          <Card.Title className="h6 mb-1">{quiz.title}</Card.Title>
                           {quiz.title_hindi && (
-                            <Card.Subtitle className="mb-3 text-muted small">{quiz.title_hindi}</Card.Subtitle>
+                            <Card.Subtitle className="mb-1 text-muted small">{quiz.title_hindi}</Card.Subtitle>
                           )}
                           
                           {quiz.description && (
-                            <Card.Text className="small text-muted mb-3" style={{ fontSize: '0.8rem' }}>
+                            <Card.Text className="small text-muted mb-1" style={{ fontSize: '0.8rem' }}>
                               {quiz.description.length > 100 
                                 ? quiz.description.substring(0, 100) + '...' 
                                 : quiz.description}
@@ -422,7 +422,7 @@ const toggleStudentSelection = (studentId) => {
                           )}
 
                           <div className="mb-3">
-                            <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
+                            <small className="text-muted d-block mb-0" style={{ fontSize: '0.75rem' }}>
                               <FaClock className="me-1" />
                               Duration:
                             </small>
@@ -432,7 +432,7 @@ const toggleStudentSelection = (studentId) => {
                             </div>
                           </div>
 
-                          <div className="d-flex align-items-center gap-4 flex-wrap">
+                          <div className="d-flex align-items-center gap-2 flex-wrap">
                             <div>
                               <small className="text-muted d-block mb-1" style={{ fontSize: '0.75rem' }}>
                                 <FaBook className="me-1" />
@@ -477,10 +477,10 @@ const toggleStudentSelection = (studentId) => {
                           )}
                         </Card.Body>
                         <Card.Footer className="bg-white py-3">
-                          <div className="d-grid gap-2">
+                          <div className="d-grid gap-1">
                             <Button 
                               variant="primary" 
-                              className="w-100"
+                              className="w-100 btn-sm"
                               onClick={() => handleRegisterClick(quiz)}
                               disabled={!isQuizActive(quiz)}
                             >
@@ -488,7 +488,7 @@ const toggleStudentSelection = (studentId) => {
                             </Button>
                             <Button 
                               variant="outline-info" 
-                              className="w-100"
+                              className="w-100 btn-sm"
                               onClick={() => fetchQuizResults(quiz.quiz_id || quiz.id)}
                               disabled={resultsLoading}
                             >
