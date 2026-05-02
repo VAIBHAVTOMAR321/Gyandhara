@@ -230,7 +230,7 @@ const Login = () => {
             {formData.role === 'admin' ? (
               <div className="form-group">
                 <label>{t.emailPhone}</label>
-                <div className="input-wrapper">
+                <div className="input-wrapper-text">
                   <i className="bi bi-person"></i>
                   <input
                     type="text"
@@ -244,7 +244,7 @@ const Login = () => {
             ) : formData.role === 'school' ? (
               <div className="form-group">
                 <label>{t.schoolId}</label>
-                <div className="input-wrapper">
+                <div className="input-wrapper-text">
                   <i className="bi bi-building"></i>
                   <input
                     type="text"
@@ -258,7 +258,7 @@ const Login = () => {
             ) : (
               <div className="form-group">
                 <label>{t.aadhaar}</label>
-                <div className="input-wrapper">
+                <div className="input-wrapper-text">
                   <i className="bi bi-person-badge"></i>
                   <input
                     type="text"
