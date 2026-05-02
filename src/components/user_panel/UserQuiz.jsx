@@ -277,11 +277,14 @@ const UserQuiz = () => {
             if (participant.student?.student_id === uniqueId) {
               participated[participant.quiz_id] = true
               
-              if (participant.attempt?.rank) {
+              // API returns 'attempt' as an array, extract the first element
+              const userAttempt = Array.isArray(participant.attempt) ? participant.attempt[0] : participant.attempt;
+              
+              if (userAttempt?.rank) {
                 if (!ranks[participant.quiz_id]) {
                   ranks[participant.quiz_id] = {
-                    userRank: participant.attempt.rank,
-                    userScore: participant.attempt.score,
+                    userRank: userAttempt.rank,
+                    userScore: userAttempt.score,
                     totalParticipants: 0,
                     topThree: []
                   }
@@ -290,7 +293,10 @@ const UserQuiz = () => {
             }
           })
           setParticipatedQuizzes(participated)
-          setQuizRanks(ranks)
+          setQuizRanks(prev => ({
+            ...prev,
+            ...ranks
+          }))
           
           const quizIds = [...new Set(response.data.data.map(p => p.quiz_id))]
           const rankPromises = quizIds.map(async (quizId) => {
@@ -300,23 +306,28 @@ const UserQuiz = () => {
                 config
               )
               if (rankResponse.data.status && rankResponse.data.data) {
-                const participants = rankResponse.data.data
-                const sorted = participants
-                  .filter(p => p.attempt?.rank)
-                  .sort((a, b) => a.attempt.rank - b.attempt.rank)
+                const participantsData = rankResponse.data.data
+                const sorted = participantsData
+                  .map(p => ({
+                    ...p,
+                    // Extract attempt object from array for each participant
+                    currentAttempt: Array.isArray(p.attempt) ? p.attempt[0] : p.attempt
+                  }))
+                  .filter(p => p.currentAttempt?.rank)
+                  .sort((a, b) => a.currentAttempt.rank - b.currentAttempt.rank)
                   .slice(0, 3)
                 
                 setQuizRanks(prev => ({
                   ...prev,
                   [quizId]: {
                     ...prev[quizId],
-                    totalParticipants: participants.length,
+                    totalParticipants: participantsData.length,
                     topThree: sorted.map(p => ({
                       student_id: p.student?.student_id,
                       full_name: p.student?.full_name,
-                      rank: p.attempt?.rank,
-                      score: p.attempt?.score,
-                      status: p.attempt?.status
+                      rank: p.currentAttempt?.rank,
+                      score: p.currentAttempt?.score,
+                      status: p.currentAttempt?.status
                     }))
                   }
                 }))
