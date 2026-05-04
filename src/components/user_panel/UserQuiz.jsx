@@ -971,15 +971,19 @@ const UserQuiz = () => {
                                         {language === 'hi' ? "रैंक" : "Rank"}: #{quizRanks[quiz.quiz_id].userRank}
                                       </Badge>
                                     )}
-                                    {quizRanks[quiz.quiz_id]?.userScore !== undefined && (
+                                   
+                                  </div>
+                                  <div className="d-flex justify-content-between gap-2">
+                                  
+                                   {quizRanks[quiz.quiz_id]?.userScore !== undefined && (
                                       <Badge bg="success" className="flex-fill py-2 quiz-badge-success">
                                         {language === 'hi' ? "स्कोर" : "Score"}: {quizRanks[quiz.quiz_id].userScore}
                                       </Badge>
                                     )}
-                                  </div>
+                              
                                   <Button
                                     variant="info"
-                                    className="w-100 quiz-btn-view-rank"
+                                    className=" quiz-btn-view-rank"
                                     onClick={() => {
                                       setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizRanks[quiz.quiz_id] })
                                       setShowRankModal(true)
@@ -987,14 +991,17 @@ const UserQuiz = () => {
                                   >
                                     {language === 'hi' ? "रैंक देखें" : "View Rank"}
                                   </Button>
-<Button
+                                  <Button
                                       variant="secondary"
-                                      className="w-100"
+                                      className=""
                                       disabled
                                       style={{ fontSize: '10px', padding: '6px 12px' }}
                                     >
                                       {language === 'hi' ? "प्रयास किया गया" : "Attempted"}
                                     </Button>
+                                    </div>
+
+
                                 </div>
                               ) : (
                                 <div className="d-flex flex-column gap-2">
