@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Container, Row, Col, Card, Spinner, Table, Badge, Button, Form, Alert } from "react-bootstrap";
+import axios from "axios";
 import { useAuth } from "../all_login/AuthContext";
 import { useLanguage } from "../all_login/LanguageContext";
 import "../../assets/css/userleftnav.css";
@@ -8,13 +9,15 @@ import UserLeftNav from "./UserLeftNav";
 import "./UserProfile.css";
 import "./Timeschedule.css";
 
+const API_URL = "https://brjobsedu.com/gyandhara/gyandhara_backend/api/time-schedule/";
+
 const Timeschedule = () => {
   const { language } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
 
-  const { uniqueId } = useAuth();
+  const { uniqueId, accessToken } = useAuth();
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -22,7 +25,7 @@ const Timeschedule = () => {
   const [loading, setLoading] = useState(true);
 
   const days = useMemo(
-    () => (language === "hi" ? ["??????", "???????", "??????", "???????", "????????"] : ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]),
+    () => (language === "hi" ? ["सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार"] : ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]),
     [language]
   );
 
@@ -33,11 +36,11 @@ const Timeschedule = () => {
 
   const taskTypes = useMemo(
     () => [
-      { value: "study", label: language === "hi" ? "??????" : "Study", variant: "primary" },
-      { value: "subject", label: language === "hi" ? "????" : "Subject", variant: "success" },
-      { value: "play", label: language === "hi" ? "???" : "Play", variant: "warning" },
-      { value: "project", label: language === "hi" ? "????????" : "Project", variant: "info" },
-      { value: "break", label: language === "hi" ? "?????" : "Break", variant: "secondary" },
+      { value: "study", label: language === "hi" ? "अध्ययन" : "Study", variant: "primary" },
+      { value: "subject", label: language === "hi" ? "विषय" : "Subject", variant: "success" },
+      { value: "play", label: language === "hi" ? "खेल" : "Play", variant: "warning" },
+      { value: "project", label: language === "hi" ? "परियोजना" : "Project", variant: "info" },
+      { value: "break", label: language === "hi" ? "ब्रेक" : "Break", variant: "secondary" },
     ],
     [language]
   );
@@ -47,7 +50,6 @@ const Timeschedule = () => {
     day: days[0],
     time: timeSlots[0],
     type: "study",
-    teacher: "",
     description: "",
   };
 
@@ -58,53 +60,30 @@ const Timeschedule = () => {
     return config || taskTypes[0];
   };
 
-  const getDefaultTasks = () => [
-    {
-      id: 1,
-      day: days[0],
-      time: "08:00-09:00",
-      title: { en: "Mathematics", hi: "????" },
-      teacher: "Mr. Sharma",
-      type: "subject",
-      description: { en: "Work on algebra and geometry.", hi: "??????? ?? ???????? ?? ??? ?????" },
-    },
-    {
-      id: 2,
-      day: days[0],
-      time: "09:00-10:00",
-      title: { en: "Economics", hi: "???????????" },
-      teacher: "Ms. Patel",
-      type: "subject",
-      description: { en: "Review demand and supply.", hi: "???? ?? ??????? ?? ??????? ?????" },
-    },
-    {
-      id: 3,
-      day: days[1],
-      time: "10:15-11:15",
-      title: { en: "Play Time", hi: "??? ?? ???" },
-      teacher: "",
-      type: "play",
-      description: { en: "Take a break with outdoor activities.", hi: "????? ?????????? ?? ??? ????? ????" },
-    },
-    {
-      id: 4,
-      day: days[2],
-      time: "11:15-12:15",
-      title: { en: "Project Work", hi: "???????? ?????" },
-      teacher: "Ms. Rao",
-      type: "project",
-      description: { en: "Build a small science project.", hi: "?? ???? ??????? ???????? ??????" },
-    },
-    {
-      id: 5,
-      day: days[3],
-      time: "10:00-10:15",
-      title: { en: "Short Break", hi: "???? ?????" },
-      teacher: "",
-      type: "break",
-      description: { en: "Rest and recharge.", hi: "???? ???? ?? ?? ????? ??????? ?????" },
-    },
-  ];
+  const fetchTasks = async () => {
+    if (!uniqueId || !accessToken) return;
+    try {
+      setLoading(true);
+      const response = await axios.get(`${API_URL}?student_id=${uniqueId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      if (response.data.success) {
+        const mappedTasks = response.data.data.map(task => ({
+          id: task.id,
+          day: task.day,
+          time: task.time,
+          type: task.type,
+          title: typeof task.title === 'object' ? task.title : { en: task.title_en || task.title, hi: task.title_hi || task.title },
+          description: typeof task.description === 'object' ? task.description : { en: task.description_en || task.description, hi: task.description_hi || task.description }
+        }));
+        setTasks(mappedTasks);
+      }
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -119,9 +98,10 @@ const Timeschedule = () => {
   }, []);
 
   useEffect(() => {
-    setTasks(getDefaultTasks());
-    setLoading(false);
-  }, [days]);
+    if (uniqueId && accessToken) {
+      fetchTasks();
+    }
+  }, [uniqueId, accessToken, days]);
 
   useEffect(() => {
     const pad = (value) => String(value).padStart(2, "0");
@@ -158,22 +138,33 @@ const Timeschedule = () => {
     event.preventDefault();
   };
 
-  const handleDrop = (event, day, time) => {
+  const handleDrop = async (event, day, time) => {
     event.preventDefault();
     const taskId = Number(event.dataTransfer.getData("text/plain"));
     if (!taskId) return;
 
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task.id === taskId
-          ? {
-              ...task,
-              day,
-              time,
-            }
-          : task
-      )
-    );
+    const taskToUpdate = tasks.find((t) => t.id === taskId);
+    if (!taskToUpdate) return;
+
+    const payload = {
+      student_id: uniqueId,
+      day: day,
+      time: time,
+      type: taskToUpdate.type,
+      title_en: taskToUpdate.title?.en || taskToUpdate.title,
+      title_hi: taskToUpdate.title?.hi || taskToUpdate.title,
+      description_en: taskToUpdate.description?.en || taskToUpdate.description,
+      description_hi: taskToUpdate.description?.hi || taskToUpdate.description,
+};
+
+    try {
+      await axios.put(`${API_URL}?task_id=${taskId}`, payload, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error("Error updating task position:", error);
+    }
   };
 
   const handleFormChange = (field, value) => {
@@ -187,56 +178,52 @@ const Timeschedule = () => {
       day: days[0],
       time: timeSlots[0],
       type: "study",
-      teacher: "",
       description: "",
     });
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!formState.title.trim()) {
+    if (!formState.title?.trim()) {
       return;
     }
 
-    if (selectedTask) {
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === selectedTask.id
-            ? {
-                ...task,
-                day: formState.day,
-                time: formState.time,
-                type: formState.type,
-                teacher: formState.teacher,
-                title: { ...task.title, [language]: formState.title },
-                description: { ...task.description, [language]: formState.description },
-              }
-            : task
-        )
-      );
-      setNotification({
-        title: language === "hi" ? "????? ????? ???? ???" : "Task updated",
-        day: formState.day,
-        time: formState.time,
-      });
-    } else {
-      const newTask = {
-        id: Date.now(),
-        day: formState.day,
-        time: formState.time,
-        type: formState.type,
-        teacher: formState.teacher,
-        title: { en: formState.title, hi: formState.title },
-        description: { en: formState.description, hi: formState.description },
-      };
-      setTasks((prev) => [...prev, newTask]);
-      setNotification({
-        title: language === "hi" ? "??? ????? ????? ???" : "New task added",
-        day: formState.day,
-        time: formState.time,
-      });
+    const payload = {
+      student_id: uniqueId,
+      day: formState.day,
+      time: formState.time,
+      type: formState.type,
+      title_en: language === "en" ? formState.title : (selectedTask?.title?.en || formState.title),
+      title_hi: language === "hi" ? formState.title : (selectedTask?.title?.hi || formState.title),
+      description_en: language === "en" ? formState.description : (selectedTask?.description?.en || formState.description),
+      description_hi: language === "hi" ? formState.description : (selectedTask?.description?.hi || formState.description),
+    };
+
+    try {
+      if (selectedTask) {
+        await axios.put(`${API_URL}?task_id=${selectedTask.id}`, payload, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        setNotification({
+          title: language === "hi" ? "कार्य अपडेट किया गया" : "Task updated",
+          day: formState.day,
+          time: formState.time,
+        });
+      } else {
+        await axios.post(`${API_URL}`, payload, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+        setNotification({
+          title: language === "hi" ? "नया कार्य जोड़ा गया" : "New task added",
+          day: formState.day,
+          time: formState.time,
+        });
+      }
+      fetchTasks();
+      resetForm();
+    } catch (error) {
+      console.error("Error saving task:", error);
     }
-    resetForm();
   };
 
   const handleEditTask = (task) => {
@@ -246,21 +233,25 @@ const Timeschedule = () => {
       day: task.day,
       time: task.time,
       type: task.type,
-      teacher: task.teacher,
       description: task.description[language] || task.description.en,
     });
   };
 
-  const handleDeleteTask = (taskId) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
-    if (selectedTask?.id === taskId) {
-      resetForm();
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await axios.delete(`${API_URL}?task_id=${taskId}`, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      fetchTasks();
+      if (selectedTask?.id === taskId) resetForm();
+      setNotification({
+        title: language === "hi" ? "कार्य हटा दिया गया" : "Task removed",
+        day: "",
+        time: "",
+      });
+    } catch (error) {
+      console.error("Error deleting task:", error);
     }
-    setNotification({
-      title: language === "hi" ? "????? ??? ???? ???" : "Task removed",
-      day: "",
-      time: "",
-    });
   };
 
   const buildCellTasks = (day, time) => tasks.filter((task) => task.day === day && task.time === time);
@@ -289,15 +280,15 @@ const Timeschedule = () => {
                   <Card.Body>
                     <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
                       <div>
-                        <h2 className="mb-1">{language === "hi" ? "????????" : "Time Schedule"}</h2>
+                        <h2 className="mb-1">{language === "hi" ? "समय सारणी" : "Time Schedule"}</h2>
                         <p className="text-muted mb-0">
                           {language === "hi"
-                            ? "???? ???????? ?????, ???????? ???? ?? ??? ?? ??????? ??????? ?????"
+                            ? "अपनी दिनचर्या बनाएँ, कार्यों को आसानी से बदलें और समय पर सूचना प्राप्त करें।"
                             : "Create your routine, move tasks easily, and receive reminders on time."}
                         </p>
                       </div>
                       <Badge bg="success" className="mt-3 mt-md-0">
-                        {language === "hi" ? "????? ??? ????? ?????" : "Drag & Drop Enabled"}
+                        {language === "hi" ? "खींचें और छोड़ें सक्षम" : "Drag & Drop Enabled"}
                       </Badge>
                     </div>
 
@@ -306,8 +297,8 @@ const Timeschedule = () => {
                         <strong>{notification.title}</strong>
                         <div className="small">
                           {notification.day && notification.time
-                            ? `${notification.day} � ${notification.time}`
-                            : language === "hi" ? "????? ?? ?? ??? ?????" : "Updated schedule"}
+                            ? `${notification.day} � ${notification.time}`
+                            : language === "hi" ? "अपडेट की गई समय सारणी" : "Updated schedule"}
                         </div>
                       </Alert>
                     )}
@@ -316,7 +307,7 @@ const Timeschedule = () => {
                       <Table bordered hover className="timetable-grid mb-0">
                         <thead>
                           <tr>
-                            <th className="time-header">{language === "hi" ? "???" : "Time"}</th>
+                            <th className="time-header">{language === "hi" ? "समय" : "Time"}</th>
                             {days.map((day) => (
                               <th key={day}>{day}</th>
                             ))}
@@ -348,7 +339,6 @@ const Timeschedule = () => {
                                               <div className="d-flex justify-content-between align-items-start">
                                                 <div>
                                                   <h6 className="mb-1 task-title">{task.title[language] || task.title.en}</h6>
-                                                  <p className="text-muted small mb-2">{task.teacher || (language === "hi" ? "??? ?????? ????" : "No teacher assigned")}</p>
                                                 </div>
                                                 <Badge bg={typeConfig.variant} className="task-badge">
                                                   {typeConfig.label}
@@ -356,10 +346,10 @@ const Timeschedule = () => {
                                               </div>
                                               <div className="task-actions mt-2 d-flex justify-content-between gap-2">
                                                 <Button size="sm" variant="outline-secondary" onClick={() => handleEditTask(task)}>
-                                                  {language === "hi" ? "???????" : "Edit"}
+                                                  {language === "hi" ? "संपादित करें" : "Edit"}
                                                 </Button>
                                                 <Button size="sm" variant="outline-danger" onClick={() => handleDeleteTask(task.id)}>
-                                                  {language === "hi" ? "?????" : "Delete"}
+                                                  {language === "hi" ? "हटाएं" : "Delete"}
                                                 </Button>
                                               </div>
                                             </Card.Body>
@@ -368,7 +358,7 @@ const Timeschedule = () => {
                                       })
                                     ) : (
                                       <div className="empty-slot-text">
-                                        {language === "hi" ? "????? ???? ?? ??? ??????" : "Drop here or add new"}
+                                        {language === "hi" ? "यहाँ छोड़ें या नया जोड़ें" : "Drop here or add new"}
                                       </div>
                                     )}
                                   </div>
@@ -386,20 +376,19 @@ const Timeschedule = () => {
               <Col lg={4}>
                 <Card className="shadow-box form-card mb-3">
                   <Card.Body>
-                    <h5 className="mb-3">{language === "hi" ? "??????? ???????" : "Activity Manager"}</h5>
+                    <h5 className="mb-3">{language === "hi" ? "गतिविधि प्रबंधक" : "Activity Manager"}</h5>
                     <Form onSubmit={handleSubmit}>
                       <Form.Group className="mb-3">
-                        <Form.Label>{language === "hi" ? "??????? ??????" : "Activity Title"}</Form.Label>
+                        <Form.Label>{language === "hi" ? "गतिविधि शीर्षक" : "Activity Title"}</Form.Label>
                         <Form.Control
                           type="text"
                           value={formState.title}
-                          placeholder={language === "hi" ? "???. ????" : "e.g. Maths"}
+                          placeholder={language === "hi" ? "जैसे: गणित" : "e.g. Maths"}
                           onChange={(e) => handleFormChange("title", e.target.value)}
                         />
                       </Form.Group>
-
                       <Form.Group className="mb-3">
-                        <Form.Label>{language === "hi" ? "???" : "Day"}</Form.Label>
+                        <Form.Label>{language === "hi" ? "दिन" : "Day"}</Form.Label>
                         <Form.Select value={formState.day} onChange={(e) => handleFormChange("day", e.target.value)}>
                           {days.map((day) => (
                             <option value={day} key={day}>
@@ -410,7 +399,7 @@ const Timeschedule = () => {
                       </Form.Group>
 
                       <Form.Group className="mb-3">
-                        <Form.Label>{language === "hi" ? "??? ?????" : "Time Slot"}</Form.Label>
+                        <Form.Label>{language === "hi" ? "समय स्लॉट" : "Time Slot"}</Form.Label>
                         <Form.Select value={formState.time} onChange={(e) => handleFormChange("time", e.target.value)}>
                           {timeSlots.map((slot) => (
                             <option value={slot} key={slot}>
@@ -421,7 +410,7 @@ const Timeschedule = () => {
                       </Form.Group>
 
                       <Form.Group className="mb-3">
-                        <Form.Label>{language === "hi" ? "??????" : "Type"}</Form.Label>
+                        <Form.Label>{language === "hi" ? "प्रकार" : "Type"}</Form.Label>
                         <Form.Select value={formState.type} onChange={(e) => handleFormChange("type", e.target.value)}>
                           {taskTypes.map((item) => (
                             <option value={item.value} key={item.value}>
@@ -432,32 +421,22 @@ const Timeschedule = () => {
                       </Form.Group>
 
                       <Form.Group className="mb-3">
-                        <Form.Label>{language === "hi" ? "??????" : "Teacher"}</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={formState.teacher}
-                          placeholder={language === "hi" ? "???. ??? ????" : "e.g. Ms. Patel"}
-                          onChange={(e) => handleFormChange("teacher", e.target.value)}
-                        />
-                      </Form.Group>
-
-                      <Form.Group className="mb-3">
-                        <Form.Label>{language === "hi" ? "?????" : "Description"}</Form.Label>
+                        <Form.Label>{language === "hi" ? "विवरण" : "Description"}</Form.Label>
                         <Form.Control
                           as="textarea"
                           rows={3}
                           value={formState.description}
-                          placeholder={language === "hi" ? "???????? ???????" : "Additional details"}
+                          placeholder={language === "hi" ? "अतिरिक्त विवरण" : "Additional details"}
                           onChange={(e) => handleFormChange("description", e.target.value)}
                         />
                       </Form.Group>
 
                       <div className="d-flex gap-2 flex-wrap">
                         <Button type="submit" variant="primary" className="flex-fill">
-                          {selectedTask ? (language === "hi" ? "??????" : "Save") : (language === "hi" ? "?????" : "Add")}
+                          {selectedTask ? (language === "hi" ? "सहेजें" : "Save") : (language === "hi" ? "जोड़ें" : "Add")}
                         </Button>
                         <Button variant="outline-secondary" onClick={resetForm} className="flex-fill">
-                          {language === "hi" ? "?????" : "Reset"}
+                          {language === "hi" ? "रीसेट करें" : "Reset"}
                         </Button>
                       </div>
                     </Form>
@@ -466,12 +445,12 @@ const Timeschedule = () => {
 
                 <Card className="shadow-box info-card">
                   <Card.Body>
-                    <h5 className="mb-3">{language === "hi" ? "?????" : "Tips"}</h5>
+                    <h5 className="mb-3">{language === "hi" ? "सुझाव" : "Tips"}</h5>
                     <ul className="timeline-list">
-                      <li>{language === "hi" ? "????? ???????? ???? ????? ?? ????? ???????? ???? ??? ??? ???? ???" : "A daily routine helps you stay focused on your studies."}</li>
-                      <li>{language === "hi" ? "????? ?? ????? ???? ???? ??? ?? ????? ????????? ?????" : "Drag tasks to organize your day instantly."}</li>
-                      <li>{language === "hi" ? "??????, ??? ?? ????? ?? ?????? ???? ?????" : "Balance study, play, and rest."}</li>
-                      <li>{language === "hi" ? "??????? ???? ??? ?? ??? ?????? ??? ??? ???? ????" : "Notifications remind you at the right time."}</li>
+                      <li>{language === "hi" ? "दैनिक दिनचर्या आपको अपनी पढ़ाई पर केंद्रित रहने में मदद करती है।" : "A daily routine helps you stay focused on your studies."}</li>
+                      <li>{language === "hi" ? "कार्यों को तुरंत व्यवस्थित करने के लिए उन्हें खींचें।" : "Drag tasks to organize your day instantly."}</li>
+                      <li>{language === "hi" ? "पढ़ाई, खेल और आराम को संतुलित करें।" : "Balance study, play, and rest."}</li>
+                      <li>{language === "hi" ? "सूचनाएं आपको सही समय पर याद दिलाती हैं।" : "Notifications remind you at the right time."}</li>
                     </ul>
                   </Card.Body>
                 </Card>
