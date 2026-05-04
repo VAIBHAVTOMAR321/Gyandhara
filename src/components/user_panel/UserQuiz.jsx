@@ -907,7 +907,7 @@ const UserQuiz = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {!takingQuiz && !showResults ? (
             <>
               <div className="mb-4">
