@@ -3,7 +3,9 @@
     height: 40px !important;
     object-fit: cover;
 }
-
+.sidebar-nav{
+    padding-top: 0px !important;
+}
 .dashboard-content {
   background: #fff;
   padding: 20px;
@@ -96,6 +98,12 @@
     .dashboard-cards-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 10px;
+    }
+    .nav-text{
+        margin-left: 12px !important;
+    }
+    .submenu-arrow{
+        margin-left: 203px !important;
     }
     .dashboard-card {
         min-height: 90px !important;
@@ -908,46 +916,75 @@ border: none !important;
 
  /* Mobile Sidebar */
  .user-mobile-offcanvas {
-    background: linear-gradient(135deg, #383be8, hsl(25, 92%, 47%)) !important;
+     background: linear-gradient(135deg, #383be8, hsl(25, 92%, 47%)) !important;
  }
-
-.user-mobile-offcanvas .nav-item {
-    color: white;
-    padding: 1rem;
-}
-
-.user-mobile-offcanvas .nav-item:hover {
-    background: #10341f;
-}
-
-.user-mobile-offcanvas .nav-item.active {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.user-mobile-offcanvas .submenu-container-user {
-   background: hsl(240, 28%, 43%) !important;
-   padding-left: 2rem;
-}
-
-.user-mobile-offcanvas .submenu-item {
-    color: rgba(255, 255, 255, 0.7);
-    padding: 0.5rem 1rem;
-}
-
-.user-mobile-offcanvas .submenu-item:hover {
-    color: white;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.user-offcanvas-header {
-    background: linear-gradient(135deg, #383be8, #4246e4) !important;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.user-offcanvas-body {
-    background: linear-gradient(135deg, #4246e4, hsl(25, 92%, 47%)) !important;
-    padding: 0 !important;
-}
+ 
+ .user-mobile-offcanvas .nav-item {
+     color: white;
+     padding: 1rem;
+ }
+ 
+ .user-mobile-offcanvas .nav-item:hover {
+     background: #10341f;
+ }
+ 
+ .user-mobile-offcanvas .nav-item.active {
+     background: rgba(255, 255, 255, 0.2);
+ }
+ 
+ .user-mobile-offcanvas .submenu-container-user {
+    background: hsl(240, 28%, 43%) !important;
+    padding-left: 2rem;
+ }
+ 
+ .user-mobile-offcanvas .submenu-item {
+     color: rgba(255, 255, 255, 0.7);
+     padding: 0.5rem 1rem;
+ }
+ 
+ .user-mobile-offcanvas .submenu-item:hover {
+     color: white;
+     background: rgba(255, 255, 255, 0.05);
+ }
+ 
+ .user-offcanvas-header {
+     background: linear-gradient(135deg, #383be8, #4246e4) !important;
+     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+ }
+ 
+ .user-offcanvas-body {
+     background: linear-gradient(135deg, #4246e4, hsl(25, 92%, 47%)) !important;
+     padding: 0 !important;
+ }
+ 
+ /* Fix for close button visibility in mobile offcanvas */
+ .user-mobile-offcanvas .btn-close {
+     background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'%3e%3c/path%3e%3c/svg%3e") center/1em auto no-repeat !important;
+     border: 2px solid rgba(255, 255, 255, 0.5) !important;
+     border-radius: 50% !important;
+     width: 30px !important;
+     height: 30px !important;
+     padding: 8px !important;
+     opacity: 1 !important;
+     transition: all 0.3s ease !important;
+ }
+ 
+ .user-mobile-offcanvas .btn-close:hover {
+     background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ff6b6b'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'%3e%3c/path%3e%3c/svg%3e") center/1em auto no-repeat !important;
+     border-color: #ff6b6b !important;
+     transform: scale(1.1) !important;
+ }
+ 
+ .user-offcanvas-header .btn-close {
+     filter: brightness(0) invert(1) !important;
+ }
+ 
+ /* Ensure Offcanvas title is visible */
+ .br-off-title {
+     color: white !important;
+     font-weight: 600 !important;
+     font-size: 1.2rem !important;
+ }
 
 /* ==================== NEW ENHANCED DASHBOARD STYLES ==================== */
 
