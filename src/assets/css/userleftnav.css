@@ -3,7 +3,9 @@
     height: 40px !important;
     object-fit: cover;
 }
-
+.sidebar-nav{
+    padding-top: 0px !important;
+}
 .dashboard-content {
   background: #fff;
   padding: 20px;
@@ -96,6 +98,12 @@
     .dashboard-cards-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 10px;
+    }
+    .nav-text{
+        margin-left: 12px !important;
+    }
+    .submenu-arrow{
+        margin-left: 203px !important;
     }
     .dashboard-card {
         min-height: 90px !important;
