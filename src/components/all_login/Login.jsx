@@ -24,7 +24,7 @@ const Login = () => {
   const content = {
     en: {
       title: "GyanDhara",
-      subtitle: "Building Careers, Shaping Futures",
+      subtitle: "Skill Today, Empower Tomorrow",
       welcome: "Welcome Back!",
       welcomeSub: "Continue your learning journey",
       roleLabel: "Select Your Role",
