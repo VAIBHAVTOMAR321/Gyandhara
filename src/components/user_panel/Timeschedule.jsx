@@ -30,7 +30,23 @@ const Timeschedule = () => {
   );
 
   const timeSlots = useMemo(
-    () => ["08:00-09:00", "09:00-10:00", "10:00-10:15", "10:15-11:15", "11:15-12:15"],
+    () => [
+      "04:00-05:00",
+      "05:00-06:00",
+      "08:00-09:00",
+      "09:00-10:00",
+      "10:00-10:15",
+      "10:15-11:15",
+      "11:15-12:15",
+      "16:00-17:00",
+      "17:00-18:00",
+      "18:00-19:00",
+      "19:00-20:00",
+      "20:00-21:00",
+      "21:00-22:00",
+      "22:00-23:00",
+      "23:00-00:00"
+    ],
     []
   );
 
@@ -73,8 +89,8 @@ const Timeschedule = () => {
           day: task.day,
           time: task.time,
           type: task.type,
-          title: typeof task.title === 'object' ? task.title : { en: task.title_en || task.title, hi: task.title_hi || task.title },
-          description: typeof task.description === 'object' ? task.description : { en: task.description_en || task.description, hi: task.description_hi || task.description }
+          title: { en: task.title_en, hi: task.title_hi },
+          description: { en: task.description_en, hi: task.description_hi }
         }));
         setTasks(mappedTasks);
       }
@@ -151,11 +167,11 @@ const Timeschedule = () => {
       day: day,
       time: time,
       type: taskToUpdate.type,
-      title_en: taskToUpdate.title?.en || taskToUpdate.title,
-      title_hi: taskToUpdate.title?.hi || taskToUpdate.title,
-      description_en: taskToUpdate.description?.en || taskToUpdate.description,
-      description_hi: taskToUpdate.description?.hi || taskToUpdate.description,
-};
+      title_en: taskToUpdate.title.en,
+      title_hi: taskToUpdate.title.hi,
+      description_en: taskToUpdate.description.en,
+      description_hi: taskToUpdate.description.hi,
+    };
 
     try {
       await axios.put(`${API_URL}?task_id=${taskId}`, payload, {
@@ -193,13 +209,13 @@ const Timeschedule = () => {
       day: formState.day,
       time: formState.time,
       type: formState.type,
-      title_en: language === "en" ? formState.title : (selectedTask?.title?.en || formState.title),
-      title_hi: language === "hi" ? formState.title : (selectedTask?.title?.hi || formState.title),
-      description_en: language === "en" ? formState.description : (selectedTask?.description?.en || formState.description),
-      description_hi: language === "hi" ? formState.description : (selectedTask?.description?.hi || formState.description),
+      title_en: language === "en" ? formState.title : (selectedTask?.title.en || formState.title),
+      title_hi: language === "hi" ? formState.title : (selectedTask?.title.hi || formState.title),
+      description_en: language === "en" ? formState.description : (selectedTask?.description.en || formState.description),
+      description_hi: language === "hi" ? formState.description : (selectedTask?.description.hi || formState.description),
     };
 
-    try {
+try {
       if (selectedTask) {
         await axios.put(`${API_URL}?task_id=${selectedTask.id}`, payload, {
           headers: { Authorization: `Bearer ${accessToken}` }
