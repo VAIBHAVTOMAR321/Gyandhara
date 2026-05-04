@@ -51,6 +51,7 @@ import AddJob from "./components/admin_panel/AddJob";
 import ManageJobs from "./components/admin_panel/ManageJobs";
 import AddSeminar from "./components/admin_panel/AddSeminar";
 import AddWorkshop from "./components/admin_panel/AddWorkshop";
+import Managecourse from "./components/admin_panel/Managecourse";
 
 import JobOpenings from "./components/user_panel/JobOpenings";
 import UserEvents from "./components/user_panel/UserEvents";
@@ -62,44 +63,45 @@ import NinthGuidance from "./components/user_panel/NinthGuidance";
 function NavBarWrapper() {
   const location = useLocation();
 
-  const hideOnRoutes = [
-    "/UserDashboard",
-    "/UserProfile",
-    "/UserTest",
-    "/AdminDashboard",
-    "/SchoolDashBoard",
-    "/DashBord",
-    "/SendQuery",
-    "/SchoolStudentRegistration",
-    "/StudentIssue",
-    "/CourseFeedback",
-    "/SchoolQuiz",
-    "/UserQuiz",
-    "/TenthGuidance",
-    "/TwelfthGuidance",
-    "/OccupationDetails",
-    "/SchoolQuizList",
-    "/GovernmentSchemes",
-    "/TwelfthGuidance",
-    "/GroomingClasses",
-    "/QuizManagement",
-    "/Competition",
-    "/ManageGovtSchemes",
-    "/AddGovtSchemes",
-    "/CreateGroomingClass",
-    "/ManageGroomingClasses",
-    "/JobOpenings",
-    "/UserEvents",
-    "/Offlinecompetition",
-    "/SchoolCompetitions",
-    "/AddJob",
-    "/ManageJobs",
-    "/AddSeminar",
-    "/AddWorkshop",
-    "/NinthGuidance",
-        "/SchoolSendQuery"
+   const hideOnRoutes = [
+      "/UserDashboard",
+      "/UserProfile",
+      "/UserTest",
+      "/AdminDashboard",
+      "/SchoolDashBoard",
+      "/DashBord",
+      "/SendQuery",
+      "/SchoolStudentRegistration",
+      "/StudentIssue",
+      "/CourseFeedback",
+      "/SchoolQuiz",
+      "/UserQuiz",
+      "/TenthGuidance",
+      "/TwelfthGuidance",
+      "/OccupationDetails",
+      "/SchoolQuizList",
+      "/GovernmentSchemes",
+      "/TwelfthGuidance",
+      "/GroomingClasses",
+      "/QuizManagement",
+      "/Competition",
+      "/ManageGovtSchemes",
+      "/AddGovtSchemes",
+      "/CreateGroomingClass",
+      "/ManageGroomingClasses",
+      "/JobOpenings",
+      "/UserEvents",
+      "/Offlinecompetition",
+      "/SchoolCompetitions",
+      "/AddJob",
+      "/ManageJobs",
+      "/Managecourse",
+      "/AddSeminar",
+      "/AddWorkshop",
+      "/NinthGuidance",
+      "/SchoolSendQuery"
 
-  ];
+    ];
 
   const shouldHide = hideOnRoutes.some((route) =>
     location.pathname.startsWith(route),
@@ -149,7 +151,8 @@ function FooterWrapper() {
     "/AddSeminar",
     "/AddWorkshop",
     "/NinthGuidance",
-    "/SchoolSendQuery"
+    "/SchoolSendQuery",
+    "/Managecourse"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -431,11 +434,19 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-        <Route
+         <Route
           path="/ManageJobs"
           element={
             <ProtectedRoute>
               <ManageJobs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Managecourse"
+          element={
+            <ProtectedRoute>
+              <Managecourse />
             </ProtectedRoute>
           }
         />

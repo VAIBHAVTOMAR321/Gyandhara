@@ -538,7 +538,7 @@ const getStreamDisplayName = (streamId) => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status" style={{ width: '60px', height: '60px' }}>
@@ -561,7 +561,7 @@ const getStreamDisplayName = (streamId) => {
               </div>
 
               {/* Header Card */}
-              <Card className="shadow-sm mb-4 border-0 notifications-header-card " style={{ borderRadius: '10px' }}>
+              <Card className="shadow-sm mb-4 border-0 notifications-header-card " style={{ borderRadius: '10px', padding: '12px' }}>
                 <Card.Body>
                   <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                     <div>
