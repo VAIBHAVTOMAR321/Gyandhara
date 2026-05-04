@@ -11,7 +11,7 @@ const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-is
 
 const SchoolSendQuery = () => {
   const { language } = useLanguage();
-  const { uniqueId, accessToken } = useAuth();
+  const { uniqueId, accessToken, user } = useAuth();
   const navigate = useNavigate();
 
   // Layout state following StudentRegistration.jsx pattern
@@ -35,6 +35,7 @@ const SchoolSendQuery = () => {
   const [queries, setQueries] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [schoolLoading, setSchoolLoading] = useState(false);
 
   const content = {
     en: {
@@ -122,6 +123,45 @@ const SchoolSendQuery = () => {
     fetchQueries();
   }, [fetchQueries]);
 
+  // Auto-fill school name when user data is available
+  useEffect(() => {
+    const fetchSchoolDetails = async () => {
+      if (!uniqueId) return;
+      
+      // First try to get from user object
+      if (user?.school_name) {
+        setFormData(prev => ({
+          ...prev,
+          school_name: user.school_name
+        }));
+        return;
+      }
+      
+      // If not in user object, fetch from API
+      setSchoolLoading(true);
+      try {
+        const response = await fetch(`https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/?school_uni_id=${uniqueId}`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data?.school_name) {
+            setFormData(prev => ({
+              ...prev,
+              school_name: result.data.school_name
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching school details:', error);
+      } finally {
+        setSchoolLoading(false);
+      }
+    };
+    
+    fetchSchoolDetails();
+  }, [uniqueId, user]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -198,7 +238,7 @@ const SchoolSendQuery = () => {
                 <Card.Body>
                   <Form onSubmit={handleSubmit}>
                     <Row>
-                      <Col md={6} className="mb-3">
+                      {/* <Col md={6} className="mb-3">
                         <Form.Group>
                           <Form.Label>{t.schoolName}</Form.Label>
                           <Form.Control
@@ -210,7 +250,7 @@ const SchoolSendQuery = () => {
                             required
                           />
                         </Form.Group>
-                      </Col>
+                      </Col> */}
                       <Col md={6} className="mb-3">
                         <Form.Group>
                           <Form.Label>{t.queryTitle}</Form.Label>
@@ -224,7 +264,7 @@ const SchoolSendQuery = () => {
                           />
                         </Form.Group>
                       </Col>
-                      <Col md={12} className="mb-3">
+                      <Col md={6} className="mb-3">
                         <Form.Group>
                           <Form.Label>{t.description}</Form.Label>
                           <Form.Control
