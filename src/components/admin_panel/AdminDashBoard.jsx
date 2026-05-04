@@ -439,7 +439,7 @@ const AdminDashBoard = () => {
        { label: 'Top 10', max: 10, color: '#2ecc71' },
        { label: '11-50', min: 11, max: 50, color: '#3498db' },
        { label: '51-100', min: 51, max: 100, color: '#f39c12' },
-       { label: '101+', min: 101, color: '#e74c3c' }
+       { label: '100+', min: 101, color: '#e74c3c' }
      ];
 
      const rankDistribution = rankRanges.map(range => {
