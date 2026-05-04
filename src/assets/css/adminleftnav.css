@@ -985,7 +985,7 @@ border: none !important;
 
 /* School Mobile Sidebar - Matches Orange Laptop View */
 .school-mobile-offcanvas {
-    background: hsl(37, 92%, 47%) !important;
+    background-color: #0d5ab8 !important;
     color: white !important;
 }
 
@@ -995,7 +995,7 @@ border: none !important;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: hsl(37, 92%, 47%) !important;
+    background-color: #0d5ab8  !important;
 }
 
 .school-mobile-offcanvas .btn-close {
@@ -1007,7 +1007,7 @@ border: none !important;
 }
 
 .school-offcanvas-body {
-    background: hsl(37, 92%, 47%) !important;
+    background-color: #0d5ab8 !important;
     padding: 0 !important;
 }
 
