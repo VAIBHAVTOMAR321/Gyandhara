@@ -355,32 +355,34 @@ return (
               Manage school offline events and competitions
             </p>
           </Col>
-          <Col className="text-end d-flex justify-content-end gap-2 align-items-center">
-            <Button
-              variant="outline-success"
-              size="sm"
-              onClick={downloadExcel}
-              title="Download Excel"
-            >
-              <FaFileExcel className="me-1" /> Excel
-            </Button>
-            <Button
-              variant="outline-danger"
-              size="sm"
-              onClick={downloadPDF}
-              title="Download PDF"
-            >
-              <FaFilePdf className="me-1" /> PDF
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                resetForm();
-                setShowModal(true);
-              }}
-            >
-              + Add Competition
-            </Button>
+           <Col className="text-end mt-3 mt-md-0">
+             <div className="d-flex flex-wrap justify-content-end gap-2 align-items-center">
+             <Button
+               variant="outline-success"
+               size="sm"
+               onClick={downloadExcel}
+               title="Download Excel"
+             >
+               <FaFileExcel className="me-1" /> Excel
+             </Button>
+             <Button
+               variant="outline-danger"
+               size="sm"
+               onClick={downloadPDF}
+               title="Download PDF"
+             >
+               <FaFilePdf className="me-1" /> PDF
+             </Button>
+             <Button
+               variant="primary"
+               onClick={() => {
+                 resetForm();
+                 setShowModal(true);
+               }}
+             >
+               + Add Competition
+              </Button>
+            </div>
           </Col>
         </Row>
 
@@ -431,24 +433,24 @@ return (
                           : "-"}
                       </td>
                       <td>{comp.school_uni_id}</td>
-                      <td className="text-center">
-                        <Button
-                          variant="outline-info"
-                          size="sm"
-                          className="me-2"
-                          onClick={() => handleViewParticipants(comp)}
-                        >
-                          View Participants
-                        </Button>
-                        <Button
-                          variant="outline-warning"
-                          size="sm"
-                          className="me-2"
-                          onClick={() => handleEditClick(comp)}
-                        >
-                          Edit
-                        </Button>
-                      </td>
+                       <td className="text-center">
+                         <div className="d-flex justify-content-center gap-2">
+                           <Button
+                             variant="outline-info"
+                             size="sm"
+                             onClick={() => handleViewParticipants(comp)}
+                           >
+                             View Participants
+                           </Button>
+                           <Button
+                             variant="outline-warning"
+                             size="sm"
+                             onClick={() => handleEditClick(comp)}
+                           >
+                             Edit
+                           </Button>
+                         </div>
+                       </td>
                     </tr>
                   ))}
                 </tbody>
