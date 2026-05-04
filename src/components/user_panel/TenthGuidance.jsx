@@ -561,7 +561,7 @@ const getStreamDisplayName = (streamId) => {
               </div>
 
               {/* Header Card */}
-              <Card className="shadow-sm mb-4 border-0 notifications-header-card " style={{ borderRadius: '10px' }}>
+              <Card className="shadow-sm mb-4 border-0 notifications-header-card " style={{ borderRadius: '10px', padding: '12px' }}>
                 <Card.Body>
                   <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3">
                     <div>
