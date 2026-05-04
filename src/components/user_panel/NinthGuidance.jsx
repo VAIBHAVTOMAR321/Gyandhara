@@ -439,7 +439,7 @@ const NinthGuidance = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           {loading ? (
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status" style={{ width: '60px', height: '60px' }}>

@@ -1721,73 +1721,73 @@ const DashBord = () => {
 
   const renderDashboardView = () => (
     <div className="fade-in">
-      <Row className="g-4 mob-top-view">
-        <Col xs={12} sm={6} md={6} lg={3}>
-          <Card className="stat-card h-100 shadow-sm border-0" onClick={handleEnrollmentsClick}>
-            <Card.Body className="d-flex align-items-center card-box-mob" >
-              <div className="stat-icon-wrapper users me-3">
-                <FaUsers className="stat-icon" />
-              </div>
-              <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Total Enrollments</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : unpaidEnrollmentCount}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-</Col>
-        <Col xs={12} sm={6} md={6} lg={3}>
-           <Card className="stat-card h-100 shadow-sm border-0" onClick={handleCoursesClick}>
-            <Card.Body className="d-flex align-items-center">
-              <div className="stat-icon-wrapper courses me-3">
-                <FaBook className="stat-icon" />
-              </div>
-              <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Total Courses</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : courses.filter(c => c.course_status === 'unpaid').length}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-</Col>
-        <Col xs={12} sm={6} md={6} lg={3}>
-           <Card className="stat-card h-100 shadow-sm border-0" onClick={handleCounselingClick} style={{ cursor: 'pointer' }}>
-            <Card.Body className="d-flex align-items-center">
-              <div className="stat-icon-wrapper courses me-3">
-                <FaComments className="stat-icon" />
-              </div>
-              <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Counseling Requests</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : counselingData.length}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-</Col>
-        <Col xs={12} sm={6} md={6} lg={3}>
-           <Card className="stat-card h-100 shadow-sm border-0" onClick={() => { handleNotificationsClick(); setShowNotificationsListModal(true) }} style={{ cursor: 'pointer' }}>
-            <Card.Body className="d-flex align-items-center">
-              <div className="stat-icon-wrapper courses me-3" style={{ backgroundColor: '#17a2b8' }}>
-                <FaBell className="stat-icon" />
-              </div>
-              <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Notifications</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : adminNotificationCount}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-</Col>
-        <Col xs={12} sm={6} md={6} lg={3}>
-           <Card className="stat-card h-100 shadow-sm border-0" onClick={handleEventsClick} style={{ cursor: 'pointer' }}>
-            <Card.Body className="d-flex align-items-center">
-              <div className="stat-icon-wrapper courses me-3" style={{ backgroundColor: '#6f42c1' }}>
-                <FaCalendarAlt className="stat-icon" />
-              </div>
-              <div className="card-content-mob-box">
-                <h6 className="stat-label text-muted mb-1">Events</h6>
-                <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : eventsCount}</h2>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+     <Row className="g-4 mob-top-view">
+         <Col xs={12} sm={12} md={6} lg={4}>
+           <Card className="stat-card h-100 shadow-sm border-0" onClick={handleEnrollmentsClick}>
+             <Card.Body className="d-flex align-items-center card-box-mob" >
+               <div className="stat-icon-wrapper users me-3">
+                 <FaUsers className="stat-icon" />
+               </div>
+               <div className="card-content-mob-box">
+                 <h6 className="stat-label text-muted mb-1">Total Enrollments</h6>
+                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : unpaidEnrollmentCount}</h2>
+               </div>
+             </Card.Body>
+           </Card>
+ </Col>
+         <Col xs={12} sm={12} md={6} lg={4}>
+            <Card className="stat-card h-100 shadow-sm border-0" onClick={handleCoursesClick}>
+             <Card.Body className="d-flex align-items-center">
+               <div className="stat-icon-wrapper courses me-3">
+                 <FaBook className="stat-icon" />
+               </div>
+               <div className="card-content-mob-box">
+                 <h6 className="stat-label text-muted mb-1">Total Courses</h6>
+                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : courses.filter(c => c.course_status === 'unpaid').length}</h2>
+               </div>
+             </Card.Body>
+           </Card>
+ </Col>
+         <Col xs={12} sm={12} md={6} lg={4}>
+            <Card className="stat-card h-100 shadow-sm border-0" onClick={handleCounselingClick} style={{ cursor: 'pointer' }}>
+             <Card.Body className="d-flex align-items-center">
+               <div className="stat-icon-wrapper courses me-3">
+                 <FaComments className="stat-icon" />
+               </div>
+               <div className="card-content-mob-box">
+                 <h6 className="stat-label text-muted mb-1">Counseling Requests</h6>
+                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : counselingData.length}</h2>
+               </div>
+             </Card.Body>
+           </Card>
+ </Col>
+         <Col xs={12} sm={12} md={6} lg={4}>
+            <Card className="stat-card h-100 shadow-sm border-0" onClick={() => { handleNotificationsClick(); setShowNotificationsListModal(true) }} style={{ cursor: 'pointer' }}>
+             <Card.Body className="d-flex align-items-center">
+               <div className="stat-icon-wrapper courses me-3" style={{ backgroundColor: '#17a2b8' }}>
+                 <FaBell className="stat-icon" />
+               </div>
+               <div className="card-content-mob-box">
+                 <h6 className="stat-label text-muted mb-1">Notifications</h6>
+                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : adminNotificationCount}</h2>
+               </div>
+             </Card.Body>
+           </Card>
+ </Col>
+         <Col xs={12} sm={12} md={6} lg={4}>
+            <Card className="stat-card h-100 shadow-sm border-0" onClick={handleEventsClick} style={{ cursor: 'pointer' }}>
+             <Card.Body className="d-flex align-items-center">
+               <div className="stat-icon-wrapper courses me-3" style={{ backgroundColor: '#6f42c1' }}>
+                 <FaCalendarAlt className="stat-icon" />
+               </div>
+               <div className="card-content-mob-box">
+                 <h6 className="stat-label text-muted mb-1">Events</h6>
+                 <h2 className="stat-value mb-0">{loading ? <Spinner size="sm" animation="border" /> : eventsCount}</h2>
+               </div>
+             </Card.Body>
+           </Card>
+         </Col>
+       </Row>
     </div>
   )
 
