@@ -1,87 +1,140 @@
-.schedule-container {
+.timetable-card {
+  min-height: 100%;
+}
+
+.timetable-wrapper {
+  overflow-x: auto;
+}
+
+.timetable-grid {
+  min-width: 860px;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.timetable-grid thead th {
+  background: #f4f7ff;
+  font-weight: 700;
+  border-bottom: 2px solid #dee2e6;
+  padding: 14px 16px;
+}
+
+.time-header {
+  width: 120px;
+  background: #eef2ff;
+}
+
+.time-cell {
+  font-weight: 600;
+  background: #f8f9ff;
+  padding: 16px;
+  vertical-align: middle;
+}
+
+.schedule-cell {
+  min-height: 140px;
+  padding: 10px;
+  background: #ffffff;
+  border: 1px dashed #dee2e6;
+  border-radius: 12px;
+  transition: background 0.2s ease;
+}
+
+.schedule-cell:hover {
+  background: #f8faff;
+}
+
+.cell-drop-zone {
+  min-height: 120px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
-.day-schedule-card {
+.task-card {
+  cursor: grab;
   border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
+  border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
-.day-schedule-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+.task-card:active {
+  cursor: grabbing;
 }
 
-.day-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 12px 16px;
+.task-title {
+  font-size: 0.95rem;
 }
 
-.day-header h6 {
-  font-size: 16px;
-  font-weight: 600;
+.task-badge {
+  font-size: 0.72rem;
+  padding: 0.55em 0.65em;
 }
 
-.day-schedule-card .table {
-  margin: 0;
+.task-actions button {
+  flex: 1;
 }
 
-.day-schedule-card .table thead th {
-  background: #f8f9fa;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #666;
-  border: none;
-  padding: 12px 16px;
+.empty-slot-text {
+  color: #6c757d;
+  font-size: 0.9rem;
+  min-height: 64px;
+  display: grid;
+  place-items: center;
+  text-align: center;
 }
 
-.day-schedule-card .table tbody td {
-  padding: 12px 16px;
-  vertical-align: middle;
-  border-top: 1px solid #f0f0f0;
-  font-size: 14px;
+.form-card {
+  min-height: 100%;
 }
 
-.day-schedule-card .table tbody tr:hover {
-  background: #f8f9fa;
+.profile-loading {
+  text-align: center;
+  padding: 60px 0;
 }
 
-.day-schedule-card .table tbody tr.table-light td {
-  background: #f8f9fa !important;
-  font-style: italic;
-  color: #666;
+.info-card {
+  border-radius: 16px;
 }
 
-.day-schedule-card .table tbody tr.table-light:hover {
-  background: #e9ecef !important;
+.timeline-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.timeline-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(112, 122, 234, 0.12);
+  color: #495057;
+}
+
+.timeline-list li:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 992px) {
+  .timetable-grid {
+    min-width: 700px;
+  }
 }
 
 @media (max-width: 768px) {
-  .day-schedule-card .table {
-    font-size: 12px;
+  .timetable-grid {
+    min-width: 540px;
   }
-  
-  .day-schedule-card .table thead th,
-  .day-schedule-card .table tbody td {
-    padding: 8px 10px;
-  }
-  
-  .day-header h6 {
-    font-size: 14px;
+
+  .task-actions {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 576px) {
-  .day-schedule-card .table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+  .timetable-grid {
+    min-width: 460px;
+  }
+
+  .time-cell,
+  .timetable-grid thead th {
+    padding: 10px 12px;
   }
 }
