@@ -85,6 +85,11 @@ const menuItems = [
        path: "/UserProfile",
      },
       {
+       icon: <FaUserCircle />,
+       label: language === 'hi' ? "समय निर्देशिका" : "Time schedule",
+       path: "/Timeschedule",
+     },
+      {
         icon: <FaChalkboardTeacher />,
         label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
         submenu: [

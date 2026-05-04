@@ -1,0 +1,87 @@
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.day-schedule-card {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.day-schedule-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.day-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+}
+
+.day-header h6 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day-schedule-card .table {
+  margin: 0;
+}
+
+.day-schedule-card .table thead th {
+  background: #f8f9fa;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+  border: none;
+  padding: 12px 16px;
+}
+
+.day-schedule-card .table tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+  border-top: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.day-schedule-card .table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.day-schedule-card .table tbody tr.table-light td {
+  background: #f8f9fa !important;
+  font-style: italic;
+  color: #666;
+}
+
+.day-schedule-card .table tbody tr.table-light:hover {
+  background: #e9ecef !important;
+}
+
+@media (max-width: 768px) {
+  .day-schedule-card .table {
+    font-size: 12px;
+  }
+  
+  .day-schedule-card .table thead th,
+  .day-schedule-card .table tbody td {
+    padding: 8px 10px;
+  }
+  
+  .day-header h6 {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .day-schedule-card .table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}

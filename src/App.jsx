@@ -57,6 +57,7 @@ import JobOpenings from "./components/user_panel/JobOpenings";
 import UserEvents from "./components/user_panel/UserEvents";
 import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 import NinthGuidance from "./components/user_panel/NinthGuidance";
+import Timeschedule from "./components/user_panel/Timeschedule";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 //  Navbar Wrapper (Hide on specific routes)
@@ -99,7 +100,8 @@ function NavBarWrapper() {
       "/AddSeminar",
       "/AddWorkshop",
       "/NinthGuidance",
-      "/SchoolSendQuery"
+      "/SchoolSendQuery",
+      "/Timeschedule"
 
     ];
 
@@ -152,7 +154,8 @@ function FooterWrapper() {
     "/AddWorkshop",
     "/NinthGuidance",
     "/SchoolSendQuery",
-    "/Managecourse"
+    "/Managecourse",
+    "/Timeschedule"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -197,6 +200,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <UserDashboard />
+            </ProtectedRoute>
+          }
+        />{" "}
+        <Route
+          path="/Timeschedule"
+          element={
+            <ProtectedRoute>
+              <Timeschedule />
             </ProtectedRoute>
           }
         />{" "}
