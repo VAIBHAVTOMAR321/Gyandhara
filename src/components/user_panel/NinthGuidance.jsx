@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Container, Card, Button, Row, Col, Badge, Form, Modal, Alert, Tab, Nav } from 'react-bootstrap'
-import { FaGraduationCap, FaLightbulb, FaArrowLeft, FaFlask, FaCalculator, FaBook, FaBrain, FaWrench, FaSeedling, FaCheckCircle, FaInfoCircle, FaUniversity, FaBookOpen, FaChartLine } from 'react-icons/fa'
+import { FaGraduationCap, FaLightbulb, FaArrowLeft, FaFlask, FaCalculator, FaBook, FaBrain, FaWrench, FaSeedling, FaCheckCircle, FaInfoCircle, FaUniversity, FaBookOpen, FaChartLine, FaTrophy, FaStar, FaUsers, FaChevronDown, FaChevronUp } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
@@ -27,11 +27,14 @@ const NinthGuidance = () => {
   const [selectedStream, setSelectedStream] = useState('')
   const [showResults, setShowResults] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [selectedCourse, setSelectedCourse] = useState(null)
-  const [selectedCareerPath, setSelectedCareerPath] = useState(null)
+  const [selectedCourse, setSelectedCourse] = useState(null) // This is the selected subject card
   const [loading, setLoading] = useState(true)
   const [showCounseling, setShowCounseling] = useState(false)
   const resultsRef = useRef(null)
+  const [expandedSubSections, setExpandedSubSections] = useState({
+    strategy: true,
+    resources: true,
+  });
 
   // Simulate loading
   useEffect(() => {
@@ -124,52 +127,209 @@ const NinthGuidance = () => {
       'foundation-science': {
         title: language === 'hi' ? 'विज्ञान फाउंडेशन प्लान' : 'Science Foundation Plan',
         subjects: [
-          { name: language === 'hi' ? 'गणित (Mathematics)' : 'Mathematics', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'संख्या पद्धति, बीजगणित, ज्यामिति, सांख्यिकी' : 'Number Systems, Algebra, Geometry, Statistics' },
-          { name: language === 'hi' ? 'भौतिकी (Physics)' : 'Physics', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'गति, ऊर्जा, प्रकाश, विद्युत' : 'Motion, Energy, Light, Electricity' },
-          { name: language === 'hi' ? 'रसायन विज्ञान (Chemistry)' : 'Chemistry', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'रासायनिक अभिक्रिया, तत्व, यौगिक' : 'Chemical reactions, Elements, Compounds' },
-          { name: language === 'hi' ? 'जीव विज्ञान (Biology)' : 'Biology', importance: language === 'hi' ? 'मध्यम' : 'Medium', topics: language === 'hi' ? 'कोशिका, पोषण, श्वसन' : 'Cell, Nutrition, Respiration' }
+          { 
+            name: language === 'hi' ? 'गणित (Mathematics)' : 'Mathematics', 
+            icon: <FaCalculator />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'संख्या पद्धति, बीजगणित, ज्यामिति, सांख्यिकी' : 'Number Systems, Algebra, Geometry, Statistics',
+            description: language === 'hi' ? '9वीं का गणित 10वीं बोर्ड और NTSE/JEE जैसी परीक्षाओं का आधार है।' : 'Class 9 Math is the cornerstone for 10th Boards and exams like NTSE/JEE.',
+            outcomes: language === 'hi' ? ['तार्किक सोच', 'समस्या समाधान', '10वीं बीजगणित आधार'] : ['Logical Reasoning', 'Problem Solving', '10th Algebra Base'],
+            academicRoadmap: [
+              { 
+                path: language === 'hi' ? '9वीं बुनियादी → 10वीं बोर्ड तैयारी' : '9th Basics → 10th Board Mastery', 
+                steps: [language === 'hi' ? 'बीजगणित के मजबूत सिद्धांत' : 'Master Algebra basics', language === 'hi' ? 'ज्यामितीय प्रमेयों का अभ्यास' : 'Practice Geometry theorems'], 
+                growth: language === 'hi' ? 'गणितीय दक्षता' : 'Mathematical Proficiency',
+                strategy: language === 'hi' ? 'प्रतिदिन 1 घंटा अभ्यास करें। सूत्रों को याद करने के बजाय उनके पीछे के तर्क को समझें।' : 'Practice for 1 hour daily. Focus on the logic behind formulas rather than rote memorization.',
+                resources: language === 'hi' ? 'NCERT गणित, आर.डी. शर्मा (अतिरिक्त अभ्यास के लिए), और खान एकेडमी।' : 'NCERT Mathematics, R.D. Sharma (for extra practice), and Khan Academy.'
+              }
+            ]
+          },
+          { 
+            name: language === 'hi' ? 'भौतिकी (Physics)' : 'Physics', 
+            icon: <FaFlask />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'गति, ऊर्जा, प्रकाश, विद्युत' : 'Motion, Energy, Light, Electricity',
+            description: language === 'hi' ? 'ब्रह्मांड के नियमों को समझना शुरू करें।' : 'Start understanding the fundamental laws of the universe.',
+            outcomes: language === 'hi' ? ['वैज्ञानिक दृष्टिकोण', 'विश्लेषणात्मक कौशल'] : ['Scientific Aptitude', 'Analytical Skills'],
+            academicRoadmap: [{ 
+              path: language === 'hi' ? '9वीं अवधारणा → 10वीं संख्यात्मक प्रश्न' : '9th Concepts → 10th Numericals', 
+              steps: ['Conceptual Clarity', 'Numerical Practice'], 
+              growth: 'Physics Foundation',
+              strategy: language === 'hi' ? 'अवधारणाओं को वास्तविक जीवन के उदाहरणों से जोड़ें। एक अलग सूत्र चार्ट बनाएं।' : 'Relate concepts to real-life examples. Maintain a dedicated formula sheet.',
+              resources: language === 'hi' ? 'NCERT विज्ञान, लखमीर सिंह (भौतिकी), और PhET सिमुलेशन।' : 'NCERT Science, Lakhmir Singh (Physics), and PhET Simulations.'
+            }]
+          },
+          { 
+            name: language === 'hi' ? 'रसायन विज्ञान (Chemistry)' : 'Chemistry', 
+            icon: <FaFlask />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'रासायनिक अभिक्रिया, तत्व, यौगिक' : 'Chemical reactions, Elements, Compounds',
+            description: language === 'hi' ? 'पदार्थों की संरचना और परिवर्तनों का अध्ययन।' : 'Study of matter structure and chemical changes.',
+            outcomes: language === 'hi' ? ['प्रायोगिक ज्ञान', 'तत्वों की समझ'] : ['Experimental Knowledge', 'Elemental Mastery'],
+            academicRoadmap: [{ 
+              path: language === 'hi' ? '9वीं तत्व → 10वीं रासायनिक अभिक्रियाएं' : '9th Elements → 10th Chemical Reactions', 
+              steps: ['Learn Periodic Table', 'Balance Equations'], 
+              growth: 'Chemistry Foundation',
+              strategy: language === 'hi' ? 'आवर्त सारणी के पहले 20 तत्वों को याद करें। रासायनिक समीकरणों को संतुलित करने का अभ्यास करें।' : 'Memorize the first 20 elements. Practice balancing chemical equations regularly.',
+              resources: language === 'hi' ? 'NCERT विज्ञान और मॉडर्न एबीसी ऑफ केमिस्ट्री।' : 'NCERT Science and Modern’s abc of Chemistry.'
+            }]
+          },
+          { 
+            name: language === 'hi' ? 'जीव विज्ञान (Biology)' : 'Biology', 
+            icon: <FaSeedling />,
+            importance: language === 'hi' ? 'मध्यम' : 'Medium', 
+            topics: language === 'hi' ? 'कोशिका, पोषण, श्वसन' : 'Cell, Nutrition, Respiration',
+            description: language === 'hi' ? 'जीवन की जटिलताओं और जैविक प्रणालियों को जानें।' : 'Explore life complexities and biological systems.',
+            outcomes: language === 'hi' ? ['जैविक प्रक्रियाएं', 'स्वास्थ्य जागरूकता'] : ['Biological Processes', 'Health Awareness'],
+            academicRoadmap: [{ 
+              path: language === 'hi' ? '9वीं कोशिका विज्ञान → 10वीं मानव प्रणाली' : '9th Cell Biology → 10th Human Systems', 
+              steps: ['Diagram Excellence', 'Taxonomy Basics'], 
+              growth: 'Biology Foundation',
+              strategy: language === 'hi' ? 'चित्रों का नियमित अभ्यास करें। जैविक प्रक्रियाओं को समझने के लिए फ्लोचार्ट का उपयोग करें।' : 'Practice diagrams frequently. Use flowcharts to summarize biological processes.',
+              resources: language === 'hi' ? 'NCERT विज्ञान और प्रदीप की बायोलॉजी।' : 'NCERT Science and Pradeep’s Biology.'
+            }]
+          }
         ],
         studyTips: [
           language === 'hi' ? 'प्रत्येक दिन 2 घंटे विज्ञान अध्ययन करें' : 'Study science for 2 hours daily',
           language === 'hi' ? 'प्रायोगिक कक्षाओं में भाग लें' : 'Attend practical classes regularly',
-          language === 'hi' ? 'डायग्राम और सूत्रों का अभ्यास करें' : 'Practice diagrams and formulas'
+          language === 'hi' ? 'डायग्राम और सूत्रों का अभ्यास करें' : 'Practice diagrams and formulas',
+          language === 'hi' ? 'NTSE और ओलंपियाड के लिए तैयारी शुरू करें' : 'Start foundation for NTSE and Olympiads'
         ],
         timeline: language === 'hi' ? '10वीं तक का विकास' : 'Development until 10th'
       },
       'foundation-commerce': {
         title: language === 'hi' ? 'वाणिज्य फाउंडेशन प्लान' : 'Commerce Foundation Plan',
         subjects: [
-          { name: language === 'hi' ? 'गणित (Mathematics)' : 'Mathematics', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'बीजगणित, ज्यामिती, वाणिज्य गणित' : 'Algebra, Geometry, Commercial Math' },
-          { name: language === 'hi' ? 'अर्थशास्त्र (Economics)' : 'Economics', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'बाजार, मांग-प्रसार, संसाधन' : 'Market, Demand-Supply, Resources' },
-          { name: language === 'hi' ? 'बुकीपीडिंग (Bookkeeping)' : 'Bookkeeping', importance: language === 'hi' ? 'मध्यम' : 'Medium', topics: language === 'hi' ? 'लेखा, वितरण, लाभ-हानि' : 'Accounting, Distribution, Profit-Loss' }
+          { 
+            name: language === 'hi' ? 'गणित (Mathematics)' : 'Mathematics', 
+            icon: <FaCalculator />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'बीजगणित, ज्यामिती, वाणिज्य गणित' : 'Algebra, Geometry, Commercial Math',
+            description: language === 'hi' ? 'वाणिज्यिक गणनाओं और सांख्यिकी के लिए गणित का आधार।' : 'Foundation of Math for commercial calculations and statistics.',
+            outcomes: language === 'hi' ? ['वित्तीय साक्षरता', 'डेटा विश्लेषण'] : ['Financial Literacy', 'Data Analysis'],
+            academicRoadmap: [{ 
+              path: '9th Math → 10th Commercial Math', 
+              steps: ['Percentage & Ratio mastery', 'Statistical Analysis'], 
+              growth: 'Calculation Speed',
+              strategy: language === 'hi' ? 'प्रतिशत और अनुपात पर ध्यान दें। मानसिक गणना कौशल विकसित करें।' : 'Focus on Percentages and Ratios. Develop mental calculation skills.',
+              resources: language === 'hi' ? 'NCERT और वाणिज्यिक गणित संदर्भ पुस्तकें।' : 'NCERT and Commercial Math reference books.'
+            }]
+          },
+          { 
+            name: language === 'hi' ? 'अर्थशास्त्र (Economics)' : 'Economics', 
+            icon: <FaChartLine />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'बाजार, मांग-प्रसार, संसाधन' : 'Market, Demand-Supply, Resources',
+            description: language === 'hi' ? 'संसाधनों के प्रबंधन और आर्थिक प्रणालियों की समझ।' : 'Understanding resource management and economic systems.',
+            outcomes: language === 'hi' ? ['आर्थिक समझ', 'संसाधन प्रबंधन'] : ['Economic Insight', 'Resource Management'],
+            academicRoadmap: [{ 
+              path: '9th Concepts → 10th Economy Base', 
+              steps: ['Understand GDP basics', 'Supply-Demand logic'], 
+              growth: 'Market Understanding',
+              strategy: language === 'hi' ? 'आर्थिक समाचार पत्र पढ़ें। बुनियादी मांग और आपूर्ति के सिद्धांतों को समझें।' : 'Read business news. Understand basic demand and supply principles.',
+              resources: language === 'hi' ? 'NCERT अर्थशास्त्र और संदीप गर्ग।' : 'NCERT Economics and Sandeep Garg.'
+            }]
+          },
+          { 
+            name: language === 'hi' ? 'बुकीपीडिंग (Bookkeeping)' : 'Bookkeeping', 
+            icon: <FaBook />,
+            importance: language === 'hi' ? 'मध्यम' : 'Medium', 
+            topics: language === 'hi' ? 'लेखा, वितरण, लाभ-हानि' : 'Accounting, Distribution, Profit-Loss',
+            description: language === 'hi' ? 'वित्तीय रिकॉर्ड रखने की बुनियादी कला।' : 'Basic art of keeping financial records.',
+            outcomes: language === 'hi' ? ['लेखांकन कौशल', 'सटीकता'] : ['Accounting Skills', 'Accuracy'],
+            academicRoadmap: [{ 
+              path: '9th Basics → 11th Accountancy Base', 
+              steps: ['Learn Debit/Credit', 'Ledger creation'], 
+              growth: 'Financial Accuracy',
+              strategy: language === 'hi' ? 'लेन-देन की रिकॉर्डिंग का अभ्यास करें। शुद्धता और फॉर्मेटिंग पर ध्यान दें।' : 'Practice recording transactions. Focus on precision and formatting.',
+              resources: language === 'hi' ? 'बुनियादी लेखांकन हैंडबुक और एनसीईआरटी।' : 'Basic Accounting handbooks and NCERT.'
+            }]
+          }
         ],
         studyTips: [
           language === 'hi' ? 'अर्थशास्त्र के सिद्धांत समझें' : 'Understand economics concepts',
           language === 'hi' ? 'गणित की नियमित अभ्यास करें' : 'Practice mathematics regularly',
-          language === 'hi' ? 'व्यावहारिक उदाहरणों का अध्ययन करें' : 'Study practical examples'
+          language === 'hi' ? 'व्यावहारिक उदाहरणों का अध्ययन करें' : 'Study practical examples',
+          language === 'hi' ? 'अखबार के व्यापार पन्ने पढ़ें' : 'Read business section of newspapers'
         ],
         timeline: language === 'hi' ? 'व्यावसायिक सफलता का आधार' : 'Foundation for business success'
       },
       'foundation-arts': {
         title: language === 'hi' ? 'कला फाउंडेशन प्लान' : 'Arts Foundation Plan',
         subjects: [
-          { name: language === 'hi' ? 'इतिहास (History)' : 'History', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'संस्कृति, साम्राज्य, सामाजिक बदलाव' : 'Culture, Empires, Social Change' },
-          { name: language === 'hi' ? 'भूगोल (Geography)' : 'Geography', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'क्षेत्रशास्त्र, जलवायु, संसाधन' : 'Regional Studies, Climate, Resources' },
-          { name: language === 'hi' ? 'सामाजिक विज्ञान (Social Science)' : 'Social Science', importance: language === 'hi' ? 'मध्यम' : 'Medium', topics: language === 'hi' ? 'समाज, शासन, अधिकार' : 'Society, Governance, Rights' }
+          { 
+            name: language === 'hi' ? 'इतिहास (History)' : 'History', 
+            icon: <FaBook />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'संस्कृति, साम्राज्य, सामाजिक बदलाव' : 'Culture, Empires, Social Change',
+            description: language === 'hi' ? 'अतीत की घटनाओं से भविष्य की समझ।' : 'Understanding future from past events.',
+            outcomes: language === 'hi' ? ['आलोचनात्मक सोच', 'ऐतिहासिक ज्ञान'] : ['Critical Thinking', 'Historical Knowledge'],
+            academicRoadmap: [{ 
+              path: '9th World History → 10th Indian History', 
+              steps: ['Timeline Analysis', 'Source Verification'], 
+              growth: 'Analytical Power',
+              strategy: language === 'hi' ? 'इतिहास को कहानियों के रूप में पढ़ें। घटनाओं का एक कालक्रम (Timeline) बनाएं।' : 'Read history as a series of stories. Create a timeline of major events.',
+              resources: language === 'hi' ? 'NCERT इतिहास और विश्व इतिहास एटलस।' : 'NCERT History and World History Atlas.'
+            }]
+          },
+          { 
+            name: language === 'hi' ? 'भूगोल (Geography)' : 'Geography', 
+            icon: <FaUniversity />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'क्षेत्रशास्त्र, जलवायु, संसाधन' : 'Regional Studies, Climate, Resources',
+            description: language === 'hi' ? 'पृथ्वी और उसकी प्राकृतिक प्रणालियों का अध्ययन।' : 'Study of Earth and its natural systems.',
+            outcomes: language === 'hi' ? ['मानचित्र कौशल', 'पर्यावरण जागरूकता'] : ['Map Reading', 'Environmental Awareness'],
+            academicRoadmap: [{ 
+              path: '9th Physical Geo → 10th Resource Geo', 
+              steps: ['Map Reading skills', 'Climate Study'], 
+              growth: 'Spatial Awareness',
+              strategy: language === 'hi' ? 'नियमित मानचित्र अभ्यास करें। भौगोलिक घटनाओं को समझने के लिए एटलस का उपयोग करें।' : 'Do regular map practice. Use an atlas to visualize geographical features.',
+              resources: language === 'hi' ? 'NCERT भूगोल और ऑक्सफोर्ड छात्र एटलस।' : 'NCERT Geography and Oxford Student Atlas.'
+            }]
+          },
+          { 
+            name: language === 'hi' ? 'सामाजिक विज्ञान (Social Science)' : 'Social Science', 
+            icon: <FaUsers />,
+            importance: language === 'hi' ? 'मध्यम' : 'Medium', 
+            topics: language === 'hi' ? 'समाज, शासन, अधिकार' : 'Society, Governance, Rights',
+            description: language === 'hi' ? 'नागरिक जीवन और शासन प्रणालियों की समझ।' : 'Understanding civic life and governance systems.',
+            outcomes: language === 'hi' ? ['नागरिक जागरूकता', 'प्रशासनिक समझ'] : ['Civic Awareness', 'Governance Knowledge'],
+            academicRoadmap: [{ 
+              path: '9th Civics → 10th Democracy Base', 
+              steps: ['Learn Constitution basics', 'Active Debating'], 
+              growth: 'Civic Duty Awareness',
+              strategy: language === 'hi' ? 'संविधान की प्रस्तावना और मौलिक अधिकारों को समझें। वाद-विवाद में भाग लें।' : 'Understand the Preamble and Fundamental Rights. Participate in debates.',
+              resources: language === 'hi' ? 'NCERT राजनीति विज्ञान और समाचार पत्र संपादकीय।' : 'NCERT Political Science and Newspaper editorials.'
+            }]
+          }
         ],
         studyTips: [
           language === 'hi' ? 'कालावधि और घटनाओं का अध्ययन करें' : 'Study timelines and events',
           language === 'hi' ? 'मानचित्रों पर ध्यान दें' : 'Focus on maps',
-          language === 'hi' ? 'सामाजिक मुद्दों को समझें' : 'Understand social issues'
+          language === 'hi' ? 'सामाजिक मुद्दों को समझें' : 'Understand social issues',
+          language === 'hi' ? 'लिखने और विश्लेषण करने का अभ्यास करें' : 'Practice writing and analysis'
         ],
         timeline: language === 'hi' ? 'मानवीय और सांस्कृतिक विकास' : 'Human and cultural development'
       },
       'foundation-vocational': {
         title: language === 'hi' ? 'कौशल फाउंडेशन प्लान' : 'Skills Foundation Plan',
         subjects: [
-          { name: language === 'hi' ? 'कंप्यूटर कौशल (Computer Skills)' : 'Computer Skills', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'MS Office, इंटरनेट, बुनियादी IT' : 'MS Office, Internet, Basic IT' },
-          { name: language === 'hi' ? 'तकनीकी अवधारणाएं (Technical Concepts)' : 'Technical Concepts', importance: language === 'hi' ? 'उच्च' : 'High', topics: language === 'hi' ? 'उपकरण, मशीनरी, विनिर्माण' : 'Tools, Machinery, Manufacturing' },
-          { name: language === 'hi' ? 'कार्यक्षेत्र ज्ञान (Workplace Knowledge)' : 'Workplace Knowledge', importance: language === 'hi' ? 'मध्यम' : 'Medium', topics: language === 'hi' ? 'सुरक्षा, काम का संगठन, टीमवर्क' : 'Safety, Work Organization, Teamwork' }
+          { 
+            name: language === 'hi' ? 'कंप्यूटर कौशल (Computer Skills)' : 'Computer Skills', 
+            icon: <FaBrain />,
+            importance: language === 'hi' ? 'उच्च' : 'High', 
+            topics: language === 'hi' ? 'MS Office, इंटरनेट, बुनियादी IT' : 'MS Office, Internet, Basic IT',
+            description: language === 'hi' ? 'डिजिटल दुनिया के लिए आवश्यक कौशल।' : 'Essential skills for the digital world.',
+            outcomes: language === 'hi' ? ['डिजिटल साक्षरता', 'आईटी कौशल'] : ['Digital Literacy', 'IT Proficiency'],
+            academicRoadmap: [{ 
+              path: '9th IT Basics → 10th Application Base', 
+              steps: ['Master MS Office', 'Learn logic/coding basics'], 
+              growth: 'Digital Efficiency',
+              strategy: language === 'hi' ? 'सॉफ्टवेयर टूल्स का व्यावहारिक अभ्यास करें। छोटे कोडिंग प्रोजेक्ट्स का प्रयास करें।' : 'Hands-on practice with software tools. Attempt small coding projects.',
+              resources: language === 'hi' ? 'कक्षा 9 आईटी पाठ्यपुस्तक और यूट्यूब ट्यूटोरियल।' : 'Class 9 IT Textbook and YouTube tutorials.'
+            }]
+          }
         ],
         studyTips: [
           language === 'hi' ? 'कंप्यूटर कौशल विकसित करें' : 'Develop computer skills',
@@ -201,24 +361,19 @@ const NinthGuidance = () => {
   }
 
   const handleCourseClick = (course) => {
+    console.log('Subject card clicked:', course.name); // Debugging line to confirm click event
     setSelectedCourse(course)
-    setSelectedCareerPath(null)
+    setSelectedAcademicPath(null) // Reset selection when opening a new subject
     setShowModal(true)
   }
 
-  const handleCareerPathClick = (path, courseName) => {
-    setSelectedCareerPath(path)
-    navigate('/OccupationDetails', { 
-      state: { 
-        occupation: path.path.split('→').pop().trim(),
-        stream: selectedStream,
-        course: courseName
-      } 
-    })
-  }
+  const handleRoadmapClick = (roadmap) => {
+    // Toggle the selected academic path to show/hide details
+    setSelectedAcademicPath(selectedAcademicPath === roadmap ? null : roadmap);
+  };
 
   const foundationData = selectedStream ? getFoundationPlan(selectedStream) : null
-
+  const [selectedAcademicPath, setSelectedAcademicPath] = useState(null) // This is the selected academic roadmap within the modal
   return (
     <div className="dashboard-container">
       <UserLeftNav
@@ -370,32 +525,35 @@ const NinthGuidance = () => {
                       <Row>
                         {foundationData.subjects.map((subject, index) => (
                           <Col md={4} key={index} className="mb-3">
-                            <Card className="h-100 border-0" style={{ backgroundColor: '#f8f9fa', borderRadius: '10px' }}>
+                            <Card 
+                              className="h-100 border-0 subject-card-ninth" 
+                              style={{ backgroundColor: '#f8f9fa', borderRadius: '10px', cursor: 'pointer', transition: 'all 0.3s ease' }}
+                              onClick={() => handleCourseClick(subject)}
+                            >
                               <Card.Body>
                                 <div className="d-flex align-items-center gap-3 mb-3">
                                   <div className="course-icon-small" style={{ 
                                     width: '40px', 
                                     height: '40px', 
                                     borderRadius: '50%',
-                                    backgroundColor: subject.importance === (language === 'hi' ? 'उच्च' : 'High') ? '#28a745' : 
-                                                                                           subject.importance === (language === 'hi' ? 'मध्यम' : 'Medium') ? '#ffc107' : '#fd7e14',
-                                    display: 'flex',
+                                    backgroundColor: '#667eea', display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     color: 'white',
                                     fontSize: '1rem'
                                   }}>
-                                    <FaBook />
+                                    {subject.icon || <FaBook />}
                                   </div>
                                   <div>
-                                    <h6 className="mb-0">{subject.name}</h6>
+                                    <h6 className="mb-0 fw-bold">{subject.name}</h6>
                                     <Badge bg={subject.importance === (language === 'hi' ? 'उच्च' : 'High') ? 'success' : 
                                                          subject.importance === (language === 'hi' ? 'मध्यम' : 'Medium') ? 'warning' : 'info'}>
                                       {subject.importance}
                                     </Badge>
                                   </div>
                                 </div>
-                                <p className="text-muted small">
+                                <div className="mb-2"><small className="text-primary">{language === 'hi' ? 'विवरण के लिए क्लिक करें' : 'Click for details'}</small></div>
+                                <p className="text-muted small mb-0">
                                   {language === 'hi' ? 'विषय:' : 'Topics:'} {subject.topics}
                                 </p>
                               </Card.Body>
@@ -422,6 +580,40 @@ const NinthGuidance = () => {
                           ))}
                         </Row>
                       </div>
+                    </Card.Body>
+                  </Card>
+
+                  {/* Competitive Exams Focus */}
+                  <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px', background: 'linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%)' }}>
+                    <Card.Body>
+                      <h5 className="mb-3">
+                        <FaTrophy className="me-2 text-warning" />
+                        {language === 'hi' ? "9वीं से प्रतियोगी परीक्षा की तैयारी" : "Competitive Outlook from Class 9"}
+                      </h5>
+                      <Row>
+                        <Col md={6}>
+                          <div className="p-3 bg-white rounded shadow-sm h-100">
+                            <h6 className="fw-bold"><FaStar className="text-primary me-2" />NTSE (National Talent Search Exam)</h6>
+                            <p className="small text-muted">
+                              {language === 'hi' 
+                                ? "9वीं का पाठ्यक्रम NTSE स्टेज 1 के लिए आधार है। गणित और मानसिक योग्यता (MAT) पर विशेष ध्यान दें।" 
+                                : "Class 9 syllabus is the base for NTSE Stage 1. Focus on Math and Mental Ability Test (MAT)."}
+                            </p>
+                            <Badge bg="light" text="dark">{language === 'hi' ? "छात्रवृत्ति अवसर" : "Scholarship Opportunity"}</Badge>
+                          </div>
+                        </Col>
+                        <Col md={6}>
+                          <div className="p-3 bg-white rounded shadow-sm h-100">
+                            <h6 className="fw-bold"><FaStar className="text-primary me-2" />Olympiads (NSO/IMO)</h6>
+                            <p className="small text-muted">
+                              {language === 'hi' 
+                                ? "विज्ञान और गणित में वैचारिक गहराई के लिए। यह राष्ट्रीय स्तर पर आपकी रैंकिंग सुधारने में मदद करता है।" 
+                                : "For conceptual depth in Science and Math. Helps improve your national-level standing early."}
+                            </p>
+                            <Badge bg="light" text="dark">{language === 'hi' ? "वैश्विक प्रतिस्पर्धा" : "Global Standing"}</Badge>
+                          </div>
+                        </Col>
+                      </Row>
                     </Card.Body>
                   </Card>
 
@@ -465,7 +657,7 @@ const NinthGuidance = () => {
                           <Tab.Pane eventKey="timeline">
                             <Card>
                               <Card.Body>
-                                <h6>{foundationData.timeline}</h6>
+                                <h6 className="fw-bold">{foundationData.timeline}</h6>
                                 <div className="timeline mt-3">
                                   <div className="timeline-item">
                                     <Badge bg="primary">1-6 माह</Badge>
@@ -555,53 +747,128 @@ const NinthGuidance = () => {
                 <p>{selectedCourse.description}</p>
               </div>
                
-              {/* Career Paths Section */}
-              {selectedCourse.careerPaths && selectedCourse.careerPaths.length > 0 && (
-                <div className="mb-4">
-                  <h6 className="text-muted mb-3">
-                    <FaLightbulb className="me-2 text-warning" />
-                    {language === 'hi' ? "कदम-दर-कदम करियर पथ" : "Step-by-Step Career Path"}
-                  </h6>
-                  <Row>
-                    {selectedCourse.careerPaths.map((path, index) => (
-                      <Col md={6} key={index} className="mb-3">
-                        <Card 
-                          className={`h-100 border career-path-card ${selectedCareerPath === path ? 'selected' : ''}`}
-                          style={{ cursor: 'pointer', borderRadius: '8px', overflow: 'hidden' }}
-                          onClick={() => handleCareerPathClick(path, selectedCourse?.name)}
-                        >
-                          <Card.Body className="p-3" style={{ maxHeight: selectedCareerPath === path ? '400px' : 'auto', overflowY: selectedCareerPath === path ? 'auto' : 'visible' }}>
-                            <h6 className="mb-2 text-primary">{path.path}</h6>
-                            <div className="mb-2">
-                              <Badge bg="secondary" className="w-100">{path.growth}</Badge>
-                            </div>
-                            {selectedCareerPath === path && (
-                              <div className="mt-3">
-                                <h6 className="text-muted mb-2">{language === 'hi' ? "सफलता के चरण:" : "Steps to Achieve:"}</h6>
-                                <ol className="ps-3 mb-0">
-                                  {path.steps.map((step, idx) => (
-                                    <li key={idx} className="mb-1 small">{step}</li>
-                                  ))}
-                                </ol>
-                              </div>
-                            )}
-                          </Card.Body>
-                        </Card>
-                      </Col>
-                    ))}
-                  </Row>
-                </div>
-              )}
+               {/* Academic Path Section */}
+               {selectedCourse.academicRoadmap && selectedCourse.academicRoadmap.length > 0 && (
+                 <div className="mb-4">
+                   <h6 className="text-muted mb-3 fw-bold">
+                     <FaChartLine className="me-2 text-primary" />
+                     {language === 'hi' ? "शैक्षणिक पथ" : "Academic Path"}
+                   </h6>
+                   {selectedCourse.academicRoadmap.map((roadmap, index) => (
+                     <Card 
+                       key={index}
+                       className={`mb-3 border roadmap-card ${selectedAcademicPath === roadmap ? 'selected' : ''}`}
+                       style={{ borderRadius: '8px', backgroundColor: '#f8f9fa', cursor: 'pointer', transition: 'all 0.3s ease' }}
+                       onClick={() => handleRoadmapClick(roadmap)}
+                     >
+                       <Card.Body className="p-3" style={{ maxHeight: selectedAcademicPath === roadmap ? '800px' : '80px', overflowY: 'hidden', transition: 'max-height 0.3s ease-in-out' }}>
+                         <div className="d-flex justify-content-between align-items-center mb-2">
+                           <h6 className="mb-0 text-primary fw-bold">
+                             <FaUniversity className="me-2" /> {roadmap.path}
+                           </h6>
+                           <div className="d-flex align-items-center">
+                             <Badge bg="secondary" className="me-2">{roadmap.growth}</Badge>
+                             {selectedAcademicPath === roadmap ? <FaChevronUp className="text-muted" /> : <FaChevronDown className="text-muted" />}
+                           </div>
+                         </div>
+                         {selectedAcademicPath === roadmap && (
+                           <>
+                             <div className="mt-3">
+                               <h6 className="text-muted mb-2 fw-bold">
+                                 <FaStar className="me-2 text-warning" />
+                                 {language === 'hi' ? "महत्वपूर्ण चरण:" : "Key Steps:"}
+                               </h6>
+                               <ol className="ps-3 mb-0">
+                                 {roadmap.steps.map((step, idx) => (
+                                   <li key={idx} className="mb-2 small" style={{ lineHeight: '1.6' }}>
+                                     <div className="d-flex align-items-start">
+                                       <span className="me-2 mt-1" style={{ color: '#667eea' }}>
+                                         <FaCheckCircle />
+                                       </span>
+                                       <div>
+                                         <span className="fw-bold text-dark">{step}</span>
+                                         <div className="text-muted small mt-1">
+                                           {language === 'hi' 
+                                           ? '🛠️ फाउंडेशन और अवधारणा निर्माण के लिए आवश्यक' 
+                                           : '🛠️ Essential for foundation and concept building'}
+                                         </div>
+                                       </div>
+                                     </div>
+                                   </li>
+                                 ))}
+                               </ol>
+                             </div>
+                             <div className="row g-2 mt-3">
+                               <Col md={12}>
+                                 <div className="p-3 bg-white rounded border-start border-3 border-success shadow-sm">
+                                   <div 
+                                     className="d-flex justify-content-between align-items-center cursor-pointer"
+                                     onClick={() => toggleSubSection('strategy')}
+                                   >
+                                     <h6 className="fw-bold text-success mb-0" style={{ fontSize: '0.9rem' }}>
+                                       <FaChartLine className="me-2" />
+                                       {language === 'hi' ? "रणनीति" : "Strategy"}
+                                     </h6>
+                                     {expandedSubSections.strategy ? <FaChevronUp className="text-muted" /> : <FaChevronDown className="text-muted" />}
+                                   </div>
+                                   {expandedSubSections.strategy && (
+                                     <p className="text-muted small mb-0 mt-2">{roadmap.strategy}</p>
+                                   )}
+                                 </div>
+                               </Col>
+                               <Col md={12}>
+                                 <div className="p-3 bg-white rounded border-start border-3 border-info shadow-sm mt-2">
+                                   <div 
+                                     className="d-flex justify-content-between align-items-center cursor-pointer"
+                                     onClick={() => toggleSubSection('resources')}
+                                   >
+                                     <h6 className="fw-bold text-info mb-0" style={{ fontSize: '0.9rem' }}>
+                                       <FaBookOpen className="me-2" />
+                                       {language === 'hi' ? "संसाधन" : "Resources"}
+                                     </h6>
+                                     {expandedSubSections.resources ? <FaChevronUp className="text-muted" /> : <FaChevronDown className="text-muted" />}
+                                   </div>
+                                   {expandedSubSections.resources && (
+                                     <p className="text-muted small mb-0 mt-2">{roadmap.resources}</p>
+                                   )}
+                                 </div>
+                               </Col>
+                             </div>
+                             <div className="mt-3">
+                               <Alert variant="info" className="mb-0">
+                                 <FaLightbulb className="me-2 mb-1" />
+                                 <small>
+                                   {language === 'hi' 
+                                     ? '💡 इन चरणों को पूरा करके आप अपनी मूल अवधारणाएं मजबूत बना सकते हैं और 10वीं की तैयारी में सफल हो सकते हैं।'
+                                     : '💡 By completing these steps, you can strengthen your core concepts and succeed in your 10th grade preparation.'}
+                                 </small>
+                               </Alert>
+                             </div>
+                           </>
+                         )}
+                       </Card.Body>
+                     </Card>
+                   ))}
+                 </div>
+               )}
               
-              {/* Career Opportunities */}
+              {/* Foundational Outcomes */}
               <div className="mb-4">
-                <h6 className="text-muted mb-2">{language === 'hi' ? "करियर के अवसर" : "Career Opportunities"}</h6>
+                <h6 className="text-muted mb-2">{language === 'hi' ? "मुख्य सीखने के परिणाम" : "Key Learning Outcomes"}</h6>
+                <Alert variant="light" className="border-0 bg-light p-2 mb-3">
+                  <small className="text-muted">
+                    <FaInfoCircle className="me-1" />
+                    {language === 'hi' 
+                      ? "9वीं में इस विषय को मास्टर करने से आपको ये लाभ होंगे:" 
+                      : "Mastering this subject in Class 9 provides these foundational benefits:"}
+                  </small>
+                </Alert>
                 <Row>
-                  {selectedCourse.careers.map((career, index) => (
+                  {selectedCourse.outcomes.map((outcome, index) => (
                     <Col md={6} key={index} className="mb-2">
                       <Badge bg="primary" className="w-100 py-2">
                         <FaCheckCircle className="me-2" />
-                        {career}
+                        {outcome}
                       </Badge>
                     </Col>
                   ))}
@@ -610,7 +877,7 @@ const NinthGuidance = () => {
               
               <Alert variant="info">
                 <FaInfoCircle className="me-2" />
-                <strong>{language === 'hi' ? "सुझाव:" : "Tip:"}</strong> {language === 'hi' ? "विस्तृत चरणों को देखने के लिए करियर पथ पर क्लिक करें" : "Click on a career path to see detailed steps"}
+                <strong>{language === 'hi' ? "सुझाव:" : "Tip:"}</strong> {language === 'hi' ? "विस्तृत फाउंडेशन चरणों को देखने के लिए पथ पर क्लिक करें" : "Click on a path to see detailed foundation steps"}
               </Alert>
             </div>
           )}
