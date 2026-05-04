@@ -142,7 +142,7 @@ const UserEvents = () => {
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           <Row className="mb-4">
             <Col xs={12} className="mt-4">
                  <div className="d-flex align-items-center mb-3">

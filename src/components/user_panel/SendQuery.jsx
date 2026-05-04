@@ -227,7 +227,7 @@ return (
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
 
-        <Container className="dashboard-box mt-3">
+        <Container fluid className="dashboard-box mt-3">
           <div className="mb-4 ">
             <Button 
               variant="outline-secondary" 

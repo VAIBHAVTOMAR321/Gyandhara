@@ -179,7 +179,12 @@
 .mobile-table-wrapper {
   display: none;
 }
+@media (max-width: 992px) {
+  .admin-dashboard {
+    padding: 15px;
+  }
 
+}
 @media (max-width: 768px) {
   .admin-dashboard {
     padding: 15px;
