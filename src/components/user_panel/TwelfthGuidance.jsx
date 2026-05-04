@@ -695,7 +695,7 @@ const TwelfthGuidance = () => {
       />
       <div className="main-content-dash" style={{ padding: isMobile ? '10px' : '4px 0 0 0', minHeight: 'calc(100vh - 70px)' }}>
         <UserHeader toggleSidebar={toggleSidebar} />
-        <Container className='fixed-notifications mt-3'>
+        <Container fluid className='fixed-notifications mt-3'>
           {/* Back Button */}
           <div className="mb-4">
             <Button 
