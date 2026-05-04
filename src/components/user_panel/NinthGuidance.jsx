@@ -374,6 +374,60 @@ const NinthGuidance = () => {
 
   const foundationData = selectedStream ? getFoundationPlan(selectedStream) : null
   const [selectedAcademicPath, setSelectedAcademicPath] = useState(null) // This is the selected academic roadmap within the modal
+  const [quizAnswers, setQuizAnswers] = useState({ q1: '', q2: '', q3: '' })
+  const [showQuizResult, setShowQuizResult] = useState(false)
+  const [quizSummary, setQuizSummary] = useState([])
+
+  const handleQuizAnswer = (question, value) => {
+    setQuizAnswers((prev) => ({ ...prev, [question]: value }))
+    setShowQuizResult(false)
+  }
+
+  const getQuizSuggestions = (answers) => {
+    const displayAnswer = (value) => {
+      if (!value) return language === 'hi' ? 'कोई चयन नहीं' : 'No selection'
+      if (value === 'yes') return language === 'hi' ? 'हाँ' : 'Yes'
+      if (value === 'no') return language === 'hi' ? 'नहीं' : 'No'
+      if (value === 'sometimes') return language === 'hi' ? 'कभी-कभी' : 'Sometimes'
+      return value
+    }
+
+    return [
+      {
+        question: language === 'hi' ? '1. क्या आप अपनी पढ़ाई के लिए एक नियमित समय सारिणी का पालन करते हैं?' : '1. Do you follow a regular study schedule?',
+        answer: displayAnswer(answers.q1),
+        suggestion: answers.q1 === 'yes'
+          ? (language === 'hi' ? 'बहुत बढ़िया! लगातार अभ्यास बनाए रखें और दिन की योजना बनाएं।' : 'Great! Keep the routine and plan your day consistently.')
+          : (language === 'hi' ? 'छोटे से शुरू करें: हर दिन 30 मिनट पढ़ाई के लिए तय करें।' : 'Start small: set aside 30 minutes each day to study.')
+      },
+      {
+        question: language === 'hi' ? '2. क्या आप पाठ्यक्रम को समझने पर प्रश्न पूछते हैं?' : '2. Do you ask questions when you do not understand the syllabus?',
+        answer: displayAnswer(answers.q2),
+        suggestion: answers.q2 === 'yes'
+          ? (language === 'hi' ? 'उत्तम! अपनी शंकाओं को तुरंत स्पष्ट रखें।' : 'Excellent! Keep clearing your doubts promptly.')
+          : (language === 'hi' ? 'जब कुछ स्पष्ट न हो, तो शिक्षक या सहपाठी से पूछें।' : 'When unsure, ask a teacher or peer for clarification.')
+      },
+      {
+        question: language === 'hi' ? '3. क्या आप पढ़ाई के साथ अपने भावनात्मक स्वास्थ्य का ध्यान रखते हैं?' : '3. Do you take care of your emotional health alongside studies?',
+        answer: displayAnswer(answers.q3),
+        suggestion: answers.q3 === 'yes'
+          ? (language === 'hi' ? 'बहुत अच्छा! नियमित ब्रेक और आराम जारी रखें।' : 'Very good! Continue taking breaks and resting.')
+          : answers.q3 === 'sometimes'
+            ? (language === 'hi' ? 'कभी-कभी अच्छा है, लेकिन थोड़ी नियमितता से और बेहतर होगा।' : 'Sometimes is a start, but more consistency will help.')
+            : (language === 'hi' ? 'स्वस्थ दिनचर्या के लिए रोज थोड़ा समय आराम और ध्यान के लिए निकालें।' : 'For a healthy balance, take a little time each day for rest and mindfulness.')
+      }
+    ]
+  }
+
+  const evaluateQuiz = () => {
+    setQuizSummary(getQuizSuggestions(quizAnswers))
+    setShowQuizResult(true)
+  }
+
+  const toggleSubSection = (section) => {
+    setExpandedSubSections((prev) => ({ ...prev, [section]: !prev[section] }))
+  }
+
   return (
     <div className="dashboard-container">
       <UserLeftNav
@@ -708,6 +762,112 @@ const NinthGuidance = () => {
                           </ul>
                         </Col>
                       </Row>
+                    </Card.Body>
+                  </Card>
+
+                  <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
+                    <Card.Body>
+                      <h5 className="mb-3">
+                        <FaBrain className="me-2 text-success" />
+                        {language === 'hi' ? 'शैक्षणिक समर्थन और करियर जागरूकता' : 'Academic Support & Career Awareness'}
+                      </h5>
+                      <Row>
+                        <Col md={6}>
+                          <h6>{language === 'hi' ? 'अकादमिक समर्थन' : 'Academic Support'}</h6>
+                          <ul className="text-muted">
+                            <li>{language === 'hi' ? 'प्रतिदिन पाठ्यक्रम की समीक्षा करें और समय सारिणी बनाएं।' : 'Review curriculum daily and follow a timetable.'}</li>
+                            <li>{language === 'hi' ? 'मजबूत नोट्स बनाएं ताकि परीक्षा से पहले तेज समीक्षा हो सके।' : 'Create strong notes for quick revision before exams.'}</li>
+                            <li>{language === 'hi' ? 'संकट की स्थिति में शिक्षकों या मेंटर्स से मार्गदर्शन लें।' : 'Seek help from teachers or mentors when in doubt.'}</li>
+                          </ul>
+                        </Col>
+                        <Col md={6}>
+                          <h6>{language === 'hi' ? 'करियर जागरूकता' : 'Career Awareness'}</h6>
+                          <ul className="text-muted">
+                            <li>{language === 'hi' ? 'अपने रुचियों और क्षमताओं की पहचान करें।' : 'Identify your interests and strengths.'}</li>
+                            <li>{language === 'hi' ? '10वीं के बाद कौशल-आधारित और अकादमिक मार्ग दोनों पर विचार करें।' : 'Consider both skill-based and academic paths after 10th.'}</li>
+                            <li>{language === 'hi' ? 'पेशे के रुझानों और भविष्य की नौकरियों के बारे में जानकारी इकट्ठा करें।' : 'Gather information about career trends and future jobs.'}</li>
+                          </ul>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+
+                  <Card className="shadow-sm mb-4 border-0" style={{ borderRadius: '10px' }}>
+                    <Card.Body>
+                      <h5 className="mb-3">
+                        <FaSeedling className="me-2 text-info" />
+                        {language === 'hi' ? 'कौशल विकास और मानसिक स्वास्थ्य' : 'Skill Development & Mental Well-being'}
+                      </h5>
+                      <Row>
+                        <Col md={6}>
+                          <h6>{language === 'hi' ? 'कौशल विकास' : 'Skill Development'}</h6>
+                          <ul className="text-muted">
+                            <li>{language === 'hi' ? 'लेखन, संचार, समय प्रबंधन जैसे सॉफ्ट स्किल्स पर काम करें।' : 'Work on soft skills like writing, communication, and time management.'}</li>
+                            <li>{language === 'hi' ? 'टेक्नोलॉजी और डिजिटल उपकरणों का परिचय प्राप्त करें।' : 'Get comfortable with technology and digital tools.'}</li>
+                            <li>{language === 'hi' ? 'किसी नए विषय पर छोटे प्रोजेक्ट करें ताकि सीखने की क्षमता बढ़े।' : 'Try a small project on a new topic to boost learning ability.'}</li>
+                          </ul>
+                        </Col>
+                        <Col md={6}>
+                          <h6>{language === 'hi' ? 'मानसिक स्वास्थ्य' : 'Mental Well-being'}</h6>
+                          <ul className="text-muted">
+                            <li>{language === 'hi' ? 'दिन में ब्रेक लें और पर्याप्त नींद लें।' : 'Take breaks and get enough sleep every day.'}</li>
+                            <li>{language === 'hi' ? 'तनाव को कम करने के लिए ध्यान या हल्की एक्सरसाइज करें।' : 'Practice mindfulness or light exercise to reduce stress.'}</li>
+                            <li>{language === 'hi' ? 'दोस्तों और परिवार से बातें करें जब आप दबाव महसूस करें।' : 'Talk to friends or family when you feel pressure.'}</li>
+                          </ul>
+                        </Col>
+                      </Row>
+                    </Card.Body>
+                  </Card>
+
+                  <Card className="shadow-sm border-0" style={{ borderRadius: '10px' }}>
+                    <Card.Body>
+                      <h5 className="mb-3">
+                        <FaLightbulb className="me-2 text-primary" />
+                        {language === 'hi' ? 'त्वरित आत्म-जांच' : 'Quick Self-Check'}
+                      </h5>
+                      <Form>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="fw-bold">{language === 'hi' ? '1. क्या आप अपनी पढ़ाई के लिए एक नियमित समय सारिणी का पालन करते हैं?' : '1. Do you follow a regular study schedule?'}</Form.Label>
+                          <div>
+                            <Form.Check inline label={language === 'hi' ? 'हाँ' : 'Yes'} name="q1" type="radio" id="q1-yes" value="yes" checked={quizAnswers.q1 === 'yes'} onChange={() => handleQuizAnswer('q1', 'yes')} />
+                            <Form.Check inline label={language === 'hi' ? 'नहीं' : 'No'} name="q1" type="radio" id="q1-no" value="no" checked={quizAnswers.q1 === 'no'} onChange={() => handleQuizAnswer('q1', 'no')} />
+                          </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="fw-bold">{language === 'hi' ? '2. क्या आप पाठ्यक्रम को समझने पर प्रश्न पूछते हैं?' : '2. Do you ask questions when you do not understand the syllabus?'}</Form.Label>
+                          <div>
+                            <Form.Check inline label={language === 'hi' ? 'हाँ' : 'Yes'} name="q2" type="radio" id="q2-yes" value="yes" checked={quizAnswers.q2 === 'yes'} onChange={() => handleQuizAnswer('q2', 'yes')} />
+                            <Form.Check inline label={language === 'hi' ? 'नहीं' : 'No'} name="q2" type="radio" id="q2-no" value="no" checked={quizAnswers.q2 === 'no'} onChange={() => handleQuizAnswer('q2', 'no')} />
+                          </div>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label className="fw-bold">{language === 'hi' ? '3. क्या आप पढ़ाई के साथ अपने भावनात्मक स्वास्थ्य का ध्यान रखते हैं?' : '3. Do you take care of your emotional health alongside studies?'}</Form.Label>
+                          <div>
+                            <Form.Check inline label={language === 'hi' ? 'हाँ' : 'Yes'} name="q3" type="radio" id="q3-yes" value="yes" checked={quizAnswers.q3 === 'yes'} onChange={() => handleQuizAnswer('q3', 'yes')} />
+                            <Form.Check inline label={language === 'hi' ? 'कभी-कभी' : 'Sometimes'} name="q3" type="radio" id="q3-sometimes" value="sometimes" checked={quizAnswers.q3 === 'sometimes'} onChange={() => handleQuizAnswer('q3', 'sometimes')} />
+                            <Form.Check inline label={language === 'hi' ? 'नहीं' : 'No'} name="q3" type="radio" id="q3-no" value="no" checked={quizAnswers.q3 === 'no'} onChange={() => handleQuizAnswer('q3', 'no')} />
+                          </div>
+                        </Form.Group>
+                        <Button variant="outline-primary" onClick={evaluateQuiz}>
+                          {language === 'hi' ? 'परिणाम देखें' : 'See Result'}
+                        </Button>
+                      </Form>
+                      {showQuizResult && (
+                        <div className="mt-3">
+                          <Alert variant="secondary">
+                            <strong>{language === 'hi' ? 'आपका स्कोर:' : 'Your score:'}</strong> {quizSummary.filter((item) => item.answer !== (language === 'hi' ? 'कोई चयन नहीं' : 'No selection')).length} / 3
+                          </Alert>
+                          {quizSummary.map((item, index) => (
+                            <Alert variant="light" className="mt-2" key={index}>
+                              <div className="fw-bold">{item.question}</div>
+                              <div className="small text-muted mb-2">
+                                {language === 'hi' ? 'उत्तर:' : 'Answer:'} {item.answer}
+                              </div>
+                              <div>{item.suggestion}</div>
+                            </Alert>
+                          ))}
+                        </div>
+                      )}
                     </Card.Body>
                   </Card>
                 </div>
