@@ -65,7 +65,7 @@ const AdminLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   }, [location.pathname, isMobile, isTablet, setSidebarOpen]);
 
 const menuItems = [
-  {
+   {
     icon: <FaBook />,
     label: "Dashbord",
     path: "/DashBord",
@@ -87,6 +87,8 @@ const menuItems = [
     label: "School Quiz",
     path: "/SchoolQuiz",
   },
+ 
+ 
   // {
   //   icon: <FaUsers />,
   //   label: " Students",
@@ -167,6 +169,13 @@ const menuItems = [
     label: "All Queries",
     path: "/StudentIssue",
   },
+   {
+    icon: <FaBook />,
+    label: "Course Management",
+    path: "/Managecourse",
+    active: true,
+  },
+  
   //   icon: <FaCalendarAlt />,
   //   label: "Event",
   //   submenu: [
