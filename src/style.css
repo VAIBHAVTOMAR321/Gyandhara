@@ -94,6 +94,10 @@ body {
 background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10));
   border: none;
 }
+.table-school tr th{
+    background-color: hsl(37, 92%, 47%) !important;
+    color: white !important;
+}
 .table-thead th {
 background: linear-gradient(135deg, rgb(94, 117, 223), rgb(230, 101, 10));
   color: white;

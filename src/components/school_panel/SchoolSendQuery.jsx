@@ -276,7 +276,7 @@ const SchoolSendQuery = () => {
                   ) : (
                     <div className="table-responsive">
                       <Table hover className="align-middle">
-                        <thead className="table-light">
+                        <thead className="table-school">
                           <tr>
                             <th>{t.table.id}</th>
                             <th>{t.table.title}</th>

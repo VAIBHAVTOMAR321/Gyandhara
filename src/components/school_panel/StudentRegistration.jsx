@@ -1004,7 +1004,7 @@ const StudentRegistration = () => {
                           <h5>{t.previewTitle} ({parsedData.length} {language === 'hi' ? 'छात्र' : 'students'})</h5>
                           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                             <Table striped bordered hover responsive>
-                              <thead>
+                              <thead className="table-school">
                                 <tr>
                                   <th>#</th>
                                   <th>{t.aadhaar}</th>
@@ -1136,7 +1136,7 @@ const StudentRegistration = () => {
                         <>
                           <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
                             <Table striped bordered hover responsive>
-                              <thead>
+                              <thead className="table-school">
                                 <tr>
                                   <th>
                                     <Form.Check

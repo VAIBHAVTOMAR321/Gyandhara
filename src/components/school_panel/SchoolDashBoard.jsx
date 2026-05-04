@@ -514,7 +514,7 @@ const SchoolDashBoard = () => {
                       <Spinner animation="border" />
                     ) : enrollments.length > 0 ? (
                       <Table striped bordered hover responsive>
-                        <thead className="table-primary">
+                        <thead className="table-school">
                           <tr>
                             <th>#</th>
                             <th>Student Name</th>
@@ -594,7 +594,7 @@ const SchoolDashBoard = () => {
                       <div className="text-center py-4"><Spinner animation="border" /></div>
                     ) : (
                       <Table striped bordered hover responsive size="sm">
-                        <thead className="table-warning">
+                        <thead className="table-school">
                           <tr>
                             <th>ID</th>
                             <th>Title</th>
@@ -832,7 +832,7 @@ const SchoolDashBoard = () => {
                                  ) : schoolRanks.length > 0 ? (
                                      <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                                          <Table striped bordered hover responsive className="mb-0">
-                                             <thead className="table-dark">
+                                             <thead className="table-school">
                                                  <tr>
                                                      <th className="text-center" style={{ width: '80px' }}>Rank</th>
                                                      <th>School Name</th>
@@ -882,7 +882,7 @@ const SchoolDashBoard = () => {
                              <Card.Body className="p-0">
                                  <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                      <Table striped hover responsive size="sm" className="mb-0">
-                                         <thead className="sticky-top table-info">
+                                         <thead className="sticky-top table-school">
                                              <tr>
                                                  <th>Rank</th>
                                                  <th>Student Name</th>
