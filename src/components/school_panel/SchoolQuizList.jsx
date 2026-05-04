@@ -623,7 +623,7 @@ const toggleStudentSelection = (studentId) => {
 
 <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
                        <table className="table table-bordered table-hover table-sm">
-                         <thead className="bg-light">
+                         <thead className="table-school">
                            <tr>
                              <th style={{ width: '40px', fontSize: '0.75rem' }}>Select</th>
                              <th style={{ fontSize: '0.75rem' }}>Student ID</th>
@@ -788,7 +788,7 @@ const toggleStudentSelection = (studentId) => {
               </div>
               <div className="table-responsive mb-4">
                 <Table bordered hover size="sm" className="small align-middle mb-0">
-                  <thead className="table-dark">
+                  <thead className="table-school">
                     <tr style={{ fontSize: '0.75rem' }}>
                       <th style={{ width: '60px' }}>Rank</th>
                       <th>Student Info</th>
@@ -828,7 +828,7 @@ const toggleStudentSelection = (studentId) => {
               </h6>
               <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
                 <Table bordered hover size="sm" className="small mb-0">
-                  <thead className="bg-light">
+                  <thead className="table-school">
                     <tr style={{ fontSize: '0.75rem' }}>
                       <th className="text-center" style={{ width: '60px' }}>Rank</th>
                       <th>School Name</th>

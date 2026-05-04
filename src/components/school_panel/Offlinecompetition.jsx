@@ -401,7 +401,7 @@ return (
               </div>
             ) : competitions.length > 0 ? (
               <Table striped bordered hover responsive>
-                <thead className="table-light">
+                <thead className="table-school">
                   <tr>
                     <th>#</th>
                     <th>Title</th>
@@ -611,7 +611,7 @@ return (
           </div>
         ) : participants.length > 0 ? (
           <Table striped bordered hover responsive>
-            <thead className="table-light">
+            <thead className="table-school">
               <tr>
                 <th>#</th>
                 <th>Full Name</th>
