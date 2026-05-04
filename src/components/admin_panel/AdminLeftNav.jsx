@@ -169,12 +169,7 @@ const menuItems = [
     label: "All Queries",
     path: "/StudentIssue",
   },
-   {
-    icon: <FaBook />,
-    label: "Course Management",
-    path: "/Managecourse",
-    active: true,
-  },
+ 
   
   //   icon: <FaCalendarAlt />,
   //   label: "Event",
