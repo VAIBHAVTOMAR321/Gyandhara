@@ -151,7 +151,8 @@ function FooterWrapper() {
     "/AddSeminar",
     "/AddWorkshop",
     "/NinthGuidance",
-    "/SchoolSendQuery"
+    "/SchoolSendQuery",
+    "/Managecourse"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
