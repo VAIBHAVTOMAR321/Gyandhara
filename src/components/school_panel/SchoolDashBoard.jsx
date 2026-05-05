@@ -907,14 +907,9 @@ const SchoolDashBoard = () => {
                                                          <small className="text-muted">{p.student.email}</small>
                                                      </td>
                                                       <td>{p.student.school_name}</td>
-                                                      <td>
-                                                          <ProgressBar 
-                                                              now={p.attempt[0]?.score || 0} 
-                                                              variant={p.attempt[0]?.status === 'passed' ? 'success' : 'danger'}
-                                                              style={{ height: '20px' }}
-                                                              label={`${p.attempt[0]?.score}/${p.attempt[0]?.total_questions}`}
-                                                          />
-                                                      </td>
+                                                       <td className="text-center fw-bold">
+                                                           {p.attempt[0]?.score || 0}/{p.attempt[0]?.total_questions}
+                                                       </td>
                                                      <td>
                                                          {p.attempt[0]?.status === 'passed' ? (
                                                              <span className="text-success fw-bold"><FaCheckCircle /> Passed</span>
