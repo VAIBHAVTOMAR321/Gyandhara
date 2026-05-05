@@ -455,11 +455,7 @@ try {
                           {language === "hi" ? "रीसेट करें" : "Reset"}
                         </Button>
                       </div>
-                    </Form>
-                  </Card.Body>
-                </Card>
-
-                <Card className="shadow-box info-card">
+                       <Card className="shadow-box info-card mt-4">
                   <Card.Body>
                     <h5 className="mb-3">{language === "hi" ? "सुझाव" : "Tips"}</h5>
                     <ul className="timeline-list">
@@ -470,6 +466,11 @@ try {
                     </ul>
                   </Card.Body>
                 </Card>
+                    </Form>
+                  </Card.Body>
+                </Card>
+
+               
               </Col>
             </Row>
           )}
