@@ -84,7 +84,7 @@ const menuItems = [
   },
   {
     icon: <FaQuestionCircle />,
-    label: "Send Query",
+    label: "Feedback & Queries",
     path: "/SchoolSendQuery",
   },
   ];
