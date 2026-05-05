@@ -94,7 +94,9 @@
   transition: transform 0.4s ease;
 }
 
-
+.modal-title-style{
+  color: #fff !important;
+}
 
 /* Hero Image Wrapper with Decorations */
 .hero-image-wrapper {
@@ -865,8 +867,55 @@ background-color: #fff;
 .benefit-card:nth-child(4) { animation-delay: 0.2s; }
 
 /* ==========================================
-   RESPONSIVE
-   ========================================== */
+    MODAL STYLES
+    ========================================== */
+
+/* Ensure modal close button is visible */
+.modal-title-style {
+  color: #fff !important;
+}
+
+/* Ensure modal close button is white */
+.modal .btn-close {
+  opacity: 1 !important;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'%3e%3c/path%3e%3c/svg%3e") center / 1em auto no-repeat !important;
+  filter: none !important;
+}
+
+.modal .btn-close:hover {
+  opacity: 0.8 !important;
+}
+
+/* Modal header styling */
+.modal-header {
+  border-bottom: 1px solid var(--gd-border) !important;
+  padding: 16px 20px !important;
+  background: linear-gradient(135deg, #2c3e50 0%, #000000 100%) !important;
+}
+
+.modal-title {
+  color: var(--gd-blue-dark) !important;
+}
+
+/* Modal body styling */
+.modal-body {
+  padding: 20px !important;
+  background: #f8f9fa !important;
+}
+
+/* Ensure modal is properly centered */
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - (var(--bs-modal-margin) * 2));
+}
+
+/* Modal content shadow */
+.modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 20px 60px rgba(14, 58, 107, 0.2) !important;
+}
 
 @media (max-width: 992px) {
   .hero-section {
@@ -1182,4 +1231,55 @@ background-color: #fff;
   .benefit-card p {
     font-size: 0.85rem;
   }
+}
+
+/* ==========================================
+    MODAL STYLES
+    ========================================== */
+
+/* Ensure modal close button is visible */
+.modal-title-style {
+  color: #fff !important;
+}
+
+/* Ensure modal close button is white */
+.modal .btn-close {
+  opacity: 1 !important;
+  background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'%3e%3c/path%3e%3c/svg%3e") center / 1em auto no-repeat !important;
+  filter: none !important;
+}
+
+.modal .btn-close:hover {
+  opacity: 0.8 !important;
+}
+
+/* Modal header styling */
+.modal-header {
+  border-bottom: 1px solid var(--gd-border) !important;
+  padding: 16px 20px !important;
+  background: linear-gradient(135deg, #2c3e50 0%, #000000 100%) !important;
+}
+
+/* .modal-title {
+  color: var(--gd-blue-dark) !important;
+} */
+
+/* Modal body styling */
+.modal-body {
+  padding: 20px !important;
+  background: #f8f9fa !important;
+}
+
+/* Ensure modal is properly centered */
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - (var(--bs-modal-margin) * 2));
+}
+
+/* Modal content shadow */
+.modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 20px 60px rgba(14, 58, 107, 0.2) !important;
 }
