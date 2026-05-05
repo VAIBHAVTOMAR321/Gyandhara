@@ -92,7 +92,7 @@ function Footer() {
             <h4 className="footer-section-title">{t.contactUs}</h4>
             <ul className="footer-links">
               <li><span className="footer-link-text">91-**********</span></li>
-              <li><span className="footer-link-text">info@gyandhara.edu</span></li>
+              <li><span className="footer-link-text">info@*****.com</span></li>
               <li><span className="footer-link-text">{t.india}</span></li>
             </ul>
           </div>
