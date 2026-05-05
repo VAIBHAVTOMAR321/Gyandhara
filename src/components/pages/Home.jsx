@@ -264,10 +264,10 @@ function Home() {
          <Modal.Body className="text-center pt-2">
            <p className="mb-4 text-muted">{t.modalMessage}</p>
            <div className="d-grid gap-2">
-             <Button variant="primary" className="rounded-pill py-2" onClick={() => { handleClose(); navigate('/login'); }}>
-               <i className="bi bi-box-arrow-in-right me-2"></i> {t.modalLogin}
-             </Button>
-             <Button variant="outline-primary" className="rounded-pill py-2" onClick={() => { handleClose(); navigate('/register'); }}>
+              <Button variant="primary" className="rounded-pill py-2" onClick={() => { handleClose(); navigate('/login'); window.scrollTo(0, 0); }}>
+                <i className="bi bi-box-arrow-in-right me-2"></i> {t.modalLogin}
+              </Button>
+             <Button variant="outline-primary" className="rounded-pill py-2" onClick={() => { handleClose(); navigate('/register');window.scrollTo(0, 0); }}>
                <i className="bi bi-person-plus me-2"></i> {t.modalRegister}
              </Button>
            </div>
