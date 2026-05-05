@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import '../../assets/css/AdminDashboard.css'
 import { renderContentWithLineBreaks } from '../../utils/contentRenderer'
 import { jsPDF } from 'jspdf'
-import 'jspdf-autotable'
+import { autoTable } from 'jspdf-autotable'
 import * as XLSX from 'xlsx'
 import {
   FaPlus, FaArrowLeft, FaBook, FaUsers, FaLayerGroup,
@@ -3939,81 +3939,163 @@ const DashBord = () => {
                  try {
                    const doc = new jsPDF({ orientation: 'landscape', unit: 'mm' })
                    const pageWidth = doc.internal.pageSize.getWidth()
+                   const pageHeight = doc.internal.pageSize.getHeight()
+                   const margin = 14
+                   let yPos = 20
 
-                   // Title
                    doc.setFontSize(18)
-                   doc.text('Enrollment Analytics Report', 14, 20)
-                   doc.setFontSize(11)
-                   doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28)
-                    doc.text(`Unique Students: ${stats.uniqueStudents} | Total Enrollments: ${stats.total} | Completed: ${stats.completed} | Ongoing: ${stats.ongoing}`, 14, 36)
+                   doc.text('Enrollment Analytics Report', margin, yPos)
+                   yPos += 7
+                   doc.setFontSize(10)
+                   doc.text(`Generated: ${new Date().toLocaleString()}`, margin, yPos)
+                   yPos += 6
+                   const filterSummary = `Filters: ${enrollmentSelectedSchools.length > 0 ? enrollmentSelectedSchools.join(', ') : 'All schools'} | Classes: ${enrollmentSelectedClasses.length > 0 ? enrollmentSelectedClasses.join(', ') : 'All classes'} | Status: ${analyticsStatusFilter}`
+                   doc.text(filterSummary, margin, yPos)
+                   yPos += 10
 
-                   let yPos = 42
-
-                   // Student Details Table
                    doc.setFontSize(12)
-                   doc.text('Student Details', 14, yPos)
-                   yPos += 8
+                   doc.text('Summary', margin, yPos)
+                   yPos += 7
+                   doc.setFontSize(10)
+                   doc.text(`Unique Students: ${stats.uniqueStudents}`, margin, yPos)
+                   yPos += 6
+                   doc.text(`Total Enrollments: ${stats.total}`, margin, yPos)
+                   yPos += 6
+                   doc.text(`Completed: ${stats.completed} (${completionRate}%)`, margin, yPos)
+                   yPos += 6
+                   doc.text(`Ongoing: ${stats.ongoing} (${100 - completionRate}%)`, margin, yPos)
+                   yPos += 6
+                   const completionLabel = completionRate >= 75 ? 'Excellent' : completionRate >= 50 ? 'Good' : 'Needs Improvement'
+                   doc.text(`Completion Status: ${completionLabel}`, margin, yPos)
+                   yPos += 10
 
-                   const studentColumns = ['#', 'Student ID', 'Name', 'School', 'Class', 'Status', 'Enrolled Date']
-                   const studentRows = filteredData.map((e, idx) => [
-                     idx + 1,
-                     e.student_id?.substring(0, 12) || '-',
-                     e.student_name?.substring(0, 25) || '-',
-                     e.school_name?.substring(0, 20) || '-',
-                     e.class_name?.toString()?.substring(0, 8) || '-',
-                     e.is_completed ? 'Completed' : 'Ongoing',
-                     e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : '-'
-                   ])
+                   const insights = []
+                   if (completionRate >= 75) {
+                     insights.push('Majority of students are successfully completing their enrollments.')
+                   } else if (completionRate >= 50) {
+                     insights.push('Good progress, but there is room for improvement in completion.')
+                   } else {
+                     insights.push('Action required: many students are still in progress.')
+                   }
+                   insights.push(`${stats.uniqueStudents} unique students are enrolled across ${stats.classDist.length} classes and ${stats.schoolDist.length} schools.`)
+                   insights.push(`${stats.ongoing} students are still ongoing; consider follow-up engagement.`)
 
-                   doc.autoTable({
-                     head: [studentColumns],
-                     body: studentRows,
-                     startY: yPos,
-                     margin: { left: 10, right: 10 },
-                     styles: { fontSize: 8, cellPadding: 0.5 },
-                     headStyles: { fillColor: [41, 128, 185], textColor: 255 }
-                   })
-
-                   yPos = (doc.lastAutoTable?.finalY || yPos) + 15
-
-                   // School-wise Grouped Data Table
-                   if (yPos > 180) {
+                   if (yPos > pageHeight - 60) {
                      doc.addPage()
                      yPos = 20
                    }
 
                    doc.setFontSize(12)
-                   doc.text('School-wise Student Distribution', 14, yPos)
-                   yPos += 8
-
-                   const schoolGroups = {}
-                   filteredData.forEach(e => {
-                     const school = e.school_name || 'Unknown School'
-                     const cls = String(e.class_name || 'Unknown')
-                     if (!schoolGroups[school]) schoolGroups[school] = {}
-                     if (!schoolGroups[school][cls]) schoolGroups[school][cls] = []
-                     schoolGroups[school][cls].push(e)
+                   doc.text('Key Insights', margin, yPos)
+                   yPos += 7
+                   doc.setFontSize(10)
+                   insights.forEach((insight, idx) => {
+                     if (yPos > pageHeight - 25) {
+                       doc.addPage()
+                       yPos = 20
+                     }
+                     doc.text(`• ${insight}`, margin, yPos)
+                     yPos += 6
                    })
+                   yPos += 6
 
-                   const schoolTableData = Object.entries(schoolGroups)
-                     .sort((a, b) => b[1][Object.keys(b[1])[0]]?.length - a[1][Object.keys(a[1])[0]]?.length)
-                     .map(([school, classes]) => {
-                       const total = Object.values(classes).flat().length
-                       return [
-                         school.substring(0, 25),
-                         Object.keys(classes).length.toString(),
-                         total.toString()
-                       ]
+                   const classRows = stats.classDist.slice(0, 8).map(([cls, count]) => [cls, count.toString(), `${stats.uniqueStudents > 0 ? Math.round((count / stats.uniqueStudents) * 100) : 0}%`])
+                   if (classRows.length > 0) {
+                     if (yPos > pageHeight - 70) {
+                       doc.addPage()
+                       yPos = 20
+                     }
+                     doc.setFontSize(12)
+                     doc.text('Top Class Distribution', margin, yPos)
+                     yPos += 7
+                     autoTable(doc, {
+                       head: [['Class', 'Unique Students', '% of Students']],
+                       body: classRows,
+                       startY: yPos,
+                       margin: { left: margin, right: margin },
+                       styles: { fontSize: 8, cellPadding: 0.5 },
+                       headStyles: { fillColor: [23, 162, 184], textColor: 255 }
                      })
+                     yPos = (doc.lastAutoTable?.finalY || yPos) + 10
+                   }
 
-                   doc.autoTable({
-                     head: [['School Name', 'Classes', 'Students']],
-                     body: schoolTableData,
-                     startY: yPos,
-                     margin: { left: 10, right: 10 },
-                     styles: { fontSize: 8, cellPadding: 0.5 },
-                     headStyles: { fillColor: [108, 117, 125] }
-                   })
+                   const schoolRows = stats.schoolDist.slice(0, 8).map(([school, count]) => [school, count.toString(), `${stats.uniqueStudents > 0 ? Math.round((count / stats.uniqueStudents) * 100) : 0}%`])
+                   if (schoolRows.length > 0) {
+                     if (yPos > pageHeight - 70) {
+                       doc.addPage()
+                       yPos = 20
+                     }
+                     doc.setFontSize(12)
+                     doc.text('Top School Distribution', margin, yPos)
+                     yPos += 7
+                     autoTable(doc, {
+                       head: [['School', 'Unique Students', '% of Students']],
+                       body: schoolRows,
+                       startY: yPos,
+                       margin: { left: margin, right: margin },
+                       styles: { fontSize: 8, cellPadding: 0.5 },
+                       headStyles: { fillColor: [111, 66, 193], textColor: 255 }
+                     })
+                     yPos = (doc.lastAutoTable?.finalY || yPos) + 10
+                   }
+
+                   const performanceRanked = calculateSchoolPerformance(filteredData)
+                   const topSchools = performanceRanked.slice(0, 5).map(s => [ `#${s.rank}`, s.schoolName.substring(0, 30), s.uniqueStudents.toString(), s.balancedScore.toFixed(2) ])
+                   if (topSchools.length > 0) {
+                     if (yPos > pageHeight - 70) {
+                       doc.addPage()
+                       yPos = 20
+                     }
+                     doc.setFontSize(12)
+                     doc.text('Top Performing Schools', margin, yPos)
+                     yPos += 7
+                     autoTable(doc, {
+                       head: [['Rank', 'School Name', 'Unique Students', 'Balanced Score']],
+                       body: topSchools,
+                       startY: yPos,
+                       margin: { left: margin, right: margin },
+                       styles: { fontSize: 8, cellPadding: 0.5 },
+                       headStyles: { fillColor: [40, 167, 69], textColor: 255 }
+                     })
+                     yPos = (doc.lastAutoTable?.finalY || yPos) + 10
+                   }
+
+                   const studentRows = filteredData.slice(0, 25).map((e, idx) => [
+                     idx + 1,
+                     e.student_id || '-',
+                     e.student_name || '-',
+                     e.school_name || '-',
+                     e.class_name || '-',
+                     e.is_completed ? 'Completed' : 'Ongoing',
+                     e.enrolled_at ? new Date(e.enrolled_at).toLocaleDateString() : '-'
+                   ])
+                   if (studentRows.length > 0) {
+                     if (yPos > pageHeight - 90) {
+                       doc.addPage()
+                       yPos = 20
+                     }
+                     doc.setFontSize(12)
+                     doc.text(`Student List Preview (first ${studentRows.length} of ${filteredData.length})`, margin, yPos)
+                     yPos += 7
+                     autoTable(doc, {
+                       head: [['#', 'Student ID', 'Name', 'School', 'Class', 'Status', 'Enrolled Date']],
+                       body: studentRows,
+                       startY: yPos,
+                       margin: { left: margin, right: margin },
+                       styles: { fontSize: 7.5, cellPadding: 0.4 },
+                       headStyles: { fillColor: [33, 37, 41], textColor: 255 }
+                     })
+                     yPos = (doc.lastAutoTable?.finalY || yPos) + 8
+                     if (filteredData.length > studentRows.length) {
+                       if (yPos > pageHeight - 20) {
+                         doc.addPage()
+                         yPos = 20
+                       }
+                       doc.setFontSize(9)
+                       doc.text(`Displayed first ${studentRows.length} rows of ${filteredData.length}. Apply filters for a smaller list.`, margin, yPos)
+                       yPos += 6
+                     }
+                   }
 
                    doc.save(`enrollment-analytics-${new Date().toISOString().split('T')[0]}.pdf`)
                  } catch (err) {
@@ -4561,7 +4643,7 @@ const DashBord = () => {
                      s.balancedScore.toFixed(2)
                    ])
 
-                  doc.autoTable({
+                  autoTable(doc, {
                     head: [columns],
                     body: rows,
                     startY: yPos,
