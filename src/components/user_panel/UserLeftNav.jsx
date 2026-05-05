@@ -27,7 +27,8 @@ import {
   FaTrophy,
   FaBriefcase,
   FaGraduationCap,
-  FaTasks
+  FaTasks,
+  FaClock
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -84,11 +85,7 @@ const menuItems = [
        label: language === 'hi' ? "प्रोफाइल" : "PROFILE",
        path: "/UserProfile",
      },
-      {
-       icon: <FaUserCircle />,
-       label: language === 'hi' ? "समय निर्देशिका" : "Time schedule",
-       path: "/Timeschedule",
-     },
+   
       {
         icon: <FaChalkboardTeacher />,
         label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
@@ -103,11 +100,7 @@ const menuItems = [
             path: "/TenthGuidance",
             icon: <FaPlusSquare />,
           },
-          // {
-          //   label: language === 'hi' ? "11वीं मार्गदर्शन" : "11th Guidance",
-          //   path: "/EleventhGuidance",
-          //   icon: <FaPlusSquare />,
-          // },
+        
           {
             label: language === 'hi' ? "12वीं मार्गदर्शन" : "12th Guidance",
             path: "/TwelfthGuidance",
@@ -150,12 +143,17 @@ const menuItems = [
        label: language === 'hi' ? "कार्यक्रम" : "Events",
        path: "/UserEvents",
      },
+     
+       {
+  icon: <FaClock />,
+  label: language === 'hi' ? "समय निर्देशिका" : "Time Schedule",
+  path: "/Timeschedule",
+},
      {
        icon: <FaComments />,
        label: language === 'hi' ? "प्रश्न भेजें" : "Send Query",
        path: "/SendQuery",
      },
-     
      
      
       
