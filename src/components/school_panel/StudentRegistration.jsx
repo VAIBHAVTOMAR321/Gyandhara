@@ -410,7 +410,7 @@ const StudentRegistration = () => {
   const downloadStudentsExcel = () => {
     const dataToExport = students.map((student, index) => ({
       '#': index + 1,
-      'Aadhaar Number': student.aadhaar_no,
+      'Aadhaar Number': student.aadhaar_no ? '******' + student.aadhaar_no.slice(-4) : '-',
       'Full Name': student.full_name,
       'Date Created': student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'
     }))
@@ -434,7 +434,7 @@ const StudentRegistration = () => {
 
     const tableRows = students.map((student, index) => [
       index + 1,
-      student.aadhaar_no,
+      student.aadhaar_no ? '******' + student.aadhaar_no.slice(-4) : '-',
       student.full_name,
       student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'
     ])
@@ -1163,7 +1163,7 @@ const StudentRegistration = () => {
                                       />
                                     </td>
                                     <td>{(currentPage - 1) * recordsPerPage + idx + 1}</td>
-                                    <td>{student.aadhaar_no}</td>
+                                    <td>{student.aadhaar_no ? '******' + student.aadhaar_no.slice(-4) : '-'}</td>
                                     <td>{student.full_name}</td>
                                     <td>{student.created_at ? new Date(student.created_at).toLocaleDateString() : '-'}</td>
                                     <td>
