@@ -95,12 +95,14 @@ const DashBord = () => {
    const [showProgressModal, setShowProgressModal] = useState(false)
    const [progressLoading, setProgressLoading] = useState(false)
 
-  // State for Simple Course Form
-  const [courseFormData, setCourseFormData] = useState({
-    course_name: '',
-    start_date: '',
-    end_date: ''
-  })
+    // State for Simple Course Form
+    const [courseFormData, setCourseFormData] = useState({
+      course_name: '',
+      start_date: '',
+      end_date: '',
+      course_img: null,
+      existing_course_img: null
+    })
   
   // Prevent double submission
   const [submitting, setSubmitting] = useState(false)
@@ -711,7 +713,7 @@ const DashBord = () => {
     fetchData() // Refresh data when returning to dashboard
   }
   const handleAddCourseClick = () => {
-    setCourseFormData({ course_name: '', start_date: '', end_date: '' })
+    setCourseFormData({ course_name: '', start_date: '', end_date: '', course_img: null, existing_course_img: null })
     setCurrentView('form')
   }
    const handleViewCourse = async (course) => {
@@ -756,7 +758,9 @@ const DashBord = () => {
       course_id: course.course_id,
       course_name: course.course_name,
       start_date: course.start_date || '',
-      end_date: course.end_date || ''
+      end_date: course.end_date || '',
+      course_img: null, // Reset file input for new upload
+      existing_course_img: course.course_img || null // Store existing image path
     })
     setCurrentView('form')
   }
@@ -1311,30 +1315,51 @@ const DashBord = () => {
 
     try {
       const config = getAuthConfig()
-      
+
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append('course_name', courseFormData.course_name)
+      formData.append('start_date', courseFormData.start_date)
+      formData.append('end_date', courseFormData.end_date)
+      if (courseFormData.course_img) {
+        formData.append('course_img', courseFormData.course_img)
+      }
+
       if (courseFormData.course_id) {
         // Update existing course
-        await axios.put('https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/', {
-          course_id: courseFormData.course_id,
-          course_name: courseFormData.course_name,
-          course_status: courseFormData.course_status || 'unpaid',
-          start_date: courseFormData.start_date,
-          end_date: courseFormData.end_date
-        }, config)
+        formData.append('course_id', courseFormData.course_id)
+        formData.append('course_status', courseFormData.course_status || 'unpaid')
+        await axios.put('https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/', formData, {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         alert('Course updated successfully!')
       } else {
         // Create new course - only create unpaid courses
-        await axios.post('https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/', {
-          course_name: courseFormData.course_name,
-          course_status: 'unpaid', // Explicitly set to unpaid
-          start_date: courseFormData.start_date,
-          end_date: courseFormData.end_date
-        }, config)
+        formData.append('course_status', 'unpaid') // Explicitly set to unpaid
+        await axios.post('https://brjobsedu.com/gyandhara/gyandhara_backend/api/course-items/', formData, {
+          ...config,
+          headers: {
+            ...config.headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        })
         alert('Unpaid course created successfully!')
       }
-      
+
       fetchData()
       setCurrentView('list')
+      // Reset form
+      setCourseFormData({
+        course_name: '',
+        start_date: '',
+        end_date: '',
+        course_img: null,
+        existing_course_img: null
+      })
     } catch (error) {
       if (error.response) {
         alert(`Failed: ${error.response.data.message || error.response.data.detail || 'Check console for details'}`);
@@ -1837,43 +1862,59 @@ const DashBord = () => {
           <Row className="g-4">
             {filteredCourses.length > 0 ? (
               filteredCourses.map((course) => (
-                <Col key={course.id} xs={12} md={6} lg={4}>
-                  <Card className="course-card h-100 shadow-sm border-0">
-                    <Card.Body className="d-flex flex-column">
-                      <div className="mb-3">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <Badge bg="primary" className="">ID: {course.course_id}</Badge>
-                          <Badge bg={course.course_status === 'paid' ? 'success' : 'info'} className="">
-                            {course.course_status === 'paid' ? 'Paid' : 'Free'}
-                          </Badge>
-                        </div>
-                        {course.start_date && course.end_date && (
-                          <div className="mb-2 text-muted small">
-                            <i className="far fa-calendar-alt me-1"></i>
-                            {course.start_date} to {course.end_date}
-                          </div>
-                        )}
-                        <Card.Title className="fw-bold">{renderContentWithLineBreaks(course.course_name)}</Card.Title>
-                      </div>
-                      <div className="mt-auto pt-3 border-top">
-                        <div className="d-flex flex-wrap gap-1">
-                          <Button variant="light" size="sm" className="flex-shrink-0 text-primary" onClick={() => handleViewCourse(course)}>
-                            <FaEye className="me-1" /> View
-                          </Button>
-                          <Button variant="outline-warning" size="sm" className="flex-shrink-0 text-warning" onClick={() => handleEditCourse(course)}>
-                            <FaEdit className="me-1" /> Edit
-                          </Button>
-                          <Button variant="outline-danger" size="sm" className="flex-shrink-0 text-danger" onClick={() => handleDeleteCourse(course)}>
-                            <FaTrash className="me-1" /> Delete
-                          </Button>
-                          <Button variant="outline-info" size="sm" className="flex-shrink-0 text-info" onClick={() => handleAddModule(course)}>
-                            <FaLayerGroup className="me-1" /> Add Module
-                          </Button>
-                        </div>
-                      </div>
-                    </Card.Body>
-                  </Card>
-                </Col>
+                 <Col key={course.id} xs={12} md={6} lg={4}>
+                   <Card className="course-card h-100 shadow-sm border-0">
+                     <Card.Body className="d-flex flex-column">
+                       <div className="mb-3">
+                         {course.course_img ? (
+                           <div className="mb-3">
+                             <Image
+                               src={`https://brjobsedu.com/gyandhara/gyandhara_backend${course.course_img}`}
+                               alt={course.course_name}
+                               thumbnail
+                               className="img-fluid"
+                               style={{ width: '100%', height: '180px', objectFit: 'cover' }}
+                             />
+                           </div>
+                         ) : (
+                           <div className="mb-3 bg-light d-flex align-items-center justify-content-center" style={{ height: '180px' }}>
+                             <FaBook className="text-muted" style={{ fontSize: '3rem' }}
+/>
+                           </div>
+                         )}
+                         <div className="d-flex justify-content-between align-items-start mb-2">
+                           <Badge bg="primary" className="">ID: {course.course_id}</Badge>
+                           <Badge bg={course.course_status === 'paid' ? 'success' : 'info'} className="">
+                             {course.course_status === 'paid' ? 'Paid' : 'Free'}
+                           </Badge>
+                         </div>
+                         {course.start_date && course.end_date && (
+                           <div className="mb-2 text-muted small">
+                             <i className="far fa-calendar-alt me-1"></i>
+                             {course.start_date} to {course.end_date}
+                           </div>
+                         )}
+                         <Card.Title className="fw-bold">{renderContentWithLineBreaks(course.course_name)}</Card.Title>
+                       </div>
+                       <div className="mt-auto pt-3 border-top">
+                         <div className="d-flex flex-wrap gap-1">
+                           <Button variant="light" size="sm" className="flex-shrink-0 text-primary" onClick={() => handleViewCourse(course)}>
+                             <FaEye className="me-1" /> View
+                           </Button>
+                           <Button variant="outline-warning" size="sm" className="flex-shrink-0 text-warning" onClick={() => handleEditCourse(course)}>
+                             <FaEdit className="me-1" /> Edit
+                           </Button>
+                           <Button variant="outline-danger" size="sm" className="flex-shrink-0 text-danger" onClick={() => handleDeleteCourse(course)}>
+                             <FaTrash className="me-1" /> Delete
+                           </Button>
+                           <Button variant="outline-info" size="sm" className="flex-shrink-0 text-info" onClick={() => handleAddModule(course)}>
+                             <FaLayerGroup className="me-1" /> Add Module
+                           </Button>
+                         </div>
+                       </div>
+                     </Card.Body>
+                   </Card>
+                 </Col>
               ))
             ) : (
               <Col xs={12}>
@@ -2111,13 +2152,45 @@ const DashBord = () => {
 
             <Form.Group className="mb-4">
               <Form.Label>End Date</Form.Label>
-              <Form.Control 
-                type="date" 
+              <Form.Control
+                type="date"
                 value={courseFormData.end_date}
                 onChange={(e) => setCourseFormData({...courseFormData, end_date: e.target.value})}
-                required 
+                required
                 disabled={submitting}
               />
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Course Image</Form.Label>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0]
+                  if (file) {
+                    setCourseFormData({ ...courseFormData, course_img: file })
+                  }
+                }}
+                disabled={submitting}
+              />
+              {(courseFormData.course_img || courseFormData.existing_course_img) && (
+                <div className="mt-2">
+                  <Image
+                    src={courseFormData.course_img 
+                      ? URL.createObjectURL(courseFormData.course_img)
+                      : `https://brjobsedu.com/gyandhara/gyandhara_backend${courseFormData.existing_course_img}`
+                    }
+                    alt="Course preview"
+                    thumbnail
+                    className="img-fluid"
+                    style={{ maxWidth: '200px' }}
+                  />
+                  {courseFormData.existing_course_img && !courseFormData.course_img && (
+                    <p className="small text-muted mt-1">Current image (upload new file to replace)</p>
+                  )}
+                </div>
+              )}
             </Form.Group>
 
             <div className="d-flex justify-content-end mt-4">
@@ -3494,11 +3567,26 @@ const DashBord = () => {
        >        <Modal.Header closeButton className="border-bottom py-2">
            <Modal.Title className="fw-bold fs-5">{renderContentWithLineBreaks(selectedCourse?.course_name)}</Modal.Title>
          </Modal.Header>
-         <Modal.Body className="">
-           {selectedCourse && (
-             <div>
-               <p><strong>Course ID:</strong> {selectedCourse.course_id}</p>
-               <p><strong>Course Name:</strong> {renderContentWithLineBreaks(selectedCourse.course_name)}</p>
+          <Modal.Body className="">
+            {selectedCourse && (
+              <div>
+                <div className="mb-3">
+                  {selectedCourse.course_img ? (
+                    <Image
+                      src={`https://brjobsedu.com/gyandhara/gyandhara_backend${selectedCourse.course_img}`}
+                      alt={selectedCourse.course_name}
+                      thumbnail
+                      className="img-fluid"
+                      style={{ maxWidth: '300px', height: '200px', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="bg-light d-flex align-items-center justify-content-center" style={{ width: '300px', height: '200px' }}>
+                      <FaBook className="text-muted" style={{ fontSize: '4rem' }} />
+                    </div>
+                  )}
+                </div>
+                <p><strong>Course ID:</strong> {selectedCourse.course_id}</p>
+                <p><strong>Course Name:</strong> {renderContentWithLineBreaks(selectedCourse.course_name)}</p>
                {selectedCourse.modules && selectedCourse.modules.length > 0 && (
                  <div className="mt-4">
                    <h5>Modules ({selectedCourse.modules.length})</h5>
