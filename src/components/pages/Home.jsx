@@ -5,6 +5,7 @@ import { useLanguage } from '../all_login/LanguageContext'
 import heroImg from "../../assets/images/CBSEimg.png";
 import '../../assets/css/home.css'
 import Logo2 from "../../assets/images/gyandharalogo2.png";
+import CompetitiveExams from './CompetitiveExams'
 
 function Home() {
   const { language } = useLanguage()
@@ -213,6 +214,9 @@ function Home() {
             ))}
           </div>
         </section>
+
+        {/* Competitive Exams Test Series Section */}
+        <CompetitiveExams language={language} />
 
         {/*Why Choose GyanDhara? section*/}
         <section className="benefits-section role-header role-section-school ">
