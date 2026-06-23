@@ -3998,7 +3998,7 @@ const DashBord = () => {
         {showGraphModal && (
           <Modal show={showGraphModal} onHide={() => setShowGraphModal(false)} centered size="xl" dialogClassName="analytics-modal-dialog">
             <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-              <Modal.Title className="d-flex align-items-center gap-3">
+              <Modal.Title className="d-flex align-items-center gap-3 text-white">
                 <FaChartBar className="me-2" /> Enrollment Analytics Dashboard
               </Modal.Title>
              <div className="d-flex gap-2">
