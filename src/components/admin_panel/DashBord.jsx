@@ -3554,19 +3554,22 @@ const DashBord = () => {
         </div>
       </div>
 
-       {/* Course Details Modal */}
-       <Modal
-         show={showModal}
-         onHide={() => setShowModal(false)}
-         fullscreen
-         style={{
-           padding: 0
-         }}
-         contentClassName="border-0"
-         dialogClassName="m-0"
-       >        <Modal.Header closeButton className="border-bottom py-2">
-           <Modal.Title className="fw-bold fs-5">{renderContentWithLineBreaks(selectedCourse?.course_name)}</Modal.Title>
-         </Modal.Header>
+{/* Course Details Modal */}
+        <Modal
+          show={showModal}
+          onHide={() => setShowModal(false)}
+          centered
+          style={{
+            padding: 0
+          }}
+          contentClassName="border-0"
+          dialogClassName="m-0"
+        >        <Modal.Header closeButton className="border-bottom py-2 d-flex justify-content-between align-items-center">
+            <Modal.Title className="fw-bold fs-5">{renderContentWithLineBreaks(selectedCourse?.course_name)}</Modal.Title>
+            <Button variant="light" size="sm" onClick={() => setShowModal(false)} className="rounded-circle" style={{ width: '32px', height: '32px', padding: 0, lineHeight: 1 }}>
+              &times;
+            </Button>
+          </Modal.Header>
           <Modal.Body className="">
             {selectedCourse && (
               <div>
@@ -3991,13 +3994,13 @@ const DashBord = () => {
         </Modal.Footer>
       </Modal>
 
-       {/* Analytics Graph Modal */}
-       {showGraphModal && (
-         <Modal show={showGraphModal} onHide={() => setShowGraphModal(false)} fullscreen={true}>
-           <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-             <Modal.Title className="d-flex align-items-center gap-3">
-               <FaChartBar className="me-2" /> Enrollment Analytics Dashboard
-             </Modal.Title>
+{/* Analytics Graph Modal */}
+        {showGraphModal && (
+          <Modal show={showGraphModal} onHide={() => setShowGraphModal(false)} centered size="xl" dialogClassName="analytics-modal-dialog">
+            <Modal.Header closeButton className="bg-gradient text-white" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+              <Modal.Title className="d-flex align-items-center gap-3">
+                <FaChartBar className="me-2" /> Enrollment Analytics Dashboard
+              </Modal.Title>
              <div className="d-flex gap-2">
                {/* <Button variant="light" size="sm" onClick={() => setShowPerformanceModal(true)}>
                  <FaTrophy className="me-1" /> Performance Ranking
