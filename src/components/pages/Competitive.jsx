@@ -603,8 +603,8 @@ function Competitive() {
     <div className="login-container-style">
       <div className="login-card">
         <div className="login-header">
-          <h1>Workshop Test Portal</h1>
-          <p className="subtitle">Government Employee Training Program</p>
+          <h1>Competitive Test</h1>
+        
         </div>
 
         <form onSubmit={handleStartTest} className="login-form">
