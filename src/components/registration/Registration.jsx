@@ -12,16 +12,16 @@ const Registration = () => {
     en: {
       title: "Registration",
       subtitle: "Skill today, empower tomorrow",
-      schoolTab: "School Registration",
+      schoolTab: "Institution Registration",
       studentTab: "Student Registration",
-      schoolId: "School ID",
+      schoolId: "Institution ID",
       state: "State",
       district: "District",
       block: "Block",
-      schoolName: "School Name",
+      schoolName: "Institution Name",
       password: "Password",
       confirmPassword: "Confirm Password",
-      registerSchool: "Register School",
+      registerSchool: "Register Institution",
       alreadyAccount: "Already have an account? Login here",
       aadhaarNo: "Aadhaar Number",
       aadhaarPlaceholder: "12 digits",
@@ -38,7 +38,7 @@ const Registration = () => {
       emailPlaceholder: "Email",
       classLabel: "Class",
       selectClass: "Select class",
-      selectSchool: "Select School",
+      selectSchool: "Select Institution",
       additionalInfo: "Additional Information",
       registerStudentBtn: "Register as Student",
       registeringBtn: "Registering...",
@@ -54,27 +54,27 @@ const Registration = () => {
         pass6: "Password must be at least 6 characters",
         passMatch: "Passwords do not match",
         classReq: "Please select a class",
-        schoolReq: "School name is required",
+        schoolReq: "Institution name is required",
         districtReq: "Please select a district",
         blockReq: "Please select a block",
         studentSuccess: "Student Registration successful! You can now login.",
-        schoolSuccess: "School Registration successful! You can now login.",
+        schoolSuccess: "Institution Registration successful! You can now login.",
         failed: "Registration failed. Please try again."
       }
     },
     hi: {
       title: "पंजीकरण",
       subtitle: "आज कौशल, कल सशक्त",
-      schoolTab: "स्कूल पंजीकरण",
+      schoolTab: "शैक्षणिक संस्था पंजीकरण",
       studentTab: "छात्र पंजीकरण",
-      schoolId: "स्कूल आईडी",
+      schoolId: "शैक्षणिक संस्था आईडी",
       state: "राज्य",
       district: "जिला",
       block: "ब्लॉक",
-      schoolName: "स्कूल का नाम",
+      schoolName: "शैक्षणिक संस्था का नाम",
       password: "पासवर्ड",
       confirmPassword: "पासवर्ड की पुष्टि करें",
-      registerSchool: "स्कूल पंजीकृत करें",
+      registerSchool: "शैक्षणिक संस्था पंजीकृत करें",
       alreadyAccount: "क्या आपके पास पहले से खाता है? यहाँ लॉगिन करें",
       aadhaarNo: "आधार नंबर",
       aadhaarPlaceholder: "12 अंक",
@@ -91,7 +91,7 @@ const Registration = () => {
       emailPlaceholder: "ईमेल",
       classLabel: "कक्षा",
       selectClass: "कक्षा चुनें",
-      selectSchool: "स्कूल का चयन करें",
+      selectSchool: "शैक्षणिक संस्था का चयन करें",
       additionalInfo: "अतिरिक्त जानकारी",
       registerStudentBtn: "छात्र के रूप में पंजीकरण करें",
       registeringBtn: "पंजीकरण हो रहा है...",
@@ -107,11 +107,11 @@ const Registration = () => {
         pass6: "पासवर्ड कम से कम 6 अक्षरों का होना चाहिए",
         passMatch: "पासवर्ड मेल नहीं खाते",
         classReq: "कृपया एक कक्षा चुनें",
-        schoolReq: "स्कूल का नाम आवश्यक है",
+        schoolReq: "शैक्षणिक संस्था का नाम आवश्यक है",
         districtReq: "कृपया एक जिला चुनें",
         blockReq: "कृपया एक ब्लॉक चुनें",
         studentSuccess: "छात्र पंजीकरण सफल! अब आप लॉगिन कर सकते हैं।",
-        schoolSuccess: "स्कूल पंजीकरण सफल! अब आप लॉगिन कर सकते हैं।",
+        schoolSuccess: "शैक्षणिक संस्था पंजीकरण सफल! अब आप लॉगिन कर सकते हैं।",
         failed: "पंजीकरण विफल रहा। कृपया पुनः प्रयास करें।"
       }
     }
@@ -220,7 +220,7 @@ const Registration = () => {
          setSchools(response.data.data);
        }
      } catch (err) {
-       console.error('Error fetching schools:', err);
+       console.error('Error fetching institutions:', err);
      }
    };
 

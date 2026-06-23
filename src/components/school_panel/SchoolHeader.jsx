@@ -68,7 +68,7 @@ function SchoolHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
 
 
     const getDisplayName = () => {
-      return userDetails.full_name || "School";
+      return userDetails.full_name || "Institution";
     };
 
   // Function to fetch user data with auth handling

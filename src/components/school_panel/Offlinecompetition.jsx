@@ -293,7 +293,7 @@ const Offlinecompetition = () => {
       'Title (Hindi)': comp.title_hindi || '',
       'Location': comp.location || '',
       'Date & Time': comp.comp_date_time ? new Date(comp.comp_date_time).toLocaleString() : '-',
-      'School ID': comp.school_uni_id || '',
+      'Institution ID': comp.school_uni_id || '',
       'Description': comp.description || ''
     }))
 
@@ -311,7 +311,7 @@ const Offlinecompetition = () => {
       'Title',
       'Location',
       'Date & Time',
-      'School ID'
+      'Institution ID'
     ]
 
     const tableRows = competitions.map((comp, index) => [
@@ -352,7 +352,7 @@ return (
           <Col>
             <h4 className="font-weight-bold">Offline Competitions</h4>
             <p className="text-muted mb-0">
-              Manage school offline events and competitions
+              Manage institution offline events and competitions
             </p>
           </Col>
            <Col className="text-end mt-3 mt-md-0">
@@ -409,7 +409,7 @@ return (
                     <th>Title</th>
                     <th>Location</th>
                     <th>Date & Time</th>
-                    <th>School ID</th>
+                    <th>Institution ID</th>
                     <th className="text-center">Actions</th>
                   </tr>
                 </thead>
@@ -540,7 +540,7 @@ return (
                   name="location"
                   value={formData.location}
                   onChange={handleInputChange}
-                  placeholder="e.g. School Auditorium"
+                  placeholder="e.g. Institution Auditorium"
                 />
               </Form.Group>
             </Col>
@@ -558,7 +558,7 @@ return (
           </Row>
 
           <Form.Group controlId="school_uni_id" className="mb-3">
-            <Form.Label>School Uni ID</Form.Label>
+            <Form.Label>Institution Uni ID</Form.Label>
             <Form.Control
               type="text"
               name="school_uni_id"
@@ -618,7 +618,7 @@ return (
                 <th>#</th>
                 <th>Full Name</th>
                 <th>Class</th>
-                <th>School Name</th>
+                <th>Institution Name</th>
                 <th>Email</th>
                 <th>Phone</th>
               </tr>

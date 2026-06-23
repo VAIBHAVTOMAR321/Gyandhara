@@ -84,7 +84,7 @@ const menuItems = [
   },
   {
     icon: <FaGraduationCap />,
-    label: "School Quiz",
+    label: "Institution Quiz",
     path: "/SchoolQuiz",
   },
  
