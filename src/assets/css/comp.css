@@ -915,7 +915,11 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--comp-orange);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: var(--comp-orange-bg);
+  border-radius: var(--comp-radius-sm);
+  display: inline-block;
 }
 
 .exam-wrong-answer-question {
@@ -991,20 +995,20 @@
   margin: 0 0 2px 0;
 }
 
-.answer-value {
+.exam-answer-value {
   font-size: 14px;
   font-weight: 600;
   color: var(--comp-text);
   margin: 0;
 }
 
-.all-options-box {
+.exam-all-options-box {
   margin-top: 20px;
   padding-top: 16px;
   border-top: 1px solid var(--comp-border);
 }
 
-.all-options-box h4 {
+.exam-all-options-box h4 {
   font-size: 13px;
   font-weight: 600;
   color: var(--comp-text-light);
@@ -1013,7 +1017,7 @@
   margin: 0 0 12px 0;
 }
 
-.options-grid {
+.exam-options-grid {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1071,12 +1075,12 @@
   font-size: 13px;
 }
 
-.marks-label-text {
+.exam-marks-label-text {
   color: var(--comp-text-light);
   font-weight: 500;
 }
 
-.marks-value-text {
+.exam-marks-value-text {
   color: var(--comp-orange);
   font-weight: 700;
 }
