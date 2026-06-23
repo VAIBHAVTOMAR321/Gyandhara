@@ -538,6 +538,7 @@
   background: var(--comp-blue-bg);
   min-height: 100vh;
   padding: 20px;
+  margin-top: 65px;
 }
 
 .exam-result-header {
@@ -902,7 +903,7 @@
   margin-bottom: 24px;
 }
 
-.wrong-answer-card {
+.exam-wrong-answer-card {
   background: var(--comp-white);
   border-radius: var(--comp-radius);
   padding: 24px;
@@ -910,20 +911,20 @@
   border: 1px solid var(--comp-border);
 }
 
-.wrong-answer-header {
+.exam-wrong-answer-header {
   font-size: 14px;
   font-weight: 700;
   color: var(--comp-orange);
   margin-bottom: 12px;
 }
 
-.wrong-answer-question {
+.exam-wrong-answer-question {
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--comp-border);
 }
 
-.wrong-answer-question p {
+.exam-wrong-answer-question p {
   font-size: 15px;
   line-height: 1.6;
   color: var(--comp-text);
@@ -931,11 +932,11 @@
   font-weight: 500;
 }
 
-.wrong-answer-section {
+.exam-wrong-answer-section {
   margin-bottom: 16px;
 }
 
-.wrong-answer-section h4 {
+.exam-wrong-answer-section h4 {
   font-size: 13px;
   font-weight: 600;
   color: var(--comp-text-light);
@@ -944,7 +945,7 @@
   margin: 0 0 8px 0;
 }
 
-.wrong-answer-box {
+.exam-wrong-answer-box {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -952,17 +953,17 @@
   border-radius: var(--comp-radius-sm);
 }
 
-.your-answer-wrong {
+.exam-your-answer-wrong {
   background: #FFF5F5;
   border: 2px solid #FC8181;
 }
 
-.correct-answer-box {
+.exam-correct-answer-box {
   background: #F0FFF4;
   border: 2px solid #48BB78;
 }
 
-.answer-badge {
+.exam-answer-badge {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -974,17 +975,17 @@
   flex-shrink: 0;
 }
 
-.badge-wrong {
+.exam-badge-wrong {
   background: #FC8181;
   color: var(--comp-white);
 }
 
-.badge-correct {
+.exam-badge-correct {
   background: #48BB78;
   color: var(--comp-white);
 }
 
-.answer-index {
+.exam-answer-index {
   font-size: 12px;
   color: var(--comp-text-light);
   margin: 0 0 2px 0;
@@ -1018,7 +1019,7 @@
   gap: 10px;
 }
 
-.option-row-item {
+.exam-option-row-item {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -1028,30 +1029,30 @@
   transition: var(--comp-transition);
 }
 
-.option-choice-yours {
+.exam-option-choice-yours {
   background: #FFF5F5;
   border: 2px solid #FC8181;
 }
 
-.option-choice-correct {
+.exam-option-choice-correct {
   background: #F0FFF4;
   border: 2px solid #48BB78;
 }
 
-.option-letter-box {
+.exam-option-letter-box {
   font-weight: 700;
   font-size: 13px;
   color: var(--comp-blue);
   min-width: 24px;
 }
 
-.option-row-item .option-text {
+.exam-option-row-item .exam-option-text {
   flex: 1;
   font-size: 13px;
   color: var(--comp-text);
 }
 
-.choice-badge-box {
+.exam-choice-badge-box {
   font-size: 10px;
   font-weight: 700;
   padding: 4px 10px;
@@ -1060,7 +1061,7 @@
   letter-spacing: 0.5px;
 }
 
-.marks-row {
+.exam-marks-row {
   display: flex;
   justify-content: space-between;
   align-items: center;

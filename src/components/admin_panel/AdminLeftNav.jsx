@@ -100,7 +100,11 @@ const menuItems = [
   //     },
   //   ],
   // },
-
+{
+    icon: <FaClipboardList />,
+    label: "Competitive Exam",
+    path: "/CompetitiveExamQuiz",
+  },
   {
     icon: <FaChalkboardTeacher />,
     label: " Grooming Classes",

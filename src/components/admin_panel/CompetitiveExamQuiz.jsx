@@ -12,7 +12,7 @@ import AdminHeader from './AdminHeader'
 import AdminLeftNav from './AdminLeftNav'
 import "../../assets/css/admindashboard.css";
 
-const API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/workshop-questions/'
+const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/open-quiz-questions/'
 const RANKING_API_URL = 'https://brjobsedu.com/girls_course/girls_course_backend/api/workshop/rankings/'
 
 const CompetitiveExamQuiz = () => {
