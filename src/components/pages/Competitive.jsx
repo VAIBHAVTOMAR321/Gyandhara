@@ -314,7 +314,7 @@ function Competitive() {
     const certificateUrl = testResults.certificate
       ? `https://brjobsedu.com/gyandhara/gyandhara_backend${testResults.certificate}`
       : null;
-    const shareText = `I completed the Workshop Test - Government Employee Program with a score of ${testResults.percentage.toFixed(1)}%!`;
+    const shareText = `I completed the  Test -   Competitive Test Assessment with a score of ${testResults.percentage.toFixed(1)}%!`;
 
     if (showWrongAnswers) {
       return (
@@ -568,7 +568,7 @@ function Competitive() {
       <div className="exam-login-card">
         <div className="exam-login-header">
           <h1 className="exam-login-title">Competitive Test</h1>
-          <p className="exam-login-subtitle">Government Employee Program</p>
+        
         </div>
 
         <form onSubmit={handleStartTest} className="exam-form">
