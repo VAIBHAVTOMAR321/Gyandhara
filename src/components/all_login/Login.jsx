@@ -30,8 +30,8 @@ const Login = () => {
       roleLabel: "Select Your Role",
       emailPhone: "Email / Phone",
       emailPhonePlaceholder: "Enter email or phone",
-      schoolId: "School ID",
-      schoolIdPlaceholder: "Enter school ID",
+      schoolId: "Institution ID",
+      schoolIdPlaceholder: "Enter institution ID",
       aadhaar: "Aadhaar Number",
       aadhaarPlaceholder: "Enter 12-digit Aadhaar",
       password: "Password",
@@ -48,7 +48,7 @@ const Login = () => {
       },
       validation: {
         emailRequired: "Email/Phone is required",
-        schoolIdRequired: "School ID is required",
+        schoolIdRequired: "Institution ID is required",
         aadhaarRequired: "Aadhaar number is required",
         passwordRequired: "Password is required",
         loginSuccess: "Login successful!",
@@ -68,8 +68,8 @@ const Login = () => {
       roleLabel: "अपनी भूमिका चुनें",
       emailPhone: "ईमेल / फोन",
       emailPhonePlaceholder: "ईमेल या फोन दर्ज करें",
-      schoolId: "स्कूल आईडी",
-      schoolIdPlaceholder: "स्कूल आईडी दर्ज करें",
+      schoolId: "शैक्षणिक संस्था आईडी",
+      schoolIdPlaceholder: "शैक्षणिक संस्था आईडी दर्ज करें",
       aadhaar: "आधार नंबर",
       aadhaarPlaceholder: "12-अंकीय आधार दर्ज करें",
       password: "पासवर्ड",
@@ -86,7 +86,7 @@ const Login = () => {
       },
       validation: {
         emailRequired: "ईमेल/फोन आवश्यक है",
-        schoolIdRequired: "स्कूल आईडी आवश्यक है",
+        schoolIdRequired: "शैक्षणिक संस्था आईडी आवश्यक है",
         aadhaarRequired: "आधार नंबर आवश्यक है",
         passwordRequired: "पासवर्ड आवश्यक है",
         loginSuccess: "लॉगिन सफल!",
@@ -95,7 +95,7 @@ const Login = () => {
       roles: {
         '9th-student': '9वीं छात्र', '10th-student': '10वीं छात्र',
         '11th-student': '11वीं छात्र', '12th-student': '12वीं छात्र',
-        'admin': 'एडमिन', 'school': 'स्कूल'
+        'admin': 'एडमिन', 'institution': 'शैक्षणिक संस्था'
       }
     }
   };

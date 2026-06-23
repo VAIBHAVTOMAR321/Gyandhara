@@ -17,7 +17,7 @@ function Home() {
     platformBadge: "🎓 GyanDhara - Educational Platform",
     heroTitle: "Objective of GyanDhara",
      heroTitleHTML: "Objective of <span class=\"hero-title-word\">GyanDhara</span>",
-  heroSubtitle: "Welcome to GyanDhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a school aiming to streamline academic management, GyanDhara provides the tools you need to succeed.",
+  heroSubtitle: "Welcome to GyanDhara, your all-in-one educational ecosystem designed to bridge the gap between academic learning and real-world success. We believe that education is not just about passing exams; it is about acquiring the skills, confidence, and direction necessary to thrive in a rapidly evolving global landscape. Whether you are a student looking to master new technologies or a institution aiming to streamline academic management, GyanDhara provides the tools you need to succeed.",
   heroImg: heroImg,
   exploreBtn: "Explore Now",
   joinBtn: "Register Today",
@@ -39,10 +39,10 @@ function Home() {
       ],
 
       // For Schools Section
-      schoolTitle: "LMS For Schools 🏫",
+      schoolTitle: "LMS For Institutions 🏫",
       schoolSubtitle: "Transform your institution's learning experience with GyanDhara's comprehensive platform",
       schoolFeatures: [
-        { icon: "bi-house-check", title: "School Registration", desc: "Register your institution and get a dedicated dashboard", color: "blue" },
+        { icon: "bi-house-check", title: "Institution Registration", desc: "Register your institution and get a dedicated dashboard", color: "blue" },
         { icon: "bi-people-fill", title: "Student Management", desc: "Efficiently manage student registrations and profiles", color: "orange" },
         { icon: "bi-question-circle-fill", title: "Events And Activities", desc: "Create and manage events and activities for your students", color: "green" },
         { icon: "bi-bar-chart-line-fill", title: "Performance Tracking", desc: "Monitor student progress and learning outcomes", color: "purple" }
@@ -51,7 +51,7 @@ function Home() {
       // Platform Benefits
       benefitsTitle: "Why Choose GyanDhara?",
       benefits: [
-        { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, schools, and administrators", color: "blue" },
+        { icon: "bi-collection-play", title: "Multi-Role Platform", desc: "Dedicated interfaces for students, institutions, and administrators", color: "blue" },
         { icon: "bi-people-fill", title: "Comprehensive Services", desc: "Career guidance, academic support, and skill development", color: "orange" },
         { icon: "bi-lightbulb", title: "Career Oriented", desc: "Focus on job opportunities and professional growth", color: "green" },
         { icon: "bi-shield-check", title: "Secure & Reliable", desc: "Safe platform for educational and career information", color: "purple" },
@@ -98,7 +98,7 @@ function Home() {
       ],
 
       // For Schools Section
-      schoolTitle: "स्कूलों के लिए 🏫",
+      schoolTitle: "शैक्षणिक संस्था के लिए 🏫",
       schoolSubtitle: "GyanDhara के व्यापक मंच के साथ अपने संस्थान के शिक्षण अनुभव को बदलें",
       schoolFeatures: [
         { icon: "bi-house-check", title: "स्कूल पंजीकरण", desc: "अपने संस्थान को पंजीकृत करें और समर्पित डैशबोर्ड प्राप्त करें", color: "blue" },
@@ -110,7 +110,7 @@ function Home() {
       // Platform Benefits
       benefitsTitle: "GyanDhara को क्यों चुनें?",
       benefits: [
-        { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, स्कूलों और प्रशासकों के लिए समर्पित इंटरफेस", color: "blue" },
+        { icon: "bi-collection-play", title: "बहु-भूमिका मंच", desc: "छात्रों, शैक्षणिक संस्था और प्रशासकों के लिए समर्पित इंटरफेस", color: "blue" },
         { icon: "bi-people-fill", title: "व्यापक सेवाएं", desc: "करियर मार्गदर्शन, शैक्षणिक सहायता और कौशल विकास", color: "orange" },
         { icon: "bi-lightbulb", title: "करियर केंद्रित", desc: "नौकरी के अवसरों और व्यावसायिक वृद्धि पर ध्यान केंद्रित", color: "green" },
         { icon: "bi-shield-check", title: "सुरक्षित और विश्वसनीय", desc: "शैक्षिक और करियर जानकारी के लिए सुरक्षित मंच", color: "purple" },
