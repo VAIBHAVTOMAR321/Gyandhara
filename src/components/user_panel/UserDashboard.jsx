@@ -968,7 +968,7 @@ const UserDashboard = () => {
                                 className={
                                   isTestPassed ? "completed-module" : ""
                                 }
-                              >
+                              > 
                                 <Accordion.Header className="fw-bold">
                                   <div className="d-flex align-items-center w-100">
                                     {isAccessible ? (
@@ -1018,7 +1018,7 @@ const UserDashboard = () => {
                                   </div>
                                 </Accordion.Header>
                                 <Accordion.Body>
-                                  <Row className="mb-4">
+                                  {/* <Row className="mb-4">
                                     <Col md={6}>
                                       <div className="p-3 bg-light rounded h-100">
                                         <h6
@@ -1044,9 +1044,9 @@ const UserDashboard = () => {
                                         </div>
                                       </div>
                                     </Col>
-
-                                    <Col md={6}>
-                                      <div className="p-3 bg-light rounded h-100">
+                                     */}
+                                    <Col md={12}>
+                                      <div className="p-3 bg-light rounded h-100"> 
                                         <h6
                                           className="mb-2 fw-semibold"
                                           style={{ fontSize: "12px" }}
@@ -1103,8 +1103,8 @@ const UserDashboard = () => {
                                           </p>
                                         )}
                                       </div>
-                                    </Col>
-                                  </Row>
+                                    </Col> 
+                                  {/* </Row> */}
 
                                   {module.sub_modules &&
                                   module.sub_modules.length > 0 ? (
