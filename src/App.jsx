@@ -58,6 +58,8 @@ import UserEvents from "./components/user_panel/UserEvents";
 import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 import NinthGuidance from "./components/user_panel/NinthGuidance";
 import Timeschedule from "./components/user_panel/Timeschedule";
+import Competitive from "./components/pages/Competitive";
+import CompetitiveExamQuiz from "./components/admin_panel/CompetitiveExamQuiz";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 //  Navbar Wrapper (Hide on specific routes)
@@ -101,7 +103,8 @@ function NavBarWrapper() {
       "/AddWorkshop",
       "/NinthGuidance",
       "/SchoolSendQuery",
-      "/Timeschedule"
+      "/Timeschedule",
+      "/CompetitiveExamQuiz"
 
     ];
 
@@ -155,7 +158,8 @@ function FooterWrapper() {
     "/NinthGuidance",
     "/SchoolSendQuery",
     "/Managecourse",
-    "/Timeschedule"
+    "/Timeschedule",
+    "/CompetitiveExamQuiz"
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -194,7 +198,17 @@ function AppContent() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/StudentRegistration" element={<StudentRegistration />} />
         <Route path="/register" element={<StudentRegistration />} />
+        <Route path="/Competitive" element={<Competitive />} />
         <Route path="/login" element={<Login />} />
+        
+        <Route
+          path="/CompetitiveExamQuiz"
+          element={
+            <ProtectedRoute>
+              <CompetitiveExamQuiz />
+            </ProtectedRoute>
+          }
+        />{" "}
         <Route
           path="/UserDashboard"
           element={

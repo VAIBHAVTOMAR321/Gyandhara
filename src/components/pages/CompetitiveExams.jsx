@@ -1,7 +1,9 @@
 import React from 'react'
 import { Row, Col } from 'react-bootstrap'
+import { useNavigate } from 'react-router-dom'
 
 function CompetitiveExams({ language }) {
+  const navigate = useNavigate()
   const content = {
     en: {
       title: "Competitive Exam Test Series",
@@ -44,7 +46,11 @@ function CompetitiveExams({ language }) {
       <Row className="g-4">
         {t.exams.map((exam, index) => (
           <Col lg={3} md={6} sm={12} key={index}>
-            <div className={`benefit-card card-${exam.color} h-100 border-0 shadow-sm exam-card`}>
+            <div 
+              className={`benefit-card card-${exam.color} h-100 border-0 shadow-sm exam-card`}
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate('/Competitive')}
+            >
               <div className={`benefit-icon icon-${exam.color}`}>
                 <i className={`bi ${exam.icon}`}></i>
               </div>
