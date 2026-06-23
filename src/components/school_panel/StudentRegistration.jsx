@@ -107,14 +107,14 @@ const StudentRegistration = () => {
       delete: "हटाएं",
       save: "परिवर्तन सहेजें", // Added comma
       cancel: "रद्द करें", // Added comma
-      schoolId: "स्कूल आईडी",
+      schoolId: "शैक्षणिक संस्था आईडी",
       autoFilled: "आपके खाते से स्वतः भरा गया",
       autoFilledSub: "आपके लॉगिन से स्वतः भरा गया",
       fullNamePlaceholder: "छात्र का पूरा नाम दर्ज करें",
       aadhaarPlaceholder: "12-अंकीय आधार संख्या",
       uploadTitle: "एक्सेल फ़ाइल अपलोड करें (.xlsx, .xls, .csv)",
       downloadTemplate: "टेम्प्लेट डाउनलोड करें",
-      uploadNote: "फ़ाइल में कॉलम होने चाहिए: \"aadhaar_no\" और \"full_name\" (या \"name\")। स्कूल आईडी स्वतः संलग्न हो जाएगी।",
+      uploadNote: "फ़ाइल में कॉलम होने चाहिए: \"aadhaar_no\" और \"full_name\" (या \"name\")। शैक्षणिक संस्था आईडी स्वतः संलग्न हो जाएगी।",
       validationErrorMsg: "सत्यापन त्रुटियाँ मिलीं। कृपया सबमिट करने से पहले ठीक करें।",
       previewTitle: "पूर्वावलोकन",
       checkingExisting: "मौजूदा छात्रों की जाँच की जा रही है...",

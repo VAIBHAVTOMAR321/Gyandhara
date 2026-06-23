@@ -125,7 +125,7 @@ const menuItems = [
      },
      {
        icon: <FaUsers />,
-       label: language === 'hi' ? "स्कूल प्रतियोगिताएं" : "School Competitions",
+       label: language === 'hi' ? "शैक्षणिक संस्था प्रतियोगिताएं" : "Institutional Competitions",
        path: "/SchoolCompetitions",
      },
      {
@@ -175,7 +175,7 @@ const menuItems = [
               <div className="logo">
                
                 <img src={gyandharaLogo} alt="Gyan Dhara" className="header-logo" />
-                 {language === 'hi' ? "यूजर डैशबोर्ड" : "User DashBoard"}
+                 {language === 'hi' ? "छात्र डैशबोर्ड" : "Student DashBoard"}
               </div>
             </div>
           ) : (

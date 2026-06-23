@@ -62,11 +62,11 @@ const SchoolSendQuery = () => {
       }
     },
     hi: {
-      title: "स्कूल सहायता और प्रश्न",
+      title: "शैक्षणिक संस्था सहायता और प्रश्न",
       back: "डैशबोर्ड पर वापस जाएं",
       raiseTitle: "प्रश्न पूछें",
       historyTitle: "मेरे प्रश्न",
-      schoolName: "स्कूल का नाम",
+      schoolName: "शैक्षणिक संस्था का नाम",
       queryTitle: "शीर्षक",
       description: "समस्या का विवरण",
       submit: "प्रश्न सबमिट करें",
