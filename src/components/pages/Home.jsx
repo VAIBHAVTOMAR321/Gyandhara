@@ -218,6 +218,17 @@ function Home() {
         {/* Competitive Exams Test Series Section */}
         <CompetitiveExams language={language} />
 
+        {/* Quick Link to Competitive Test */}
+        <section className="competitive-cta-section">
+          <div className="competitive-cta-content">
+            <h3>Ready to test yourself?</h3>
+            <p>Take our competitive mock test and assess your preparation</p>
+            <Link to="/Competitive" className="btn-gyandhara btn-primary-custom btn-lg">
+              <i className="bi bi-pencil-square"></i> Start  Test
+            </Link>
+          </div>
+        </section>
+
         {/*Why Choose GyanDhara? section*/}
         <section className="benefits-section role-header role-section-school ">
           <div className="role-header">

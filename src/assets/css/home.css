@@ -949,6 +949,127 @@ background-color: #fff;
   box-shadow: 0 20px 60px rgba(14, 58, 107, 0.2) !important;
 }
 
+/* Coming Soon Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1055;
+  backdrop-filter: blur(4px);
+}
+
+.competitive-cta-section {
+  margin-top: 12px;
+  padding: 40px 45px;
+  background: linear-gradient(135deg, var(--gd-blue) 0%, var(--gd-blue-dark) 100%);
+  border-radius: var(--gd-radius);
+  text-align: center;
+  color: var(--gd-white);
+}
+
+.competitive-cta-content h3 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.competitive-cta-content p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 24px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.competitive-cta-content .btn-gyandhara {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.competitive-cta-content .btn-gyandhara:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+  color: var(--gd-white);
+}
+
+.modal-overlay .modal-dialog {
+  max-width: 500px;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.coming-soon-modal {
+  border-radius: 20px !important;
+  border: none !important;
+  box-shadow: 0 25px 70px rgba(14, 58, 107, 0.3) !important;
+  overflow: hidden;
+}
+
+.coming-soon-modal .modal-header {
+  background: linear-gradient(135deg, var(--gd-blue) 0%, var(--gd-orange) 100%) !important;
+  padding: 16px 24px !important;
+  border-bottom: none !important;
+}
+
+.coming-soon-modal .modal-title {
+  color: var(--gd-white) !important;
+  font-weight: 700 !important;
+  font-size: 1.2rem !important;
+}
+
+.coming-soon-modal .btn-close {
+  opacity: 1 !important;
+  filter: brightness(0) invert(1) !important;
+}
+
+.coming-soon-modal .btn-close:hover {
+  opacity: 0.7 !important;
+}
+
+.coming-soon-modal .modal-body {
+  padding: 30px 24px !important;
+  background: var(--gd-white) !important;
+}
+
+.coming-soon-modal .modal-body h4 {
+  color: var(--gd-blue-dark);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.coming-soon-modal .modal-body p {
+  color: var(--gd-text-light);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.coming-soon-modal .modal-footer {
+  border-top: none !important;
+  padding: 16px 24px !important;
+  background: var(--gd-white) !important;
+  justify-content: center !important;
+}
+
+.coming-soon-modal .modal-footer .btn-primary {
+  background: var(--gd-gradient-warm);
+  border: none;
+  padding: 8px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.coming-soon-modal .modal-footer .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--gd-shadow-orange);
+}
+
 /* Additional centering for modal */
 .modal.show .modal-dialog {
   display: flex;
