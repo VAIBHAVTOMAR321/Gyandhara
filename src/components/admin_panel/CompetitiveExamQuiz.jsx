@@ -54,6 +54,19 @@ const CompetitiveExamQuiz = () => {
   const [showOverallAnalysisModal, setShowOverallAnalysisModal] = useState(false)
   const [selectedCandidateAnalysis, setSelectedCandidateAnalysis] = useState(null)
 
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      setIsTablet(width >= 768 && width < 1024);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   useEffect(() => {
     if (activeTab === 'postQuestions') {
       fetchQuestions()
@@ -308,14 +321,22 @@ const CompetitiveExamQuiz = () => {
     return `${minutes}m ${seconds}s`
   }
 
+  const toggleSidebar = () => {
+    setShowSidebar(!showSidebar);
+  };
+
   return (
-    <div className="admin-layout">
-      <div className="admin-wrapper">
-        <AdminLeftNav show={showSidebar} setShow={setShowSidebar} />
-        <div className={`admin-main-content flex-grow-1 ${!showSidebar ? 'sidebar-compact' : ''}`}>
-          <AdminHeader />
-          <div className="content-area">
-            <Container fluid className='mob-top-view'>
+    <div className="dashboard-container">
+       <AdminLeftNav
+        sidebarOpen={showSidebar}
+        setSidebarOpen={setShowSidebar}
+        isMobile={isMobile}
+        isTablet={isTablet}
+      />
+      <div className="main-content-dash">
+        <AdminHeader toggleSidebar={toggleSidebar} />
+        <div className="dashboard-content">
+            <Container fluid className="dashboard-box">
               <div className="d-flex justify-content-between align-items-center mb-4 page-header">
                 <div className="d-flex align-items-center all-en-box gap-3">
                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
@@ -575,7 +596,6 @@ const CompetitiveExamQuiz = () => {
               </Tab.Container>
             </Container>
           </div>
-        </div>
       </div>
 
       {/* Single Employee Analysis Modal */}
