@@ -327,18 +327,18 @@ function Competitive() {
       : null;
     const shareText = `I completed the  Test -   Competitive Test Assessment with a score of ${testResults.percentage.toFixed(1)}%!`;
 
-    const shareCertificateImage = async () => {
-      if (!navigator.share || !certificateUrl) {
-        // Fallback to link sharing if Web Share API is not supported or no certificate URL
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`, '_blank');
+    const shareToPlatform = async (platform) => {
+      if (!certificateUrl) {
+        alert('Certificate not available for sharing.');
         return;
       }
 
+      const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+      if (isMobile && navigator.share) {
         try {
           const response = await fetch(certificateUrl);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch image: ${response.statusText}`);
-        }
+          if (!response.ok) throw new Error('Failed to fetch certificate');
           const blob = await response.blob();
           const file = new File([blob], 'certificate.jpg', { type: blob.type });
 
@@ -348,15 +348,29 @@ function Competitive() {
               title: 'My Test Certificate!',
               text: shareText,
             });
-          } else {
-            throw new Error("Cannot share files on this browser.");
+            return;
           }
         } catch (error) {
-          console.error('Error sharing file:', error);
-          // Fallback to sharing the link if file sharing fails
-          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`, '_blank');
+          console.error('Native share failed:', error);
         }
+      }
+
+      const encodedUrl = encodeURIComponent(certificateUrl);
+      const encodedText = encodeURIComponent(shareText);
+
+      const shareUrls = {
+        whatsapp: `https://api.whatsapp.com/send?text=${encodedText}%20Check%20it%20out%3A%20${encodedUrl}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+        twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+        instagram: 'https://www.instagram.com/',
       };
+
+      const url = shareUrls[platform];
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    };
     
     
     if (showWrongAnswers) {
@@ -492,34 +506,40 @@ function Competitive() {
                     <div className="exam-share-icons">
                       <a
                         href="#"
-                        onClick={(e) => { e.preventDefault(); shareCertificateImage(); }}
+                        onClick={(e) => { e.preventDefault(); shareToPlatform('whatsapp'); }}
                         className="exam-share-icon text-success"
                         title="Share on WhatsApp"
                       >
                         <i className="bi bi-whatsapp fs-2"></i>
                       </a>
                       <a
-                        href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(certificateUrl)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); shareToPlatform('facebook'); }}
                         className="exam-share-icon text-primary"
                         title="Share on Facebook"
                       >
                         <i className="bi bi-facebook fs-2"></i>
                       </a>
                       <a
-                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(certificateUrl)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); shareToPlatform('twitter'); }}
                         className="exam-share-icon text-dark"
                         title="Share on X"
                       >
                         <i className="bi bi-twitter-x fs-2"></i>
                       </a>
                       <a
-                        href="https://www.instagram.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); shareToPlatform('linkedin'); }}
+                        className="exam-share-icon"
+                        style={{ color: '#0A66C2' }}
+                        title="Share on LinkedIn"
+                      >
+                        <i className="bi bi-linkedin fs-2"></i>
+                      </a>
+                      <a
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); shareToPlatform('instagram'); }}
                         className="exam-share-icon"
                         style={{ color: '#E1306C' }}
                         title="Share on Instagram"
