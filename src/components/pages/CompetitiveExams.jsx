@@ -1,9 +1,7 @@
 import React from 'react'
 import { Row, Col } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
 
 function CompetitiveExams({ language }) {
-  const navigate = useNavigate()
   const content = {
     en: {
       title: "Competitive Exam Test Series",
@@ -37,6 +35,14 @@ function CompetitiveExams({ language }) {
 
   const t = content[language] || content.en
 
+  const [showModal, setShowModal] = React.useState(false)
+  const [selectedExam, setSelectedExam] = React.useState("")
+
+  const handleCardClick = (examTitle) => {
+    setSelectedExam(examTitle)
+    setShowModal(true)
+  }
+
   return (
     <section className="competitive-exams-section role-section-school">
       <div className="role-header">
@@ -46,10 +52,10 @@ function CompetitiveExams({ language }) {
       <Row className="g-4">
         {t.exams.map((exam, index) => (
           <Col lg={3} md={6} sm={12} key={index}>
-            <div 
+            <div
               className={`benefit-card card-${exam.color} h-100 border-0 shadow-sm exam-card`}
               style={{ cursor: 'pointer' }}
-              onClick={() => navigate('/Competitive')}
+              onClick={() => handleCardClick(exam.title)}
             >
               <div className={`benefit-icon icon-${exam.color}`}>
                 <i className={`bi ${exam.icon}`}></i>
@@ -60,6 +66,38 @@ function CompetitiveExams({ language }) {
           </Col>
         ))}
       </Row>
+
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-dialog modal-dialog-centered" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content coming-soon-modal">
+              <div className="modal-header border-0">
+                <h5 className="modal-title fw-bold">Coming Soon</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setShowModal(false)}
+                ></button>
+              </div>
+              <div className="modal-body text-center">
+                <div className="mb-3">
+                  <i className="bi bi-calendar-event display-4 text-primary"></i>
+                </div>
+                <h4 className="mb-3">{selectedExam}</h4>
+                <p className="text-muted">This exam series will be available very soon. Stay tuned!</p>
+              </div>
+              <div className="modal-footer border-0 justify-content-center">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

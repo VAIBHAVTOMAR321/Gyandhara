@@ -28,8 +28,39 @@
 }
 
 /* ---------- Login Page ---------- */
-.exam-login-wrapper {
+.exam-page-wrapper {
   min-height: 100vh;
+  background: var(--comp-blue-bg);
+}
+
+.exam-hero-section {
+  background: linear-gradient(135deg, var(--comp-blue) 0%, var(--comp-blue-dark) 100%);
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--comp-white);
+}
+
+.exam-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.exam-hero-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+
+.exam-hero-subtitle {
+  font-size: 16px;
+  opacity: 0.9;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.exam-login-wrapper {
+  min-height: calc(100vh - 200px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,7 +210,7 @@
   border-radius: var(--comp-radius);
   padding: 20px 28px;
   display: flex;
-  margin-top: 66px !important;
+  margin-top: 20px !important;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -538,7 +569,6 @@
   background: var(--comp-blue-bg);
   min-height: 100vh;
   padding: 20px;
-  margin-top: 65px;
 }
 
 .exam-result-header {
@@ -909,6 +939,7 @@
   padding: 24px;
   box-shadow: 0 4px 16px var(--comp-shadow-blue);
   border: 1px solid var(--comp-border);
+  text-align: left;
 }
 
 .exam-wrong-answer-header {
