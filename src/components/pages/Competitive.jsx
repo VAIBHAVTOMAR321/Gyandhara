@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import '../../assets/css/comp.css';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 
@@ -24,23 +24,6 @@ function Competitive() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
-  useEffect(() => {
-    if (!testStarted || testSubmitted) return;
-
-    const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          handleSubmitTest(true);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [testStarted, testSubmitted]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -137,7 +120,7 @@ function Competitive() {
     }
   };
 
-  const handleSubmitTest = async (autoSubmit = false) => {
+  const handleSubmitTest = useCallback(async (autoSubmit = false) => {
     // If not auto-submitting, show confirmation dialog
     if (!autoSubmit && !window.confirm('Are you sure you want to submit the test?')) {
       return;
@@ -183,7 +166,24 @@ function Competitive() {
     } finally {
       setSubmittingTest(false);
     }
-  };
+  }, [answers, candidateId]);
+
+  useEffect(() => {
+    if (!testStarted || testSubmitted) return;
+
+    const timer = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handleSubmitTest(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [testStarted, testSubmitted, handleSubmitTest]);
 
   const handleJumpToQuestion = (index) => {
     setCurrentQuestionIndex(index);
@@ -327,37 +327,38 @@ function Competitive() {
       : null;
     const shareText = `I completed the  Test -   Competitive Test Assessment with a score of ${testResults.percentage.toFixed(1)}%!`;
 
-    const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+    const shareCertificateImage = async () => {
+      if (!navigator.share || !certificateUrl) {
+        // Fallback to link sharing if Web Share API is not supported or no certificate URL
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`, '_blank');
+        return;
+      }
 
-    const handleShare = async (platform) => {
-      if (platform === 'whatsapp' && navigator.share && certificateUrl) {
         try {
-          // Use a CORS proxy to fetch the image data
-          const response = await fetch(CORS_PROXY + certificateUrl, {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
+          const response = await fetch(certificateUrl);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch image: ${response.statusText}`);
+        }
           const blob = await response.blob();
           const file = new File([blob], 'certificate.jpg', { type: blob.type });
 
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
               files: [file],
-              title: 'My Test Certificate',
+              title: 'My Test Certificate!',
               text: shareText,
             });
-            return;
+          } else {
+            throw new Error("Cannot share files on this browser.");
           }
         } catch (error) {
           console.error('Error sharing file:', error);
           // Fallback to sharing the link if file sharing fails
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`, '_blank');
         }
-      }
-      // Fallback for other platforms or if Web Share API is not supported/fails
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`, '_blank');
-    };
-
+      };
+    
+    
     if (showWrongAnswers) {
       return (
         <div className="exam-result-wrapper">
@@ -491,7 +492,7 @@ function Competitive() {
                     <div className="exam-share-icons">
                       <a
                         href="#"
-                        onClick={(e) => { e.preventDefault(); handleShare('whatsapp'); }}
+                        onClick={(e) => { e.preventDefault(); shareCertificateImage(); }}
                         className="exam-share-icon text-success"
                         title="Share on WhatsApp"
                       >
