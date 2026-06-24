@@ -343,7 +343,7 @@ const CompetitiveExamQuiz = () => {
                   <Button variant="outline-secondary" size="sm" onClick={() => navigate('/AdminDashboard')} className="me-2">
                     <FaArrowLeft /> Dashboard
                   </Button>
-                  <h4 className="mb-0">Employee Quiz Management</h4>
+                  <h4 className="mb-0">Participants Quiz Management</h4>
                 </div>
                 <Button variant="primary" onClick={() => handleOpenQuestionModal()}>
                   <FaPlus className="me-2" /> Add New Question
@@ -599,7 +599,7 @@ const CompetitiveExamQuiz = () => {
           </div>
       </div>
 
-      {/* Single Employee Analysis Modal */}
+      {/* Single ParticipantsAnalysis Modal */}
       <Modal show={showSingleAnalysisModal} onHide={() => setShowSingleAnalysisModal(false)} centered size="lg">
         <Modal.Header closeButton className="bg-light">
           <Modal.Title className="fs-5">Candidate Performance Analysis</Modal.Title>
@@ -812,7 +812,7 @@ const CompetitiveExamQuiz = () => {
             <Col md={6} sm={6} className="print-col-6">
               <div className="text-center mb-3">
                 <h6 className="fw-bold text-secondary">Score Performance Levels</h6>
-                <small className="text-muted">Employee performance based on accuracy</small>
+                <small className="text-muted">Participants performance based on accuracy</small>
               </div>
               <div style={{ width: '100%', height: 250 }}>
                 <ResponsiveContainer>

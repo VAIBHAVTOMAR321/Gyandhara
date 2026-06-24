@@ -22,12 +22,16 @@ function Competitive() {
   const [resultError, setResultError] = useState('');
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (!testStarted || testSubmitted) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          handleSubmitTest();
+          handleSubmitTest(true); // Auto-submit when timer ends
           return 0;
         }
         return prev - 1;
@@ -132,8 +136,11 @@ function Competitive() {
     }
   };
 
-  const handleSubmitTest = async () => {
-    if (!window.confirm('Are you sure you want to submit the test?')) return;
+  const handleSubmitTest = async (autoSubmit = false) => {
+    // If not auto-submitting, show confirmation dialog
+    if (!autoSubmit && !window.confirm('Are you sure you want to submit the test?')) {
+      return;
+    }
 
     setSubmittingTest(true);
     setResultError('');
@@ -316,6 +323,33 @@ function Competitive() {
       : null;
     const shareText = `I completed the  Test -   Competitive Test Assessment with a score of ${testResults.percentage.toFixed(1)}%!`;
 
+    const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+
+    const handleShare = async (platform) => {
+      if (platform === 'whatsapp' && navigator.share && certificateUrl) {
+        try {
+          // Use a CORS proxy to fetch the image data
+          const response = await fetch(CORS_PROXY + certificateUrl);
+          const blob = await response.blob();
+          const file = new File([blob], 'certificate.jpg', { type: blob.type });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'My Test Certificate',
+              text: shareText,
+            });
+            return;
+          }
+        } catch (error) {
+          console.error('Error sharing file:', error);
+          // Fallback to sharing the link if file sharing fails
+        }
+      }
+      // Fallback for other platforms or if Web Share API is not supported/fails
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`, '_blank');
+    };
+
     if (showWrongAnswers) {
       return (
         <div className="exam-result-wrapper">
@@ -437,7 +471,7 @@ function Competitive() {
                   <div className="exam-certificate-preview mb-3" style={{ border: '8px solid #f8f9fa', borderRadius: '10px', overflow: 'hidden', backgroundColor: '#fff' }}>
                     <img
                       src={certificateUrl}
-                      alt="Test Certificate"
+                      alt="Your test certificate"
                       className="exam-certificate-img"
                       style={{ maxHeight: '350px', cursor: 'pointer' }}
                       onClick={() => window.open(certificateUrl, '_blank')}
@@ -448,9 +482,8 @@ function Competitive() {
                     <p className="exam-share-title small text-muted mb-3 text-uppercase fw-bold" style={{ letterSpacing: '1px' }}>Share Achievement</p>
                     <div className="exam-share-icons">
                       <a
-                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' Check it out: ' + certificateUrl)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href="#"
+                        onClick={(e) => { e.preventDefault(); handleShare('whatsapp'); }}
                         className="exam-share-icon text-success"
                         title="Share on WhatsApp"
                       >
