@@ -85,7 +85,7 @@ function Competitive() {
         setTestStarted(true);
         setCurrentQuestionIndex(0);
         setAnswers({});
-        setTimeRemaining(10);
+        setTimeRemaining(300);
         setTestSubmitted(false);
         setError('');
       } else {
@@ -652,7 +652,7 @@ function Competitive() {
           </button>
 
           <p className="exam-info-text">
-            ℹ️ A 10-minute timer will start once you begin the test.
+            ℹ️ A 5-minute timer will start once you begin the test.
           </p>
         </form>
       </div>
