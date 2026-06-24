@@ -204,6 +204,7 @@
   background: var(--comp-blue-bg);
   min-height: 100vh;
   padding: 20px;
+  margin-top: 50px;
 }
 
 .exam-test-header {
