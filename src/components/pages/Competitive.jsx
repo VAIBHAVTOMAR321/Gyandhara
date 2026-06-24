@@ -363,7 +363,7 @@ function Competitive() {
         facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
         twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
         linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
-        instagram: 'https://www.instagram.com/',
+        // instagram: 'https://www.instagram.com/',
       };
 
       const url = shareUrls[platform];
@@ -537,7 +537,7 @@ function Competitive() {
                       >
                         <i className="bi bi-linkedin fs-2"></i>
                       </a>
-                      <a
+                      {/* <a
                         href="#"
                         onClick={(e) => { e.preventDefault(); shareToPlatform('instagram'); }}
                         className="exam-share-icon"
@@ -545,7 +545,7 @@ function Competitive() {
                         title="Share on Instagram"
                       >
                         <i className="bi bi-instagram fs-2"></i>
-                      </a>
+                      </a> */}
                     </div>
                   </div>
                 </Card.Body>
