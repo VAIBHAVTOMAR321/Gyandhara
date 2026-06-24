@@ -434,28 +434,28 @@ const CompetitiveExamQuiz = () => {
                         {/* Stats Summary Cards */}
                         <Row className="mb-4 g-3">
                           <Col md={3}>
-                            <Card className="border-0 shadow-sm text-center py-3 bg-primary text-white">
+                            <Card className="border-0 shadow-sm text-center p-4 py-3 bg-primary text-white">
                               <FaUsers className="mb-2 fs-3" />
                               <h6 className="small text-uppercase">Total Participated</h6>
                               <h4>{stats.totalRanked}</h4>
                             </Card>
                           </Col>
                           <Col md={3}>
-                            <Card className="border-0 shadow-sm text-center py-3 bg-success text-white">
+                            <Card className="border-0 shadow-sm text-center p-4 py-3 bg-success text-white">
                               <FaCheckCircle className="mb-2 fs-3" />
                               <h6 className="small text-uppercase">Avg. Score</h6>
                               <h4>{stats.avgScore}</h4>
                             </Card>
                           </Col>
                           <Col md={3}>
-                            <Card className="border-0 shadow-sm text-center py-3 bg-info text-white">
+                            <Card className="border-0 shadow-sm text-center p-4 py-3 bg-info text-white">
                               <FaClock className="mb-2 fs-3" />
                               <h6 className="small text-uppercase">Completion Rate</h6>
                               <h4>{stats.completionRate}%</h4>
                             </Card>
                           </Col>
                           <Col md={3}>
-                            <Card className="border-0 shadow-sm text-center py-3 bg-warning text-dark">
+                            <Card className="border-0 shadow-sm text-center p-4 py-3 bg-warning text-dark">
                               <FaClock className="mb-2 fs-3" />
                               <h6 className="small text-uppercase">Pending Tests</h6>
                               <h4>{stats.totalPending}</h4>
