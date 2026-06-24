@@ -31,7 +31,8 @@ function Competitive() {
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          handleSubmitTest(true); // Auto-submit when timer ends
+          clearInterval(timer);
+          handleSubmitTest(true);
           return 0;
         }
         return prev - 1;
@@ -101,7 +102,7 @@ function Competitive() {
         setTestStarted(true);
         setCurrentQuestionIndex(0);
         setAnswers({});
-        setTimeRemaining(300);
+        setTimeRemaining(10);
         setTestSubmitted(false);
         setError('');
       } else {
@@ -225,6 +226,9 @@ function Competitive() {
             <div className="exam-timer-display">{formatTime(timeRemaining)}</div>
             <div className="exam-timer-label">Time Left</div>
           </div>
+          {timeRemaining <= 0 && (
+            <div className="exam-time-up-alert">Time's Up! Submitting...</div>
+          )}
           <button
             className="exam-lang-toggle"
             onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
@@ -329,7 +333,11 @@ function Competitive() {
       if (platform === 'whatsapp' && navigator.share && certificateUrl) {
         try {
           // Use a CORS proxy to fetch the image data
-          const response = await fetch(CORS_PROXY + certificateUrl);
+          const response = await fetch(CORS_PROXY + certificateUrl, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
           const blob = await response.blob();
           const file = new File([blob], 'certificate.jpg', { type: blob.type });
 
