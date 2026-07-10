@@ -657,7 +657,7 @@ const AdminDashBoard = () => {
                   </div>
                   <div className="student-info-row">
                     <div className="d-flex">
-                      <span className="student-info-label" style={{width: '140px'}}>School Name:</span>
+                      <span className="student-info-label" style={{width: '140px'}}>Institution Name:</span>
                       <span className="student-info-value">{selectedStudent.school_name || '-'}</span>
                     </div>
                   </div>
@@ -1094,7 +1094,7 @@ const AdminDashBoard = () => {
         ]);
       } else if (activeTab === 'enrollments') {
         title = "Enrollment List Report";
-        headers = [['#', 'Student ID', 'Student Name', 'School Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status']];
+        headers = [['#', 'Student ID', 'Student Name', 'Institution Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status']];
         data = enrollments.map((e, i) => [
           i + 1,
           e.student_id || '-',
@@ -1173,10 +1173,10 @@ const AdminDashBoard = () => {
         data = students.map((s, i) => ({ '#': i + 1, 'Student ID': s.student_id || '-', 'Name': s.full_name || '-', 'Aadhaar': s.aadhaar_no ? `****${s.aadhaar_no.slice(-4)}` : '-', 'Phone': s.phone || '-', 'Email': s.email || '-', 'Class': s.class_name || '-', 'School': s.school_name || '-', 'District': s.district || '-', 'Status': s.status || 'pending' }));
       } else if (activeTab === 'schools') {
         title = "School_List";
-        data = schools.map((s, i) => ({ '#': i + 1, 'School ID': s.school_uni_id || '-', 'School Name': s.school_name || '-', 'District': s.district || '-', 'State': s.state || 'Uttarakhand', 'Status': s.status || 'pending' }));
+        data = schools.map((s, i) => ({ '#': i + 1, 'School ID': s.school_uni_id || '-', 'Institution Name': s.school_name || '-', 'District': s.district || '-', 'State': s.state || 'Uttarakhand', 'Status': s.status || 'pending' }));
       } else if (activeTab === 'enrollments') {
         title = "Enrollment_List";
-        data = enrollments.map((e, i) => ({ '#': i + 1, 'Student ID': e.student_id || '-', 'Student Name': e.student_name || '-', 'School Name': e.school_name || '-', 'Class': e.class_name || '-', 'Course ID': e.course_id || '-', 'Course Name': e.course_name || '-', 'Enrolled At': e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-', 'Status': e.is_completed ? 'Completed' : 'Ongoing' }));
+        data = enrollments.map((e, i) => ({ '#': i + 1, 'Student ID': e.student_id || '-', 'Student Name': e.student_name || '-', 'Institution Name': e.school_name || '-', 'Class': e.class_name || '-', 'Course ID': e.course_id || '-', 'Course Name': e.course_name || '-', 'Enrolled At': e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-', 'Status': e.is_completed ? 'Completed' : 'Ongoing' }));
       } else if (activeTab === 'quiz-participants') {
         title = "Quiz_Participants";
         const filteredQuizData = quizParticipants.filter(p => {
@@ -1542,7 +1542,7 @@ const AdminDashBoard = () => {
                <tr>
                  <th>#</th>
                  <th>School ID</th>
-                 <th>School Name</th>
+                 <th>Institution Name</th>
                  <th>District</th>
                  <th>State</th>
                  <th>Status</th>
@@ -1596,7 +1596,7 @@ const AdminDashBoard = () => {
                  <th>#</th>
                  <th>Student ID</th>
                  <th>Student Name</th>
-                 <th>School Name</th>
+                 <th>Institution Name</th>
                  <th>Class</th>
                  <th>Course ID</th>
                  <th>Course Name</th>
@@ -1920,7 +1920,7 @@ const AdminDashBoard = () => {
                                 </div>
                               </div>
                               <div className="mobile-card-row">
-                                <span className="mobile-card-label">School Name</span>
+                                <span className="mobile-card-label">Institution Name</span>
                                 <span className="mobile-card-value">{school.school_name || "-"}</span>
                               </div>
                               <div className="mobile-card-row">

@@ -123,7 +123,7 @@ const SchoolSendQuery = () => {
     fetchQueries();
   }, [fetchQueries]);
 
-  // Auto-fill school name when user data is available
+  // Auto-fill Institution name when user data is available
   useEffect(() => {
     const fetchSchoolDetails = async () => {
       if (!uniqueId) return;
@@ -246,7 +246,7 @@ const SchoolSendQuery = () => {
                             name="school_name"
                             value={formData.school_name}
                             onChange={handleInputChange}
-                            placeholder="Enter school name"
+                            placeholder="Enter Institution name"
                             required
                           />
                         </Form.Group>

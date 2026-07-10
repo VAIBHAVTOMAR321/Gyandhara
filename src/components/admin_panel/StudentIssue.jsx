@@ -278,10 +278,10 @@ const StudentIssue = () => {
   const downloadExcel = () => {
     const dataToExport = filteredQueries.map(query => ({
       'Query ID': query.query_id,
-      [activeTab === 'student' ? 'Student Name' : 'School Name']: activeTab === 'student' ? query.full_name : query.school_name,
+      [activeTab === 'student' ? 'Student Name' : 'Institution Name']: activeTab === 'student' ? query.full_name : query.school_name,
       [activeTab === 'student' ? 'Student ID' : 'School/Uni ID']: activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id),
       ...(activeTab === 'student' ? {
-        'School Name': query.school_name || '-',
+        'Institution Name': query.school_name || '-',
         'School ID': query.school_uni_id || '-'
       } : {}),
       'Title': query.title,
@@ -302,9 +302,9 @@ const StudentIssue = () => {
 
     const tableColumn = [
       'Query ID',
-      activeTab === 'student' ? 'Student Name' : 'School Name',
+      activeTab === 'student' ? 'Student Name' : 'Institution Name',
       activeTab === 'student' ? 'Student ID' : 'School/Uni ID',
-      ...(activeTab === 'student' ? ['School Name', 'School ID'] : []),
+      ...(activeTab === 'student' ? ['Institution Name', 'School ID'] : []),
       'Title',
       'Issue',
       'Status',
