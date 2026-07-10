@@ -1536,7 +1536,7 @@ const DashBord = () => {
           'Student ID': enrollment.student_id || '-',
           'Student Name': enrollment.student_name || '-',
           'Institution Name': enrollment.school_name || '-',
-          'Class': enrollment.class_name || '-',
+          'Course': enrollment.class_name || '-',
           'Course ID': enrollment.course_id || '-',
           'Course Name': enrollment.course_name || '-',
           'Enrolled At': enrollment.enrolled_at ? new Date(enrollment.enrolled_at).toLocaleString() : '-',
@@ -1586,7 +1586,7 @@ const DashBord = () => {
                   onChange={handleSchoolFilterChange}
                   value=""
                 >
-                  <option value="">Select school to filter...</option>
+                  <option value="">Select Institution to filter...</option>
                   {enrollmentUniqueSchools.map((school, index) => (
                     <option key={index} value={school}>{school}</option>
                   ))}
@@ -1616,7 +1616,7 @@ const DashBord = () => {
             <Col md={6}>
               <div className="d-flex flex-wrap gap-2 align-items-center">
                 <FaFilter className="text-muted me-2" />
-                <strong>Filter by Class:</strong>
+                <strong>Filter by Course:</strong>
                 <Form.Control
                   as="select"
                   size="sm"
@@ -1624,7 +1624,7 @@ const DashBord = () => {
                   onChange={handleClassFilterChange}
                   value=""
                 >
-                  <option value="">Select class to filter...</option>
+                  <option value="">Select Course to filter...</option>
                   {enrollmentUniqueClasses.map((cls, index) => (
                     <option key={index} value={cls}>{cls}</option>
                   ))}
@@ -1695,7 +1695,7 @@ const DashBord = () => {
                       <th>Student ID</th>
                       <th>Student Name</th>
                       <th>Institution Name</th>
-                      <th>Class</th>
+                      <th>Course</th>
                       <th>Course ID</th>
                       <th>Course Name</th>
                       <th>Enrolled At</th>
@@ -2907,7 +2907,7 @@ const DashBord = () => {
           doc.text(`Total Records: ${filteredData.length}`, margin, 23)
           
           // Column definitions - optimized proportional widths for landscape
-          const headers = ['#', 'ID', 'Name', 'School', 'S.ID', 'Phone', 'Dist', 'Block', 'Class', 'Category', 'Status']
+          const headers = ['#', 'ID', 'Name', 'School', 'S.ID', 'Phone', 'Dist', 'Block', 'Course', 'Category', 'Status']
           // Total = 280 units (fits better in landscape)
           const colWidths = [8, 20, 35, 40, 25, 28, 22, 22, 12, 40, 28]
           const totalWidth = colWidths.reduce((a, b) => a + b, 0)
@@ -3032,7 +3032,7 @@ const DashBord = () => {
             'District': student.district || '-',
             'Block': student.block || '-',
             'State': student.state || '-',
-            'Class': student.class_name || '-',
+            'Course': student.class_name || '-',
             'Category': Array.isArray(counseling.category_consulting) 
               ? counseling.category_consulting.join(', ') 
               : (counseling.category_consulting || '-'),
@@ -3110,7 +3110,7 @@ const DashBord = () => {
                       onChange={handleSchoolFilterChange}
                       value=""
                     >
-                      <option value="">Select school to filter...</option>
+                      <option value="">Select Institution to filter...</option>
                       {uniqueSchools.map((school, index) => (
                         <option key={index} value={school}>{school}</option>
                       ))}
@@ -3148,7 +3148,7 @@ const DashBord = () => {
                       onChange={handleClassFilterChange}
                       value=""
                     >
-                      <option value="">Select class to filter...</option>
+                      <option value="">Select Course  to filter...</option>
                       {uniqueClasses.map((cls, index) => (
                         <option key={index} value={cls}>{cls}</option>
                       ))}
@@ -3216,11 +3216,11 @@ const DashBord = () => {
                          <th>Student ID</th>
                          <th>Full Name</th>
                          <th>Institution Name</th>
-                         <th>School ID</th>
+                         <th>Institution ID</th>
                          <th>Phone</th>
                          <th>District</th>
                          <th>Block</th>
-                         <th>Class</th>
+                         <th>Course</th>
                          <th>Category</th>
                          <th>Status</th>
                          <th>Action</th>
@@ -3804,7 +3804,7 @@ const DashBord = () => {
                        <p><strong>Aadhaar No:</strong> {selectedCounseling.student_details?.aadhaar_no ? `****${selectedCounseling.student_details.aadhaar_no.slice(-4)}` : '-'}</p>
                        <p><strong>Phone:</strong> {selectedCounseling.student_details?.phone || selectedCounseling.student_details?.mobile_no || '-'}</p>
                        <p><strong>Email:</strong> {selectedCounseling.student_details?.email || 'N/A'}</p>
-                       <p><strong>Class:</strong> {selectedCounseling.student_details?.class_name || '-'}</p>
+                       <p><strong>Course:</strong> {selectedCounseling.student_details?.class_name || '-'}</p>
                        <p><strong>Status:</strong> <Badge bg={selectedCounseling.status === 'pending' ? 'warning' : selectedCounseling.status === 'approved' ? 'success' : 'danger'}>{selectedCounseling.status || 'pending'}</Badge></p>
                      </Card.Body>
                    </Card>
@@ -4200,7 +4200,7 @@ const DashBord = () => {
                  try {
                    // Sheet 1: Student Details
                    const studentData = [
-                     ['Student ID', 'Name', 'Institution', 'Class', 'Status', 'Enrolled Date'],
+                     ['Student ID', 'Name', 'Institution', 'Course', 'Status', 'Enrolled Date'],
                      ...filteredData.map(e => [
                        e.student_id || '',
                        e.student_name || '',
@@ -4223,7 +4223,7 @@ const DashBord = () => {
                    })
 
                    const schoolData = [
-                     ['Institution Name', 'Class', 'Total', 'Completed', 'Ongoing'],
+                     ['Institution Name', 'Course', 'Total', 'Completed', 'Ongoing'],
                      ...Object.entries(schoolGroups)
                        .sort((a, b) => {
                          const totalA = Object.values(a[1]).reduce((sum, c) => sum + c.total, 0)
@@ -4589,7 +4589,7 @@ const DashBord = () => {
                                 <th>Student ID</th>
                                 <th>Name</th>
                                 <th>Institution</th>
-                                <th>Class</th>
+                                <th>Course</th>
                                 <th>Status</th>
                                 <th>Enrolled</th>
                               </tr>

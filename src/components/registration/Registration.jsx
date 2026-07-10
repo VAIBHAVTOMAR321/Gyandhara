@@ -36,8 +36,8 @@ const Registration = () => {
       mobilePlaceholder: "10 digits",
       emailLabel: "Email",
       emailPlaceholder: "Email",
-      classLabel: "Class",
-      selectClass: "Select class",
+      classLabel: "Course",
+      selectClass: "Select Course",
       selectSchool: "Select Institution",
       additionalInfo: "Additional Information",
       registerStudentBtn: "Register as Student",
@@ -163,6 +163,7 @@ const Registration = () => {
 
     const classOptions = [
   { label: "Graduation", value: "graduation" },
+  // { label: "Graduation", value: "graduation" },
 ];
 
   React.useEffect(() => {

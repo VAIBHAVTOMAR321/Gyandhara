@@ -602,7 +602,7 @@ const SchoolQuiz = () => {
                             <tr>
                               <th className="py-3 px-2">Title</th>
                               <th className="py-3 px-2">Activity Type</th>
-                              <th className="py-3 px-2">Classes</th>
+                              <th className="py-3 px-2">Course</th>
                               <th className="py-3 px-2">Institutions</th>
                               <th className="py-3 px-2">Participants</th>
                               <th className="py-3 px-2">Questions</th>
@@ -738,7 +738,7 @@ const SchoolQuiz = () => {
 
                                 <div className="mb-2">
                                   <small className="text-muted d-block">
-                                    Classes:
+                                    Course:
                                   </small>
                                   <div>
                                     {quiz.class_allowed?.map((c) => (
