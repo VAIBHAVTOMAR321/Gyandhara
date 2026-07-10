@@ -44,7 +44,7 @@ const Login = () => {
       highlights: {
         learn: { title: "Learn", desc: "Access quality education and new courses" },
         grow: { title: "Grow", desc: "Track your academic progress" },
-        succeed: { title: "Succeed", desc: "Build your career from class 9 to 12" }
+        succeed: { title: "Succeed", desc: "Build your career with gyandhara " }
       },
       validation: {
         emailRequired: "Email/Phone is required",
@@ -55,9 +55,10 @@ const Login = () => {
         loginFailed: "Login failed. Please try again."
       },
       roles: {
-        '9th-student': '9th Student', '10th-student': '10th Student',
-        '11th-student': '11th Student', '12th-student': '12th Student',
-        'admin': 'Admin', 'school': 'School'
+        '9th-student': 'Student Login', 
+        // '10th-student': '10th Student',
+        // '11th-student': '11th Student', '12th-student': '12th Student',
+        'admin': 'Admin', 'school': 'Institution'
       }
     },
     hi: {
@@ -104,11 +105,12 @@ const Login = () => {
 
   const roleOptions = [
     { value: '9th-student', label: t.roles['9th-student'], icon: 'bi-mortarboard' },
-    { value: '10th-student', label: t.roles['10th-student'], icon: 'bi-mortarboard' },
-    { value: '11th-student', label: t.roles['11th-student'], icon: 'bi-mortarboard' },
-    { value: '12th-student', label: t.roles['12th-student'], icon: 'bi-mortarboard' },
-    { value: 'admin', label: t.roles['admin'], icon: 'bi-shield-lock' },
+    // { value: '10th-student', label: t.roles['10th-student'], icon: 'bi-mortarboard' },
+    // { value: '11th-student', label: t.roles['11th-student'], icon: 'bi-mortarboard' },
+    // { value: '12th-student', label: t.roles['12th-student'], icon: 'bi-mortarboard' },
+   
     { value: 'school', label: t.roles['school'], icon: 'bi-building' },
+     { value: 'admin', label: t.roles['admin'], icon: 'bi-shield-lock' },
   ];
 
   const handleChange = (e) => {

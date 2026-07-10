@@ -353,7 +353,7 @@ const DashBord = () => {
              setUnpaidEnrollmentCount(enrollments.length)
              setUnpaidEnrollments(enrollments)
              
-             // Extract unique school names
+             // Extract unique Institution names
              const schools = [...new Set(enrollments
                .map(item => item.school_name)
                .filter(name => name && name.trim() !== '')
@@ -392,7 +392,7 @@ const DashBord = () => {
            const data = counselingRes.data.data
            setCounselingData(data)
            
-           // Extract unique school names
+           // Extract unique Institution names
            const schools = [...new Set(data
              .map(item => item.student_details?.school_name)
              .filter(name => name && name.trim() !== '')
@@ -1436,7 +1436,7 @@ const DashBord = () => {
         doc.text(`Total Records: ${filteredEnrollments.length}`, margin, 23)
         
         // Column definitions (Excluding Action)
-        const headers = ['#', 'Student ID', 'Name', 'School Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status', 'Cert ID']
+        const headers = ['#', 'Student ID', 'Name', 'Institution Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status', 'Cert ID']
         const colWidths = [8, 25, 35, 40, 15, 20, 45, 35, 25, 32]
         const totalWidth = colWidths.reduce((a, b) => a + b, 0)
         
@@ -1535,7 +1535,7 @@ const DashBord = () => {
           '#': index + 1,
           'Student ID': enrollment.student_id || '-',
           'Student Name': enrollment.student_name || '-',
-          'School Name': enrollment.school_name || '-',
+          'Institution Name': enrollment.school_name || '-',
           'Class': enrollment.class_name || '-',
           'Course ID': enrollment.course_id || '-',
           'Course Name': enrollment.course_name || '-',
@@ -1694,7 +1694,7 @@ const DashBord = () => {
                       <th>#</th>
                       <th>Student ID</th>
                       <th>Student Name</th>
-                      <th>School Name</th>
+                      <th>Institution Name</th>
                       <th>Class</th>
                       <th>Course ID</th>
                       <th>Course Name</th>
@@ -3025,7 +3025,7 @@ const DashBord = () => {
             '#': index + 1,
             'Student ID': student.student_id || counseling.student_id || '-',
             'Full Name': student.full_name || student.candidate_name || '-',
-            'School Name': student.school_name || '-',
+            'Institution Name': student.school_name || '-',
             'School ID': student.school_uni_id || '-',
             'Phone': student.phone || student.mobile_no || '-',
             'Email': student.email || 'N/A',
@@ -3215,7 +3215,7 @@ const DashBord = () => {
                          <th>#</th>
                          <th>Student ID</th>
                          <th>Full Name</th>
-                         <th>School Name</th>
+                         <th>Institution Name</th>
                          <th>School ID</th>
                          <th>Phone</th>
                          <th>District</th>
