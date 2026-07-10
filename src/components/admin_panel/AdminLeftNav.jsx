@@ -105,6 +105,12 @@ const menuItems = [
     label: "Competitive Exam",
     path: "/CompetitiveExamQuiz",
   },
+
+  {
+    icon: <FaClipboardList />,
+    label: "Govt. Test Series ",
+    path: "/GovtTestSeries",
+  },
   {
     icon: <FaChalkboardTeacher />,
     label: " Grooming Classes",
