@@ -1222,7 +1222,7 @@ const AdminDashBoard = () => {
             <Row className="mb-3">
               <Col md={3} sm={6}>
                 <Form.Group>
-                  <Form.Label>School</Form.Label>
+                  <Form.Label>Institutions</Form.Label>
                   <Form.Select
                     value={quizSchoolFilter}
                     onChange={(e) => setQuizSchoolFilter(e.target.value)}
@@ -1754,7 +1754,7 @@ const AdminDashBoard = () => {
         <Card.Body className="p-4">
           <h5 className="mb-4 fw-bold text-dark d-flex align-items-center">
             <i className={`bi bi-bar-chart-fill me-2`} style={{ color: chartColor }}></i>
-            {activeTab === 'students' ? 'Student' : activeTab === 'schools' ? 'School' : activeTab === 'enrollments' ? 'Course Enrollment' : 'Unique Course'} Distribution by District
+            {activeTab === 'students' ? 'Student' : activeTab === 'schools' ? 'Institutions' : activeTab === 'enrollments' ? 'Course Enrollment' : 'Unique Course'} Distribution by District
           </h5>
           <div className="district-chart-outer" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div style={{ minWidth: '950px', height: '340px', display: 'flex', alignItems: 'flex-end', gap: '20px', padding: '20px 10px 70px 10px' }}>
