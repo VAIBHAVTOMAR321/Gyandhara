@@ -437,7 +437,7 @@ const toggleStudentSelection = (studentId) => {
                             </div>
                             <div className="d-flex align-items-center">
                               <FaUsers className="me-1 text-primary" size={10} />
-                              <span className="text-muted me-1">Classes:</span>
+                              <span className="text-muted me-1">Cources: </span>
                               <span className="fw-bold text-dark">{quiz.class_allowed?.join(', ')}</span>
                             </div>
                           </div>
@@ -487,7 +487,7 @@ const toggleStudentSelection = (studentId) => {
 <Alert variant="info" className="mb-3 small">
                            <strong>Quiz:</strong> {selectedQuiz.title}<br />
                            <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
-                           <strong>Eligible Classes:</strong> {selectedQuiz.class_allowed?.join(', ')}
+                           <strong>Eligible Cources:</strong> {selectedQuiz.class_allowed?.join(', ')}
                            {maxParticipants && (
                              <><br />
                              <strong>Max Participants:</strong> {maxParticipants}</>
