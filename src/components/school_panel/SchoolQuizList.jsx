@@ -244,15 +244,19 @@ const toggleStudentSelection = (studentId) => {
       if (selectedStudents.includes(studentId)) {
         setSelectedStudents(prev => prev.filter(id => id !== studentId))
       } else {
-        const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || [];
-        const currentRegisteredCount = registeredList.length;
-        const alreadySelectedForRemoval = selectedStudents.filter(id => registeredList.includes(id)).length;
-        const currentSelectedForAddition = selectedStudents.filter(id => !registeredList.includes(id)).length;
-        const effectiveRegisteredCount = currentRegisteredCount - alreadySelectedForRemoval;
+        const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
+        const isRegisteringNewStudent = !registeredList.includes(studentId)
 
-        if (maxParticipants && (effectiveRegisteredCount + currentSelectedForAddition) >= maxParticipants) {
+        if (isRegisteringNewStudent) {
+          const currentRegisteredCount = registeredList.length;
+          const alreadySelectedForRemoval = selectedStudents.filter(id => registeredList.includes(id)).length;
+          const currentSelectedForAddition = selectedStudents.filter(id => !registeredList.includes(id)).length;
+          const effectiveRegisteredCount = currentRegisteredCount - alreadySelectedForRemoval;
+
+          if (maxParticipants && (effectiveRegisteredCount + currentSelectedForAddition) >= maxParticipants) {
           setError(`Maximum participants limit of ${maxParticipants} reached. To add a new student, you must first deselect a registered student (who has not taken the test).`);
           return
+          }
         }
         setSelectedStudents(prev => [...prev, studentId])
       }
@@ -460,7 +464,7 @@ const toggleStudentSelection = (studentId) => {
                             </div>
                             <div className="d-flex align-items-center">
                               <FaUsers className="me-1 text-primary" size={10} />
-                              <span className="text-muted me-1">Cources: </span>
+                              <span className="text-muted me-1">Coursess: </span>
                               <span className="fw-bold text-dark">{quiz.class_allowed?.join(', ')}</span>
                             </div>
                           </div>
@@ -510,7 +514,7 @@ const toggleStudentSelection = (studentId) => {
 <Alert variant="info" className="mb-3 small">
                            <strong>Quiz:</strong> {selectedQuiz.title}<br />
                            <strong>Category:</strong> {selectedQuiz.quiz_category}<br />
-                           <strong>Eligible Cources:</strong> {selectedQuiz.class_allowed?.join(', ')}
+                           <strong>Eligible Coursess:</strong> {selectedQuiz.class_allowed?.join(', ')}
                            {maxParticipants && (
                              <><br />
                              <strong>Max Participants:</strong> {maxParticipants}</>
@@ -609,7 +613,7 @@ const toggleStudentSelection = (studentId) => {
                              <th style={{ width: '40px', fontSize: '0.75rem' }}>Select</th>
                              <th style={{ fontSize: '0.75rem' }}>Student ID</th>
                              <th style={{ fontSize: '0.75rem' }}>Full Name</th>
-                             <th style={{ fontSize: '0.75rem' }}>Class</th>
+                             <th style={{ fontSize: '0.75rem' }}>Courses</th>
                              <th style={{ fontSize: '0.75rem' }}>Status</th>
                            </tr>
                          </thead>

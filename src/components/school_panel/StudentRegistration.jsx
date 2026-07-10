@@ -56,7 +56,7 @@ const StudentRegistration = () => {
       delete: "Delete",
       save: "Save Changes", // Added comma
       cancel: "Cancel", // Added comma
-      schoolId: "School ID",
+      schoolId: "Institution ID",
       autoFilled: "Auto-filled from your account",
       autoFilledSub: "Automatically filled from your login",
       fullNamePlaceholder: "Enter student's full name",
