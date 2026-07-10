@@ -96,19 +96,19 @@ const menuItems = [
         icon: <FaChalkboardTeacher />,
         label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
         submenu: [
-          {
-            label: language === 'hi' ? "9वीं मार्गदर्शन" : "9th Guidance",
-            path: "/NinthGuidance",
-            icon: <FaPlusSquare />,
-          },
-          {
-            label: language === 'hi' ? "10वीं मार्गदर्शन" : "10th Guidance",
-            path: "/TenthGuidance",
-            icon: <FaPlusSquare />,
-          },
+          // {
+          //   label: language === 'hi' ? "9वीं मार्गदर्शन" : "9th Guidance",
+          //   path: "/NinthGuidance",
+          //   icon: <FaPlusSquare />,
+          // },
+          // {
+          //   label: language === 'hi' ? "10वीं मार्गदर्शन" : "10th Guidance",
+          //   path: "/TenthGuidance",
+          //   icon: <FaPlusSquare />,
+          // },
         
           {
-            label: language === 'hi' ? "12वीं मार्गदर्शन" : "12th Guidance",
+            label: language === 'hi' ? "12वीं बाद" : "After 12th",
             path: "/TwelfthGuidance",
             icon: <FaPlusSquare />,
           },
