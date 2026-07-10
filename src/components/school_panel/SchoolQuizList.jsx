@@ -47,6 +47,7 @@ const SchoolQuizList = () => {
    const [selectedStudents, setSelectedStudents] = useState([])
    const [registeredStudents, setRegisteredStudents] = useState({})
    const [selectedClassFilter, setSelectedClassFilter] = useState('all')
+   const [attemptedStudents, setAttemptedStudents] = useState([])
    const [showRegistered, setShowRegistered] = useState(true)
    const [maxParticipants, setMaxParticipants] = useState(null)
    const [showResultsModal, setShowResultsModal] = useState(false)
@@ -218,6 +219,22 @@ const handleRegisterClick = async (quiz) => {
       const registered = await checkRegisteredStudents(quiz.quiz_id || quiz.id)
       setRegisteredStudents(prev => ({ ...prev, [quiz.quiz_id || quiz.id]: registered }))
       
+      // Fetch students who have attempted the test
+      try {
+        const rankRes = await axios.get(`${API_URL_RANK}?quiz_id=${quiz.quiz_id}`, {
+          headers: { 'Authorization': `Bearer ${accessToken}` }
+        });
+        if (rankRes.data.success && Array.isArray(rankRes.data.data)) {
+          const attemptedIds = rankRes.data.data.map(p => p.student?.student_id).filter(Boolean);
+          setAttemptedStudents(attemptedIds);
+        } else {
+          setAttemptedStudents([]);
+        }
+      } catch (err) {
+        console.error('Error fetching attempted students:', err);
+        setAttemptedStudents([]);
+      }
+
       setShowRegisterModal(true)
     }
 
@@ -227,8 +244,14 @@ const toggleStudentSelection = (studentId) => {
       if (selectedStudents.includes(studentId)) {
         setSelectedStudents(prev => prev.filter(id => id !== studentId))
       } else {
-        if (maxParticipants && selectedStudents.length >= maxParticipants) {
-          setError(`You can only select up to ${maxParticipants} participants for this quiz.`)
+        const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || [];
+        const currentRegisteredCount = registeredList.length;
+        const alreadySelectedForRemoval = selectedStudents.filter(id => registeredList.includes(id)).length;
+        const currentSelectedForAddition = selectedStudents.filter(id => !registeredList.includes(id)).length;
+        const effectiveRegisteredCount = currentRegisteredCount - alreadySelectedForRemoval;
+
+        if (maxParticipants && (effectiveRegisteredCount + currentSelectedForAddition) >= maxParticipants) {
+          setError(`Maximum participants limit of ${maxParticipants} reached. To add a new student, you must first deselect a registered student (who has not taken the test).`);
           return
         }
         setSelectedStudents(prev => [...prev, studentId])
@@ -595,7 +618,10 @@ const toggleStudentSelection = (studentId) => {
                              .map((student) => {
                                const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
                                const isRegistered = registeredList.includes(student.student_id)
+                               const hasAttempted = attemptedStudents.includes(student.student_id);
                                const isSelected = selectedStudents.includes(student.student_id)
+                               const currentRegisteredCount = registeredList.length;
+                               const canSelectMore = !maxParticipants || currentRegisteredCount < maxParticipants || isRegistered;
                                return (
                                  <tr key={student.student_id} className={isSelected ? 'table-primary' : ''}>
                                    <td>
@@ -603,6 +629,7 @@ const toggleStudentSelection = (studentId) => {
                                        type="checkbox"
                                        checked={isSelected}
                                        onChange={() => toggleStudentSelection(student.student_id)}
+                                       disabled={hasAttempted || (!isSelected && !canSelectMore && selectedStudents.length >= maxParticipants)}
                                      />
                                    </td>
                                    <td style={{ fontSize: '0.8rem' }}>{student.student_id}</td>
@@ -612,8 +639,9 @@ const toggleStudentSelection = (studentId) => {
                                    </td>
                                    <td>
                                      {isRegistered ? (
-                                       <Badge bg="success" className="small">
-                                         <FaCheck className="me-1" /> Registered
+                                       <Badge bg={hasAttempted ? "info" : "success"} className="small d-flex align-items-center">
+                                         <FaCheck className="me-1" />
+                                         {hasAttempted ? "Attempted" : "Registered"}
                                        </Badge>
                                      ) : (
                                        <Badge bg="secondary" className="small">Not Registered</Badge>
