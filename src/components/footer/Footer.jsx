@@ -13,7 +13,7 @@ function Footer() {
 
   const content = {
     en: {
-      description: "Your comprehensive educational platform delivering knowledge, career guidance, skill development, and academic excellence for students, schools, and administrators",
+      description: "Your comprehensive educational platform delivering knowledge, career guidance, skill development, and academic excellence for students, Institutions, and administrators",
       quickLinks: "Quick Links",
       home: "Home",
       login: "Login",
