@@ -44,7 +44,7 @@ const Login = () => {
       highlights: {
         learn: { title: "Learn", desc: "Access quality education and new courses" },
         grow: { title: "Grow", desc: "Track your academic progress" },
-        succeed: { title: "Succeed", desc: "Build your career from class 9 to 12" }
+        succeed: { title: "Succeed", desc: "Build your career with gyandhara " }
       },
       validation: {
         emailRequired: "Email/Phone is required",
