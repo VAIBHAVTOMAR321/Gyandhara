@@ -61,6 +61,7 @@ import Timeschedule from "./components/user_panel/Timeschedule";
 import Competitive from "./components/pages/Competitive";
 import CompetitiveExamQuiz from "./components/admin_panel/CompetitiveExamQuiz";
 import CompetitiveQuiz from "./components/user_panel/CompetitiveQuiz";
+import GovtTestSeries from "./components/admin_panel/GovtTestSeries";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 //  Navbar Wrapper (Hide on specific routes)
@@ -125,6 +126,7 @@ function FooterWrapper() {
 
   const hideOnRoutes = [
     "/UserDashboard",
+    "/GovtTestSeries",
     "/UserProfile",
     "/UserTest",
     "/AdminDashboard",
@@ -162,7 +164,8 @@ function FooterWrapper() {
     "/SchoolSendQuery",
     "/Managecourse",
     "/Timeschedule",
-    "/CompetitiveExamQuiz"
+    "/CompetitiveExamQuiz",
+    
   ];
 
   const shouldHide = hideOnRoutes.some((route) =>
@@ -218,6 +221,15 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <CompetitiveQuiz />
+            </ProtectedRoute>
+          }
+        />{" "}
+
+         <Route
+          path="/GovtTestSeries"
+          element={
+            <ProtectedRoute>
+              <GovtTestSeries/>
             </ProtectedRoute>
           }
         />{" "}
