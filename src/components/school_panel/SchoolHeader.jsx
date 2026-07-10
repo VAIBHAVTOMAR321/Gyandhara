@@ -57,7 +57,7 @@ function SchoolHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
   
   // State for user details - matching UserProfile
   const [userDetails, setUserDetails] = useState({
-    full_name: "",
+    school_name: "",
     profile_picture: null,
   });
    // State for loading and error handling
@@ -68,13 +68,41 @@ function SchoolHeader({ toggleSidebar, searchTerm, setSearchTerm }) {
 
 
     const getDisplayName = () => {
-      return userDetails.full_name || "Institution";
+      return userDetails.school_name || "Institution";
     };
 
-  // Function to fetch user data with auth handling
+   // Fetch school details when component mounts (auth passed from AuthContext)
+   useEffect(() => {
+     const fetchSchoolDetails = async () => {
+       if (!uniqueId || !accessToken) {
+         setIsLoading(false);
+         return;
+       }
 
+       try {
+         setIsLoading(true);
+         const response = await axios.get(
+           `https://brjobsedu.com/gyandhara/gyandhara_backend/api/school-reg/?school_uni_id=${uniqueId}`,
+           {
+             headers: {
+               Authorization: `Bearer ${accessToken}`,
+             },
+           }
+         );
 
-  // Fetch user data when component mounts
+         if (response.data.success && response.data.data) {
+           setUserDetails(response.data.data);
+         }
+       } catch (err) {
+         setError("Failed to load school details.");
+         console.error("Error fetching school details:", err);
+       } finally {
+         setIsLoading(false);
+       }
+     };
+
+     fetchSchoolDetails();
+   }, [uniqueId, accessToken]);
  
 
   const markAsRead = (id) => {
