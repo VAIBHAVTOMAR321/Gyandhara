@@ -142,7 +142,7 @@ const UserProfile = () => {
                     <h5 className="section-title">{language === 'hi' ? "शैक्षणिक विवरण" : "Academic Details"}</h5>
                     <div className="info-grid">
                       <div className="info-item">
-                        <label>{language === 'hi' ? "कक्षा" : "Class"}</label>
+                       <label>{language === 'hi' ? "कोर्स" : "Course"}</label>
                         <span>{profile?.class_name || "-"}</span>
                       </div>
                       <div className="info-item">
