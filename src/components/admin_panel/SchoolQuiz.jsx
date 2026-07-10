@@ -482,8 +482,6 @@ const SchoolQuiz = () => {
     })
   }
 
-  const classOptions = ['9th', '10th', '11th', '12th']
-
   if (loading) {
     return (
       <div className="dashboard-container">
@@ -998,18 +996,15 @@ const SchoolQuiz = () => {
             <Row className="mb-3">
               <Col md={4} xs={12}>
                 <Form.Group>
-                  <Form.Label>Enrolled Classes</Form.Label>
+                  <Form.Label>Enroll in Course</Form.Label>
                   <div className="d-flex flex-wrap gap-2">
-                    {classOptions.map((cls) => (
-                      <Form.Check
-                        key={cls}
-                        type="checkbox"
-                        label={cls}
-                        value={cls}
-                        checked={quizForm.class_allowed.includes(cls)}
-                        onChange={handleClassChange}
-                      />
-                    ))}
+                    <Form.Check
+                      type="checkbox"
+                      label="Graduation"
+                      value="graduation"
+                      checked={quizForm.class_allowed.includes('graduation')}
+                      onChange={handleClassChange}
+                    />
                   </div>
                 </Form.Group>
               </Col>

@@ -121,7 +121,7 @@ const SchoolQuizList = () => {
      try {
        setStudentsLoading(true)
        const response = await axios.get(
-         `${API_URL_STUDENTS}?school_uni_id=${school_uni_id}`,
+         `${API_URL_STUDENTS}?school_uni_id=${school_uni_id}&class_name=graduation`,
          {
            headers: {
              'Authorization': `Bearer ${accessToken}`
@@ -131,21 +131,13 @@ const SchoolQuizList = () => {
 
        if (response.data.success && response.data.data) {
          const data = response.data.data
-         setStudents(data)
-         
-         // Create a flat array of all students with class info
-         const flatStudents = []
-         Object.keys(data).forEach(className => {
-           if (Array.isArray(data[className])) {
-             data[className].forEach(student => {
-               flatStudents.push({
-                 ...student,
-                 class_name: className
-               })
-             })
-           }
-         })
-         setAllStudentsFlat(flatStudents)
+         // Assuming the API returns an array of students for the 'graduation' class
+         const graduationStudents = Array.isArray(data) ? data : (data.graduation || []);
+         const studentsWithClass = graduationStudents.map(student => ({
+            ...student,
+            class_name: 'graduation'
+         }));
+         setAllStudentsFlat(studentsWithClass);
        } else {
          setStudents({})
          setAllStudentsFlat([])
@@ -527,37 +519,10 @@ const toggleStudentSelection = (studentId) => {
                   </Alert>
                 ) : (
                   <>
-                    <div className="mb-3">
-                        <Form.Select 
-                          value={selectedClassFilter}
-                          onChange={(e) => {
-                            setSelectedClassFilter(e.target.value)
-                            setSelectedStudents([])
-                            setError('')
-                          }}
-                          style={{ width: '200px', fontSize: '0.85rem' }}
-                          size="sm"
-                        >
-                          <option value="all">All Classes</option>
-                          {selectedQuiz.class_allowed?.map(cls => {
-                            const classNum = normalizeClass(cls)
-                            return (
-                              <option key={cls} value={classNum}>Class {cls}</option>
-                            )
-                          })}
-                        </Form.Select>
-                      <small className="text-muted ms-2 small">
-                        Showing eligible students only
-                      </small>
-                    </div>
-
 <div className="d-flex justify-content-between align-items-center mb-3">
                       <div className="d-flex align-items-center gap-3">
                         <span className="small text-muted">
-                          {selectedClassFilter === 'all' 
-                            ? `All students (${selectedStudents.length} selected)`
-                            : `Class ${selectedClassFilter} students (${selectedStudents.length} selected)`
-                          }
+                          {`All students (${selectedStudents.length} selected)`}
                           {maxParticipants && (
                             <span className="ms-2 text-danger">
                               (Max: {maxParticipants})
@@ -567,7 +532,7 @@ const toggleStudentSelection = (studentId) => {
                        <Form.Check 
                          type="checkbox"
                          id="show-registered"
-                         label="Show registered"
+                         label="Show only registered"
                          checked={selectedClassFilter !== 'all' || showRegistered}
                          onChange={(e) => {
                            if (e.target.checked) {
@@ -585,16 +550,9 @@ const toggleStudentSelection = (studentId) => {
                           size="sm" 
                           className="me-2"
                           onClick={() => {
-                            const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
-                            const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
-                            
                             const eligibleStudents = allStudentsFlat.filter(s => {
-                              const studentClassNum = normalizeClass(s.class_name)
-                              const isEligible = selectedQuiz.class_allowed?.some(allowed => 
-                                normalizeClass(allowed) === studentClassNum
-                              )
-                              const matchesFilter = filterNum === null || studentClassNum === filterNum
-                              return isEligible && matchesFilter
+                              // All fetched students are eligible now
+                              return true;
                             })
                             
                             if (maxParticipants) {
@@ -634,17 +592,6 @@ const toggleStudentSelection = (studentId) => {
                          </thead>
                          <tbody>
                            {allStudentsFlat
-                             .filter(student => {
-                               const studentClassNum = normalizeClass(student.class_name)
-                               // Only show students from eligible classes
-                               const isEligible = selectedQuiz.class_allowed?.some(allowed => 
-                                 normalizeClass(allowed) === studentClassNum
-                               )
-                               // Apply class filter
-                               const filterNum = selectedClassFilter === 'all' ? null : parseInt(selectedClassFilter, 10)
-                               const classMatch = filterNum === null || studentClassNum === filterNum
-                               return isEligible && classMatch
-                             })
                              .map((student) => {
                                const registeredList = registeredStudents[selectedQuiz?.quiz_id || selectedQuiz?.id] || []
                                const isRegistered = registeredList.includes(student.student_id)
