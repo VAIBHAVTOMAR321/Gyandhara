@@ -105,7 +105,8 @@ function NavBarWrapper() {
       "/NinthGuidance",
       "/SchoolSendQuery",
       "/Timeschedule",
-      "/CompetitiveExamQuiz"
+      "/CompetitiveExamQuiz",
+      "/CompetitiveQuiz"
 
     ];
 
