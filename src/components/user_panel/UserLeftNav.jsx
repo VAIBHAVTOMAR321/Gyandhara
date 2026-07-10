@@ -85,6 +85,12 @@ const menuItems = [
        label: language === 'hi' ? "प्रोफाइल" : "PROFILE",
        path: "/UserProfile",
      },
+
+      {
+       icon: <FaUserCircle />,
+       label: language === 'hi' ? "Govt. Competitive Quiz" : "Govt. Competitive Quiz",
+       path: "/CompetitiveQuiz",
+     },
    
       {
         icon: <FaChalkboardTeacher />,

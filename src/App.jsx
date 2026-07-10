@@ -60,6 +60,7 @@ import NinthGuidance from "./components/user_panel/NinthGuidance";
 import Timeschedule from "./components/user_panel/Timeschedule";
 import Competitive from "./components/pages/Competitive";
 import CompetitiveExamQuiz from "./components/admin_panel/CompetitiveExamQuiz";
+import CompetitiveQuiz from "./components/user_panel/CompetitiveQuiz";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 //  Navbar Wrapper (Hide on specific routes)
@@ -152,6 +153,7 @@ function FooterWrapper() {
     "/Offlinecompetition",
     "/SchoolCompetitions",
     "/AddJob",
+    "/CompetitiveQuiz",
     "/ManageJobs",
     "/AddSeminar",
     "/AddWorkshop",
@@ -206,6 +208,15 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <CompetitiveExamQuiz />
+            </ProtectedRoute>
+          }
+        />{" "}
+
+         <Route
+          path="/CompetitiveQuiz"
+          element={
+            <ProtectedRoute>
+              <CompetitiveQuiz />
             </ProtectedRoute>
           }
         />{" "}
