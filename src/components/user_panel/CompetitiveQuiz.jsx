@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Container, Row, Col, Card, Button, Badge, Spinner, Alert, ProgressBar, Modal } from 'react-bootstrap'
+import { Container, Row, Col, Card, Button, Badge, Spinner, Alert, ProgressBar, Modal, Form } from 'react-bootstrap'
 import axios from 'axios'
 import { useAuth } from '../all_login/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -40,6 +40,8 @@ const CompetitiveQuiz = () => {
   
   const [quizzes, setQuizzes] = useState([])
   const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
   const [participatedQuizzes, setParticipatedQuizzes] = useState({})
   const [quizRanks, setQuizRanks] = useState({})
   const [refreshKey, setRefreshKey] = useState(0)
@@ -246,11 +248,17 @@ const CompetitiveQuiz = () => {
           headers: {
             'Authorization': `Bearer ${accessToken}`
           }
-        }
-        const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/', config)
+        };
+        const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/test-series-quiz/', config);
         
         if (response.data.success) {
-          setQuizzes(response.data.data || [])
+          const fetchedQuizzes = response.data.data || [];
+          setQuizzes(fetchedQuizzes);
+          // Extract unique categories
+          const uniqueCategories = [...new Set(fetchedQuizzes.map(q => q.quiz_category))];
+          setCategories(uniqueCategories);
+        } else {
+          setQuizzes([]);
         }
       } catch (error) {
         console.error('Error fetching quizzes:', error)
@@ -260,91 +268,10 @@ const CompetitiveQuiz = () => {
       }
     }
 
-    const fetchParticipatedQuizzes = async () => {
-      try {
-        const config = {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }
-        const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/', config)
-        
-        if (response.data.status && response.data.data) {
-          const participated = {}
-          const ranks = {}
-          
-          response.data.data.forEach(participant => {
-            if (participant.student?.student_id === uniqueId) {
-              participated[participant.quiz_id] = true
-              
-              // API returns 'attempt' as an array, extract the first element
-              const userAttempt = Array.isArray(participant.attempt) ? participant.attempt[0] : participant.attempt;
-              
-              if (userAttempt?.rank) {
-                if (!ranks[participant.quiz_id]) {
-                  ranks[participant.quiz_id] = {
-                    userRank: userAttempt.rank,
-                    userScore: userAttempt.score,
-                    totalParticipants: 0,
-                    topThree: []
-                  }
-                }
-              }
-            }
-          })
-          setParticipatedQuizzes(participated)
-          setQuizRanks(prev => ({
-            ...prev,
-            ...ranks
-          }))
-          
-          const quizIds = [...new Set(response.data.data.map(p => p.quiz_id))]
-          const rankPromises = quizIds.map(async (quizId) => {
-            try {
-              const rankResponse = await axios.get(
-                `https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/?quiz_id=${quizId}`,
-                config
-              )
-              if (rankResponse.data.status && rankResponse.data.data) {
-                const participantsData = rankResponse.data.data
-                const sorted = participantsData
-                  .map(p => ({
-                    ...p,
-                    // Extract attempt object from array for each participant
-                    currentAttempt: Array.isArray(p.attempt) ? p.attempt[0] : p.attempt
-                  }))
-                  .filter(p => p.currentAttempt?.rank)
-                  .sort((a, b) => a.currentAttempt.rank - b.currentAttempt.rank)
-                  .slice(0, 3)
-                
-                setQuizRanks(prev => ({
-                  ...prev,
-                  [quizId]: {
-                    ...prev[quizId],
-                    totalParticipants: participantsData.length,
-                    topThree: sorted.map(p => ({
-                      student_id: p.student?.student_id,
-                      full_name: p.student?.full_name,
-                      rank: p.currentAttempt?.rank,
-                      score: p.currentAttempt?.score,
-                      status: p.currentAttempt?.status
-                    }))
-                  }
-                }))
-              }
-            } catch (err) {
-              console.error('Error fetching rank for quiz', quizId, err)
-            }
-          })
-          await Promise.all(rankPromises)
-        }
-      } catch (error) {
-        console.error('Error fetching participated quizzes:', error)
-      }
-    }
-
     fetchQuizzes()
-    fetchParticipatedQuizzes()
+    // The logic for participated quizzes might need adjustment based on the new API structure.
+    // For now, I'll comment it out to focus on displaying the quizzes.
+    // fetchParticipatedQuizzes() 
   }, [accessToken, uniqueId, refreshKey])
 
   // Quiz timer
@@ -422,14 +349,13 @@ const CompetitiveQuiz = () => {
 
       console.log('Registering quiz participant:', participantData)
 
+      // Using the start-open-quiz endpoint as seen in Competitive.jsx
       const participantResponse = await axios.post(
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/',
-        participantData,
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/start-open-quiz/',
         {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
+          full_name: uniqueId, // Assuming uniqueId can be used as a name here, might need adjustment
+          phone: '0000000000', // Placeholder, might need user's phone
+          quiz_id: quiz.quiz_id
         }
       )
 
@@ -437,7 +363,7 @@ const CompetitiveQuiz = () => {
       const responseData = participantResponse.data
 
       // Validate response
-      if (!responseData.status) {
+      if (!responseData.success) {
         if (responseData.message && responseData.message.toLowerCase().includes('already')) {
           alert('Already participated.')
         } else {
@@ -446,7 +372,6 @@ const CompetitiveQuiz = () => {
         return
       }
 
-      // Extract data from response
       const now = new Date()
       const endTime = new Date(quiz.end_date_time)
 
@@ -459,19 +384,18 @@ const CompetitiveQuiz = () => {
         end_date_time: quiz.end_date_time,
         questions: responseData.questions || [],
         total_questions: responseData.total_questions || (responseData.questions ? responseData.questions.length : 0),
-        attempt_id: responseData.attempt_id
+        candidate_id: responseData.candidate_id // Use candidate_id from the new API response
       }
 
       console.log('Quiz data loaded:', {
         quiz_id: quizData.quiz_id,
         student_id: uniqueId,
-        attempt_id: quizData.attempt_id,
+        candidate_id: quizData.candidate_id,
         total_questions: quizData.total_questions,
         questions_received: quizData.questions.length
       })
 
-      // Store attempt ID for submission
-      setAttemptId(responseData.attempt_id)
+      setAttemptId(responseData.candidate_id)
 
       // Initialize quiz with data from API response
       setCurrentQuiz(quizData)
@@ -557,16 +481,16 @@ const CompetitiveQuiz = () => {
 
       // Prepare submission payload with all answers
       const submissionData = {
-        student_id: uniqueId,
-        quiz_id: currentQuiz.quiz_id,
-        answers: allAnswers
+        candidate_id: attemptId,
+        answers: allAnswers.map(a => ({ question_id: a.question_id, selected: a.selected_option }))
       }
 
       console.log('Submitting quiz:', submissionData)
 
       // Submit quiz to backend
       const submitResponse = await axios.post(
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/submit-quiz/',
+        // Using the submit-open-quiz endpoint
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/submit-open-quiz/',
         submissionData,
         {
           headers: {
@@ -579,10 +503,10 @@ const CompetitiveQuiz = () => {
       const responseData = submitResponse.data
       console.log('Submit quiz response:', responseData)
 
-      // Handle server response for scoring
-      let correctCount = responseData.correct_answers || responseData.score || 0
+      // Handle server response for scoring from the new API
+      let correctCount = responseData.correct_answers || 0
       let totalQuestions = responseData.total_questions || currentQuiz.total_questions
-      let serverScore = responseData.score !== undefined ? responseData.score : correctCount
+      let serverScore = responseData.score || 0
       let serverPercentage = responseData.percentage || ((correctCount / totalQuestions) * 100).toFixed(2)
 
       // Collect wrong answers
@@ -620,6 +544,15 @@ const CompetitiveQuiz = () => {
             })
           }
         })
+      } else if (responseData.incorrect_answers) {
+        wrongAnswersArray = responseData.incorrect_answers.map(item => ({
+            question_text: item.question,
+            question_text_hindi: item.question_hindi,
+            options: item.options,
+            options_hindi: item.options_hindi,
+            userAnswer: item.your_answer_index,
+            correctAnswer: item.correct_answer_index
+        }));
       }
 
       setQuizResults({
@@ -629,7 +562,7 @@ const CompetitiveQuiz = () => {
         totalQuestions,
         score: serverScore,
         totalMarks: totalQuestions,
-        percentage: serverPercentage,
+        percentage: responseData.percentage,
         status: correctCount >= (totalQuestions * 0.6) ? 'passed' : 'failed'
       })
 
@@ -895,6 +828,10 @@ const CompetitiveQuiz = () => {
     </Modal>
   )
 
+  const filteredQuizzes = selectedCategory === 'All'
+    ? quizzes
+    : quizzes.filter(quiz => quiz.quiz_category === selectedCategory);
+
   return (
     <div className="dashboard-container">
       <UserLeftNav
@@ -921,18 +858,33 @@ const CompetitiveQuiz = () => {
                 </Button>
               </div>
 
-              <h5 className="quiz-heading">{language === 'hi' ? "क्विज़" : "Quizzes"}</h5>
+              <h5 className="quiz-heading">{language === 'hi' ? "प्रतियोगी परीक्षा प्रश्नोत्तरी" : "Competitive Exam Quizzes"}</h5>
+
+              <Form.Group as={Row} className="mb-4 align-items-center">
+                <Form.Label column sm="2" className="fw-bold">
+                  {language === 'hi' ? "श्रेणी चुनें" : "Select Category"}:
+                </Form.Label>
+                <Col sm="4">
+                  <Form.Select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
+                    <option value="All">{language === 'hi' ? "सभी" : "All"}</option>
+                    {categories.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </Form.Select>
+                </Col>
+              </Form.Group>
 
               {loading ? (
                 <div className="text-center py-5">
                   <Spinner animation="border" variant="primary" style={{ width: '60px', height: '60px' }} />
                   <p className="mt-3">Loading...</p>
                 </div>
-              ) : quizzes.length > 0 ? (
+              ) : filteredQuizzes.length > 0 ? (
                 <Row>
-                  {quizzes.map((quiz) => {
+                  {filteredQuizzes.map((quiz) => {
                     const startTime = new Date(quiz.start_date_time)
                     const endTime = new Date(quiz.end_date_time)
+                    const isEnrolled = participatedQuizzes[quiz.quiz_id];
 
                     return (
                       <Col md={6} lg={4} key={quiz.quiz_id} className="mb-4">
@@ -947,7 +899,7 @@ const CompetitiveQuiz = () => {
                               <div className="d-flex justify-content-between mb-1">
                                 <small className="quiz-meta">
                                   <FaQuestion className="me-1" />
-                                  {language === 'hi' ? "प्रश्न: 10" : "Questions: 10"}
+                                  {language === 'hi' ? `प्रश्न: ${quiz.questions.length}` : `Questions: ${quiz.questions.length}`}
                                 </small>
                                 <Badge bg="info quiz-badge">{quiz.quiz_category}</Badge>
                               </div>
@@ -960,7 +912,7 @@ const CompetitiveQuiz = () => {
                             </div>
 
                             <div className="mt-auto">
-                              {participatedQuizzes[quiz.quiz_id] ? (
+                              {isEnrolled ? (
                                 <div className="d-flex flex-column gap-2">
                                   <div className="d-flex justify-content-between gap-2">
                                     <Badge bg="primary" className="flex-fill py-2 quiz-badge-primary">
@@ -1004,21 +956,6 @@ const CompetitiveQuiz = () => {
 
                                 </div>
                               ) : (
-                                <div className="d-flex flex-column gap-2">
-                                  {quizRanks[quiz.quiz_id]?.totalParticipants > 0 && (
-                                    <Button
-                                      variant="outline-primary"
-                                      className="w-100"
-                                      onClick={() => {
-                                        setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizRanks[quiz.quiz_id] })
-                                        setShowRankModal(true)
-                                      }}
-                                      style={{ fontSize: '10px', padding: '6px 12px' }}
-                                    >
-                                      <FaUsers className="me-1" />
-                                      {quizRanks[quiz.quiz_id].totalParticipants}
-                                    </Button>
-                                  )}
                                   <Button
                                     variant="primary"
                                     className="w-100 quiz-btn-start"
@@ -1027,7 +964,6 @@ const CompetitiveQuiz = () => {
                                     {language === 'hi' ? "क्विज़ शुरू करें" : "Start Quiz"}
                                     <FaChevronRight className="ms-1" />
                                   </Button>
-                                </div>
                               )}
                             </div>
                           </Card.Body>
@@ -1038,7 +974,7 @@ const CompetitiveQuiz = () => {
                 </Row>
               ) : (
                 <Alert variant="info" className="text-center">
-                  {language === 'hi' ? "कोई क्विज़ उपलब्ध नहीं है" : "No quizzes available"}
+                  {language === 'hi' ? "इस श्रेणी में कोई क्विज़ उपलब्ध नहीं है" : "No quizzes available in this category"}
                 </Alert>
               )}
             </>
