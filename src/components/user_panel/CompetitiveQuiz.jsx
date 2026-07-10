@@ -20,6 +20,7 @@ const CompetitiveQuiz = () => {
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
   const [showRankModal, setShowRankModal] = useState(false)
+  const [showAnalysisModal, setShowAnalysisModal] = useState(false)
   const [selectedQuizRank, setSelectedQuizRank] = useState(null)
 
   useEffect(() => {
@@ -42,9 +43,199 @@ const CompetitiveQuiz = () => {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [participatedQuizzes, setParticipatedQuizzes] = useState({})
   const [quizRanks, setQuizRanks] = useState({})
   const [refreshKey, setRefreshKey] = useState(0)
+  const MAX_QUIZ_QUESTIONS = 10
+  const MAX_QUIZ_SCORE = 10
+  
+  const buildQuizRegisterInfo = (quizId, participantData) => {
+    const totalParticipants = participantData.length
+    const participantsWithAttempt = participantData.filter(item => item.attempt)
+    const topThree = participantsWithAttempt
+      .slice()
+      .sort((a, b) => (a.attempt.rank || 999) - (b.attempt.rank || 999))
+      .slice(0, 3)
+      .map(item => ({
+        rank: item.attempt.rank,
+        full_name: item.student?.full_name || item.student?.student_id || 'Unknown',
+        student_id: item.student?.student_id || '',
+        score: item.attempt.score,
+        status: item.attempt.status
+      }))
+
+    const userRecord = participantData.find(item => item.student?.student_id === uniqueId)
+    const attempted = Boolean(userRecord?.attempt)
+
+    return {
+      quizId,
+      totalParticipants,
+      topThree,
+      attempted,
+      userScore: userRecord?.attempt?.score,
+      userRank: userRecord?.attempt?.rank,
+      userStatus: userRecord?.attempt?.status,
+      userAttempt: userRecord,
+      participantAttempts: participantsWithAttempt.map((item) => ({
+        student_id: item.student?.student_id,
+        full_name: item.student?.full_name || item.student?.student_id || 'Unknown',
+        score: item.attempt?.score || 0,
+        rank: item.attempt?.rank,
+        status: item.attempt?.status || 'unknown',
+        quiz_id: quizId
+      }))
+    }
+  }
+
+  const calculatePercentile = (userScore, allScores) => {
+    if (allScores.length === 0) return 0;
+    const scoresBelow = allScores.filter(score => score < userScore).length;
+    const scoresEqual = allScores.filter(score => score === userScore).length;
+    return ((scoresBelow + 0.5 * scoresEqual) / allScores.length) * 100;
+  };
+
+  const getCategoryAnalysis = (categoryKey) => {
+    const selectedQuizzes = categoryKey === 'All'
+      ? quizzes
+      : quizzes.filter(q => q.quiz_category === categoryKey);
+
+    const quizAnalysis = selectedQuizzes.map((quiz) => {
+      const quizInfo = quizRanks[quiz.quiz_id] || { participantAttempts: [] };
+      const attempts = quizInfo.participantAttempts || [];
+      const totalParticipants = attempts.length
+      const totalScore = attempts.reduce((sum, item) => sum + (item.score || 0), 0)
+      const avgScore = totalParticipants ? totalScore / totalParticipants : 0
+      const avgScorePercent = Math.round((avgScore / MAX_QUIZ_SCORE) * 100)
+      const passCount = attempts.filter(item => item.status === 'passed').length
+      const passRate = totalParticipants ? Math.round((passCount / totalParticipants) * 100) : 0
+      const bestScore = attempts.reduce((max, item) => Math.max(max, item.score || 0), 0)
+      const userAttempt = attempts.find(item => item.student_id === uniqueId);
+      const userPercentile = userAttempt
+        ? calculatePercentile(userAttempt.score, attempts.map(a => a.score))
+        : null;
+
+      return {
+        quizId: quiz.quiz_id,
+        title: quiz.title,
+        category: quiz.quiz_category,
+        totalParticipants,
+        avgScore: Number(avgScore.toFixed(1)),
+        avgScorePercent,
+        passRate,
+        bestScore,
+        userAttempt,
+        userPercentile,
+      }
+    });
+
+    const totalParticipants = quizAnalysis.reduce((sum, quiz) => sum + quiz.totalParticipants, 0)
+    const totalScore = quizAnalysis.reduce((sum, quiz) => sum + (quiz.avgScore * quiz.totalParticipants), 0)
+    const overallAvg = totalParticipants ? totalScore / totalParticipants : 0
+    const overallAvgPercent = Math.round((overallAvg / MAX_QUIZ_SCORE) * 100)
+    const categoryUserAttempts = quizAnalysis.filter(q => q.userAttempt);
+    const userAvgScore = categoryUserAttempts.length
+      ? categoryUserAttempts.reduce((sum, q) => sum + q.userAttempt.score, 0) / categoryUserAttempts.length
+      : null;
+    const userAvgScorePercent = userAvgScore !== null ? Math.round((userAvgScore / MAX_QUIZ_SCORE) * 100) : null;
+    const allUserScores = categoryUserAttempts.map(q => q.userAttempt.score);
+    const allCategoryScores = quizAnalysis.flatMap(q => q.userAttempt ? q.userAttempt.score : []);
+    const overallUserPercentile = allUserScores.length > 0
+      ? calculatePercentile(userAvgScore, allCategoryScores)
+      : null;
+
+
+    const userMessage = categoryUserAttempts.length > 0
+      ? userAvgScore >= overallAvg
+        ? 'Great work! Your category performance is meeting or exceeding the average. Keep practicing to maintain your lead.'
+        : 'Good effort! Your performance is below the category average. Focus on the quizzes where your score was lower to improve faster.'
+      : 'No attempts yet in this category. Start one of the available quizzes to see your personalized analysis.';
+
+    return {
+      categoryKey,
+      quizAnalysis,
+      totalQuizzes: selectedQuizzes.length,
+      totalParticipants,
+      overallAvg: Number(overallAvg.toFixed(1)),
+      overallAvgPercent,
+      userAvgScore: userAvgScore !== null ? Number(userAvgScore.toFixed(1)) : null,
+      userAvgScorePercent,
+      overallUserPercentile,
+      userAttemptCount: categoryUserAttempts.length,
+      userMessage
+    };
+  }
+
+  const getCategoryComparisons = () => {
+    const categoriesToCompare = Array.from(new Set(quizzes.map(q => q.quiz_category || 'Other')))
+    return categoriesToCompare.map(category => {
+      const categoryQuizzes = quizzes.filter(q => q.quiz_category === category)
+      const summary = categoryQuizzes.reduce(
+        (acc, quiz) => {
+          const quizInfo = quizRanks[quiz.quiz_id] || { participantAttempts: [] };
+          const attempts = quizInfo.participantAttempts || [];
+          acc.totalParticipants += attempts.length;
+          acc.scoreSum += attempts.reduce((sum, item) => sum + (item.score || 0), 0);
+          acc.passCount += attempts.filter((item) => item.status === "passed").length;
+          return acc;
+        },
+        { totalParticipants: 0, scoreSum: 0, passCount: 0 }
+      );
+
+      const avgScore = summary.totalParticipants ? summary.scoreSum / summary.totalParticipants : 0
+      const avgScorePercent = Math.round((avgScore / MAX_QUIZ_SCORE) * 100)
+      const passRate = summary.totalParticipants ? Math.round((summary.passCount / summary.totalParticipants) * 100) : 0
+
+      return {
+        category,
+        totalParticipants: summary.totalParticipants,
+        avgScore: Number(avgScore.toFixed(1)),
+        avgScorePercent,
+        passRate
+      };
+    });
+  };
+  
+  const analysisSummary = getCategoryAnalysis(selectedCategory)
+  const categoryComparisons = selectedCategory === 'All' ? getCategoryComparisons() : []
+
+  const openAnalysisModal = () => {
+    setShowAnalysisModal(true)
+  }
+
+  const closeAnalysisModal = () => {
+    setShowAnalysisModal(false)
+  }
+
+  const loadQuizRegisterInfo = async (quizList) => {
+    if (!quizList || quizList.length === 0) return
+
+    try {
+      const config = { headers: { Authorization: `Bearer ${accessToken}` } }
+      const entries = await Promise.all(quizList.map(async (quiz) => {
+        try {
+          const response = await axios.get(
+            `https://brjobsedu.com/gyandhara/gyandhara_backend/api/test-series-quiz/register/?quiz_id=${encodeURIComponent(quiz.quiz_id)}`,
+            config,
+          )
+          if (response.data && response.data.status && Array.isArray(response.data.data)) {
+            return [quiz.quiz_id, buildQuizRegisterInfo(quiz.quiz_id, response.data.data)]
+          }
+        } catch (err) {
+          console.warn(`Unable to load register data for ${quiz.quiz_id}:`, err)
+        }
+        return [quiz.quiz_id, { quizId: quiz.quiz_id, totalParticipants: 0, topThree: [], attempted: false, participantAttempts: [] }]
+      }))
+
+      setQuizRanks((prev) => {
+        const next = { ...prev }
+        entries.forEach(([quizId, data]) => {
+          next[quizId] = data
+        })
+        return next
+      })
+    } catch (error) {
+      console.error('Error loading quiz register info:', error)
+    }
+  }
   
   // Quiz taking state
   const [takingQuiz, setTakingQuiz] = useState(false)
@@ -246,7 +437,7 @@ const CompetitiveQuiz = () => {
         setLoading(true)
         const config = {
           headers: {
-            'Authorization': `Bearer ${accessToken}`
+            Authorization: `Bearer ${accessToken}`
           }
         };
         const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/test-series-quiz/', config);
@@ -257,6 +448,8 @@ const CompetitiveQuiz = () => {
           // Extract unique categories
           const uniqueCategories = [...new Set(fetchedQuizzes.map(q => q.quiz_category))];
           setCategories(uniqueCategories);
+
+          loadQuizRegisterInfo(fetchedQuizzes)
         } else {
           setQuizzes([]);
         }
@@ -269,9 +462,6 @@ const CompetitiveQuiz = () => {
     }
 
     fetchQuizzes()
-    // The logic for participated quizzes might need adjustment based on the new API structure.
-    // For now, I'll comment it out to focus on displaying the quizzes.
-    // fetchParticipatedQuizzes() 
   }, [accessToken, uniqueId, refreshKey])
 
   // Quiz timer
@@ -762,12 +952,8 @@ const CompetitiveQuiz = () => {
             
             {selectedQuizRank.topThree && selectedQuizRank.topThree.length > 0 && (
               <>
-                <h6 className="mb-3">
-                  {selectedQuizRank.userRank ? 'Top Three' : 'Top Rankers'}
-                </h6>
-                {selectedQuizRank.topThree
-                  .filter(p => p.rank >= 1 && p.rank <= 3)
-                  .map((participant, idx) => {
+                <h6 className="mb-3">{language === 'hi' ? 'शीर्ष 3 रैंक' : 'Top Three Rankers'}</h6>
+                {selectedQuizRank.topThree.map((participant, idx) => {
                   const isUser = participant.student_id === uniqueId
                   const medalColor = participant.rank === 1 ? '#FFD700' : participant.rank === 2 ? '#C0C0C0' : '#CD7F32'
                   return (
@@ -782,23 +968,23 @@ const CompetitiveQuiz = () => {
                       <div className="flex-grow-1">
                         <div className="fw-bold">
                           {participant.full_name}
-                          {isUser && <Badge bg="primary" className="ms-2">You</Badge>}
+                          {isUser && <Badge bg="primary" className="ms-2">{language === 'hi' ? 'आप' : 'You'}</Badge>}
                         </div>
                         <small className="text-muted">{participant.student_id}</small>
                       </div>
                       <div className="text-end">
-                        <div className="fw-bold">Score: {participant.score}</div>
+                        <div className="fw-bold">{language === 'hi' ? 'स्कोर' : 'Score'}: {participant.score}</div>
                          <small className={participant.status === 'passed' ? 'text-success' : 'text-danger'}>
-                           {participant.status === 'passed' ? 'Passed' : 'Failed'}
+                           {participant.status === 'passed' ? (language === 'hi' ? 'उत्तीर्ण' : 'Passed') : (language === 'hi' ? 'अवतीर्ण' : 'Failed')}
                          </small>
                       </div>
                     </div>
                   )
                 })}
-                
+
                 {selectedQuizRank.userRank && selectedQuizRank.userRank > 3 && (
                   <div className="mt-3 p-3 bg-light rounded text-center">
-                    <small className="text-muted">Rank: #{selectedQuizRank.userRank}</small>
+                    <small className="text-muted">{language === 'hi' ? 'रैंक' : 'Rank'}: #{selectedQuizRank.userRank}</small>
                   </div>
                 )}
               </>
@@ -864,6 +1050,11 @@ const CompetitiveQuiz = () => {
                     ))}
                   </Form.Select>
                 </Col>
+                <Col sm="3" className="text-end">
+                  <Button variant="secondary" onClick={openAnalysisModal} className="w-100">
+                    {language === 'hi' ? "विश्लेषण देखें" : "View Analysis"}
+                  </Button>
+                </Col>
               </Form.Group>
 
               {loading ? (
@@ -876,7 +1067,8 @@ const CompetitiveQuiz = () => {
                   {filteredQuizzes.map((quiz) => {
                     const startTime = new Date(quiz.start_date_time)
                     const endTime = new Date(quiz.end_date_time)
-                    const isEnrolled = participatedQuizzes[quiz.quiz_id];
+                    const quizInfo = quizRanks[quiz.quiz_id] || {}
+                    const isEnrolled = quizInfo.attempted
 
                     return (
                       <Col md={6} lg={4} key={quiz.quiz_id} className="mb-4">
@@ -891,7 +1083,7 @@ const CompetitiveQuiz = () => {
                               <div className="d-flex justify-content-between mb-1">
                                 <small className="quiz-meta">
                                   <FaQuestion className="me-1" />
-                                  {language === 'hi' ? `प्रश्न: ${quiz.questions.length}` : `Questions: ${quiz.questions.length}`}
+                                  {language === 'hi' ? "प्रश्न: 10" : "Questions: 10"}
                                 </small>
                                 <Badge bg="info quiz-badge">{quiz.quiz_category}</Badge>
                               </div>
@@ -908,20 +1100,20 @@ const CompetitiveQuiz = () => {
                                 <div className="d-flex flex-column gap-2">
                                   <div className="d-flex justify-content-between gap-2">
                                     <Badge bg="primary" className="flex-fill py-2 quiz-badge-primary">
-                                      {language === 'hi' ? "प्रतिभागी" : "Participants"}: {quizRanks[quiz.quiz_id]?.totalParticipants || 0}
+                                      {language === 'hi' ? "प्रतिभागी" : "Participants"}: {quizInfo.participantAttempts?.length || 0}
                                     </Badge>
-                                    {quizRanks[quiz.quiz_id]?.userRank && (
+                                    {quizInfo.userRank && (
                                       <Badge bg="warning" className="flex-fill py-2 quiz-badge-warning">
-                                        {language === 'hi' ? "रैंक" : "Rank"}: #{quizRanks[quiz.quiz_id].userRank}
+                                        {language === 'hi' ? "रैंक" : "Rank"}: #{quizInfo.userRank}
                                       </Badge>
                                     )}
                                    
                                   </div>
                                   <div className="d-flex justify-content-between gap-2">
                                   
-                                   {quizRanks[quiz.quiz_id]?.userScore !== undefined && (
+                                   {quizInfo.userScore !== undefined && quizInfo.userScore !== null && (
                                       <Badge bg="success" className="flex-fill py-2 quiz-badge-success">
-                                        {language === 'hi' ? "स्कोर" : "Score"}: {quizRanks[quiz.quiz_id].userScore}
+                                        {language === 'hi' ? "स्कोर" : "Score"}: {quizInfo.userScore}
                                       </Badge>
                                     )}
                               
@@ -929,7 +1121,7 @@ const CompetitiveQuiz = () => {
                                     variant="info"
                                     className=" quiz-btn-view-rank"
                                     onClick={() => {
-                                      setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizRanks[quiz.quiz_id] })
+                                      setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizInfo })
                                       setShowRankModal(true)
                                     }}
                                   >
@@ -972,29 +1164,34 @@ const CompetitiveQuiz = () => {
             </>
           ) : showResults ? (
             <>
-              <div className="text-center quiz-result-container">
-                <div className="mb-3">
-                  <FaTrophy className="text-warning quiz-result-icon" />
-                </div>
-                <h5 className="quiz-result-title">{language === 'hi' ? "बधाई हो!" : "Congratulations!"}</h5>
-                <p className="text-muted quiz-result-score">{language === 'hi' ? "शानदार काम! आपका स्कोर:" : "Great job! Your score:"} {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}</p>
+              <div className="quiz-result-container">
+                <Card className="quiz-result-panel shadow-sm mx-auto">
+                  <Card.Body className="text-center">
+                    <div className="quiz-result-header">
+                      <div className="quiz-result-badge">
+                        <FaTrophy className="quiz-result-icon text-warning" />
+                      </div>
+                      <h5 className="quiz-result-title">{language === 'hi' ? "बधाई हो!" : "Congratulations!"}</h5>
+                      <p className="quiz-result-score">
+                        {language === 'hi' ? "शानदार काम!" : "Great job!"}
+                        <span className="quiz-result-score-value"> {language === 'hi' ? "आपका स्कोर:" : "Your score:"} {quizResults.score}/{quizResults.totalMarks || quizResults.totalQuestions}</span>
+                      </p>
+                    </div>
 
-                <Card className="shadow-sm mb-3" style={{ maxWidth: '500px', margin: '0 auto' }}>
-                  <Card.Body>
-                    <Row className="mb-3">
-                      <Col md={6} className="mb-2">
-                        <div className="result-item">
+                    <Row className="quiz-result-grid gx-3 gy-3 justify-content-center mb-3">
+                      <Col xs={12} sm={6} className="">
+                        <div className="result-item result-card">
                           <h5 className="quiz-result-correct">{quizResults.correctAnswers}</h5>
-                          <small className="text-muted quiz-result-label">
+                          <small className="quiz-result-label text-uppercase">
                             <FaCheckCircle className="me-1 text-success" />
                             {language === 'hi' ? "सही" : "Correct"}
                           </small>
                         </div>
                       </Col>
-                      <Col md={6} className="mb-2">
-                        <div className="result-item">
+                      <Col xs={12} sm={6} className="">
+                        <div className="result-item result-card">
                           <h5 className="quiz-result-wrong">{quizResults.wrongAnswers}</h5>
-                          <small className="text-muted quiz-result-label">
+                          <small className="quiz-result-label text-uppercase">
                             <FaTimesCircle className="me-1 text-danger" />
                             {language === 'hi' ? "गलत" : "Wrong"}
                           </small>
@@ -1002,45 +1199,46 @@ const CompetitiveQuiz = () => {
                       </Col>
                     </Row>
 
-                    <div className="mb-2">
-                      <small className="text-muted quiz-result-label">{language === 'hi' ? "प्रतिशत" : "Percentage"}</small>
-                      <h5 className={`mb-1 ${quizResults.percentage >= 60 ? 'quiz-result-percentage-pass' : 'quiz-result-percentage-fail'}`}>
-                        {quizResults.percentage}%
-                      </h5>
+                    <div className="quiz-result-summary mb-3">
+                      <div className="d-flex justify-content-between align-items-center mb-2 quiz-result-summary-row">
+                        <small className="quiz-result-label">{language === 'hi' ? "प्रतिशत" : "Percentage"}</small>
+                        <h5 className={`mb-0 ${quizResults.percentage >= 60 ? 'quiz-result-percentage-pass' : 'quiz-result-percentage-fail'}`}>
+                          {quizResults.percentage}%
+                        </h5>
+                      </div>
                       <ProgressBar 
                         now={quizResults.percentage} 
                         variant={quizResults.percentage >= 60 ? 'success' : 'danger'}
                         label={`${quizResults.percentage}%`}
                       />
                     </div>
+
+                    <div className="d-flex gap-2 justify-content-center flex-wrap quiz-result-actions">
+                      {wrongAnswers.length > 0 && (
+                        <Button
+                          variant="warning"
+                          onClick={() => setShowWrongAnswersModal(true)}
+                          className="d-flex align-items-center quiz-btn-view-wrong"
+                        >
+                          <FaTimesCircle className="me-1" />
+                          {language === 'hi' ? "गलत उत्तर देखें" : "View Wrong"}
+                        </Button>
+                      )}
+                      <Button
+                        variant="outline-secondary"
+                        onClick={() => {
+                          setShowResults(false)
+                          setCurrentQuiz(null)
+                          setQuizResults(null)
+                          setRefreshKey(prev => prev + 1)
+                        }}
+                        className="d-flex align-items-center quiz-btn-back-result"
+                      >
+                        {language === 'hi' ? "पीछे" : "Back"}
+                      </Button>
+                    </div>
                   </Card.Body>
                 </Card>
-
-                 <div className="d-flex gap-2 justify-content-center mt-2 flex-wrap">
-                    {wrongAnswers.length > 0 && (
-                      <Button
-                        variant="warning"
-                        onClick={() => setShowWrongAnswersModal(true)}
-                        className="d-flex align-items-center quiz-btn-view-wrong"
-                      >
-                        <FaTimesCircle className="me-1" />
-                        {language === 'hi' ? "गलत उत्तर देखें" : "View Wrong"}
-                      </Button>
-                    )}
-                    <Button
-                      variant="outline-secondary"
-                      onClick={() => {
-                        setShowResults(false)
-                        setCurrentQuiz(null)
-                        setQuizResults(null)
-                        setRefreshKey(prev => prev + 1)
-                        navigate('/UserQuiz', { state: { fromQuiz: true } })
-                      }}
-                      className="d-flex align-items-center quiz-btn-back-result"
-                    >
-                      {language === 'hi' ? "पीछे" : "Back"}
-                    </Button>
-                 </div>
               </div>
             </>
           ) : (
@@ -1149,6 +1347,130 @@ const CompetitiveQuiz = () => {
 
       <NavigationWarningModal />
       <WrongAnswersModal />
+      <Modal show={showAnalysisModal} onHide={closeAnalysisModal} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{language === 'hi' ? 'प्रदर्शन विश्लेषण' : 'Performance Analysis'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="analysis-summary mb-4">
+            <h6>{language === 'hi' ? 'विश्लेषण सारांश' : 'Analysis Summary'}</h6>
+            <p className="text-muted">
+              {selectedCategory === 'All'
+                ? language === 'hi'
+                  ? 'सभी श्रेणियों में छात्र प्रदर्शन तुलना देखें।' 
+                  : 'View student performance comparisons across all categories.'
+                : language === 'hi'
+                  ? `${selectedCategory} श्रेणी के लिए विस्तृत अंक और प्रगति विश्लेषण देखें।`
+                  : `See detailed score and progress analysis for ${selectedCategory} category.`}
+            </p>
+          </div>
+
+          {selectedCategory === 'All' && categoryComparisons.length > 0 ? (
+            <>
+              <div className="mb-4">
+                <h6>{language === 'hi' ? 'श्रेणी तुलना' : 'Category Comparison'}</h6>
+                {categoryComparisons.map((categoryItem) => (
+                  <div key={categoryItem.category} className="analysis-item mb-3">
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                      <strong>{categoryItem.category}</strong>
+                      <span className="text-muted">{language === 'hi' ? 'प्रतिभागी' : 'Participants'}: {categoryItem.totalParticipants}</span>
+                    </div>
+                    <div className="analysis-graph-row mb-1">
+                      <span>{language === 'hi' ? 'औसत स्कोर' : 'Average Score'}</span>
+                      <strong>{categoryItem.avgScore} / {MAX_QUIZ_SCORE} ({categoryItem.avgScorePercent}%)</strong>
+                    </div>
+                    <ProgressBar now={categoryItem.avgScorePercent} label={`${categoryItem.avgScorePercent}%`} className="mb-2" />
+                    <div className="analysis-graph-row">
+                      <span>{language === 'hi' ? 'उत्तीर्णता दर' : 'Pass Rate'}</span>
+                      <strong>{categoryItem.passRate}%</strong>
+                    </div>
+                    <ProgressBar now={categoryItem.passRate} variant="success" label={`${categoryItem.passRate}%`} />
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="mb-4">
+                <h6>{language === 'hi' ? 'श्रेणी विश्लेषण' : 'Category Analysis'}</h6>
+                <div className="analysis-item mb-3">
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <strong>{language === 'hi' ? 'कुल क्विज़' : 'Total Quizzes'}</strong>
+                    <span>{analysisSummary.totalQuizzes}</span>
+                  </div>
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <strong>{language === 'hi' ? 'कुल प्रतिभागी' : 'Total Participants'}</strong>
+                    <span>{analysisSummary.totalParticipants}</span>
+                </div> 
+                  <div className="d-flex justify-content-between align-items-center mb-1">
+                    <strong>{language === 'hi' ? 'औसत स्कोर' : 'Average Score'}</strong>
+                    <span>{analysisSummary.overallAvg} / {MAX_QUIZ_SCORE} ({analysisSummary.overallAvgPercent}%)</span>
+                  </div>
+                  {analysisSummary.userAvgScore !== null && (
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                      <strong>{language === 'hi' ? 'आपका औसत' : 'Your Average'}</strong>
+                      <span>{analysisSummary.userAvgScore} / {MAX_QUIZ_SCORE} ({analysisSummary.userAvgScorePercent}%)</span>
+                    </div>
+                  )}
+                  {analysisSummary.overallUserPercentile !== null && (
+                    <div className="d-flex justify-content-between align-items-center mb-1">
+                      <strong>{language === 'hi' ? 'आपका परसेंटाइल' : 'Your Percentile'}</strong>
+                      <span>{analysisSummary.overallUserPercentile.toFixed(1)}%</span>
+                    </div>
+                  )}
+                  <ProgressBar now={analysisSummary.overallAvgPercent} label={`${analysisSummary.overallAvgPercent}%`} className="mb-2" />
+                  <Alert variant="info" className="analysis-message">
+                    {analysisSummary.userMessage}
+                  </Alert>
+                </div>
+              </div>
+
+              {analysisSummary.quizAnalysis.length > 0 ? (
+                <>
+                  <h6>{language === 'hi' ? 'क्विज़ तुलना' : 'Quiz Comparison'}</h6>
+                  {analysisSummary.quizAnalysis.map((quiz) => (
+                    <div key={quiz.quizId} className="analysis-item mb-3">
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <strong>{quiz.title}</strong>
+                        <span className="text-muted">{language === 'hi' ? 'प्रतिभागी' : 'Participants'}: {quiz.totalParticipants}</span>
+                      </div>
+                      <div className="analysis-graph-row mb-1">
+                        <span>{language === 'hi' ? 'औसत स्कोर' : 'Average Score'}</span>
+                        <strong>{quiz.avgScore} / {MAX_QUIZ_SCORE} ({quiz.avgScorePercent}%)</strong>
+                      </div>
+                      <ProgressBar now={quiz.avgScorePercent} label={`${quiz.avgScorePercent}%`} className="mb-2" />
+                      <div className="analysis-graph-row mb-1">
+                        <span>{language === 'hi' ? 'उत्तीर्णता दर' : 'Pass Rate'}</span>
+                        <strong>{quiz.passRate}%</strong>
+                      </div>
+                      <ProgressBar now={quiz.passRate} variant="success" label={`${quiz.passRate}%`} />
+                      {quiz.userAttempt && (
+                        <div className="mt-2 text-muted small">
+                          {quiz.userPercentile !== null && (
+                            <div className="mb-1">
+                              {language === 'hi' ? 'आपका परसेंटाइल' : 'Your Percentile'}: {quiz.userPercentile.toFixed(1)}%
+                            </div>
+                          )}
+                          {language === 'hi' ? 'आपका स्कोर' : 'Your Score'}: {quiz.userAttempt.score} / {MAX_QUIZ_SCORE} ({quiz.userAttempt.score * 10}%)
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <Alert variant="warning">
+                  {language === 'hi' ? 'इस श्रेणी में कोई क्विज़ डेटा अभी उपलब्ध नहीं है।' : 'No quiz data is available yet for this category.'}
+                </Alert>
+              )}
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeAnalysisModal}>
+            {language === 'hi' ? 'बंद करें' : 'Close'}
+          </Button>
+        </Modal.Footer>
+      </Modal>
       <RankModal />
     </div>
   )
