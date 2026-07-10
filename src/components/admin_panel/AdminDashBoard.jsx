@@ -663,7 +663,7 @@ const AdminDashBoard = () => {
                   </div>
                   <div className="student-info-row">
                     <div className="d-flex">
-                      <span className="student-info-label" style={{width: '140px'}}>School ID:</span>
+                      <span className="student-info-label" style={{width: '140px'}}>Institution ID:</span>
                       <span className="student-info-value">{selectedStudent.school_uni_id || '-'}</span>
                     </div>
                   </div>
@@ -675,7 +675,7 @@ const AdminDashBoard = () => {
                   </div>
                   <div className="student-info-row">
                     <div className="d-flex">
-                      <span className="student-info-label" style={{width: '140px'}}>Class:</span>
+                      <span className="student-info-label" style={{width: '140px'}}>Course :</span>
                       <span className="student-info-value">{selectedStudent.class_name || '-'}</span>
                     </div>
                   </div>
@@ -794,7 +794,7 @@ const AdminDashBoard = () => {
                       <th>#</th>
                       <th>Student Name</th>
                       <th>District</th>
-                      <th>School</th>
+                      <th>Institution</th>
                       <th>Attempts</th>
                       <th>Best Score</th>
                       <th>Best Rank</th>
@@ -1068,7 +1068,7 @@ const AdminDashBoard = () => {
 
       if (activeTab === 'students') {
         title = "Student List Report";
-        headers = [['#', 'Student ID', 'Name', 'Aadhaar', 'Phone', 'Email', 'Class', 'School', 'District', 'Status']];
+        headers = [['#', 'Student ID', 'Name', 'Aadhaar', 'Phone', 'Email', 'Course', 'Institution', 'District', 'Status']];
         data = students.map((s, i) => [
           i + 1,
           s.student_id || '-',
@@ -1094,7 +1094,7 @@ const AdminDashBoard = () => {
         ]);
       } else if (activeTab === 'enrollments') {
         title = "Enrollment List Report";
-        headers = [['#', 'Student ID', 'Student Name', 'Institution Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status']];
+        headers = [['#', 'Student ID', 'Student Name', 'Institution Name', 'Course', 'Course ID', 'Course Name', 'Enrolled At', 'Status']];
         data = enrollments.map((e, i) => [
           i + 1,
           e.student_id || '-',
@@ -1278,7 +1278,7 @@ const AdminDashBoard = () => {
                     <th>#</th>
                     <th>Student</th>
                     <th>District</th>
-                    <th>School</th>
+                    <th>Institution</th>
                     <th>Quiz</th>
                     <th>Participants</th>
                     <th>Attempts</th>
@@ -1498,8 +1498,8 @@ const AdminDashBoard = () => {
                  <th>Aadhaar</th>
                  <th>Phone</th>
                  <th>Email</th>
-                 <th>Class</th>
-                 <th>School</th>
+                 <th>Course</th>
+                 <th>Institution</th>
                  <th>District</th>
                  <th>Status</th>
                </tr>
@@ -1541,7 +1541,7 @@ const AdminDashBoard = () => {
              <thead>
                <tr>
                  <th>#</th>
-                 <th>School ID</th>
+                 <th>Institution ID</th>
                  <th>Institution Name</th>
                  <th>District</th>
                  <th>State</th>
@@ -1597,7 +1597,7 @@ const AdminDashBoard = () => {
                  <th>Student ID</th>
                  <th>Student Name</th>
                  <th>Institution Name</th>
-                 <th>Class</th>
+                 <th>Course </th>
                  <th>Course ID</th>
                  <th>Course Name</th>
                  <th>Enrolled At</th>
@@ -1886,11 +1886,11 @@ const AdminDashBoard = () => {
                                 <span className="mobile-card-value">{student.email || "-"}</span>
                               </div>
                               <div className="mobile-card-row">
-                                <span className="mobile-card-label">Class</span>
+                                <span className="mobile-card-label">Course</span>
                                 <span className="mobile-card-value">{student.class_name || "-"}</span>
                               </div>
                               <div className="mobile-card-row">
-                                <span className="mobile-card-label">School</span>
+                                <span className="mobile-card-label">Institution</span>
                                 <span className="mobile-card-value">{student.school_name || "-"}</span>
                               </div>
                               <div className="mobile-card-row">
@@ -2031,7 +2031,7 @@ const AdminDashBoard = () => {
                               <th>#</th>
                               <th>Student Name</th>
                               <th>District</th>
-                              <th>School</th>
+                              <th>Institution</th>
                               <th>Quiz ID</th>
                               <th>Attempts</th>
                               <th>Best Score</th>
@@ -2136,7 +2136,7 @@ const AdminDashBoard = () => {
                             <th>#</th>
                             <th>Student Name</th>
                             <th>District</th>
-                            <th>School</th>
+                            <th>Institution</th>
                             <th>Quiz ID</th>
                             <th>Score</th>
                             <th>Rank</th>
