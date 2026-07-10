@@ -107,7 +107,8 @@ function NavBarWrapper() {
       "/SchoolSendQuery",
       "/Timeschedule",
       "/CompetitiveExamQuiz",
-      "/CompetitiveQuiz"
+      "/CompetitiveQuiz",
+      "/GovtTestSeries",
 
     ];
 
