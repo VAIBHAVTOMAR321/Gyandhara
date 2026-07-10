@@ -94,7 +94,7 @@ const Login = () => {
         loginFailed: "लॉगिन विफल रहा। कृपया पुनः प्रयास करें।"
       },
       roles: {
-        '9th-student': '9वीं छात्र', '10th-student': '10वीं छात्र',
+        '9th-student': 'विद्यार्थी लॉगिन', '10th-student': '10वीं छात्र',
         '11th-student': '11वीं छात्र', '12th-student': '12वीं छात्र',
         'admin': 'एडमिन', 'institution': 'शैक्षणिक संस्था'
       }
