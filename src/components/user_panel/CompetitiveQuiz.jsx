@@ -341,29 +341,24 @@ const CompetitiveQuiz = () => {
 
   const startQuiz = async (quiz) => {
     try {
-      // Register as quiz participant and fetch questions 
-      const participantData = {
+      const startData = {
         quiz_id: quiz.quiz_id,
         student_id: uniqueId
-      }
+      };
 
-      console.log('Registering quiz participant:', participantData)
+      console.log('Starting quiz with data:', startData);
 
-      // Using the start-open-quiz endpoint as seen in Competitive.jsx
       const participantResponse = await axios.post(
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/start-open-quiz/',
-        {
-          full_name: uniqueId, // Assuming uniqueId can be used as a name here, might need adjustment
-          phone: '0000000000', // Placeholder, might need user's phone
-          quiz_id: quiz.quiz_id
-        }
-      )
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/test-series-quiz/register/',
+        startData,
+        { headers: { 'Authorization': `Bearer ${accessToken}` } }
+      );
 
-      console.log('Quiz participant response:', participantResponse.data)
-      const responseData = participantResponse.data
+      console.log('Quiz start response:', participantResponse.data);
+      const responseData = participantResponse.data;
 
       // Validate response
-      if (!responseData.success) {
+      if (!responseData.status) {
         if (responseData.message && responseData.message.toLowerCase().includes('already')) {
           alert('Already participated.')
         } else {
@@ -372,30 +367,28 @@ const CompetitiveQuiz = () => {
         return
       }
 
-      const now = new Date()
-      const endTime = new Date(quiz.end_date_time)
-
       const quizData = {
         id: quiz.quiz_id,
         quiz_id: quiz.quiz_id,
         title: quiz.title,
         description: quiz.description,
+        title_hindi: quiz.title_hindi,
         start_date_time: quiz.start_date_time,
         end_date_time: quiz.end_date_time,
         questions: responseData.questions || [],
         total_questions: responseData.total_questions || (responseData.questions ? responseData.questions.length : 0),
-        candidate_id: responseData.candidate_id // Use candidate_id from the new API response
+        attempt_id: responseData.attempt_id
       }
 
       console.log('Quiz data loaded:', {
         quiz_id: quizData.quiz_id,
         student_id: uniqueId,
-        candidate_id: quizData.candidate_id,
+        attempt_id: quizData.attempt_id,
         total_questions: quizData.total_questions,
         questions_received: quizData.questions.length
       })
 
-      setAttemptId(responseData.candidate_id)
+      setAttemptId(responseData.attempt_id);
 
       // Initialize quiz with data from API response
       setCurrentQuiz(quizData)
@@ -481,16 +474,15 @@ const CompetitiveQuiz = () => {
 
       // Prepare submission payload with all answers
       const submissionData = {
-        candidate_id: attemptId,
-        answers: allAnswers.map(a => ({ question_id: a.question_id, selected: a.selected_option }))
+        student_id: uniqueId,
+        quiz_id: currentQuiz.quiz_id,
+        answers: allAnswers
       }
 
       console.log('Submitting quiz:', submissionData)
 
-      // Submit quiz to backend
       const submitResponse = await axios.post(
-        // Using the submit-open-quiz endpoint
-        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/submit-open-quiz/',
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/test-series-quiz/submit/',
         submissionData,
         {
           headers: {
@@ -503,11 +495,11 @@ const CompetitiveQuiz = () => {
       const responseData = submitResponse.data
       console.log('Submit quiz response:', responseData)
 
-      // Handle server response for scoring from the new API
-      let correctCount = responseData.correct_answers || 0
-      let totalQuestions = responseData.total_questions || currentQuiz.total_questions
+      // Handle server response for scoring
+      let correctCount = responseData.score || 0
+      let totalQuestions = responseData.total_marks || currentQuiz.total_questions
       let serverScore = responseData.score || 0
-      let serverPercentage = responseData.percentage || ((correctCount / totalQuestions) * 100).toFixed(2)
+      let serverPercentage = totalQuestions > 0 ? ((correctCount / totalQuestions) * 100).toFixed(2) : 0
 
       // Collect wrong answers
       let wrongAnswersArray = []
@@ -562,7 +554,7 @@ const CompetitiveQuiz = () => {
         totalQuestions,
         score: serverScore,
         totalMarks: totalQuestions,
-        percentage: responseData.percentage,
+        percentage: serverPercentage,
         status: correctCount >= (totalQuestions * 0.6) ? 'passed' : 'failed'
       })
 
