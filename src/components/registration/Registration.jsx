@@ -157,11 +157,17 @@ const Registration = () => {
   const [aadhaarExists, setAadhaarExists] = useState(null);
   const [checkingAadhaar, setCheckingAadhaar] = useState(false);
 
-  const classOptions = ['9th', '10th', '11th', '12th'];
+  // const classOptions = ['graduation',
+  //    '10th', '11th', '12th'
+  //   ];
+
+    const classOptions = [
+  { label: "Graduation", value: "graduation" },
+];
 
   React.useEffect(() => {
     fetchDistricts();
-  }, []);
+  }, []); 
 
   React.useEffect(() => {
     if (studentData.district) {
@@ -942,27 +948,29 @@ const Registration = () => {
                       </div>
                     </div>
 
-                    <div className="form-row">
-                      <div className="form-group full-width">
-                        <label htmlFor="class_name" className="form-label">
-                          {t.classLabel} <span className="required">*</span>
-                        </label>
-                        <select
-                          className="form-control"
-                          id="class_name"
-                          name="class_name"
-                          value={studentData.class_name}
-                          onChange={handleStudentChange}
-                        >
-                          <option value="">{t.selectClass}</option>
-                          {classOptions.map((cls) => (
-                            <option key={cls} value={cls}>
-                              {cls}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                  <div className="form-row">
+  <div className="form-group full-width">
+    <label htmlFor="class_name" className="form-label">
+      {t.classLabel} <span className="required">*</span>
+    </label>
+
+    <select
+      className="form-control"
+      id="class_name"
+      name="class_name"
+      value={studentData.class_name}
+      onChange={handleStudentChange}
+    >
+      <option value="">{t.selectClass}</option>
+
+      {classOptions.map((cls) => (
+        <option key={cls.value} value={cls.value}>
+          {cls.label}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
                   </div>
                 </>
               )}
