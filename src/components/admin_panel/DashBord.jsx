@@ -4436,7 +4436,7 @@ const DashBord = () => {
                                 return (
                                   <div key={cls} className="border-bottom pb-2">
                                     <div className="d-flex justify-content-between align-items-center mb-1">
-                                      <Badge bg="info" className="fs-6">Course {cls}</Badge>
+                                      <Badge bg="info" className="fs-6"> {cls}</Badge>
                                       <span className="fw-bold">{count} unique students</span>
                                     </div>
                                     <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>

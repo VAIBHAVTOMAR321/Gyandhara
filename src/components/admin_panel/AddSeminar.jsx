@@ -68,7 +68,7 @@ const [customElInput, setCustomElInput] = useState('')
 const [customBenInput, setCustomBenInput] = useState('')
 
 const eligibilityOptions = [
-  '10th Pass', '12th Pass', 'Graduate', 'Post Graduate', 'Diploma', 'ITI', 'Polytechnic', 'Working Professional', 'Student', 'Unemployed'
+   'Graduate', 'Post Graduate', 'Diploma', 'ITI', 'Polytechnic', 'Working Professional', 'Student', 'Unemployed'
 ]
 
 const benefitOptions = [
