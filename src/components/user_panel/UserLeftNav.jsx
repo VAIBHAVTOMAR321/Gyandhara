@@ -29,7 +29,8 @@ import {
   FaGraduationCap,
   FaTasks,
   FaClock
-} from "react-icons/fa";
+} from "react-icons/fa"; 
+import { FaClipboardList } from "react-icons/fa";
 import axios from "axios";
 
 import "../../assets/css/UserLeftNav.css";
@@ -87,8 +88,8 @@ const menuItems = [
      },
 
       {
-       icon: <FaUserCircle />,
-       label: language === 'hi' ? "Govt. Competitive Quiz" : "Govt. Competitive Quiz",
+       icon: <FaTrophy />,
+      label: language === 'hi' ? "सरकारी प्रतियोगी परीक्षा क्विज़" : "Govt. Competitive Quiz",
        path: "/CompetitiveQuiz",
      },
    
@@ -121,9 +122,10 @@ const menuItems = [
      },
      {
        icon: <FaGraduationCap />,
-       label: language === 'hi' ? "क्विज़" : "Quiz",
+       label: language === 'hi' ? "प्रैक्टिस क्विज़" : "Practice Quiz",
        path: "/UserQuiz",
      },
+    
      {
        icon: <FaTrophy />,
        label: language === 'hi' ? "प्रतियोगिता" : "Competition",
