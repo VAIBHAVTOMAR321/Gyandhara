@@ -279,10 +279,10 @@ const StudentIssue = () => {
     const dataToExport = filteredQueries.map(query => ({
       'Query ID': query.query_id,
       [activeTab === 'student' ? 'Student Name' : 'Institution Name']: activeTab === 'student' ? query.full_name : query.school_name,
-      [activeTab === 'student' ? 'Student ID' : 'School/Uni ID']: activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id),
+      [activeTab === 'student' ? 'Student ID' : 'Institution/Uni ID']: activeTab === 'student' ? query.student_id : (query.school_id || query.student_uni_id),
       ...(activeTab === 'student' ? {
         'Institution Name': query.school_name || '-',
-        'School ID': query.school_uni_id || '-'
+        'Institution ID': query.school_uni_id || '-'
       } : {}),
       'Title': query.title,
       'Issue': query.issue,
@@ -293,7 +293,7 @@ const StudentIssue = () => {
 
     const ws = XLSX.utils.json_to_sheet(dataToExport)
     const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, `${activeTab === 'student' ? 'Student' : 'School'} Queries`)
+    XLSX.utils.book_append_sheet(wb, ws, `${activeTab === 'student' ? 'Student' : 'Institution'} Queries`)
     XLSX.writeFile(wb, `${activeTab}_queries_${new Date().toISOString().split('T')[0]}.xlsx`)
   }
 
@@ -303,8 +303,8 @@ const StudentIssue = () => {
     const tableColumn = [
       'Query ID',
       activeTab === 'student' ? 'Student Name' : 'Institution Name',
-      activeTab === 'student' ? 'Student ID' : 'School/Uni ID',
-      ...(activeTab === 'student' ? ['Institution Name', 'School ID'] : []),
+      activeTab === 'student' ? 'Student ID' : 'Institution/Uni ID',
+      ...(activeTab === 'student' ? ['Institution Name', 'Institution ID'] : []),
       'Title',
       'Issue',
       'Status',
@@ -341,7 +341,7 @@ const StudentIssue = () => {
       }
     })
 
-    doc.text(`${activeTab === 'student' ? 'Student' : 'School'} Queries Report`, 14, 15)
+    doc.text(`${activeTab === 'student' ? 'Student' : 'Institution'} Queries Report`, 14, 15)
     doc.save(`${activeTab}_queries_${new Date().toISOString().split('T')[0]}.pdf`)
   }
 
@@ -392,7 +392,7 @@ const StudentIssue = () => {
 
             <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-3">
               <Tab eventKey="student" title="Student Queries" />
-              <Tab eventKey="school" title="School Queries" />
+              <Tab eventKey="school" title="Institution Queries" />
             </Tabs>
 
             <Row>
