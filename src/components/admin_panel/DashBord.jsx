@@ -214,7 +214,7 @@ const DashBord = () => {
       // Group by school and track unique students with their course participation
       const schoolGroups = {}
       enrollments.forEach(e => {
-        const school = e.school_name || 'Unknown School'
+        const school = e.school_name || 'Unknown Institution'
         const studentId = e.student_id
 
         // Skip enrollments without valid student_id
@@ -1436,7 +1436,7 @@ const DashBord = () => {
         doc.text(`Total Records: ${filteredEnrollments.length}`, margin, 23)
         
         // Column definitions (Excluding Action)
-        const headers = ['#', 'Student ID', 'Name', 'Institution Name', 'Class', 'Course ID', 'Course Name', 'Enrolled At', 'Status', 'Cert ID']
+        const headers = ['#', 'Student ID', 'Name', 'Institution Name', 'Course', 'Course ID', 'Course Name', 'Enrolled At', 'Status', 'Cert ID']
         const colWidths = [8, 25, 35, 40, 15, 20, 45, 35, 25, 32]
         const totalWidth = colWidths.reduce((a, b) => a + b, 0)
         
@@ -2907,7 +2907,7 @@ const DashBord = () => {
           doc.text(`Total Records: ${filteredData.length}`, margin, 23)
           
           // Column definitions - optimized proportional widths for landscape
-          const headers = ['#', 'ID', 'Name', 'School', 'S.ID', 'Phone', 'Dist', 'Block', 'Course', 'Category', 'Status']
+          const headers = ['#', 'ID', 'Name', 'Institution', 'S.ID', 'Phone', 'Dist', 'Block', 'Course', 'Category', 'Status']
           // Total = 280 units (fits better in landscape)
           const colWidths = [8, 20, 35, 40, 25, 28, 22, 22, 12, 40, 28]
           const totalWidth = colWidths.reduce((a, b) => a + b, 0)
@@ -3026,7 +3026,7 @@ const DashBord = () => {
             'Student ID': student.student_id || counseling.student_id || '-',
             'Full Name': student.full_name || student.candidate_name || '-',
             'Institution Name': student.school_name || '-',
-            'School ID': student.school_uni_id || '-',
+            'Institution ID': student.school_uni_id || '-',
             'Phone': student.phone || student.mobile_no || '-',
             'Email': student.email || 'N/A',
             'District': student.district || '-',
@@ -3140,7 +3140,7 @@ const DashBord = () => {
                 <Col md={6}>
                   <div className="d-flex flex-wrap gap-2 align-items-center">
                     <FaFilter className="text-muted me-2" />
-                    <strong>Filter by Class:</strong>
+                    <strong>Filter by Course:</strong>
                     <Form.Control
                       as="select"
                       size="sm"
@@ -4040,7 +4040,7 @@ const DashBord = () => {
                    doc.setFontSize(10)
                    doc.text(`Generated: ${new Date().toLocaleString()}`, margin, yPos)
                    yPos += 6
-                   const filterSummary = `Filters: ${enrollmentSelectedSchools.length > 0 ? enrollmentSelectedSchools.join(', ') : 'All institutes'} | Classes: ${enrollmentSelectedClasses.length > 0 ? enrollmentSelectedClasses.join(', ') : 'All classes'} | Status: ${analyticsStatusFilter}`
+                   const filterSummary = `Filters: ${enrollmentSelectedSchools.length > 0 ? enrollmentSelectedSchools.join(', ') : 'All institutes'} | Cources: ${enrollmentSelectedClasses.length > 0 ? enrollmentSelectedClasses.join(', ') : 'All classes'} | Status: ${analyticsStatusFilter}`
                    doc.text(filterSummary, margin, yPos)
                    yPos += 10
 
@@ -4097,10 +4097,10 @@ const DashBord = () => {
                        yPos = 20
                      }
                      doc.setFontSize(12)
-                     doc.text('Top Class Distribution', margin, yPos)
+                     doc.text('Top Course Distribution', margin, yPos)
                      yPos += 7
                      autoTable(doc, {
-                       head: [['Class', 'Unique Students', '% of Students']],
+                       head: [['Course', 'Unique Students', '% of Students']],
                        body: classRows,
                        startY: yPos,
                        margin: { left: margin, right: margin },
@@ -4169,7 +4169,7 @@ const DashBord = () => {
                      doc.text(`Student List Preview (first ${studentRows.length} of ${filteredData.length})`, margin, yPos)
                      yPos += 7
                      autoTable(doc, {
-                       head: [['#', 'Student ID', 'Name', 'Institution', 'Class', 'Status', 'Enrolled Date']],
+                       head: [['#', 'Student ID', 'Name', 'Institution', 'Course', 'Status', 'Enrolled Date']],
                        body: studentRows,
                        startY: yPos,
                        margin: { left: margin, right: margin },
@@ -4235,7 +4235,7 @@ const DashBord = () => {
                            .sort((a, b) => parseInt(b[0]) - parseInt(a[0]))
                            .map(([cls, stats], idx, arr) => [
                              idx === 0 ? school : '',
-                             `Class ${cls}`,
+                             `Course ${cls}`,
                              stats.total,
                              stats.completed,
                              stats.total - stats.completed
@@ -4426,7 +4426,7 @@ const DashBord = () => {
                     <Col md={6}>
                       <Card className="shadow-sm border-0 h-100">
                         <Card.Header className="bg-info text-white">
-                          <h6 className="mb-0 fw-bold"><FaLayerGroup className="me-2" /> Distribution by Class</h6>
+                          <h6 className="mb-0 fw-bold"><FaLayerGroup className="me-2" /> Distribution by Course</h6>
                         </Card.Header>
                         <Card.Body>
                           {stats.classDist.length > 0 ? (
@@ -4436,7 +4436,7 @@ const DashBord = () => {
                                 return (
                                   <div key={cls} className="border-bottom pb-2">
                                     <div className="d-flex justify-content-between align-items-center mb-1">
-                                      <Badge bg="info" className="fs-6">Class {cls}</Badge>
+                                      <Badge bg="info" className="fs-6">Course {cls}</Badge>
                                       <span className="fw-bold">{count} unique students</span>
                                     </div>
                                     <div className="progress" style={{ height: '8px', borderRadius: '4px' }}>
@@ -4456,7 +4456,7 @@ const DashBord = () => {
                     <Col md={6}>
                       <Card className="shadow-sm border-0 h-100">
                         <Card.Header className="text-white" style={{ backgroundColor: '#6f42c1' }}>
-                          <h6 className="mb-0 fw-bold"><FaSchool className="me-2" /> Top 10 Performing Schools</h6>
+                          <h6 className="mb-0 fw-bold"><FaSchool className="me-2" /> Top 10 Performing Institutions</h6>
                         </Card.Header>
                         <Card.Body>
                           {(() => {
@@ -4501,7 +4501,7 @@ const DashBord = () => {
                           // Group by school and class with unique students
                           const schoolGroups = {}
                           filteredData.forEach(enrollment => {
-                            const school = enrollment.school_name || 'Unknown School'
+                            const school = enrollment.school_name || 'Unknown Institution'
                             const className = String(enrollment.class_name || 'Unknown')
                             const studentId = enrollment.student_id
                             
@@ -4550,7 +4550,7 @@ const DashBord = () => {
                                       <Col md={6} lg={4} key={className} className="mb-2">
                                         <div className="p-2 border rounded bg-white">
                                           <div className="d-flex justify-content-between align-items-center mb-2">
-                                            <Badge bg="info" className="fs-6">Class {className}</Badge>
+                                            <Badge bg="info" className="fs-6">Cource {className}</Badge>
                                             <span className="fw-bold small">{uniqueCount} unique students</span>
                                           </div>
                                           <div className="d-flex justify-content-between small mb-1">
@@ -4718,7 +4718,7 @@ const DashBord = () => {
                   doc.text('Institution Performance Ranking Report', margin, 20)
                   doc.setFontSize(11)
                   doc.text(`Generated: ${new Date().toLocaleString()}`, margin, 28)
-                  doc.text(`Total Schools: ${rankedSchools.length}`, margin, 36)
+                  doc.text(`Total Institutions: ${rankedSchools.length}`, margin, 36)
 
                   let yPos = 44
 

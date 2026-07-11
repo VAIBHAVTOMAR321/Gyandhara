@@ -1108,7 +1108,7 @@ const AdminDashBoard = () => {
         ]);
        } else if (activeTab === 'quiz-participants') {
          title = "Quiz Participants Report";
-         headers = [['#', 'Student', 'District', 'School', 'Quiz ID', 'Participants', 'Attempts', 'Best Score', 'Best Rank']];
+         headers = [['#', 'Student', 'District', 'Institution', 'Quiz ID', 'Participants', 'Attempts', 'Best Score', 'Best Rank']];
          const filteredQuizData = quizParticipants.filter(p => {
            const matchSchool = !quizSchoolFilter || (p.student?.school_name || '').toLowerCase().includes(quizSchoolFilter.toLowerCase());
            const matchDistrict = !quizDistrictFilter || (p.student?.district || '').toLowerCase().includes(quizDistrictFilter.toLowerCase());
@@ -1170,13 +1170,13 @@ const AdminDashBoard = () => {
       let data = [];
       if (activeTab === 'students') {
         title = "Student_List";
-        data = students.map((s, i) => ({ '#': i + 1, 'Student ID': s.student_id || '-', 'Name': s.full_name || '-', 'Aadhaar': s.aadhaar_no ? `****${s.aadhaar_no.slice(-4)}` : '-', 'Phone': s.phone || '-', 'Email': s.email || '-', 'Class': s.class_name || '-', 'School': s.school_name || '-', 'District': s.district || '-', 'Status': s.status || 'pending' }));
+        data = students.map((s, i) => ({ '#': i + 1, 'Student ID': s.student_id || '-', 'Name': s.full_name || '-', 'Aadhaar': s.aadhaar_no ? `****${s.aadhaar_no.slice(-4)}` : '-', 'Phone': s.phone || '-', 'Email': s.email || '-', 'Course': s.class_name || '-', 'Institution': s.school_name || '-', 'District': s.district || '-', 'Status': s.status || 'pending' }));
       } else if (activeTab === 'schools') {
-        title = "School_List";
-        data = schools.map((s, i) => ({ '#': i + 1, 'School ID': s.school_uni_id || '-', 'Institution Name': s.school_name || '-', 'District': s.district || '-', 'State': s.state || 'Uttarakhand', 'Status': s.status || 'pending' }));
+        title = "Institution_List";
+        data = schools.map((s, i) => ({ '#': i + 1, 'Institution ID': s.school_uni_id || '-', 'Institution Name': s.school_name || '-', 'District': s.district || '-', 'State': s.state || 'Uttarakhand', 'Status': s.status || 'pending' }));
       } else if (activeTab === 'enrollments') {
         title = "Enrollment_List";
-        data = enrollments.map((e, i) => ({ '#': i + 1, 'Student ID': e.student_id || '-', 'Student Name': e.student_name || '-', 'Institution Name': e.school_name || '-', 'Class': e.class_name || '-', 'Course ID': e.course_id || '-', 'Course Name': e.course_name || '-', 'Enrolled At': e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-', 'Status': e.is_completed ? 'Completed' : 'Ongoing' }));
+        data = enrollments.map((e, i) => ({ '#': i + 1, 'Student ID': e.student_id || '-', 'Student Name': e.student_name || '-', 'Institution Name': e.school_name || '-', 'Course': e.class_name || '-', 'Course ID': e.course_id || '-', 'Course Name': e.course_name || '-', 'Enrolled At': e.enrolled_at ? new Date(e.enrolled_at).toLocaleString() : '-', 'Status': e.is_completed ? 'Completed' : 'Ongoing' }));
       } else if (activeTab === 'quiz-participants') {
         title = "Quiz_Participants";
         const filteredQuizData = quizParticipants.filter(p => {
@@ -1188,7 +1188,7 @@ const AdminDashBoard = () => {
           const bestAttempt = p.attempt?.reduce((best, curr) => (curr.score || 0) > (best.score || 0) ? curr : best, p.attempt?.[0] || {});
           const bestRank = p.attempt?.reduce((best, curr) => curr.rank && curr.rank > 0 && (!best || curr.rank < best) ? curr.rank : best, null);
           const percentage = bestAttempt?.total_questions ? ((bestAttempt.score / bestAttempt.total_questions) * 100).toFixed(1) : 0;
-          return { '#': i + 1, 'Student': p.student?.full_name || '-', 'District': p.student?.district || '-', 'School': p.student?.school_name || '-', 'Quiz ID': p.quiz_id || '-', 'Participants': quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length, 'Attempts': p.attempt?.length || 0, 'Best Score': `${bestAttempt?.score || 0}/${bestAttempt?.total_questions || 0} (${percentage}%)`, 'Best Rank': bestRank ? `#${bestRank}` : '-' };
+          return { '#': i + 1, 'Student': p.student?.full_name || '-', 'District': p.student?.district || '-', 'Institution': p.student?.school_name || '-', 'Quiz ID': p.quiz_id || '-', 'Participants': quizParticipants.filter(qp => qp.quiz_id === p.quiz_id).length, 'Attempts': p.attempt?.length || 0, 'Best Score': `${bestAttempt?.score || 0}/${bestAttempt?.total_questions || 0} (${percentage}%)`, 'Best Rank': bestRank ? `#${bestRank}` : '-' };
         });
       }
       const ws = XLSX.utils.json_to_sheet(data);
@@ -1842,7 +1842,7 @@ const AdminDashBoard = () => {
                          <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                            <h4 className="mb-0">
                              {activeTab === "students" && "Student List"}
-                             {activeTab === "schools" && "School List"}
+                             {activeTab === "schools" && "Institution List"}
                              {activeTab === "enrollments" && "Enrollment List"}
                              {activeTab === "quiz-participants" && "Quiz Participants List"}
                              {activeTab === "quiz-items" && "Quiz Items List"}
