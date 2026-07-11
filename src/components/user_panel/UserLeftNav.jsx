@@ -122,7 +122,7 @@ const menuItems = [
      },
      {
        icon: <FaGraduationCap />,
-       label: language === 'hi' ? "प्रैक्टिस क्विज़" : "Practice Quiz",
+       label: language === 'hi' ? "क्विज़" : "Quiz",
        path: "/UserQuiz",
      },
     
