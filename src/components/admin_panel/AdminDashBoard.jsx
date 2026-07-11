@@ -1635,6 +1635,45 @@ const AdminDashBoard = () => {
            {renderPagination(enrollments.length, currentPage)}
          </>
        );
+     } else if (activeTab === "unique-courses") {
+       const uniqueCourses = [...new Map(enrollments.map(item => [item.course_id, item])).values()];
+       const currentUniqueCourses = uniqueCourses.slice(indexOfFirstItem, indexOfLastItem);
+ 
+       return (
+         <>
+           <Table striped bordered hover responsive>
+             <thead>
+               <tr>
+                 <th>#</th>
+                 <th>Course ID</th>
+                 <th>Course Name</th>
+                 <th>Course</th>
+               </tr>
+             </thead>
+             <tbody>
+               {currentUniqueCourses.length > 0 ? (
+                 currentUniqueCourses.map((course, index) => (
+                   <tr key={course.course_id || index}>
+                     <td>{indexOfFirstItem + index + 1}</td>
+                     <td>
+                       <Badge bg="info">{course.course_id}</Badge>
+                     </td>
+                     <td className="fw-bold">{course.course_name}</td>
+                     <td>
+                       <Badge bg="secondary">{course.class_name || '-'}</Badge>
+                     </td>
+                   </tr>
+                 ))
+               ) : (
+                 <tr>
+                   <td colSpan="4" className="text-center">No unique courses found</td>
+                 </tr>
+               )}
+             </tbody>
+           </Table>
+           {renderPagination(uniqueCourses.length, currentPage)}
+         </>
+       );
      } else if (activeTab === "quiz-participants") {
        // Return the custom quiz table
        return renderQuizTable();
@@ -1844,6 +1883,7 @@ const AdminDashBoard = () => {
                              {activeTab === "students" && "Student List"}
                              {activeTab === "schools" && "Institution List"}
                              {activeTab === "enrollments" && "Enrollment List"}
+                             {activeTab === "unique-courses" && "Unique Course List"}
                              {activeTab === "quiz-participants" && "Quiz Participants List"}
                              {activeTab === "quiz-items" && "Quiz Items List"}
                            </h4>
