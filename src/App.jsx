@@ -61,6 +61,7 @@ import Timeschedule from "./components/user_panel/Timeschedule";
 import Competitive from "./components/pages/Competitive";
 import CompetitiveExamQuiz from "./components/admin_panel/CompetitiveExamQuiz";
 import CompetitiveQuiz from "./components/user_panel/CompetitiveQuiz";
+import Analysis from "./components/admin_panel/Analysis";
 import GovtTestSeries from "./components/admin_panel/GovtTestSeries";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
@@ -109,6 +110,7 @@ function NavBarWrapper() {
       "/CompetitiveExamQuiz",
       "/CompetitiveQuiz",
       "/GovtTestSeries",
+     "/Analysis",
 
     ];
 
@@ -166,6 +168,7 @@ function FooterWrapper() {
     "/Managecourse",
     "/Timeschedule",
     "/CompetitiveExamQuiz",
+    "/Analysis",
     
   ];
 
@@ -234,6 +237,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />{" "}
+        <Route
+          path="/Analysis"
+          element={
+            <ProtectedRoute>
+              <Analysis />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/UserDashboard"
           element={

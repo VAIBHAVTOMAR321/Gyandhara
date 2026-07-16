@@ -1027,6 +1027,14 @@
   transform: translateY(-1px);
 }
 
+.analysis-section-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #eee;
+}
 
 /* District Chart Tooltip Enhancement */
 .district-bar[title] {
@@ -1402,4 +1410,14 @@
 
 .quiz-participants-modal .table tbody tr:hover {
   background-color: #f8f9ff;
+}
+
+.clickable-rank-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clickable-rank-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

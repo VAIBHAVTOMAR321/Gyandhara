@@ -24,7 +24,8 @@ import {
   FaGlassCheers,
   FaChalkboardTeacher,
   FaIndustry,
-  FaQuestionCircle
+  FaQuestionCircle,
+  FaChartBar
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -70,6 +71,11 @@ const menuItems = [
     label: "Dashbord",
     path: "/DashBord",
     active: true,
+  },
+  {
+    icon: <FaChartBar />,
+    label: "Analysis",
+    path: "/Analysis",
   },
   {
     icon: <FaTachometerAlt />,
