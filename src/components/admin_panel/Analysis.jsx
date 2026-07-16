@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Container,
   Spinner,
@@ -11,6 +11,7 @@ import {
   Table,
   Modal,
   Button,
+  Dropdown,
 } from "react-bootstrap";
 import AdminLeftNav from "./AdminLeftNav";
 import AdminHeader from "./AdminHeader";
@@ -62,6 +63,23 @@ const Analysis = () => {
   const [selectedCourseSummary, setSelectedCourseSummary] = useState(null);
   const [showOverallAnalysisModal, setShowOverallAnalysisModal] = useState(false);
 
+  // New state for quiz institution analysis
+  const [quizInstitutionSummary, setQuizInstitutionSummary] = useState({});
+  const [showQuizInstitutionModal, setShowQuizInstitutionModal] = useState(false);
+  const [selectedQuizInstitutionSummary, setSelectedQuizInstitutionSummary] = useState(null);
+
+  // New state for quiz participant analysis
+  const [quizParticipantData, setQuizParticipantData] = useState([]);
+  const [showQuizAnalysisModal, setShowQuizAnalysisModal] = useState(false);
+  const [selectedStudentForQuiz, setSelectedStudentForQuiz] = useState(null);
+
+  // New state for quiz filter
+  const [rawQuizData, setRawQuizData] = useState([]);
+  const [quizItems, setQuizItems] = useState([]);
+  const [quizTitleMap, setQuizTitleMap] = useState({});
+  const [selectedQuizzes, setSelectedQuizzes] = useState([]);
+
+
   const { accessToken } = useAuth();
 
   useEffect(() => {
@@ -84,14 +102,65 @@ const Analysis = () => {
       }
       try {
         setLoading(true);
-        const response = await axios.get(
-          "https://brjobsedu.com/gyandhara/gyandhara_backend/api/student/course-analytics/",
-          {
-            headers: { Authorization: `Bearer ${accessToken}` },
-          }
-        );
-        const studentData = response.data.results || [];
+        const [courseResponse, quizResponse, quizItemsResponse] = await Promise.all([
+            axios.get(
+              "https://brjobsedu.com/gyandhara/gyandhara_backend/api/student/course-analytics/",
+              { headers: { Authorization: `Bearer ${accessToken}` } }
+            ),
+            axios.get(
+              "https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/",
+              { headers: { Authorization: `Bearer ${accessToken}` } }
+            ),
+            axios.get(
+              "https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/",
+              { headers: { Authorization: `Bearer ${accessToken}` } }
+            ),
+        ]);
+
+        const studentData = courseResponse.data.results || [];
         setAnalyticsData(studentData);
+
+        const fetchedQuizItems = quizItemsResponse.data?.data || quizItemsResponse.data || [];
+        setQuizItems(fetchedQuizItems);
+
+        const titleMap = {};
+        if (Array.isArray(fetchedQuizItems)) {
+            fetchedQuizItems.forEach(quiz => { titleMap[quiz.quiz_id] = quiz.title; });
+        }
+        setQuizTitleMap(titleMap);
+
+        const fetchedRawQuizData = quizResponse.data.data || [];
+        const processedQuizData = fetchedRawQuizData.reduce((acc, item) => {
+          const studentId = item.student.student_id;
+          if (!acc[studentId]) {
+            acc[studentId] = { student: item.student, attempts: [] };
+          }
+          acc[studentId].attempts.push({ quiz_id: item.quiz_id, ...item.attempt[0] });
+          return acc;
+        }, {});
+        setQuizParticipantData(Object.values(processedQuizData));
+        setRawQuizData(fetchedRawQuizData);
+
+        // New processing for quiz institution summary
+        const quizInstSum = {};
+        fetchedRawQuizData.forEach(item => {
+            const schoolName = item.student.school_name;
+            if (schoolName) {
+                if (!quizInstSum[schoolName]) {
+                    quizInstSum[schoolName] = {
+                        name: schoolName,
+                        participants: new Set(),
+                        totalAttempts: 0,
+                        totalScore: 0,
+                    };
+                }
+                quizInstSum[schoolName].participants.add(item.student.student_id);
+                if (item.attempt && item.attempt.length > 0) {
+                    quizInstSum[schoolName].totalAttempts += item.attempt.length;
+                    item.attempt.forEach(att => { quizInstSum[schoolName].totalScore += att.score || 0; });
+                }
+            }
+        });
 
         // Process data for course summary cards
         const courseSum = {};
@@ -142,6 +211,14 @@ const Analysis = () => {
         setCourseSummary(courseSum);
         setInstitutionSummary(institutionSum);
 
+        // Convert Set to count for quiz institution summary
+        Object.keys(quizInstSum).forEach(key => {
+            const summary = quizInstSum[key];
+            summary.participantCount = summary.participants.size;
+            summary.averageScore = summary.totalAttempts > 0 ? (summary.totalScore / summary.totalAttempts) : 0;
+            delete summary.participants;
+        });
+        setQuizInstitutionSummary(quizInstSum);
       } catch (error) {
         console.error("Error fetching analytics data:", error);
       } finally {
@@ -150,6 +227,57 @@ const Analysis = () => {
     };
     fetchAnalytics();
   }, [accessToken]);
+
+  const filteredQuizData = useMemo(() => {
+    // If no quizzes are selected, show all participants with all their attempts.
+    if (selectedQuizzes.length === 0) {
+      return quizParticipantData.map(studentData => ({
+        ...studentData,
+        bestRank: studentData.attempts.reduce((minRank, attempt) => (attempt.rank && (minRank === null || attempt.rank < minRank)) ? attempt.rank : minRank, null)
+      })).sort((a, b) => (a.bestRank ?? Infinity) - (b.bestRank ?? Infinity));
+    }
+
+    // If quizzes are selected, filter attempts and then filter out students with no matching attempts.
+    return quizParticipantData.map(studentData => {
+      const filteredAttempts = studentData.attempts.filter(attempt => 
+        selectedQuizzes.length === 0 || selectedQuizzes.includes(attempt.quiz_id)
+      );
+
+      // Find the best rank (lowest rank number) for the student from the filtered attempts
+      const bestRank = filteredAttempts.reduce((minRank, attempt) => {
+        if (attempt.rank && (minRank === null || attempt.rank < minRank)) {
+          return attempt.rank;
+        }
+        return minRank;
+      }, null);
+
+      return { ...studentData, attempts: filteredAttempts, bestRank };
+    })
+    .filter(studentData => studentData.attempts.length > 0);
+  }, [quizParticipantData, selectedQuizzes]);
+
+  const filteredInstitutionSummary = useMemo(() => {
+    const dataToProcess = selectedQuizzes.length > 0
+      ? rawQuizData.filter(item => selectedQuizzes.includes(item.quiz_id))
+      : rawQuizData;
+
+    const summary = dataToProcess.reduce((acc, item) => {
+      const schoolName = item.student.school_name;
+      if (schoolName) {
+        if (!acc[schoolName]) {
+          acc[schoolName] = {
+            name: schoolName,
+            participants: new Set(),
+          };
+        }
+        acc[schoolName].participants.add(item.student.student_id);
+      }
+      return acc;
+    }, {});
+
+    Object.values(summary).forEach(inst => { inst.participantCount = inst.participants.size; });
+    return summary;
+  }, [rawQuizData, selectedQuizzes]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -174,6 +302,26 @@ const Analysis = () => {
     setShowOverallAnalysisModal(true);
   };
 
+  const handleViewQuizInstitutionSummary = (institutionKey) => {
+    setSelectedQuizInstitutionSummary(filteredInstitutionSummary[institutionKey]);
+    setShowQuizInstitutionModal(true);
+  };
+
+  const handleViewQuizAnalysis = (studentData) => {
+    setSelectedStudentForQuiz(studentData);
+    setShowQuizAnalysisModal(true);
+  };
+
+  const handleQuizFilterChange = (quizId) => {
+    setSelectedQuizzes(prev => {
+      if (prev.includes(quizId)) {
+        return prev.filter(id => id !== quizId);
+      } else {
+        return [...prev, quizId];
+      }
+    });
+  };
+
 
   const handleViewCourseStatus = (student) => {
     setSelectedStudentForStatus(student);
@@ -193,7 +341,7 @@ const Analysis = () => {
         <div className="dashboard-content">
           <Container fluid>
             <Card className="mb-4">
-              <Card.Body>
+              <Card.Body className="pb-2">
                 <Row className="align-items-end">
                   <Col md={4}>
                     <Form.Group controlId="analysisType">
@@ -203,15 +351,50 @@ const Analysis = () => {
                         onChange={(e) => setAnalysisType(e.target.value)}
                       >
                         <option value="course-wise">Course Wise Analysis</option>
+                        <option value="quiz-participant-wise">Quiz Participant wise</option>
                       </Form.Select>
                     </Form.Group>
+                  </Col>
+                  <Col md={8}>
+                    {analysisType === 'quiz-participant-wise' && (
+                      <Form.Group controlId="quizFilter">
+                        <Form.Label>Filter by Quiz</Form.Label>
+                        <Dropdown>
+                          <Dropdown.Toggle variant="outline-secondary" id="quiz-filter-dropdown" className="w-100 text-start">
+                            {selectedQuizzes.length === 0
+                              ? 'All Quizzes'
+                              : `${selectedQuizzes.length} quiz(zes) selected`}
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="quiz-filter-dropdown-menu">
+                            <Dropdown.Item onClick={() => setSelectedQuizzes(quizItems.map(q => q.quiz_id))}>
+                              Select All
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => setSelectedQuizzes([])} className="text-danger">
+                              Deselect All
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            {quizItems.map(quiz => (
+                              <Dropdown.Item key={quiz.quiz_id} as="div" onClick={(e) => e.stopPropagation()}>
+                                <Form.Check
+                                  type="checkbox"
+                                  id={`quiz-check-${quiz.quiz_id}`}
+                                  label={quiz.title}
+                                  checked={selectedQuizzes.includes(quiz.quiz_id)}
+                                  onChange={() => handleQuizFilterChange(quiz.quiz_id)}
+                                />
+                              </Dropdown.Item>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                    )}
                   </Col>
                 </Row>
               </Card.Body>
             </Card>
 
             {/* Course Summary Cards - Conditionally Rendered */}
-            {analysisType === "course-wise" && Object.keys(courseSummary).length > 0 && (
+            {analysisType === "course-wise" && !loading && Object.keys(courseSummary).length > 0 && (
               <>
                 <h5 className="analysis-section-heading">Courses</h5>
                 <Row className="mb-4">
@@ -235,7 +418,7 @@ const Analysis = () => {
             )}
 
             {/* Institution Summary Cards - Conditionally Rendered */}
-            {analysisType === "course-wise" && Object.keys(institutionSummary).length > 0 && (
+            {analysisType === "course-wise" && !loading && Object.keys(institutionSummary).length > 0 && (
               <>
                 <h5 className="analysis-section-heading">Institutions</h5>
                 <Row className="mb-4">
@@ -255,12 +438,36 @@ const Analysis = () => {
               </>
             )}
 
+            {/* Quiz Institution Summary Cards - Conditionally Rendered */}
+            {analysisType === "quiz-participant-wise" && !loading && Object.keys(filteredInstitutionSummary).length > 0 && (
+              <>
+                <h5 className="analysis-section-heading">Institutions</h5>
+                <Row className="mb-4">
+                  {Object.keys(filteredInstitutionSummary).map((key) => (
+                    <Col lg={3} md={4} sm={6} key={key} className="mb-3">
+                      <Card
+                        className="stat-card-hover clickable-rank-card"
+                        onClick={() => handleViewQuizInstitutionSummary(key)}
+                      >
+                        <Card.Body className="py-2">
+                          <div className="d-flex justify-content-between align-items-center gap-2 w-100">
+                            <h6 className="mb-0 fw-bold text-truncate" title={filteredInstitutionSummary[key].name} style={{ minWidth: 0 }}>{filteredInstitutionSummary[key].name}</h6>
+                            <Badge bg="info" pill className="flex-shrink-0">{filteredInstitutionSummary[key].participantCount} Participants</Badge>
+                          </div>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </>
+            )}
+
             {loading ? (
               <div className="text-center">
                 <Spinner animation="border" variant="primary" />
                 <p>Loading Analytics...</p>
               </div>
-            ) : (
+            ) : analysisType === 'course-wise' ? (
               <>
                 <div className="d-flex justify-content-end mb-3">
                   <Button variant="primary" onClick={handleShowOverallAnalysis}>
@@ -321,6 +528,55 @@ const Analysis = () => {
                 </Table>
                 </Card>
               </>
+            ) : analysisType === 'quiz-participant-wise' ? (
+              <Card className="table-card">
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Institution</th>
+                      <th>Rank</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredQuizData.map((data, index) => (
+                      <tr key={data.student.student_id}>
+                        <td>{index + 1}</td>
+                        <td>{data.student.full_name}</td>
+                        <td>{data.student.student_id}</td>
+                        <td>{data.student.school_name}</td>
+                        <td>
+                          {data.attempts.length === 1 && data.bestRank !== null ? (
+                            <Badge bg="primary">#{data.bestRank}</Badge>
+                          ) : data.bestRank !== null ? (
+                            <Badge bg="info">Best: #{data.bestRank}</Badge>
+                          ) : (
+                            <Badge bg="secondary">N/A</Badge>
+                          )}
+                        </td>
+                        <td>
+                          {data.attempts.length > 1 && (
+                            <Button
+                              variant="outline-primary"
+                              size="sm"
+                              onClick={() => handleViewQuizAnalysis(data)}
+                            >
+                              View Ranks
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Card>
+            ) : (
+              <div className="text-center py-5">
+                <p className="text-muted">Please select an analysis type.</p>
+              </div>
             )}
           </Container>
 
@@ -526,6 +782,53 @@ const Analysis = () => {
               </Modal.Body>
             </Modal>
           )}
+
+          {/* Quiz Analysis Modal */}
+          {selectedStudentForQuiz && (
+            <Modal
+              show={showQuizAnalysisModal}
+              onHide={() => setShowQuizAnalysisModal(false)}
+              size="xl"
+              centered
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>
+                  Quiz Analysis for: {selectedStudentForQuiz.student.full_name}
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>Quiz Title</th>
+                      <th>Score</th>
+                      <th>Total Questions</th>
+                      <th>Status</th>
+                      <th>Rank</th>
+                      <th>Submitted At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedStudentForQuiz.attempts.map((attempt, index) => (
+                      <tr key={index}>
+                        <td><Badge bg="secondary">{quizTitleMap[attempt.quiz_id] || attempt.quiz_id}</Badge></td>
+                        <td>{attempt.score}</td>
+                        <td>{attempt.total_questions}</td>
+                        <td>
+                          <Badge bg={attempt.status === 'passed' ? 'success' : 'danger'}>
+                            {attempt.status}
+                          </Badge>
+                        </td>
+                        <td><Badge bg="primary">#{attempt.rank}</Badge></td>
+                        <td>{new Date(attempt.submitted_at).toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Modal.Body>
+            </Modal>
+          )}
+
 
           {/* Institution Summary Modal */}
           {selectedInstitutionSummary && (

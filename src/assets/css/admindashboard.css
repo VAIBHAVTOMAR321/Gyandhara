@@ -1036,6 +1036,13 @@
   border-bottom: 2px solid #eee;
 }
 
+.quiz-filter-dropdown-menu {
+  max-height: 300px;
+  overflow-y: auto;
+  width: 100%;
+}
+
+
 /* District Chart Tooltip Enhancement */
 .district-bar[title] {
   cursor: help;
