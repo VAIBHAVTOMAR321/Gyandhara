@@ -79,6 +79,17 @@ const Analysis = () => {
   const [quizTitleMap, setQuizTitleMap] = useState({});
   const [selectedQuizzes, setSelectedQuizzes] = useState([]);
 
+  // State for Competition Quiz Analysis
+  const [competitionQuizData, setCompetitionQuizData] = useState([]);
+  const [selectedCompetitionQuizzes, setSelectedCompetitionQuizzes] = useState([]);
+  const [competitionQuizTitles, setCompetitionQuizTitles] = useState([]);
+  const [competitionQuizInstitutionSummary, setCompetitionQuizInstitutionSummary] = useState({});
+  const [showCompetitionQuizInstitutionModal, setShowCompetitionQuizInstitutionModal] = useState(false);
+  const [
+    selectedCompetitionQuizInstitutionSummary, setSelectedCompetitionQuizInstitutionSummary
+  ] = useState(null);
+  const [showCompetitionQuizOverallAnalysisModal, setShowCompetitionQuizOverallAnalysisModal] = useState(false);
+
 
   const { accessToken } = useAuth();
 
@@ -102,7 +113,7 @@ const Analysis = () => {
       }
       try {
         setLoading(true);
-        const [courseResponse, quizResponse, quizItemsResponse] = await Promise.all([
+        const [courseResponse, quizResponse, quizItemsResponse, competitionQuizResponse] = await Promise.all([
             axios.get(
               "https://brjobsedu.com/gyandhara/gyandhara_backend/api/student/course-analytics/",
               { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -113,6 +124,10 @@ const Analysis = () => {
             ),
             axios.get(
               "https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-items/",
+              { headers: { Authorization: `Bearer ${accessToken}` } }
+            ),
+            axios.get(
+              "https://brjobsedu.com/gyandhara/gyandhara_backend/api/competition-quiz/rank/all/",
               { headers: { Authorization: `Bearer ${accessToken}` } }
             ),
         ]);
@@ -140,6 +155,47 @@ const Analysis = () => {
         }, {});
         setQuizParticipantData(Object.values(processedQuizData));
         setRawQuizData(fetchedRawQuizData);
+
+        // Process Competition Quiz Data
+        if (competitionQuizResponse.data.success) {
+          const flattenedParticipants = [];
+          (competitionQuizResponse.data.data || []).forEach(quiz => {
+            if (quiz.students && Array.isArray(quiz.students)) {
+              quiz.students.forEach(student => {
+                flattenedParticipants.push({
+                  ...student,
+                  quiz_id: quiz.quiz_id,
+                  quiz_title: quiz.title,
+                  quiz_category: quiz.quiz_category,
+                });
+              });
+            }
+          });
+          
+          setCompetitionQuizData(flattenedParticipants);
+          setCompetitionQuizTitles([...new Set(flattenedParticipants.map(p => p.quiz_title))]);
+        }
+        
+        // Process Competition Quiz Institution Summary
+        const compQuizInstSum = {};
+        competitionQuizData.forEach(item => {
+            const schoolName = item.school_name;
+            if (schoolName) {
+                if (!compQuizInstSum[schoolName]) {
+                    compQuizInstSum[schoolName] = {
+                        name: schoolName,
+                        participants: new Set(),
+                    };
+                }
+                compQuizInstSum[schoolName].participants.add(item.student_id);
+            }
+        });
+
+        Object.keys(compQuizInstSum).forEach(key => {
+            const summary = compQuizInstSum[key];
+            summary.participantCount = summary.participants.size;
+        });
+        setCompetitionQuizInstitutionSummary(compQuizInstSum);
 
         // New processing for quiz institution summary
         const quizInstSum = {};
@@ -279,6 +335,46 @@ const Analysis = () => {
     return summary;
   }, [rawQuizData, selectedQuizzes]);
 
+  const filteredCompetitionQuizParticipants = useMemo(() => {
+    if (selectedCompetitionQuizzes.length === 0) {
+      return competitionQuizData;
+    }
+    return competitionQuizData.filter(participant =>
+      selectedCompetitionQuizzes.includes(participant.quiz_title)
+    );
+  }, [competitionQuizData, selectedCompetitionQuizzes]);
+
+  const filteredCompetitionInstitutionSummary = useMemo(() => {
+    const dataToProcess = selectedCompetitionQuizzes.length > 0
+      ? filteredCompetitionQuizParticipants
+      : competitionQuizData;
+
+    const summary = dataToProcess.reduce((acc, participant) => {
+      const schoolName = participant.school_name;
+      if (schoolName) {
+        if (!acc[schoolName]) {
+          acc[schoolName] = {
+            name: schoolName,
+            participants: new Set(),
+            totalScore: 0,
+            totalAttempts: 0,
+          };
+        }
+        acc[schoolName].participants.add(participant.student_id);
+        acc[schoolName].totalScore += participant.score || 0;
+        acc[schoolName].totalAttempts += 1;
+      }
+      return acc;
+    }, {});
+
+    Object.values(summary).forEach(inst => {
+      inst.participantCount = inst.participants.size;
+      inst.averageScore = inst.totalAttempts > 0 ? (inst.totalScore / inst.totalAttempts) : 0;
+      delete inst.participants;
+    });
+    return summary;
+  }, [competitionQuizData, selectedCompetitionQuizzes, filteredCompetitionQuizParticipants]);
+
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
@@ -308,7 +404,19 @@ const Analysis = () => {
   };
 
   const handleViewQuizAnalysis = (studentData) => {
-    setSelectedStudentForQuiz(studentData);
+    if (analysisType === 'competition-quiz-analysis') {
+      const studentId = studentData.student_id || studentData.student?.student_id;
+      const attempts = filteredCompetitionQuizParticipants.filter(p => p.student_id === studentId);
+      setSelectedStudentForQuiz({
+        student: {
+          full_name: studentData.student_name || studentData.student?.full_name,
+          student_id: studentId,
+        },
+        attempts: attempts,
+      });
+    } else {
+      setSelectedStudentForQuiz(studentData);
+    }
     setShowQuizAnalysisModal(true);
   };
 
@@ -320,6 +428,25 @@ const Analysis = () => {
         return [...prev, quizId];
       }
     });
+  };
+
+  const handleCompetitionQuizFilterChange = (quizTitle) => {
+    setSelectedCompetitionQuizzes(prev => {
+      if (prev.includes(quizTitle)) {
+        return prev.filter(title => title !== quizTitle);
+      } else {
+        return [...prev, quizTitle];
+      }
+    });
+  };
+
+  const handleViewCompetitionQuizInstitutionSummary = (institutionKey) => {
+    setSelectedCompetitionQuizInstitutionSummary(filteredCompetitionInstitutionSummary[institutionKey]);
+    setShowCompetitionQuizInstitutionModal(true);
+  };
+
+  const handleShowCompetitionQuizOverallAnalysis = () => {
+    setShowCompetitionQuizOverallAnalysisModal(true);
   };
 
 
@@ -352,6 +479,7 @@ const Analysis = () => {
                       >
                         <option value="course-wise">Course Wise Analysis</option>
                         <option value="quiz-participant-wise">Quiz Participant wise</option>
+                        <option value="competition-quiz-analysis">Competition Quiz Analysis</option>
                       </Form.Select>
                     </Form.Group>
                   </Col>
@@ -382,6 +510,36 @@ const Analysis = () => {
                                   checked={selectedQuizzes.includes(quiz.quiz_id)}
                                   onChange={() => handleQuizFilterChange(quiz.quiz_id)}
                                 />
+                              </Dropdown.Item>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                    )}
+                    {analysisType === 'competition-quiz-analysis' && (
+                      <Form.Group controlId="competitionQuizFilter">
+                        <Form.Label>Filter by Competition Quiz</Form.Label>
+                        <Dropdown>
+                          <Dropdown.Toggle variant="outline-secondary" id="competition-quiz-filter-dropdown" className="w-100 text-start">
+                            {selectedCompetitionQuizzes.length === 0
+                              ? 'All Competition Quizzes'
+                              : `${selectedCompetitionQuizzes.length} quiz(zes) selected`}
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="quiz-filter-dropdown-menu">
+                            <Dropdown.Item onClick={() => setSelectedCompetitionQuizzes(competitionQuizTitles)}>
+                              Select All
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => setSelectedCompetitionQuizzes([])} className="text-danger">
+                              Deselect All
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            {competitionQuizTitles.map(title => (
+                              <Dropdown.Item key={title} as="div" onClick={(e) => e.stopPropagation()}>
+                                <Form.Check
+                                  type="checkbox"
+                                  label={title}
+                                  checked={selectedCompetitionQuizzes.includes(title)}
+                                  onChange={() => handleCompetitionQuizFilterChange(title)} />
                               </Dropdown.Item>
                             ))}
                           </Dropdown.Menu>
@@ -573,6 +731,78 @@ const Analysis = () => {
                   </tbody>
                 </Table>
               </Card>
+            ) : analysisType === 'competition-quiz-analysis' ? (
+              <>
+                <div className="d-flex justify-content-end mb-3">
+                  <Button variant="primary" onClick={handleShowCompetitionQuizOverallAnalysis}>
+                    Overall Analysis
+                  </Button>
+                </div>
+                {!loading && Object.keys(filteredCompetitionInstitutionSummary).length > 0 && (
+                  <>
+                    <h5 className="analysis-section-heading">Institutions</h5>
+                    <Row className="mb-4">
+                      {Object.keys(filteredCompetitionInstitutionSummary).map((key) => (
+                        <Col lg={3} md={4} sm={6} key={key} className="mb-3">
+                          <Card
+                            className="stat-card-hover clickable-rank-card"
+                            onClick={() => handleViewCompetitionQuizInstitutionSummary(key)}
+                          >
+                            <Card.Body className="py-2">
+                              <div className="d-flex justify-content-between align-items-center gap-2 w-100">
+                                <h6 className="mb-0 fw-bold text-truncate" title={filteredCompetitionInstitutionSummary[key].name} style={{ minWidth: 0 }}>{filteredCompetitionInstitutionSummary[key].name}</h6>
+                                <Badge bg="info" pill className="flex-shrink-0">{filteredCompetitionInstitutionSummary[key].participantCount} Participants</Badge>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </>
+                )}
+                <Card className="table-card">
+                  <Table striped bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Institution</th>
+                        <th>Rank</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredCompetitionQuizParticipants.length > 0 ? (
+                        filteredCompetitionQuizParticipants.map((participant, index) => (
+                          <tr key={`${participant.student_id}-${index}`}>
+                            <td>{index + 1}</td>
+                            <td>{participant.student_name}</td>
+                            <td>{participant.student_id}</td>
+                            <td>{participant.school_name}</td>
+                            <td>
+                              <Badge bg={participant.rank <= 10 ? "primary" : "secondary"}>
+                                #{participant.rank}
+                              </Badge>
+                            </td>
+                            <td>
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleViewQuizAnalysis(participant)}
+                              >
+                                View
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="6" className="text-center">No participants found for the selected competition quizzes.</td></tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </Card>
+              </>
             ) : (
               <div className="text-center py-5">
                 <p className="text-muted">Please select an analysis type.</p>
@@ -580,7 +810,7 @@ const Analysis = () => {
             )}
           </Container>
 
-          {/* Student Detail Modal */}
+          {/* Course-wise Student Detail Modal */}
           <Modal
             show={showStudentModal}
             onHide={() => setShowStudentModal(false)}
@@ -784,7 +1014,7 @@ const Analysis = () => {
           )}
 
           {/* Quiz Analysis Modal */}
-          {selectedStudentForQuiz && (
+          {selectedStudentForQuiz && analysisType === 'quiz-participant-wise' && (
             <Modal
               show={showQuizAnalysisModal}
               onHide={() => setShowQuizAnalysisModal(false)}
@@ -890,6 +1120,124 @@ const Analysis = () => {
               </Modal.Body>
             </Modal>
           )}
+
+          {/* Competition Quiz Institution Summary Modal */}
+          {selectedCompetitionQuizInstitutionSummary && (
+            <Modal
+              show={showCompetitionQuizInstitutionModal}
+              onHide={() => setShowCompetitionQuizInstitutionModal(false)}
+              centered
+              size="lg"
+            >
+              <Modal.Header closeButton>
+                <Modal.Title className="fw-bold">{selectedCompetitionQuizInstitutionSummary.name} - Competition Summary</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Student Name</th>
+                      <th>Student ID</th>
+                      <th>Quiz Title</th>
+                      <th>Score</th>
+                      <th>Rank</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCompetitionQuizParticipants
+                      .filter(p => p.school_name === selectedCompetitionQuizInstitutionSummary.name)
+                      .map((participant, index) => (
+                        <tr key={`${participant.student_id}-${index}`}>
+                          <td>{index + 1}</td>
+                          <td>{participant.student_name}</td>
+                          <td>{participant.student_id}</td>
+                          <td><Badge bg="info">{participant.quiz_title}</Badge></td>
+                          <td>
+                            <Badge bg={participant.score > 5 ? "success" : "warning"}>
+                              {participant.score}
+                            </Badge>
+                          </td>
+                          <td>
+                            <Badge bg={participant.rank <= 10 ? "primary" : "secondary"}>
+                              #{participant.rank}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))
+                    }
+                  </tbody>
+                </Table>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowCompetitionQuizInstitutionModal(false)}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          )}
+
+          {/* Competition Quiz Participant Analysis Modal */}
+          {selectedStudentForQuiz && analysisType === 'competition-quiz-analysis' && (
+            <Modal
+              show={showQuizAnalysisModal}
+              onHide={() => setShowQuizAnalysisModal(false)}
+              size="xl"
+              centered
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>
+                  Competition Quiz Analysis for: {selectedStudentForQuiz.student.full_name}
+                </Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>Quiz Title</th>
+                      <th>Score</th>
+                      <th>Rank</th>
+                      <th>Status</th>
+                      <th>Submitted At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedStudentForQuiz.attempts.map((attempt, index) => (
+                      <tr key={index}>
+                        <td><Badge bg="secondary">{attempt.quiz_title}</Badge></td>
+                        <td>
+                          <Badge bg={attempt.score > 5 ? "success" : "warning"}>
+                            {attempt.score}
+                          </Badge>
+                        </td>
+                        <td>
+                          <Badge bg={attempt.rank <= 10 ? "primary" : "secondary"}>
+                            #{attempt.rank}
+                          </Badge>
+                        </td>
+                        <td>
+                          <Badge bg={attempt.status === 'passed' ? 'success' : 'danger'}>
+                            {attempt.status}
+                          </Badge>
+                        </td>
+                        <td>
+                          {attempt.submitted_at
+                            ? new Date(attempt.submitted_at).toLocaleString()
+                            : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => setShowQuizAnalysisModal(false)}>
+                  Close
+                </Button>
+              </Modal.Footer>
+            </Modal>
+          )}
+
 
           {/* Overall Analysis Modal */}
           <Modal
@@ -1013,6 +1361,104 @@ const Analysis = () => {
                         <p className="mt-2 text-muted">
                           <strong>{totalCompletedEnrollments}</strong> out of <strong>{totalEnrollments}</strong> total course enrollments are complete.
                         </p>
+                      </Col>
+                    </Row>
+                  </>
+                );
+               })()}
+            </Modal.Body>
+          </Modal>
+
+          {/* Competition Quiz Overall Analysis Modal */}
+          <Modal
+            show={showCompetitionQuizOverallAnalysisModal}
+            onHide={() => setShowCompetitionQuizOverallAnalysisModal(false)}
+            centered
+            size="lg"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title className="fw-bold">Competition Quiz Overall Analysis</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {(() => {
+                const participants = filteredCompetitionQuizParticipants;
+                const totalParticipants = participants.length;
+                const totalQuizzes = [...new Set(participants.map(p => p.quiz_title))].length;
+                const totalScore = participants.reduce((sum, p) => sum + (p.score || 0), 0);
+                const avgScore = totalParticipants > 0 ? totalScore / totalParticipants : 0;
+                const passCount = participants.filter(p => p.status === 'passed').length;
+                const passRate = totalParticipants > 0 ? (passCount / totalParticipants) * 100 : 0;
+
+                const quizWiseData = Object.values(
+                  participants.reduce((acc, p) => {
+                    if (!acc[p.quiz_title]) {
+                      acc[p.quiz_title] = { title: p.quiz_title, scores: [], count: 0 };
+                    }
+                    acc[p.quiz_title].scores.push(p.score || 0);
+                    acc[p.quiz_title].count += 1;
+                    return acc;
+                  }, {})
+                ).map(q => ({
+                  name: q.title.length > 15 ? `${q.title.substring(0, 15)}...` : q.title,
+                  avgScore: q.scores.reduce((a, b) => a + b, 0) / q.scores.length,
+                  participants: q.count,
+                }));
+
+                const statusData = [
+                  { name: 'Passed', value: passCount, color: '#28a745' },
+                  { name: 'Failed', value: totalParticipants - passCount, color: '#dc3545' },
+                ];
+
+                return (
+                  <>
+                    <Row className="mb-4">
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{totalParticipants}</h4><small className="text-muted">Total Participants</small></Card.Body></Card></Col>
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{totalQuizzes}</h4><small className="text-muted">Total Quizzes</small></Card.Body></Card></Col>
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{avgScore.toFixed(1)}</h4><small className="text-muted">Average Score</small></Card.Body></Card></Col>
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{passRate.toFixed(1)}%</h4><small className="text-muted">Pass Rate</small></Card.Body></Card></Col>
+                    </Row>
+
+                    <Row className="g-4">
+                      <Col md={6}>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Quiz-wise Average Score</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <BarChart data={quizWiseData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
+                                <YAxis />
+                                <Tooltip />
+                                <Bar dataKey="avgScore" fill="#8884d8" name="Avg Score" radius={[4, 4, 0, 0]} />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                      <Col md={6}>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Pass / Fail Distribution</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                  data={statusData}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  outerRadius={80}
+                                  dataKey="value"
+                                >
+                                  {statusData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
                       </Col>
                     </Row>
                   </>
