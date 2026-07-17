@@ -953,11 +953,6 @@ const Analysis = () => {
                 )}
                 <Card className="table-card">
                   <Table striped bordered hover responsive>
-                    <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
-                      <span className="text-muted small">
-                        Showing {filteredTestSeriesQuizParticipants.slice((testSeriesCurrentPage - 1) * testSeriesRecordsPerPage, testSeriesCurrentPage * testSeriesRecordsPerPage).length} of {filteredTestSeriesQuizParticipants.length} records
-                      </span>
-                    </Card.Header>
                     <thead>
                       <tr>
                         <th>#</th>
@@ -965,14 +960,20 @@ const Analysis = () => {
                         <th>Student ID</th>
                         <th>Institution</th>
                         <th>Rank</th>
-                        <th>Time Taken</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {filteredCompetitionQuizParticipants.length > 0 ? (
                         filteredCompetitionQuizParticipants.map((participant, index) => (
-                          <tr key={`${participant.student_id}-${index}`}>
+                          <tr
+                            key={`${participant.student_id}-${index}`}
+                            className={
+                              participant.rank === 1 ? 'table-success' :
+                              participant.rank === 2 ? 'table-primary' :
+                              participant.rank === 3 ? 'table-info' : ''
+                            }
+                          >
                             <td>{index + 1}</td>
                             <td>{participant.student_name}</td>
                             <td>{participant.student_id}</td>
@@ -981,16 +982,6 @@ const Analysis = () => {
                               <Badge bg={participant.rank <= 10 ? "primary" : "secondary"}>
                                 #{participant.rank}
                               </Badge>
-                            </td>
-                            <td>
-                              {participant.submitted_at && participant.started_at ? (
-                                (() => {
-                                  const duration = new Date(participant.submitted_at) - new Date(participant.started_at);
-                                  const minutes = Math.floor(duration / 60000);
-                                  const seconds = ((duration % 60000) / 1000).toFixed(0);
-                                  return `${minutes}m ${seconds}s`;
-                                })()
-                              ) : 'N/A'}
                             </td>
                             <td>
                               <Button
@@ -1057,13 +1048,7 @@ const Analysis = () => {
                           .slice((testSeriesCurrentPage - 1) * testSeriesRecordsPerPage, testSeriesCurrentPage * testSeriesRecordsPerPage)
                           .map((participant, index) => (
                             <tr
-                              key={`${participant.student_id}-${participant.quiz_id}-${(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index}`}
-                              className={
-                                participant.rank === 1 ? 'table-success' :
-                                participant.rank === 2 ? 'table-primary' :
-                                participant.rank === 3 ? 'table-info' : ''
-                              }
-                            >
+                              key={`${participant.student_id}-${participant.quiz_id}-${(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index}`}>
                             <td>{(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index + 1}</td>
                             <td>{participant.full_name}</td>
                             <td>{participant.student_id}</td>
@@ -1079,13 +1064,13 @@ const Analysis = () => {
                                 size="sm"
                                 onClick={() => handleViewTestSeriesQuizAnalysis(participant)}
                               >
-                                View
+                                View Rank
                               </Button>
                             </td>
                           </tr>
                         ))
                       ) : (
-                        <tr><td colSpan="6" className="text-center">No participants found for the selected test series quizzes.</td></tr>
+                        <tr><td colSpan="6" className="text-center">No participants found for the selected competition quizzes.</td></tr>
                       )}
                     </tbody>
                   </Table>
@@ -1523,11 +1508,12 @@ const Analysis = () => {
                       <th>Rank</th>
                       <th>Status</th>
                       <th>Submitted At</th>
+                      <th>Time Taken</th>
                     </tr>
                   </thead>
                   <tbody>
                     {selectedStudentForQuiz.attempts.map((attempt, index) => (
-                      <tr key={index}>
+                      <tr key={attempt.id || index}>
                         <td><Badge bg="secondary">{attempt.quiz_title}</Badge></td>
                         <td>
                           <Badge bg={attempt.score > 5 ? "success" : "warning"}>
@@ -1548,6 +1534,16 @@ const Analysis = () => {
                           {attempt.submitted_at
                             ? new Date(attempt.submitted_at).toLocaleString()
                             : '-'}
+                        </td>
+                        <td>
+                          {attempt.submitted_at && attempt.started_at ? (
+                            (() => {
+                              const duration = new Date(attempt.submitted_at) - new Date(attempt.started_at);
+                              const minutes = Math.floor(duration / 60000);
+                              const seconds = ((duration % 60000) / 1000).toFixed(0);
+                              return `${minutes}m ${seconds}s`;
+                            })()
+                          ) : 'N/A'}
                         </td>
                       </tr>
                     ))}
@@ -1584,6 +1580,7 @@ const Analysis = () => {
                       <th>Score</th>
                       <th>Rank</th>
                       <th>Status</th>
+                      <th>Time Taken</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1609,6 +1606,16 @@ const Analysis = () => {
                             <Badge bg={participant.status === 'passed' || participant.status === 'merit' ? 'success' : 'danger'}>
                               {participant.status}
                             </Badge>
+                          </td>
+                          <td>
+                            {participant.submitted_at && participant.started_at ? (
+                              (() => {
+                                const duration = new Date(participant.submitted_at) - new Date(participant.started_at);
+                                const minutes = Math.floor(duration / 60000);
+                                const seconds = ((duration % 60000) / 1000).toFixed(0);
+                                return `${minutes}m ${seconds}s`;
+                              })()
+                            ) : 'N/A'}
                           </td>
                         </tr>
                       ))
@@ -1641,7 +1648,7 @@ const Analysis = () => {
                 <Table striped bordered hover responsive>
                   <thead>
                     <tr>
-                      <th>Quiz ID</th>
+                      <th>Quiz Title</th>
                       <th>Total Questions</th>
                       <th>Score</th>
                       <th>Rank</th>
@@ -1651,8 +1658,8 @@ const Analysis = () => {
                   </thead>
                   <tbody>
                     {selectedStudentForQuiz.attempts.map((attempt, index) => (
-                      <tr key={attempt.attempt_id || index}>
-                        <td><Badge bg="secondary">{attempt.quiz_id}</Badge></td>
+                      <tr key={attempt.attempt_id || index}> 
+                        <td><Badge bg="secondary">{attempt.quiz_title}</Badge></td>
                         <td>{attempt.total_questions}</td>
                         <td>
                           <Badge bg={attempt.score >= 6 ? "success" : "warning"}>
@@ -1714,11 +1721,11 @@ const Analysis = () => {
 
                 const quizWiseData = Object.values(
                   participants.reduce((acc, p) => {
-                    if (!acc[p.quiz_id]) {
-                      acc[p.quiz_id] = { title: p.quiz_id, scores: [], count: 0 };
+                    if (!acc[p.quiz_title]) {
+                      acc[p.quiz_title] = { title: p.quiz_title, scores: [], count: 0 };
                     }
-                    acc[p.quiz_id].scores.push(p.score || 0);
-                    acc[p.quiz_id].count += 1;
+                    acc[p.quiz_title].scores.push(p.score || 0);
+                    acc[p.quiz_title].count += 1;
                     return acc;
                   }, {})
                 ).map(q => ({
@@ -1785,6 +1792,66 @@ const Analysis = () => {
                       </Col>
                     </Row>
                   </>
+                );
+              })()}
+              <hr />
+              <h6 className="fw-bold text-center mb-3">Unique Participants Summary</h6>
+              {(() => {
+                const uniqueParticipantsMap = new Map();
+                filteredTestSeriesQuizParticipants.forEach(p => {
+                  if (!uniqueParticipantsMap.has(p.student_id)) {
+                    uniqueParticipantsMap.set(p.student_id, {
+                      ...p,
+                      attemptCount: 1,
+                      totalScore: p.score,
+                      bestRank: p.rank,
+                    });
+                  } else {
+                    const existing = uniqueParticipantsMap.get(p.student_id);
+                    existing.attemptCount += 1;
+                    existing.totalScore += p.score;
+                    if (p.rank < existing.bestRank) {
+                      existing.bestRank = p.rank;
+                    }
+                  }
+                });
+                const uniqueParticipants = Array.from(uniqueParticipantsMap.values()).sort((a, b) => (a.bestRank || Infinity) - (b.bestRank || Infinity));
+
+                if (uniqueParticipants.length === 0) {
+                  return <p className="text-center text-muted">No participants to display.</p>;
+                }
+                return (
+                  <div className="table-responsive" style={{ maxHeight: '400px' }}>
+                    <Table striped bordered hover size="sm">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Student Name</th>
+                          <th>Institution</th>
+                          <th>Best Rank</th>
+                          <th>Total Score</th>
+                          <th>Attempts</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {uniqueParticipants.map((p, index) => (
+                          <tr key={p.student_id}>
+                            <td>{index + 1}</td>
+                            <td>{p.full_name}</td>
+                            <td>{p.school_name}</td>
+                            <td><Badge bg="primary">#{p.bestRank}</Badge></td>
+                            <td><Badge bg="success">{p.totalScore}</Badge></td>
+                            <td>
+                              <Button variant="link" size="sm" onClick={() => handleViewQuizAnalysis({
+                                student: { full_name: p.full_name, student_id: p.student_id },
+                                attempts: filteredTestSeriesQuizParticipants.filter(att => att.student_id === p.student_id)
+                              })}>{p.attemptCount}</Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
                 );
               })()}
             </Modal.Body>
