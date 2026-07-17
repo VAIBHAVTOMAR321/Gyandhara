@@ -12,6 +12,7 @@ import {
   Modal,
   Button,
   Dropdown,
+  Pagination,
 } from "react-bootstrap";
 import AdminLeftNav from "./AdminLeftNav";
 import AdminHeader from "./AdminHeader";
@@ -85,10 +86,19 @@ const Analysis = () => {
   const [competitionQuizTitles, setCompetitionQuizTitles] = useState([]);
   const [competitionQuizInstitutionSummary, setCompetitionQuizInstitutionSummary] = useState({});
   const [showCompetitionQuizInstitutionModal, setShowCompetitionQuizInstitutionModal] = useState(false);
-  const [
-    selectedCompetitionQuizInstitutionSummary, setSelectedCompetitionQuizInstitutionSummary
-  ] = useState(null);
+  const [selectedCompetitionQuizInstitutionSummary, setSelectedCompetitionQuizInstitutionSummary] = useState(null);
   const [showCompetitionQuizOverallAnalysisModal, setShowCompetitionQuizOverallAnalysisModal] = useState(false);
+
+  // State for Test Series Quiz Analysis
+  const [testSeriesQuizData, setTestSeriesQuizData] = useState([]);
+  const [selectedTestSeriesQuizzes, setSelectedTestSeriesQuizzes] = useState([]);
+  const [testSeriesQuizTitles, setTestSeriesQuizTitles] = useState([]);
+  const [testSeriesQuizInstitutionSummary, setTestSeriesQuizInstitutionSummary] = useState({});
+  const [testSeriesCurrentPage, setTestSeriesCurrentPage] = useState(1);
+  const [showTestSeriesInstitutionSummaryModal, setShowTestSeriesInstitutionSummaryModal] = useState(false);
+  const [selectedTestSeriesInstitution, setSelectedTestSeriesInstitution] = useState(null);
+  const [testSeriesRecordsPerPage] = useState(10);
+  const [showTestSeriesQuizOverallAnalysisModal, setShowTestSeriesQuizOverallAnalysisModal] = useState(false);
 
 
   const { accessToken } = useAuth();
@@ -113,7 +123,10 @@ const Analysis = () => {
       }
       try {
         setLoading(true);
-        const [courseResponse, quizResponse, quizItemsResponse, competitionQuizResponse] = await Promise.all([
+        const [
+          courseResponse, quizResponse, quizItemsResponse, 
+          competitionQuizResponse, testSeriesQuizResponse
+        ] = await Promise.all([
             axios.get(
               "https://brjobsedu.com/gyandhara/gyandhara_backend/api/student/course-analytics/",
               { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -128,6 +141,10 @@ const Analysis = () => {
             ),
             axios.get(
               "https://brjobsedu.com/gyandhara/gyandhara_backend/api/competition-quiz/rank/all/",
+              { headers: { Authorization: `Bearer ${accessToken}` } }
+            ),
+            axios.get(
+              "https://brjobsedu.com/gyandhara/gyandhara_backend/api/test-series-quiz/register/",
               { headers: { Authorization: `Bearer ${accessToken}` } }
             ),
         ]);
@@ -155,6 +172,43 @@ const Analysis = () => {
         }, {});
         setQuizParticipantData(Object.values(processedQuizData));
         setRawQuizData(fetchedRawQuizData);
+
+        // Process Test Series Quiz Data
+        if (testSeriesQuizResponse.data && testSeriesQuizResponse.data.status) {
+          const flattenedTestSeriesParticipants = [];
+          (testSeriesQuizResponse.data.data || []).forEach(entry => {
+            if (entry.student && entry.attempt) {
+              flattenedTestSeriesParticipants.push({
+                ...entry.student,
+                quiz_id: entry.quiz_id,
+                quiz_title: entry.title,
+                joined_at: entry.joined_at,
+                attempt_id: entry.attempt.id,
+                total_questions: entry.attempt.total_questions,
+                score: entry.attempt.score,
+                status: entry.attempt.status,
+                rank: entry.attempt.rank,
+                started_at: entry.attempt.started_at,
+                submitted_at: entry.attempt.submitted_at,
+              });
+            }
+          });
+
+          setTestSeriesQuizData(flattenedTestSeriesParticipants);
+          setTestSeriesQuizTitles([...new Set(flattenedTestSeriesParticipants.map(p => p.quiz_title))]);
+
+          const testSeriesInstSum = {};
+          flattenedTestSeriesParticipants.forEach(p => {
+            if (p.school_name) {
+              if (!testSeriesInstSum[p.school_name]) {
+                testSeriesInstSum[p.school_name] = { name: p.school_name, participants: new Set() };
+              }
+              testSeriesInstSum[p.school_name].participants.add(p.student_id);
+            }
+          });
+          Object.values(testSeriesInstSum).forEach(inst => { inst.participantCount = inst.participants.size; });
+          setTestSeriesQuizInstitutionSummary(testSeriesInstSum);
+        }
 
         // Process Competition Quiz Data
         if (competitionQuizResponse.data.success) {
@@ -284,6 +338,32 @@ const Analysis = () => {
     fetchAnalytics();
   }, [accessToken]);
 
+  const filteredTestSeriesQuizParticipants = useMemo(() => {
+    const data = testSeriesQuizData || [];
+    if (selectedTestSeriesQuizzes.length === 0) {
+      // Sort by rank ascending (best rank first), then by score descending as a tie-breaker
+      return [...data].sort((a, b) => (a.rank || Infinity) - (b.rank || Infinity) || (b.score || 0) - (a.score || 0));
+    }
+    const filtered = data.filter(participant =>
+      selectedTestSeriesQuizzes.includes(participant.quiz_title)
+    );
+    // Sort by rank, then by time taken
+    return filtered.sort((a, b) => {
+      // Prioritize 'merit' status
+      if (a.status === 'merit' && b.status !== 'merit') return -1;
+      if (a.status !== 'merit' && b.status === 'merit') return 1;
+
+      // Then sort by rank
+      const rankSort = (a.rank || Infinity) - (b.rank || Infinity);
+      if (rankSort !== 0) return rankSort;
+
+      // Then by time taken
+      const durationA = a.submitted_at ? new Date(a.submitted_at) - new Date(a.started_at) : Infinity;
+      const durationB = b.submitted_at ? new Date(b.submitted_at) - new Date(b.started_at) : Infinity;
+      return durationA - durationB;
+    });
+  }, [testSeriesQuizData, selectedTestSeriesQuizzes]);
+
   const filteredQuizData = useMemo(() => {
     // If no quizzes are selected, show all participants with all their attempts.
     if (selectedQuizzes.length === 0) {
@@ -379,6 +459,14 @@ const Analysis = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const handleTestSeriesPageChange = (page) => {
+    setTestSeriesCurrentPage(page);
+  };
+
+  const handleSidebarToggle = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   const handleViewStudentAnalysis = (student) => {
     setSelectedStudent(student);
     setShowStudentModal(true);
@@ -398,6 +486,16 @@ const Analysis = () => {
     setShowOverallAnalysisModal(true);
   };
 
+  const handleViewTestSeriesInstitutionSummary = (institutionName) => {
+    const institutionData = testSeriesQuizInstitutionSummary[institutionName];
+    setSelectedTestSeriesInstitution(institutionData);
+    setShowTestSeriesInstitutionSummaryModal(true);
+  };
+
+  const handleShowTestSeriesQuizOverallAnalysis = () => {
+    setShowTestSeriesQuizOverallAnalysisModal(true);
+  };
+
   const handleViewQuizInstitutionSummary = (institutionKey) => {
     setSelectedQuizInstitutionSummary(filteredInstitutionSummary[institutionKey]);
     setShowQuizInstitutionModal(true);
@@ -409,10 +507,22 @@ const Analysis = () => {
       const attempts = filteredCompetitionQuizParticipants.filter(p => p.student_id === studentId);
       setSelectedStudentForQuiz({
         student: {
-          full_name: studentData.student_name || studentData.student?.full_name,
+          full_name: studentData.student_name || studentData.full_name,
           student_id: studentId,
         },
         attempts: attempts,
+      });
+    } else if (analysisType === 'test-series-quiz-analysis') {
+      const studentId = studentData.student_id;
+      const allAttemptsForStudent = testSeriesQuizData.filter(p => p.student_id === studentId);
+      setSelectedStudentForQuiz({
+        // The 'student' object is nested inside for consistency with other parts of the component
+        student: {
+          full_name: studentData.full_name,
+          student_id: studentId,
+        },
+        // Pass all attempts for this student
+        attempts: allAttemptsForStudent,
       });
     } else {
       setSelectedStudentForQuiz(studentData);
@@ -426,6 +536,16 @@ const Analysis = () => {
         return prev.filter(id => id !== quizId);
       } else {
         return [...prev, quizId];
+      }
+    });
+  };
+
+  const handleTestSeriesQuizFilterChange = (quizTitle) => {
+    setSelectedTestSeriesQuizzes(prevTitles => {
+      if (prevTitles.includes(quizTitle)) {
+        return prevTitles.filter(title => title !== quizTitle);
+      } else {
+        return [...prevTitles, quizTitle];
       }
     });
   };
@@ -480,6 +600,7 @@ const Analysis = () => {
                         <option value="course-wise">Course Wise Analysis</option>
                         <option value="quiz-participant-wise">Quiz Participant wise</option>
                         <option value="competition-quiz-analysis">Competition Quiz Analysis</option>
+                        <option value="test-series-quiz-analysis">Test Series Quiz Analysis</option>
                       </Form.Select>
                     </Form.Group>
                   </Col>
@@ -540,6 +661,36 @@ const Analysis = () => {
                                   label={title}
                                   checked={selectedCompetitionQuizzes.includes(title)}
                                   onChange={() => handleCompetitionQuizFilterChange(title)} />
+                              </Dropdown.Item>
+                            ))}
+                          </Dropdown.Menu>
+                        </Dropdown>
+                      </Form.Group>
+                    )}
+                    {analysisType === 'test-series-quiz-analysis' && (
+                      <Form.Group controlId="testSeriesQuizFilter">
+                        <Form.Label>Filter by Test Series Quiz</Form.Label>
+                        <Dropdown>
+                          <Dropdown.Toggle variant="outline-secondary" id="test-series-quiz-filter-dropdown" className="w-100 text-start">
+                            {selectedTestSeriesQuizzes.length === 0
+                              ? 'All Test Series Quizzes'
+                              : `${selectedTestSeriesQuizzes.length} quiz(zes) selected`}
+                          </Dropdown.Toggle>
+                          <Dropdown.Menu className="quiz-filter-dropdown-menu">
+                            <Dropdown.Item onClick={() => setSelectedTestSeriesQuizzes(testSeriesQuizTitles)}>
+                              Select All
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => setSelectedTestSeriesQuizzes([])} className="text-danger">
+                              Deselect All
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            {testSeriesQuizTitles.map(title => (
+                              <Dropdown.Item key={title} as="div" onClick={(e) => e.stopPropagation()}>
+                                <Form.Check
+                                  type="checkbox"
+                                  label={title}
+                                  checked={selectedTestSeriesQuizzes.includes(title)}
+                                  onChange={() => handleTestSeriesQuizFilterChange(title)} />
                               </Dropdown.Item>
                             ))}
                           </Dropdown.Menu>
@@ -801,6 +952,128 @@ const Analysis = () => {
                       )}
                     </tbody>
                   </Table>
+                </Card>
+              </>
+            ) : analysisType === 'test-series-quiz-analysis' ? (
+              <>
+                <div className="d-flex justify-content-end mb-3">
+                  <Button variant="primary" onClick={handleShowTestSeriesQuizOverallAnalysis}>
+                    Overall Analysis
+                  </Button>
+                </div>
+                {!loading && Object.keys(testSeriesQuizInstitutionSummary).length > 0 && (
+                  <>
+                    <h5 className="analysis-section-heading">Institutions</h5>
+                    <Row className="mb-4">
+                      {Object.keys(testSeriesQuizInstitutionSummary).map((key) => (
+                        <Col lg={3} md={4} sm={6} key={key} className="mb-3">
+                          <Card
+                            className="stat-card-hover clickable-rank-card"
+                            onClick={() => handleViewTestSeriesInstitutionSummary(key)}
+                          >
+                            <Card.Body className="py-2">
+                              <div className="d-flex justify-content-between align-items-center gap-2 w-100">
+                                <h6 className="mb-0 fw-bold text-truncate" title={testSeriesQuizInstitutionSummary[key].name} style={{ minWidth: 0 }}>{testSeriesQuizInstitutionSummary[key].name}</h6>
+                                <Badge bg="info" pill className="flex-shrink-0">{testSeriesQuizInstitutionSummary[key].participantCount} Participants</Badge>
+                              </div>
+                            </Card.Body>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </>
+                )}
+                <Card className="table-card">
+                  <Card.Header className="bg-white border-bottom py-3 px-3 d-flex justify-content-between align-items-center">
+                    <span className="text-muted small">
+                      Showing {filteredTestSeriesQuizParticipants.slice((testSeriesCurrentPage - 1) * testSeriesRecordsPerPage, testSeriesCurrentPage * testSeriesRecordsPerPage).length} of {filteredTestSeriesQuizParticipants.length} records
+                    </span>
+                  </Card.Header>
+                  <Table striped bordered hover responsive>
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Institution</th>
+                        <th>Rank</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredTestSeriesQuizParticipants.length > 0 ? (
+                        filteredTestSeriesQuizParticipants
+                          .slice((testSeriesCurrentPage - 1) * testSeriesRecordsPerPage, testSeriesCurrentPage * testSeriesRecordsPerPage)
+                          .map((participant, index) => (
+                            <tr
+                              key={`${participant.student_id}-${participant.quiz_id}-${(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index}`}
+                              className={
+                                participant.rank === 1 ? 'table-success' :
+                                participant.rank === 2 ? 'table-primary' :
+                                participant.rank === 3 ? 'table-info' : ''
+                              }
+                            >
+                            <td>{(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index + 1}</td>
+                            <td>{participant.full_name}</td>
+                            <td>{participant.student_id}</td>
+                            <td>{participant.school_name}</td>
+                            <td>
+                              <Badge bg={participant.rank <= 10 ? "primary" : "secondary"}>
+                                #{participant.rank}
+                              </Badge>
+                            </td>
+                            <td>
+                              <Button
+                                variant="outline-primary"
+                                size="sm"
+                                onClick={() => handleViewQuizAnalysis(participant)}
+                              >
+                                View Rank
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr><td colSpan="6" className="text-center">No participants found for the selected test series quizzes.</td></tr>
+                      )}
+                    </tbody>
+                  </Table>
+                  {filteredTestSeriesQuizParticipants.length > testSeriesRecordsPerPage && (
+                    <Card.Footer className="bg-light border-top py-2 px-3">
+                      <Pagination className="justify-content-center mb-0" size="sm">
+                        <Pagination.First onClick={() => handleTestSeriesPageChange(1)} disabled={testSeriesCurrentPage === 1} />
+                        <Pagination.Prev onClick={() => handleTestSeriesPageChange(testSeriesCurrentPage - 1)} disabled={testSeriesCurrentPage === 1} />
+                        
+                        {(() => {
+                          const totalPages = Math.ceil(filteredTestSeriesQuizParticipants.length / testSeriesRecordsPerPage);
+                          const items = [];
+                          let startPage = Math.max(1, testSeriesCurrentPage - 2);
+                          let endPage = Math.min(totalPages, testSeriesCurrentPage + 2);
+
+                          if (testSeriesCurrentPage > 3) {
+                            items.push(<Pagination.Ellipsis key="start-ellipsis" disabled />);
+                          }
+
+                          for (let i = startPage; i <= endPage; i++) {
+                            items.push(
+                              <Pagination.Item key={i} active={i === testSeriesCurrentPage} onClick={() => handleTestSeriesPageChange(i)}>
+                                {i}
+                              </Pagination.Item>
+                            );
+                          }
+
+                          if (testSeriesCurrentPage < totalPages - 2) {
+                            items.push(<Pagination.Ellipsis key="end-ellipsis" disabled />);
+                          }
+                          
+                          return items;
+                        })()}
+
+                        <Pagination.Next onClick={() => handleTestSeriesPageChange(testSeriesCurrentPage + 1)} disabled={testSeriesCurrentPage === Math.ceil(filteredTestSeriesQuizParticipants.length / testSeriesRecordsPerPage)} />
+                        <Pagination.Last onClick={() => handleTestSeriesPageChange(Math.ceil(filteredTestSeriesQuizParticipants.length / testSeriesRecordsPerPage))} disabled={testSeriesCurrentPage === Math.ceil(filteredTestSeriesQuizParticipants.length / testSeriesRecordsPerPage)} />
+                      </Pagination>
+                    </Card.Footer>
+                  )}
                 </Card>
               </>
             ) : (
@@ -1178,7 +1451,7 @@ const Analysis = () => {
           )}
 
           {/* Competition Quiz Participant Analysis Modal */}
-          {selectedStudentForQuiz && analysisType === 'competition-quiz-analysis' && (
+          {selectedStudentForQuiz && (analysisType === 'competition-quiz-analysis' || analysisType === 'test-series-quiz-analysis') && (
             <Modal
               show={showQuizAnalysisModal}
               onHide={() => setShowQuizAnalysisModal(false)}
@@ -1187,7 +1460,9 @@ const Analysis = () => {
             >
               <Modal.Header closeButton>
                 <Modal.Title>
-                  Competition Quiz Analysis for: {selectedStudentForQuiz.student.full_name}
+                  {analysisType === 'competition-quiz-analysis' ? 'Competition' : 'Test Series'} Quiz Analysis for: {
+                    selectedStudentForQuiz.student?.full_name || selectedStudentForQuiz.full_name
+                  }
                 </Modal.Title>
               </Modal.Header>
               <Modal.Body>
@@ -1221,9 +1496,14 @@ const Analysis = () => {
                           </Badge>
                         </td>
                         <td>
-                          {attempt.submitted_at
-                            ? new Date(attempt.submitted_at).toLocaleString()
-                            : '-'}
+                          {attempt.submitted_at && attempt.started_at ? (
+                            (() => {
+                              const duration = new Date(attempt.submitted_at) - new Date(attempt.started_at);
+                              const minutes = Math.floor(duration / 60000);
+                              const seconds = ((duration % 60000) / 1000).toFixed(0);
+                              return `${minutes}m ${seconds}s`;
+                            })()
+                          ) : 'N/A'}
                         </td>
                       </tr>
                     ))}
@@ -1462,6 +1742,269 @@ const Analysis = () => {
                       </Col>
                     </Row>
                   </>
+                );
+              })()}
+            </Modal.Body>
+          </Modal>
+
+          {/* Test Series Quiz Overall Analysis Modal */}
+          <Modal
+            show={showTestSeriesQuizOverallAnalysisModal}
+            onHide={() => setShowTestSeriesQuizOverallAnalysisModal(false)}
+            centered
+            size="lg"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title className="fw-bold">Test Series Quiz Overall Analysis</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {(() => {
+                const participants = filteredTestSeriesQuizParticipants || [];
+                const totalParticipants = new Set(participants.map(p => p.student_id)).size;
+                const totalAttempts = participants.length;
+                const totalScore = participants.reduce((sum, p) => sum + (p.score || 0), 0);
+                const avgScore = totalAttempts > 0 ? totalScore / totalAttempts : 0;
+                const passCount = participants.filter(p => p.status === 'passed' || p.status === 'merit').length;
+                const passRate = totalAttempts > 0 ? (passCount / totalAttempts) * 100 : 0;
+
+                const quizWiseData = Object.values(
+                  participants.reduce((acc, p) => {
+                    if (!acc[p.quiz_title]) {
+                      acc[p.quiz_title] = { title: p.quiz_title, scores: [], count: 0 };
+                    }
+                    acc[p.quiz_title].scores.push(p.score || 0);
+                    acc[p.quiz_title].count += 1;
+                    return acc;
+                  }, {})
+                ).map(q => ({
+                  name: q.title,
+                  avgScore: q.scores.reduce((a, b) => a + b, 0) / q.scores.length,
+                  participants: q.count,
+                }));
+
+                const statusData = [
+                  { name: 'Passed/Merit', value: passCount, color: '#28a745' },
+                  { name: 'Failed', value: totalAttempts - passCount, color: '#dc3545' },
+                ];
+
+                const scoreDistributionData = participants.reduce((acc, p) => {
+                  const score = p.score || 0;
+                  if (score >= 9) acc['9-10']++;
+                  else if (score >= 7) acc['7-8']++;
+                  else if (score >= 5) acc['5-6']++;
+                  else if (score >= 3) acc['3-4']++;
+                  else acc['0-2']++;
+                  return acc;
+                }, { '0-2': 0, '3-4': 0, '5-6': 0, '7-8': 0, '9-10': 0 });
+
+                const scoreChartData = Object.keys(scoreDistributionData).map(key => ({
+                  range: key,
+                  count: scoreDistributionData[key]
+                }));
+
+                return (
+                  <>
+                    <Row className="mb-4">
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{totalParticipants}</h4><small className="text-muted">Unique Participants</small></Card.Body></Card></Col>
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{totalAttempts}</h4><small className="text-muted">Total Attempts</small></Card.Body></Card></Col>
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{avgScore.toFixed(1)}</h4><small className="text-muted">Average Score</small></Card.Body></Card></Col>
+                      <Col md={3}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{passRate.toFixed(1)}%</h4><small className="text-muted">Pass Rate</small></Card.Body></Card></Col>
+                    </Row>
+
+                    <Row className="g-4">
+                      <Col md={6}>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Quiz-wise Average Score</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <BarChart data={quizWiseData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="name" tick={false} />
+                                <YAxis />
+                                <Tooltip />
+                                <Bar dataKey="avgScore" fill="#8884d8" name="Avg Score" radius={[4, 4, 0, 0]} />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                      <Col md={6}>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Pass / Fail Distribution</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                  data={statusData}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  outerRadius={80}
+                                  dataKey="value"
+                                >
+                                  {statusData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    </Row>
+                    <Row className="mt-4">
+                      <Col>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Score Distribution</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <BarChart data={scoreChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="range" tick={{ fontSize: 12 }} />
+                                <YAxis allowDecimals={false} />
+                                <Tooltip />
+                                <Bar dataKey="count" fill="#20c997" name="Participants" radius={[4, 4, 0, 0]} />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    </Row>
+                    <hr />
+                    <h6 className="fw-bold text-center mb-3">Unique Participants Summary</h6>
+                    {(() => {
+                      const uniqueParticipantsMap = new Map();
+                      filteredTestSeriesQuizParticipants.forEach(p => {
+                        if (!uniqueParticipantsMap.has(p.student_id)) {
+                          uniqueParticipantsMap.set(p.student_id, {
+                            ...p,
+                            attemptCount: 1,
+                            totalScore: p.score,
+                            bestRank: p.rank,
+                          });
+                        } else {
+                          const existing = uniqueParticipantsMap.get(p.student_id);
+                          existing.attemptCount += 1;
+                          existing.totalScore += p.score;
+                          if (p.rank < existing.bestRank) {
+                            existing.bestRank = p.rank;
+                          }
+                        }
+                      });
+                      const uniqueParticipants = Array.from(uniqueParticipantsMap.values()).sort((a, b) => (a.bestRank || Infinity) - (b.bestRank || Infinity));
+
+                      if (uniqueParticipants.length === 0) {
+                        return <p className="text-center text-muted">No participants to display.</p>;
+                      }
+                      return (
+                        <div className="table-responsive" style={{ maxHeight: '400px' }}>
+                          <Table striped bordered hover size="sm">
+                            <thead>
+                              <tr>
+                                <th>#</th>
+                                <th>Student Name</th>
+                                <th>Institution</th>
+                                <th>Best Rank</th>
+                                <th>Total Score</th>
+                                <th>Attempts</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {uniqueParticipants.map((p, index) => (
+                                <tr key={p.student_id}>
+                                  <td>{index + 1}</td>
+                                  <td>{p.full_name}</td>
+                                  <td>{p.school_name}</td>
+                                  <td><Badge bg="primary">#{p.bestRank}</Badge></td>
+                                  <td><Badge bg="success">{p.totalScore}</Badge></td>
+                                  <td>
+                                    <Button variant="link" size="sm" onClick={() => handleViewQuizAnalysis(p)}>{p.attemptCount}</Button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </Table>
+                        </div>
+                      );
+                    })()}
+                  </>
+                );
+              })()}
+            </Modal.Body>
+          </Modal>
+
+          {/* Test Series Institution Summary Modal */}
+          <Modal
+            show={showTestSeriesInstitutionSummaryModal}
+            onHide={() => setShowTestSeriesInstitutionSummaryModal(false)}
+            centered
+            size="lg"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title className="fw-bold">
+                Unique Participants Summary for: {selectedTestSeriesInstitution?.name}
+              </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {(() => {
+                if (!selectedTestSeriesInstitution) return null;
+
+                const institutionParticipants = filteredTestSeriesQuizParticipants.filter(
+                  p => p.school_name === selectedTestSeriesInstitution.name
+                );
+
+                const uniqueParticipantsMap = new Map();
+                institutionParticipants.forEach(p => {
+                  if (!uniqueParticipantsMap.has(p.student_id)) {
+                    uniqueParticipantsMap.set(p.student_id, {
+                      ...p,
+                      attemptCount: 1,
+                      totalScore: p.score,
+                      bestRank: p.rank,
+                    });
+                  } else {
+                    const existing = uniqueParticipantsMap.get(p.student_id);
+                    existing.attemptCount += 1;
+                    existing.totalScore += p.score;
+                    if (p.rank < existing.bestRank) {
+                      existing.bestRank = p.rank;
+                    }
+                  }
+                });
+                const uniqueParticipants = Array.from(uniqueParticipantsMap.values()).sort((a, b) => (a.bestRank || Infinity) - (b.bestRank || Infinity));
+
+                if (uniqueParticipants.length === 0) {
+                  return <p className="text-center text-muted">No participants to display for this institution.</p>;
+                }
+                return (
+                  <div className="table-responsive" style={{ maxHeight: '500px' }}>
+                    <Table striped bordered hover size="sm">
+                      <thead>
+                        <tr>
+                          <th>#</th>
+                          <th>Student Name</th>
+                          <th>Best Rank</th>
+                          <th>Total Score</th>
+                          <th>Attempts</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {uniqueParticipants.map((p, index) => (
+                          <tr key={p.student_id}>
+                            <td>{index + 1}</td>
+                            <td>{p.full_name}</td>
+                            <td><Badge bg="primary">#{p.bestRank}</Badge></td>
+                            <td><Badge bg="success">{p.totalScore}</Badge></td>
+                            <td>
+                              <Button variant="link" size="sm" onClick={() => handleViewQuizAnalysis(p)}>{p.attemptCount}</Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  </div>
                 );
               })()}
             </Modal.Body>
