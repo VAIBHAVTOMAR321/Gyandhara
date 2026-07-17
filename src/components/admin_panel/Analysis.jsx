@@ -1546,6 +1546,104 @@ const Analysis = () => {
           )}
 
 
+          {/* Quiz Participant Overall Analysis Modal */}
+          <Modal
+            show={showQuizParticipantOverallAnalysisModal}
+            onHide={() => setShowQuizParticipantOverallAnalysisModal(false)}
+            centered
+            size="lg"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title className="fw-bold">Quiz Participant Overall Analysis</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {(() => {
+                const participants = filteredQuizData;
+                const totalParticipants = participants.length;
+                const totalQuizzes = quizItems.length;
+                const totalAttempts = participants.reduce((sum, p) => sum + p.attempts.length, 0);
+                const allScores = participants.flatMap(p => p.attempts.map(a => a.score || 0));
+                const avgScore = allScores.length > 0 ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 0;
+                const passCount = participants.filter(p => p.attempts.some(a => a.status === 'passed')).length;
+                const passRate = totalParticipants > 0 ? (passCount / totalParticipants) * 100 : 0;
+
+                const quizWiseData = quizItems.map(quiz => {
+                  const attempts = participants.flatMap(p => p.attempts.filter(a => a.quiz_id === quiz.quiz_id));
+                  const scores = attempts.map(a => a.score || 0);
+                  const avg = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+                  return {
+                    name: quiz.title.length > 15 ? `${quiz.title.substring(0, 15)}...` : quiz.title,
+                    fullName: quiz.title, // Add full name for tooltip
+                    avgScore: avg,
+                    participants: attempts.length,
+                  };
+                }).filter(q => q.participants > 0);
+                
+                const statusData = [
+                  { name: 'Passed', value: passCount, color: '#28a745' },
+                  { name: 'Not Passed', value: totalParticipants - passCount, color: '#dc3545' },
+                ];
+
+                return (
+                  <>
+                   
+
+                    <Row className="mb-4">
+                      <Col md={4}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{totalParticipants}</h4><small className="text-muted">Total Students</small></Card.Body></Card></Col>
+                      <Col md={4}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{totalQuizzes}</h4><small className="text-muted">Total Quizzes</small></Card.Body></Card></Col>
+                     
+                      <Col md={4}><Card className="text-center h-100"><Card.Body><h4 className="fw-bold">{passRate.toFixed(1)}%</h4><small className="text-muted">Pass Rate</small></Card.Body></Card></Col>
+                    </Row>
+
+                    <Row className="g-4">
+                      <Col md={6}>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Quiz-wise Average Score</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <BarChart data={quizWiseData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                                <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
+                                <YAxis />
+                                <Tooltip />
+                                <Bar dataKey="avgScore" fill="#8884d8" name="Avg Score" radius={[4, 4, 0, 0]} />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                      <Col md={6}>
+                        <Card className="h-100">
+                          <Card.Body>
+                            <h6 className="fw-bold text-center mb-3">Pass / Fail Distribution</h6>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                  data={statusData}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  outerRadius={80}
+                                  dataKey="value"
+                                >
+                                  {statusData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                    </Row>
+                  </>
+                );
+              })()}
+            </Modal.Body>
+          </Modal>
+
           {/* Overall Analysis Modal */}
           <Modal
             show={showOverallAnalysisModal}
