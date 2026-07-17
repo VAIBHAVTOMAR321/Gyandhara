@@ -55,10 +55,10 @@ const Analysis = () => {
   const [selectedInstitutionSummary, setSelectedInstitutionSummary] = useState(null);
 
   const [showCourseStatusModal, setShowCourseStatusModal] = useState(false);
-  const [selectedStudentForStatus, setSelectedStudentForStatus] = useState(null);
+  // This state will now hold all data for the comprehensive student modal
+  const [overallStudentAnalysis, setOverallStudentAnalysis] = useState(null);
+  const [showOverallStudentModal, setShowOverallStudentModal] = useState(false);
 
-
-  const [showStudentModal, setShowStudentModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [selectedCourseSummary, setSelectedCourseSummary] = useState(null);
@@ -467,6 +467,21 @@ const Analysis = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const handleShowOverallPerformance = () => {
+    switch (analysisType) {
+      case 'course-wise':
+        return handleShowOverallAnalysis();
+      case 'quiz-participant-wise':
+        return handleShowQuizParticipantOverallAnalysis();
+      case 'competition-quiz-analysis':
+        return handleShowCompetitionQuizOverallAnalysis();
+      case 'test-series-quiz-analysis':
+        return handleShowTestSeriesQuizOverallAnalysis();
+      default:
+        return;
+    }
+  };
+
   const handleTestSeriesPageChange = (page) => {
     setTestSeriesCurrentPage(page);
   };
@@ -475,9 +490,40 @@ const Analysis = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const handleViewStudentAnalysis = (student) => {
-    setSelectedStudent(student);
-    setShowStudentModal(true);
+  const handleViewStudentAnalysis = (studentIdentifier) => {
+    const studentId = studentIdentifier.student_id || studentIdentifier.student?.student_id;
+    if (!studentId) return;
+
+    const courseData = analyticsData.find(s => s.student_id === studentId);
+    const quizData = quizParticipantData.find(s => s.student.student_id === studentId);
+    const competitionData = competitionQuizData.filter(s => s.student_id === studentId);
+    const testSeriesData = testSeriesQuizData.filter(s => s.student_id === studentId);
+
+    // Consolidate student details from any available source
+    const studentDetails = 
+      courseData || 
+      quizData?.student || 
+      competitionData[0] || 
+      testSeriesData[0] ||
+      {};
+
+    const consolidatedData = {
+      student: {
+        student_id: studentId,
+        full_name: studentDetails.student_name || studentDetails.full_name,
+        school_name: studentDetails.school_name,
+        district: studentDetails.district,
+      },
+      courses: courseData?.courses || [],
+      quizzes: quizData?.attempts || [],
+      competitionQuizzes: competitionData,
+      testSeries: testSeriesData,
+    };
+
+    console.log("Consolidated Student Data:", consolidatedData);
+
+    setOverallStudentAnalysis(consolidatedData);
+    setShowOverallStudentModal(true);
   };
 
   const handleViewCourseSummary = (courseKey) => {
@@ -514,32 +560,7 @@ const Analysis = () => {
   };
 
   const handleViewQuizAnalysis = (studentData) => {
-    if (analysisType === 'competition-quiz-analysis') {
-      const studentId = studentData.student_id || studentData.student?.student_id;
-      const attempts = filteredCompetitionQuizParticipants.filter(p => p.student_id === studentId);
-      setSelectedStudentForQuiz({
-        student: {
-          full_name: studentData.student_name || studentData.full_name,
-          student_id: studentId,
-        },
-        attempts: attempts,
-      });
-    } else if (analysisType === 'test-series-quiz-analysis') {
-      const studentId = studentData.student_id;
-      const allAttemptsForStudent = testSeriesQuizData.filter(p => p.student_id === studentId);
-      setSelectedStudentForQuiz({
-        // The 'student' object is nested inside for consistency with other parts of the component
-        student: {
-          full_name: studentData.full_name,
-          student_id: studentId,
-        },
-        // Pass all attempts for this student
-        attempts: allAttemptsForStudent,
-      });
-    } else {
-      setSelectedStudentForQuiz(studentData);
-    }
-    setShowQuizAnalysisModal(true);
+    handleViewStudentAnalysis(studentData);
   };
 
   const handleQuizFilterChange = (quizId) => {
@@ -583,8 +604,8 @@ const Analysis = () => {
 
 
   const handleViewCourseStatus = (student) => {
-    setSelectedStudentForStatus(student);
-    setShowCourseStatusModal(true);
+    // Re-routing to the main analysis view
+    handleViewStudentAnalysis(student);
   };
 
   return (
@@ -602,7 +623,7 @@ const Analysis = () => {
             <Card className="mb-4">
               <Card.Body className="pb-2">
                 <Row className="align-items-end">
-                  <Col md={4}>
+                  <Col md={5}>
                     <Form.Group controlId="analysisType">
                       <Form.Label>Analysis Type</Form.Label>
                       <Form.Select
@@ -616,7 +637,7 @@ const Analysis = () => {
                       </Form.Select>
                     </Form.Group>
                   </Col>
-                  <Col md={8}>
+                  <Col md={5}>
                     {analysisType === 'quiz-participant-wise' && (
                       <Form.Group controlId="quizFilter">
                         <Form.Label>Filter by Quiz</Form.Label>
@@ -710,6 +731,11 @@ const Analysis = () => {
                       </Form.Group>
                     )}
                   </Col>
+                  <Col md={2} className="d-flex justify-content-end">
+                    <Button variant="primary" onClick={handleShowOverallPerformance} className="w-100">
+                      Overall Performance
+                    </Button>
+                  </Col>
                 </Row>
               </Card.Body>
             </Card>
@@ -759,13 +785,6 @@ const Analysis = () => {
               </>
             )}
 
-            {analysisType === 'quiz-participant-wise' && (
-              <div className="d-flex justify-content-end mb-3">
-                <Button variant="primary" onClick={handleShowQuizParticipantOverallAnalysis}>
-                  Overall Analysis
-                </Button>
-              </div>
-            )}
             {/* Quiz Institution Summary Cards - Conditionally Rendered */}
             {analysisType === "quiz-participant-wise" && !loading && Object.keys(filteredInstitutionSummary).length > 0 && (
               <>
@@ -792,16 +811,9 @@ const Analysis = () => {
 
             {loading ? (
               <div className="text-center">
-                <Spinner animation="border" variant="primary" />
-                <p>Loading Analytics...</p>
               </div>
             ) : analysisType === 'course-wise' ? (
               <>
-                <div className="d-flex justify-content-end mb-3">
-                  <Button variant="primary" onClick={handleShowOverallAnalysis}>
-                    Overall Analysis
-                  </Button>
-                </div>
                 <Card className="table-card">
                 <Table striped bordered hover responsive>
                   <thead>
@@ -829,11 +841,7 @@ const Analysis = () => {
                         </td>
                         <td className="text-center">
                           <Badge
-                            bg="success"
-                            pill
-                            style={{ cursor: "pointer" }}
-                            onClick={() => handleViewCourseStatus(student)}
-                          >
+                            bg="success" pill>
                             {
                               student.courses.filter(course =>
                                 course.modules.length > 0 && course.modules.every(m => m.module_status === 'completed')
@@ -890,7 +898,7 @@ const Analysis = () => {
                             <Button
                               variant="outline-primary"
                               size="sm"
-                              onClick={() => handleViewQuizAnalysis(data)}
+                              onClick={() => handleViewStudentAnalysis(data)}
                             >
                               View Ranks
                             </Button>
@@ -903,11 +911,6 @@ const Analysis = () => {
               </Card>
             ) : analysisType === 'competition-quiz-analysis' ? (
               <>
-                <div className="d-flex justify-content-end mb-3">
-                  <Button variant="primary" onClick={handleShowCompetitionQuizOverallAnalysis}>
-                    Overall Analysis
-                  </Button>
-                </div>
                 {!loading && Object.keys(filteredCompetitionInstitutionSummary).length > 0 && (
                   <>
                     <h5 className="analysis-section-heading">Institutions</h5>
@@ -963,7 +966,7 @@ const Analysis = () => {
                               <Button
                                 variant="outline-primary"
                                 size="sm"
-                                onClick={() => handleViewQuizAnalysis(participant)}
+                                onClick={() => handleViewStudentAnalysis(participant)}
                               >
                                 View
                               </Button>
@@ -979,11 +982,6 @@ const Analysis = () => {
               </>
             ) : analysisType === 'test-series-quiz-analysis' ? (
               <>
-                <div className="d-flex justify-content-end mb-3">
-                  <Button variant="primary" onClick={handleShowTestSeriesQuizOverallAnalysis}>
-                    Overall Analysis
-                  </Button>
-                </div>
                 {!loading && Object.keys(testSeriesQuizInstitutionSummary).length > 0 && (
                   <>
                     <h5 className="analysis-section-heading">Institutions</h5>
@@ -1052,8 +1050,8 @@ const Analysis = () => {
                             <td>
                               <Button
                                 variant="outline-primary"
-                                size="sm"
-                                onClick={() => handleViewQuizAnalysis(participant)}
+                                size="sm" 
+                                onClick={() => handleViewStudentAnalysis(participant)}
                               >
                                 View Rank
                               </Button>
@@ -1110,92 +1108,113 @@ const Analysis = () => {
             )}
           </Container>
 
-          {/* Course-wise Student Detail Modal */}
+          {/* Unified Student Overall Performance Modal */}
           <Modal
-            show={showStudentModal}
-            onHide={() => setShowStudentModal(false)}
+            show={showOverallStudentModal}
+            onHide={() => setShowOverallStudentModal(false)}
             size="xl"
+            centered
           >
             <Modal.Header closeButton>
               <Modal.Title>
-                Analysis for: {selectedStudent?.student_name}
+                Overall Performance: {overallStudentAnalysis?.student?.full_name}
               </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {selectedStudent?.courses.map((course) => {
-                const completedModules = course.modules.filter(
-                  (m) => m.module_status === "completed"
-                ).length;
-                const progress =
-                  course.modules.length > 0
-                    ? (completedModules / course.modules.length) * 100
-                    : 0;
+              {overallStudentAnalysis && (
+                <>
+                  {/* Course Performance */}
+                  <h5 className="mb-3">Course Performance</h5>
+                  {overallStudentAnalysis.courses.length > 0 ? (
+                    overallStudentAnalysis.courses.map((course) => {
+                      const completedModules = course.modules.filter(m => m.module_status === "completed").length;
+                      const progress = course.modules.length > 0 ? (completedModules / course.modules.length) * 100 : 0;
+                      return (
+                        <Card key={course.course_id} className="mb-4">
+                          <Card.Header>
+                            <div className="d-flex justify-content-between">
+                              <h6>{course.course_name}</h6>
+                              <span className="fw-bold">{progress.toFixed(0)}% Complete</span>
+                            </div>
+                            <ProgressBar now={progress} label={`${progress.toFixed(0)}%`} />
+                          </Card.Header>
+                          <Card.Body>
+                            <Table striped bordered hover responsive size="sm">
+                              <thead><tr><th>Module</th><th>Status</th><th>Test</th><th>Score</th></tr></thead>
+                              <tbody>
+                                {course.modules.map(module => (
+                                  <tr key={module.module_id}>
+                                    <td>{module.module_name}</td>
+                                    <td><Badge bg={module.module_status === "completed" ? "success" : "secondary"}>{module.module_status}</Badge></td>
+                                    <td><Badge bg={module.test_status === "passed" ? "success" : module.test_status === "failed" ? "danger" : "secondary"}>{module.test_status}</Badge></td>
+                                    <td>{module.test_score !== null ? <Badge bg="info">{module.test_score}%</Badge> : "-"}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Table>
+                          </Card.Body>
+                        </Card>
+                      );
+                    })
+                  ) : <p className="text-muted">No course data available.</p>}
 
-                return (
-                  <Card key={course.course_id} className="mb-4">
-                    <Card.Header>
-                      <div className="d-flex justify-content-between">
-                        <h5>{course.course_name}</h5>
-                        <span className="fw-bold">{progress.toFixed(0)}% Complete</span>
-                      </div>
-                      <ProgressBar
-                        now={progress}
-                        label={`${progress.toFixed(0)}%`}
-                      />
-                    </Card.Header>
-                    <Card.Body>
-                      <Table striped bordered hover responsive size="sm">
-                        <thead>
-                          <tr>
-                            <th>Module Name</th>
-                            <th>Module Status</th>
-                            <th>Test Status</th>
-                            <th>Test Score</th>
+                  {/* Quiz Performance */}
+                  <h5 className="mb-3 mt-4">Quiz Performance</h5>
+                  {overallStudentAnalysis.quizzes.length > 0 ? (
+                    <Table striped bordered hover responsive size="sm">
+                      <thead><tr><th>Quiz</th><th>Score</th><th>Total Qs</th><th>Status</th><th>Rank</th><th>Submitted</th></tr></thead>
+                      <tbody>
+                        {overallStudentAnalysis.quizzes.map((attempt, index) => (
+                          <tr key={`quiz-${index}`}>
+                            <td><Badge bg="secondary">{quizTitleMap[attempt.quiz_id] || attempt.quiz_id}</Badge></td>
+                            <td>{attempt.score}</td>
+                            <td>{attempt.total_questions}</td>
+                            <td><Badge bg={attempt.status === 'passed' ? 'success' : 'danger'}>{attempt.status}</Badge></td>
+                            <td><Badge bg="primary">#{attempt.rank}</Badge></td>
+                            <td>{new Date(attempt.submitted_at).toLocaleString()}</td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {course.modules.map((module) => (
-                            <tr key={module.module_id}>
-                              <td>{module.module_name}</td>
-                              <td>
-                                <Badge
-                                  bg={
-                                    module.module_status === "completed"
-                                      ? "success"
-                                      : "secondary"
-                                  }
-                                >
-                                  {module.module_status}
-                                </Badge>
-                              </td>
-                              <td>
-                                <Badge
-                                  bg={
-                                    module.test_status === "passed"
-                                      ? "success"
-                                      : module.test_status === "failed"
-                                      ? "danger"
-                                      : "secondary"
-                                  }
-                                >
-                                  {module.test_status}
-                                </Badge>
-                              </td>
-                              <td>
-                                {module.test_score !== null ? (
-                                  <Badge bg="info">{module.test_score}%</Badge>
-                                ) : (
-                                  "-"
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </Table>
-                    </Card.Body>
-                  </Card>
-                );
-              })}
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : <p className="text-muted">No regular quiz data available.</p>}
+
+                  {/* Competition Quiz Performance */}
+                  <h5 className="mb-3 mt-4">Competition Quiz Performance</h5>
+                  {overallStudentAnalysis.competitionQuizzes.length > 0 ? (
+                    <Table striped bordered hover responsive size="sm">
+                      <thead><tr><th>Quiz</th><th>Score</th><th>Rank</th></tr></thead>
+                      <tbody>
+                        {overallStudentAnalysis.competitionQuizzes.map((attempt, index) => (
+                          <tr key={`comp-${index}`}>
+                            <td><Badge bg="info">{attempt.quiz_title}</Badge></td>
+                            <td><Badge bg={attempt.score > 5 ? "success" : "warning"}>{attempt.score}</Badge></td>
+                            <td><Badge bg={attempt.rank <= 10 ? "primary" : "secondary"}>#{attempt.rank}</Badge></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : <p className="text-muted">No competition quiz data available.</p>}
+
+                  {/* Test Series Performance */}
+                  <h5 className="mb-3 mt-4">Test Series Performance</h5>
+                  {overallStudentAnalysis.testSeries.length > 0 ? (
+                    <Table striped bordered hover responsive size="sm">
+                      <thead><tr><th>Quiz</th><th>Score</th><th>Rank</th><th>Status</th><th>Submitted</th></tr></thead>
+                      <tbody>
+                        {overallStudentAnalysis.testSeries.map((attempt, index) => (
+                          <tr key={`test-${index}`}>
+                            <td><Badge bg="dark">{attempt.quiz_title}</Badge></td>
+                            <td><Badge bg={attempt.score > 5 ? "success" : "warning"}>{attempt.score}</Badge></td>
+                            <td><Badge bg={attempt.rank <= 10 ? "primary" : "secondary"}>#{attempt.rank}</Badge></td>
+                            <td><Badge bg={attempt.status === 'passed' ? 'success' : 'danger'}>{attempt.status}</Badge></td>
+                            <td>{new Date(attempt.submitted_at).toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
+                  ) : <p className="text-muted">No test series data available.</p>}
+                </>
+              )}
             </Modal.Body>
           </Modal>
 
@@ -1259,106 +1278,6 @@ const Analysis = () => {
               </Modal.Body>
             </Modal>
           )}
-
-          {/* Course Status Modal */}
-          {selectedStudentForStatus && (
-            <Modal
-              show={showCourseStatusModal}
-              onHide={() => setShowCourseStatusModal(false)}
-              centered
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>
-                  Course Status: {selectedStudentForStatus.student_name}
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <ul className="list-group">
-                  {selectedStudentForStatus.courses.map((course) => {
-                    const isCompleted =
-                      course.modules.length > 0 &&
-                      course.modules.every(
-                        (m) => m.module_status === "completed"
-                      );
-                    const completedModules = course.modules.filter(
-                      (m) => m.module_status === "completed"
-                    ).length;
-                    const progress =
-                      course.modules.length > 0
-                        ? (completedModules / course.modules.length) * 100
-                        : 0;
-
-                    return (
-                      <li
-                        key={course.course_id}
-                        className="list-group-item d-flex justify-content-between align-items-center"
-                      >
-                        <div>
-                          {course.course_name}
-                          <ProgressBar
-                            now={progress}
-                            label={`${progress.toFixed(0)}%`}
-                            variant={isCompleted ? "success" : "primary"}
-                            style={{ height: "10px", marginTop: "5px" }}
-                          />
-                        </div>
-                        <Badge bg={isCompleted ? "success" : "warning"}>
-                          {isCompleted ? "Completed" : "In Progress"}
-                        </Badge>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </Modal.Body>
-            </Modal>
-          )}
-
-          {/* Quiz Analysis Modal */}
-          {selectedStudentForQuiz && analysisType === 'quiz-participant-wise' && (
-            <Modal
-              show={showQuizAnalysisModal}
-              onHide={() => setShowQuizAnalysisModal(false)}
-              size="xl"
-              centered
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>
-                  Quiz Analysis for: {selectedStudentForQuiz.student.full_name}
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <Table striped bordered hover responsive>
-                  <thead>
-                    <tr>
-                      <th>Quiz Title</th>
-                      <th>Score</th>
-                      <th>Total Questions</th>
-                      <th>Status</th>
-                      <th>Rank</th>
-                      <th>Submitted At</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedStudentForQuiz.attempts.map((attempt, index) => (
-                      <tr key={index}>
-                        <td><Badge bg="secondary">{quizTitleMap[attempt.quiz_id] || attempt.quiz_id}</Badge></td>
-                        <td>{attempt.score}</td>
-                        <td>{attempt.total_questions}</td>
-                        <td>
-                          <Badge bg={attempt.status === 'passed' ? 'success' : 'danger'}>
-                            {attempt.status}
-                          </Badge>
-                        </td>
-                        <td><Badge bg="primary">#{attempt.rank}</Badge></td>
-                        <td>{new Date(attempt.submitted_at).toLocaleString()}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Modal.Body>
-            </Modal>
-          )}
-
 
           {/* Institution Summary Modal */}
           {selectedInstitutionSummary && (
@@ -1476,75 +1395,6 @@ const Analysis = () => {
               </Modal.Footer>
             </Modal>
           )}
-
-          {/* Competition Quiz Participant Analysis Modal */}
-          {selectedStudentForQuiz && (analysisType === 'competition-quiz-analysis' || analysisType === 'test-series-quiz-analysis') && (
-            <Modal
-              show={showQuizAnalysisModal}
-              onHide={() => setShowQuizAnalysisModal(false)}
-              size="xl"
-              centered
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>
-                  {analysisType === 'competition-quiz-analysis' ? 'Competition' : 'Test Series'} Quiz Analysis for: {
-                    selectedStudentForQuiz.student?.full_name || selectedStudentForQuiz.full_name
-                  }
-                </Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                <Table striped bordered hover responsive>
-                  <thead>
-                    <tr>
-                      <th>Quiz Title</th>
-                      <th>Score</th>
-                      <th>Rank</th>
-                      <th>Status</th>
-                      <th>Submitted At</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedStudentForQuiz.attempts.map((attempt, index) => (
-                      <tr key={index}>
-                        <td><Badge bg="secondary">{attempt.quiz_title}</Badge></td>
-                        <td>
-                          <Badge bg={attempt.score > 5 ? "success" : "warning"}>
-                            {attempt.score}
-                          </Badge>
-                        </td>
-                        <td>
-                          <Badge bg={attempt.rank <= 10 ? "primary" : "secondary"}>
-                            #{attempt.rank}
-                          </Badge>
-                        </td>
-                        <td>
-                          <Badge bg={attempt.status === 'passed' ? 'success' : 'danger'}>
-                            {attempt.status}
-                          </Badge>
-                        </td>
-                        <td>
-                          {attempt.submitted_at && attempt.started_at ? (
-                            (() => {
-                              const duration = new Date(attempt.submitted_at) - new Date(attempt.started_at);
-                              const minutes = Math.floor(duration / 60000);
-                              const seconds = ((duration % 60000) / 1000).toFixed(0);
-                              return `${minutes}m ${seconds}s`;
-                            })()
-                          ) : 'N/A'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={() => setShowQuizAnalysisModal(false)}>
-                  Close
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          )}
-
 
           {/* Quiz Participant Overall Analysis Modal */}
           <Modal
