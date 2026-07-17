@@ -80,6 +80,7 @@ const Analysis = () => {
   const [quizTitleMap, setQuizTitleMap] = useState({});
   const [selectedQuizzes, setSelectedQuizzes] = useState([]);
 
+  const [showQuizParticipantOverallAnalysisModal, setShowQuizParticipantOverallAnalysisModal] = useState(false);
   // State for Competition Quiz Analysis
   const [competitionQuizData, setCompetitionQuizData] = useState([]);
   const [selectedCompetitionQuizzes, setSelectedCompetitionQuizzes] = useState([]);
@@ -339,29 +340,36 @@ const Analysis = () => {
   }, [accessToken]);
 
   const filteredTestSeriesQuizParticipants = useMemo(() => {
-    const data = testSeriesQuizData || [];
-    if (selectedTestSeriesQuizzes.length === 0) {
-      // Sort by rank ascending (best rank first), then by score descending as a tie-breaker
-      return [...data].sort((a, b) => (a.rank || Infinity) - (b.rank || Infinity) || (b.score || 0) - (a.score || 0));
-    }
-    const filtered = data.filter(participant =>
+    const allAttempts = testSeriesQuizData || [];
+
+    // 1. Filter attempts based on selected quizzes
+    const filteredAttempts = selectedTestSeriesQuizzes.length === 0
+      ? allAttempts
+      : allAttempts.filter(participant =>
       selectedTestSeriesQuizzes.includes(participant.quiz_title)
     );
-    // Sort by rank, then by time taken
-    return filtered.sort((a, b) => {
-      // Prioritize 'merit' status
-      if (a.status === 'merit' && b.status !== 'merit') return -1;
-      if (a.status !== 'merit' && b.status === 'merit') return 1;
 
-      // Then sort by rank
-      const rankSort = (a.rank || Infinity) - (b.rank || Infinity);
-      if (rankSort !== 0) return rankSort;
-
-      // Then by time taken
-      const durationA = a.submitted_at ? new Date(a.submitted_at) - new Date(a.started_at) : Infinity;
-      const durationB = b.submitted_at ? new Date(b.submitted_at) - new Date(b.started_at) : Infinity;
-      return durationA - durationB;
+    // 2. Group by student and find the best rank
+    const uniqueStudents = new Map();
+    filteredAttempts.forEach(attempt => {
+      if (!uniqueStudents.has(attempt.student_id)) {
+        uniqueStudents.set(attempt.student_id, {
+          ...attempt, // Use the first attempt for basic student info
+          bestRank: attempt.rank,
+          attemptCount: 1,
+        });
+      } else {
+        const existing = uniqueStudents.get(attempt.student_id);
+        if (attempt.rank < existing.bestRank) {
+          existing.bestRank = attempt.rank;
+        }
+        existing.attemptCount += 1;
+      }
     });
+
+    // 3. Convert map to array and sort by best rank
+    return Array.from(uniqueStudents.values())
+      .sort((a, b) => (a.bestRank || Infinity) - (b.bestRank || Infinity));
   }, [testSeriesQuizData, selectedTestSeriesQuizzes]);
 
   const filteredQuizData = useMemo(() => {
@@ -484,6 +492,10 @@ const Analysis = () => {
 
   const handleShowOverallAnalysis = () => {
     setShowOverallAnalysisModal(true);
+  };
+
+  const handleShowQuizParticipantOverallAnalysis = () => {
+    setShowQuizParticipantOverallAnalysisModal(true);
   };
 
   const handleViewTestSeriesInstitutionSummary = (institutionName) => {
@@ -747,6 +759,13 @@ const Analysis = () => {
               </>
             )}
 
+            {analysisType === 'quiz-participant-wise' && (
+              <div className="d-flex justify-content-end mb-3">
+                <Button variant="primary" onClick={handleShowQuizParticipantOverallAnalysis}>
+                  Overall Analysis
+                </Button>
+              </div>
+            )}
             {/* Quiz Institution Summary Cards - Conditionally Rendered */}
             {analysisType === "quiz-participant-wise" && !loading && Object.keys(filteredInstitutionSummary).length > 0 && (
               <>
@@ -920,6 +939,7 @@ const Analysis = () => {
                         <th>Student ID</th>
                         <th>Institution</th>
                         <th>Rank</th>
+                        <th>Attempts</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -935,6 +955,9 @@ const Analysis = () => {
                               <Badge bg={participant.rank <= 10 ? "primary" : "secondary"}>
                                 #{participant.rank}
                               </Badge>
+                            </td>
+                            <td>
+                              <Badge bg="secondary">{participant.attemptCount}</Badge>
                             </td>
                             <td>
                               <Button
@@ -997,6 +1020,7 @@ const Analysis = () => {
                         <th>Student ID</th>
                         <th>Institution</th>
                         <th>Rank</th>
+                        <th>Attempts</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -1006,11 +1030,11 @@ const Analysis = () => {
                           .slice((testSeriesCurrentPage - 1) * testSeriesRecordsPerPage, testSeriesCurrentPage * testSeriesRecordsPerPage)
                           .map((participant, index) => (
                             <tr
-                              key={`${participant.student_id}-${participant.quiz_id}-${(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index}`}
+                              key={`${participant.student_id}-${(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index}`}
                               className={
-                                participant.rank === 1 ? 'table-success' :
-                                participant.rank === 2 ? 'table-primary' :
-                                participant.rank === 3 ? 'table-info' : ''
+                                participant.bestRank === 1 ? 'table-success' :
+                                participant.bestRank === 2 ? 'table-primary' :
+                                participant.bestRank === 3 ? 'table-info' : ''
                               }
                             >
                             <td>{(testSeriesCurrentPage - 1) * testSeriesRecordsPerPage + index + 1}</td>
@@ -1018,9 +1042,12 @@ const Analysis = () => {
                             <td>{participant.student_id}</td>
                             <td>{participant.school_name}</td>
                             <td>
-                              <Badge bg={participant.rank <= 10 ? "primary" : "secondary"}>
-                                #{participant.rank}
+                              <Badge bg={participant.bestRank <= 10 ? "primary" : "secondary"}>
+                                #{participant.bestRank}
                               </Badge>
+                            </td>
+                            <td>
+                              <Badge bg="secondary">{participant.attemptCount}</Badge>
                             </td>
                             <td>
                               <Button
@@ -1034,7 +1061,7 @@ const Analysis = () => {
                           </tr>
                         ))
                       ) : (
-                        <tr><td colSpan="6" className="text-center">No participants found for the selected test series quizzes.</td></tr>
+                        <tr><td colSpan="7" className="text-center">No participants found for the selected test series quizzes.</td></tr>
                       )}
                     </tbody>
                   </Table>
@@ -1679,7 +1706,7 @@ const Analysis = () => {
                     return acc;
                   }, {})
                 ).map(q => ({
-                  name: q.title.length > 15 ? `${q.title.substring(0, 15)}...` : q.title,
+                  name: q.title,
                   avgScore: q.scores.reduce((a, b) => a + b, 0) / q.scores.length,
                   participants: q.count,
                 }));
@@ -1706,7 +1733,7 @@ const Analysis = () => {
                             <ResponsiveContainer width="100%" height={250}>
                               <BarChart data={quizWiseData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={0} />
+                                <XAxis dataKey="name" tick={false} />
                                 <YAxis />
                                 <Tooltip />
                                 <Bar dataKey="avgScore" fill="#8884d8" name="Avg Score" radius={[4, 4, 0, 0]} />
@@ -1759,7 +1786,13 @@ const Analysis = () => {
             </Modal.Header>
             <Modal.Body>
               {(() => {
-                const participants = filteredTestSeriesQuizParticipants || [];
+                const allAttempts = testSeriesQuizData || [];
+                const filteredAttempts = selectedTestSeriesQuizzes.length === 0
+                  ? allAttempts
+                  : allAttempts.filter(p => selectedTestSeriesQuizzes.includes(p.quiz_title));
+
+                const participants = filteredAttempts;
+
                 const totalParticipants = new Set(participants.map(p => p.student_id)).size;
                 const totalAttempts = participants.length;
                 const totalScore = participants.reduce((sum, p) => sum + (p.score || 0), 0);
@@ -1875,18 +1908,23 @@ const Analysis = () => {
                     <hr />
                     <h6 className="fw-bold text-center mb-3">Unique Participants Summary</h6>
                     {(() => {
-                      const uniqueParticipantsMap = new Map();
-                      filteredTestSeriesQuizParticipants.forEach(p => {
+                       const allAttemptsForSummary = testSeriesQuizData || [];
+                       const filteredAttemptsForSummary = selectedTestSeriesQuizzes.length === 0
+                         ? allAttemptsForSummary
+                         : allAttemptsForSummary.filter(p => selectedTestSeriesQuizzes.includes(p.quiz_title));
+
+                       const uniqueParticipantsMap = new Map();
+                      filteredAttemptsForSummary.forEach(p => {
                         if (!uniqueParticipantsMap.has(p.student_id)) {
                           uniqueParticipantsMap.set(p.student_id, {
                             ...p,
-                            attemptCount: 1,
+                            attemptCount: 1, // Initialize attempt count
                             totalScore: p.score,
                             bestRank: p.rank,
                           });
                         } else {
                           const existing = uniqueParticipantsMap.get(p.student_id);
-                          existing.attemptCount += 1;
+                          existing.attemptCount += 1; // Increment attempt count
                           existing.totalScore += p.score;
                           if (p.rank < existing.bestRank) {
                             existing.bestRank = p.rank;
@@ -1951,12 +1989,18 @@ const Analysis = () => {
               {(() => {
                 if (!selectedTestSeriesInstitution) return null;
 
-                const institutionParticipants = filteredTestSeriesQuizParticipants.filter(
+                const allAttempts = testSeriesQuizData || [];
+                const institutionAttempts = allAttempts.filter(
                   p => p.school_name === selectedTestSeriesInstitution.name
                 );
 
+                const filteredInstitutionAttempts = selectedTestSeriesQuizzes.length === 0
+                  ? institutionAttempts
+                  : institutionAttempts.filter(p => selectedTestSeriesQuizzes.includes(p.quiz_title)
+                );
+
                 const uniqueParticipantsMap = new Map();
-                institutionParticipants.forEach(p => {
+                filteredInstitutionAttempts.forEach(p => {
                   if (!uniqueParticipantsMap.has(p.student_id)) {
                     uniqueParticipantsMap.set(p.student_id, {
                       ...p,
@@ -1986,7 +2030,6 @@ const Analysis = () => {
                           <th>#</th>
                           <th>Student Name</th>
                           <th>Best Rank</th>
-                          <th>Total Score</th>
                           <th>Attempts</th>
                         </tr>
                       </thead>
@@ -1996,7 +2039,6 @@ const Analysis = () => {
                             <td>{index + 1}</td>
                             <td>{p.full_name}</td>
                             <td><Badge bg="primary">#{p.bestRank}</Badge></td>
-                            <td><Badge bg="success">{p.totalScore}</Badge></td>
                             <td>
                               <Button variant="link" size="sm" onClick={() => handleViewQuizAnalysis(p)}>{p.attemptCount}</Button>
                             </td>
