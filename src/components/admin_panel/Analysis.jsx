@@ -703,9 +703,12 @@ const Analysis = () => {
       doc.setLineWidth(7);
       doc.circle(cx, cy, radius, "FD", (start * Math.PI) / 180, (end * Math.PI) / 180, false);
     }
+    // Add a background for the text for better contrast
+  doc.setFillColor(123, 31, 162); // #7B1FA2
+    doc.circle(cx, cy, radius - 5, 'F');
     doc.setDrawColor(0);
     doc.setLineWidth(0.2);
-    doc.setFontSize(13);
+    doc.setFontSize(12);
     doc.setTextColor(255, 255, 255);
     doc.text(`${percent.toFixed(1)}%`, cx, cy + 4, { align: "center" });
     doc.setFontSize(7);
