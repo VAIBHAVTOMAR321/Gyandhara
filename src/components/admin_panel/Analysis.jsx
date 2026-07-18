@@ -706,7 +706,7 @@ const Analysis = () => {
     doc.setDrawColor(0);
     doc.setLineWidth(0.2);
     doc.setFontSize(13);
-    doc.setTextColor(30);
+    doc.setTextColor(255, 255, 255);
     doc.text(`${percent.toFixed(1)}%`, cx, cy + 4, { align: "center" });
     doc.setFontSize(7);
     doc.setTextColor(110);
