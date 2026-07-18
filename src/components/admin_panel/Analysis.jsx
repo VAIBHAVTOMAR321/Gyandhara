@@ -34,6 +34,9 @@ import {
 } from "recharts";
 import { useAuth } from "../all_login/AuthContext";
 import { FaArrowLeft } from "react-icons/fa";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 
 const Analysis = () => {
@@ -643,6 +646,449 @@ const Analysis = () => {
     handleSearchStudent(studentId);
   };
 
+  // ---------- Report helpers ----------
+  const nowStr = () => new Date().toLocaleString();
+  const stampStr = () => new Date().toISOString().slice(0, 10);
+
+  const renderExportButtons = (type) => (
+    <div className="d-flex gap-2">
+      <Button variant="success" size="sm" onClick={() => exportReport(type, "excel")}>
+        Export Excel
+      </Button>
+      <Button variant="danger" size="sm" onClick={() => exportReport(type, "pdf")}>
+        Export PDF
+      </Button>
+    </div>
+  );
+
+  // Draw a donut/ring progress chart with jsPDF primitives
+  const drawDonut = (doc, x, y, radius, percent, label, color) => {
+    const start = -90;
+    const end = start + (percent / 100) * 360;
+    doc.setDrawColor(225);
+    doc.setLineWidth(6);
+    doc.circle(x, y, radius, "S");
+    doc.setDrawColor(color[0], color[1], color[2]);
+    doc.setLineWidth(6);
+    doc.circle(x, y, radius, "FD", (start * Math.PI) / 180, (end * Math.PI) / 180, false);
+    doc.setDrawColor(0);
+    doc.setLineWidth(0.2);
+    doc.setFontSize(10);
+    doc.setTextColor(40);
+    doc.text(`${percent.toFixed(1)}%`, x, y + 3, { align: "center" });
+    doc.setFontSize(7);
+    doc.setTextColor(120);
+    doc.text(label, x, y + radius + 6, { align: "center" });
+    doc.setTextColor(0);
+  };
+
+  // Draw a bar chart with jsPDF primitives
+  const drawBarChart = (doc, x, y, w, h, data, color, label) => {
+    doc.setFontSize(8);
+    doc.setTextColor(60);
+    if (label) doc.text(label, x, y - 4);
+    const max = Math.max(...data.map((d) => d.value), 1);
+    const n = data.length;
+    const gap = 6;
+    const barW = (w - gap * (n + 1)) / n;
+    doc.setDrawColor(220);
+    doc.line(x, y + h, x + w, y + h);
+    data.forEach((d, i) => {
+      const bh = (d.value / max) * (h - 14);
+      const bx = x + gap + i * (barW + gap);
+      const by = y + h - bh;
+      doc.setFillColor(color[0], color[1], color[2]);
+      doc.rect(bx, by, barW, bh, "F");
+      doc.setFontSize(6);
+      doc.setTextColor(80);
+      doc.text(String(d.value), bx + barW / 2, by - 2, { align: "center" });
+      const lbl = d.label.length > 10 ? `${d.label.substring(0, 9)}..` : d.label;
+      doc.text(lbl, bx + barW / 2, y + h + 6, { align: "center", angle: 0 });
+    });
+    doc.setTextColor(0);
+  };
+
+  // Draw a pie chart with jsPDF primitives
+  const drawPie = (doc, cx, cy, radius, data, label) => {
+    doc.setFontSize(8);
+    doc.setTextColor(60);
+    if (label) doc.text(label, cx - radius, cy - radius - 6);
+    const total = data.reduce((s, d) => s + d.value, 0) || 1;
+    let startAngle = 0;
+    data.forEach((d) => {
+      const slice = (d.value / total) * 2 * Math.PI;
+      doc.setFillColor(d.color[0], d.color[1], d.color[2]);
+      doc.setDrawColor(255);
+      doc.setLineWidth(0.5);
+      doc.path([
+        [cx, cy],
+        [cx + radius * Math.cos(startAngle), cy + radius * Math.sin(startAngle)],
+        [cx + radius * Math.cos(startAngle + slice), cy + radius * Math.sin(startAngle + slice)],
+        [cx, cy],
+      ], "FD");
+      startAngle += slice;
+    });
+    // legend
+    let ly = cy + radius + 6;
+    data.forEach((d) => {
+      doc.setFillColor(d.color[0], d.color[1], d.color[2]);
+      doc.rect(cx - radius, ly, 4, 4, "F");
+      doc.setFontSize(7);
+      doc.setTextColor(60);
+      doc.text(`${d.label}: ${d.value}`, cx - radius + 6, ly + 3.5);
+      ly += 6;
+    });
+    doc.setTextColor(0);
+  };
+
+  const addStatCards = (doc, x, y, cards, colW) => {
+    const cardH = 18;
+    cards.forEach((c, i) => {
+      const cx = x + i * colW;
+      doc.setFillColor(245, 247, 250);
+      doc.setDrawColor(220);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(cx, y, colW - 6, cardH, 2, 2, "FD");
+      doc.setFontSize(13);
+      doc.setTextColor(20);
+      doc.text(String(c.value), cx + (colW - 6) / 2, y + 9, { align: "center" });
+      doc.setFontSize(6.5);
+      doc.setTextColor(120);
+      doc.text(c.label, cx + (colW - 6) / 2, y + 15, { align: "center" });
+    });
+    doc.setTextColor(0);
+    return y + cardH;
+  };
+
+  const exportToPDF = ({ title, summaryCards, charts, tables, fileName }) => {
+    const doc = new jsPDF({ orientation: "landscape" });
+    doc.setFontSize(16);
+    doc.setTextColor(20);
+    doc.text(title, 14, 14);
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text(`Generated on: ${nowStr()}`, 14, 20);
+    doc.setTextColor(0);
+
+    let y = 28;
+    if (summaryCards && summaryCards.length) {
+      const colW = (doc.internal.pageSize.getWidth() - 28) / summaryCards.length;
+      y = addStatCards(doc, 14, y, summaryCards, colW) + 6;
+    }
+
+    if (charts && charts.length) {
+      charts.forEach((ch) => {
+        if (y > 170) { doc.addPage(); y = 16; }
+        if (ch.type === "donut") {
+          drawDonut(doc, ch.x, y + ch.radius, ch.radius, ch.percent, ch.label, ch.color);
+        } else if (ch.type === "bar") {
+          drawBarChart(doc, ch.x, y, ch.w, ch.h, ch.data, ch.color, ch.label);
+          y += ch.h + 18;
+        } else if (ch.type === "pie") {
+          drawPie(doc, ch.cx, y + ch.radius, ch.radius, ch.data, ch.label);
+          y += ch.radius * 2 + 14 + ch.data.length * 6;
+        }
+      });
+    }
+
+    tables.forEach((t, idx) => {
+      if (y > 160) { doc.addPage(); y = 16; }
+      doc.setFontSize(10);
+      doc.setTextColor(20);
+      doc.text(t.title, 14, y);
+      y += 4;
+      autoTable(doc, {
+        startY: y,
+        head: [t.columns],
+        body: t.rows,
+        styles: { fontSize: 7, cellPadding: 1.5 },
+        headStyles: { fillColor: [13, 110, 253] },
+        margin: { left: 14, right: 14 },
+        didDrawPage: () => {},
+        didParseCell: (h) => {
+          if (t.columnStyles && t.columnStyles[h.column]) {
+            h.cell.styles = { ...h.cell.styles, ...t.columnStyles[h.column] };
+          }
+        },
+      });
+      y = doc.lastAutoTable.finalY + 8;
+    });
+
+    doc.save(fileName);
+  };
+
+  const rowsToObjectsArray = (columns, rows) =>
+    rows.map((r) => {
+      const obj = {};
+      columns.forEach((c, i) => { obj[c] = r[i]; });
+      return obj;
+    });
+
+  const exportToExcel = ({ title, summaryCards, tables, charts, fileName }) => {
+    const wb = XLSX.utils.book_new();
+    const sheetName = title.substring(0, 28);
+
+    // Summary sheet
+    const summaryRows = [["Gyaan Dhara - Analysis Report"], [title], [`Generated on: ${nowStr()}`], []];
+    if (summaryCards && summaryCards.length) {
+      summaryRows.push(summaryCards.map((c) => c.label));
+      summaryRows.push(summaryCards.map((c) => c.value));
+    }
+    if (charts && charts.length) {
+      charts.forEach((ch) => {
+        summaryRows.push([]);
+        summaryRows.push([ch.label || ch.type]);
+        if (ch.type === "bar" || ch.type === "pie") {
+          ch.data.forEach((d) => summaryRows.push([d.label, d.value]));
+        } else if (ch.type === "donut") {
+          summaryRows.push([ch.label, `${ch.percent.toFixed(1)}%`]);
+        }
+      });
+    }
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+    XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
+
+    // Detail tables sheets
+    tables.forEach((t) => {
+      const data = rowsToObjectsArray(t.columns, t.rows);
+      const ws = XLSX.utils.json_to_sheet(data, { header: t.columns });
+      let name = t.title.replace(/[^a-zA-Z0-9 ]/g, "").substring(0, 28) || "Sheet";
+      let finalName = name;
+      let n = 1;
+      while (wb.SheetNames.includes(finalName)) { finalName = `${name.slice(0, 24)}_${n}`; n++; }
+      XLSX.utils.book_append_sheet(wb, ws, finalName);
+    });
+
+    XLSX.writeFile(wb, fileName);
+  };
+
+  // ---------- Per-analysis report builders ----------
+  const buildCourseWiseReport = () => {
+    const totalStudents = analyticsData.length;
+    const totalCourses = Object.keys(courseSummary).length;
+    const totalInstitutions = Object.keys(institutionSummary).length;
+    const totalEnrollments = Object.values(courseSummary).reduce((s, c) => s + c.studentCount, 0);
+    const totalCompleted = Object.values(courseSummary).reduce((s, c) => s + c.completedStudentCount, 0);
+    const completionRate = totalEnrollments > 0 ? (totalCompleted / totalEnrollments) * 100 : 0;
+
+    const topCourses = Object.values(courseSummary)
+      .sort((a, b) => b.studentCount - a.studentCount)
+      .slice(0, 6)
+      .map((c) => ({ label: c.name, value: c.studentCount }));
+
+    const instRows = Object.values(institutionSummary).map((inst, i) => [
+      i + 1, inst.name, inst.studentCount, inst.completedStudentCount,
+      inst.studentCount > 0 ? `${((inst.completedStudentCount / inst.studentCount) * 100).toFixed(1)}%` : "0%",
+    ]);
+    const courseRows = Object.values(courseSummary).map((c, i) => [
+      i + 1, c.name, c.studentCount, c.completedStudentCount,
+      c.studentCount > 0 ? `${((c.completedStudentCount / c.studentCount) * 100).toFixed(1)}%` : "0%",
+    ]);
+    const studentRows = analyticsData.map((s, i) => [
+      i + 1, s.student_name, s.student_id, s.school_name, s.district,
+      s.courses.length,
+      s.courses.filter((c) => c.modules.length > 0 && c.modules.every((m) => m.module_status === "completed")).length,
+    ]);
+
+    const summaryCards = [
+      { label: "Total Students", value: totalStudents },
+      { label: "Total Courses", value: totalCourses },
+      { label: "Institutions", value: totalInstitutions },
+      { label: "Total Enrollments", value: totalEnrollments },
+      { label: "Completion Rate", value: `${completionRate.toFixed(1)}%` },
+    ];
+    const charts = [
+      { type: "donut", x: 60, radius: 28, percent: completionRate, label: "Course Completion", color: [13, 110, 253] },
+      { type: "bar", x: 160, y: 0, w: 240, h: 60, data: topCourses, label: "Top Enrolled Courses", color: [136, 132, 216] },
+    ];
+    const tables = [
+      { title: "Course Summary", columns: ["#", "Course Name", "Enrolled", "Completed", "Completion %"], rows: courseRows },
+      { title: "Institution Summary", columns: ["#", "Institution", "Students", "Completed", "Completion %"], rows: instRows },
+      { title: "Student Details", columns: ["#", "Student Name", "Student ID", "Institution", "District", "Enrolled", "Completed"], rows: studentRows },
+    ];
+    return { title: "Course Wise Analysis Report", summaryCards, charts, tables };
+  };
+
+  const buildQuizParticipantReport = () => {
+    const participants = filteredQuizData;
+    const totalParticipants = participants.length;
+    const totalQuizzes = quizItems.length;
+    const totalAttempts = participants.reduce((s, p) => s + p.attempts.length, 0);
+    const allScores = participants.flatMap((p) => p.attempts.map((a) => a.score || 0));
+    const avgScore = allScores.length ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 0;
+    const passCount = participants.filter((p) => p.attempts.some((a) => a.status === "passed")).length;
+    const passRate = totalParticipants ? (passCount / totalParticipants) * 100 : 0;
+
+    const quizWise = quizItems.map((q) => {
+      const attempts = participants.flatMap((p) => p.attempts.filter((a) => a.quiz_id === q.quiz_id));
+      const scores = attempts.map((a) => a.score || 0);
+      const avg = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+      return { label: q.title.length > 12 ? `${q.title.substring(0, 11)}..` : q.title, value: Number(avg.toFixed(1)) };
+    }).filter((q) => q.value > 0);
+
+    const instSummary = Object.values(filteredInstitutionSummary).map((inst, i) => [
+      i + 1, inst.name, inst.participantCount || 0,
+    ]);
+
+    const studentRows = participants.map((d, i) => [
+      i + 1, d.student.full_name, d.student.student_id, d.student.school_name,
+      d.bestRank !== null ? `#${d.bestRank}` : "N/A",
+      d.attempts.length,
+    ]);
+
+    const summaryCards = [
+      { label: "Total Students", value: totalParticipants },
+      { label: "Total Quizzes", value: totalQuizzes },
+      { label: "Total Attempts", value: totalAttempts },
+      { label: "Avg Score", value: avgScore.toFixed(1) },
+      { label: "Pass Rate", value: `${passRate.toFixed(1)}%` },
+    ];
+    const charts = [
+      { type: "donut", x: 60, radius: 28, percent: passRate, label: "Pass Rate", color: [40, 167, 69] },
+      { type: "bar", x: 160, y: 0, w: 260, h: 60, data: quizWise, label: "Avg Score per Quiz", color: [136, 132, 216] },
+      { type: "pie", cx: 60, cy: 0, radius: 24, label: "Pass / Fail", data: [
+        { label: "Passed", value: passCount, color: [40, 167, 69] },
+        { label: "Not Passed", value: totalParticipants - passCount, color: [220, 53, 69] },
+      ] },
+    ];
+    const tables = [
+      { title: "Institution Summary", columns: ["#", "Institution", "Participants"], rows: instSummary },
+      { title: "Participant Details", columns: ["#", "Student Name", "Student ID", "Institution", "Best Rank", "Attempts"], rows: studentRows },
+    ];
+    return { title: "Quiz Participant Analysis Report", summaryCards, charts, tables };
+  };
+
+  const buildCompetitionQuizReport = () => {
+    const participants = filteredCompetitionQuizParticipants;
+    const totalParticipants = participants.length;
+    const totalQuizzes = [...new Set(participants.map((p) => p.quiz_title))].length;
+    const totalScore = participants.reduce((s, p) => s + (p.score || 0), 0);
+    const avgScore = totalParticipants ? totalScore / totalParticipants : 0;
+    const passCount = participants.filter((p) => p.status === "passed").length;
+    const passRate = totalParticipants ? (passCount / totalParticipants) * 100 : 0;
+
+    const quizWise = Object.values(
+      participants.reduce((acc, p) => {
+        if (!acc[p.quiz_title]) acc[p.quiz_title] = { label: p.quiz_title, scores: [], count: 0 };
+        acc[p.quiz_title].scores.push(p.score || 0);
+        acc[p.quiz_title].count += 1;
+        return acc;
+      }, {})
+    ).map((q) => ({ label: q.label.length > 12 ? `${q.label.substring(0, 11)}..` : q.label, value: Number((q.scores.reduce((a, b) => a + b, 0) / q.scores.length).toFixed(1)) }));
+
+    const instSummary = Object.values(filteredCompetitionInstitutionSummary).map((inst, i) => [
+      i + 1, inst.name, inst.participantCount || 0,
+      inst.averageScore ? inst.averageScore.toFixed(1) : "0",
+    ]);
+
+    const studentRows = participants.map((p, i) => [
+      i + 1, p.student_name, p.student_id, p.school_name, `#${p.rank}`, p.attemptCount,
+    ]);
+
+    const summaryCards = [
+      { label: "Total Participants", value: totalParticipants },
+      { label: "Total Quizzes", value: totalQuizzes },
+      { label: "Avg Score", value: avgScore.toFixed(1) },
+      { label: "Pass Rate", value: `${passRate.toFixed(1)}%` },
+    ];
+    const charts = [
+      { type: "donut", x: 60, radius: 28, percent: passRate, label: "Pass Rate", color: [40, 167, 69] },
+      { type: "bar", x: 160, y: 0, w: 260, h: 60, data: quizWise, label: "Avg Score per Quiz", color: [136, 132, 216] },
+      { type: "pie", cx: 60, cy: 0, radius: 24, label: "Pass / Fail", data: [
+        { label: "Passed", value: passCount, color: [40, 167, 69] },
+        { label: "Failed", value: totalParticipants - passCount, color: [220, 53, 69] },
+      ] },
+    ];
+    const tables = [
+      { title: "Institution Summary", columns: ["#", "Institution", "Participants", "Avg Score"], rows: instSummary },
+      { title: "Participant Details", columns: ["#", "Student Name", "Student ID", "Institution", "Rank", "Attempts"], rows: studentRows },
+    ];
+    return { title: "Competition Quiz Analysis Report", summaryCards, charts, tables };
+  };
+
+  const buildTestSeriesReport = () => {
+    const allAttempts = testSeriesQuizData || [];
+    const filteredAttempts = selectedTestSeriesQuizzes.length === 0
+      ? allAttempts
+      : allAttempts.filter((p) => selectedTestSeriesQuizzes.includes(p.quiz_title));
+    const participants = filteredAttempts;
+    const totalParticipants = new Set(participants.map((p) => p.student_id)).size;
+    const totalAttempts = participants.length;
+    const totalScore = participants.reduce((s, p) => s + (p.score || 0), 0);
+    const avgScore = totalAttempts ? totalScore / totalAttempts : 0;
+    const passCount = participants.filter((p) => p.status === "passed" || p.status === "merit").length;
+    const passRate = totalAttempts ? (passCount / totalAttempts) * 100 : 0;
+
+    const quizWise = Object.values(
+      participants.reduce((acc, p) => {
+        if (!acc[p.quiz_title]) acc[p.quiz_title] = { label: p.quiz_title, scores: [], count: 0 };
+        acc[p.quiz_title].scores.push(p.score || 0);
+        acc[p.quiz_title].count += 1;
+        return acc;
+      }, {})
+    ).map((q) => ({ label: q.label.length > 12 ? `${q.label.substring(0, 11)}..` : q.label, value: Number((q.scores.reduce((a, b) => a + b, 0) / q.scores.length).toFixed(1)) }));
+
+    const scoreDist = participants.reduce((acc, p) => {
+      const s = p.score || 0;
+      if (s >= 9) acc["9-10"]++; else if (s >= 7) acc["7-8"]++; else if (s >= 5) acc["5-6"]++; else if (s >= 3) acc["3-4"]++; else acc["0-2"]++;
+      return acc;
+    }, { "0-2": 0, "3-4": 0, "5-6": 0, "7-8": 0, "9-10": 0 });
+    const scoreDistData = Object.keys(scoreDist).map((k) => ({ label: k, value: scoreDist[k] }));
+
+    const instSummary = Object.values(testSeriesQuizInstitutionSummary).map((inst, i) => [
+      i + 1, inst.name, inst.participantCount || 0,
+    ]);
+
+    const uniqueMap = new Map();
+    filteredAttempts.forEach((p) => {
+      if (!uniqueMap.has(p.student_id)) uniqueMap.set(p.student_id, { ...p, attemptCount: 1, totalScore: p.score, bestRank: p.rank });
+      else {
+        const e = uniqueMap.get(p.student_id);
+        e.attemptCount += 1; e.totalScore += p.score;
+        if (p.rank < e.bestRank) e.bestRank = p.rank;
+      }
+    });
+    const uniqueParticipants = Array.from(uniqueMap.values()).sort((a, b) => (a.bestRank || Infinity) - (b.bestRank || Infinity));
+    const studentRows = uniqueParticipants.map((p, i) => [
+      i + 1, p.full_name, p.student_id, p.school_name, `#${p.bestRank}`, p.attemptCount, p.totalScore,
+    ]);
+
+    const summaryCards = [
+      { label: "Unique Participants", value: totalParticipants },
+      { label: "Total Attempts", value: totalAttempts },
+      { label: "Avg Score", value: avgScore.toFixed(1) },
+      { label: "Pass Rate", value: `${passRate.toFixed(1)}%` },
+    ];
+    const charts = [
+      { type: "donut", x: 60, radius: 28, percent: passRate, label: "Pass Rate", color: [40, 167, 69] },
+      { type: "bar", x: 160, y: 0, w: 240, h: 60, data: quizWise, label: "Avg Score per Quiz", color: [136, 132, 216] },
+      { type: "bar", x: 510, y: 0, w: 180, h: 60, data: scoreDistData, label: "Score Distribution", color: [32, 201, 151] },
+      { type: "pie", cx: 60, cy: 0, radius: 24, label: "Pass / Fail", data: [
+        { label: "Passed/Merit", value: passCount, color: [40, 167, 69] },
+        { label: "Failed", value: totalAttempts - passCount, color: [220, 53, 69] },
+      ] },
+    ];
+    const tables = [
+      { title: "Institution Summary", columns: ["#", "Institution", "Participants"], rows: instSummary },
+      { title: "Unique Participants", columns: ["#", "Student Name", "Student ID", "Institution", "Best Rank", "Attempts", "Total Score"], rows: studentRows },
+    ];
+    return { title: "Test Series Quiz Analysis Report", summaryCards, charts, tables };
+  };
+
+  const exportReport = (type, format) => {
+    const stamp = stampStr();
+    let report;
+    if (type === "course-wise") report = buildCourseWiseReport();
+    else if (type === "quiz-participant-wise") report = buildQuizParticipantReport();
+    else if (type === "competition-quiz-analysis") report = buildCompetitionQuizReport();
+    else if (type === "test-series-quiz-analysis") report = buildTestSeriesReport();
+    else return;
+
+    const fileName = `${report.title.replace(/\s+/g, "-").toLowerCase()}-${stamp}`;
+    if (format === "pdf") exportToPDF({ ...report, fileName: `${fileName}.pdf` });
+    else exportToExcel({ ...report, fileName: `${fileName}.xlsx` });
+  };
+
   return (
     <div className="dashboard-container">
       <AdminLeftNav
@@ -821,10 +1267,11 @@ const Analysis = () => {
             )}
 
             {analysisType === 'quiz-participant-wise' && (
-              <div className="d-flex justify-content-end mb-3">
+              <div className="d-flex justify-content-end gap-2 mb-3">
                 <Button variant="primary" onClick={handleShowQuizParticipantOverallAnalysis}>
                   Overall Analysis
                 </Button>
+                {renderExportButtons("quiz-participant-wise")}
               </div>
             )}
             {/* Quiz Institution Summary Cards - Conditionally Rendered */}
@@ -858,10 +1305,11 @@ const Analysis = () => {
               </div>
             ) : analysisType === 'course-wise' ? (
               <>
-                <div className="d-flex justify-content-end mb-3">
+                <div className="d-flex justify-content-end gap-2 mb-3">
                   <Button variant="primary" onClick={handleShowOverallAnalysis}>
                     Overall Analysis
                   </Button>
+                  {renderExportButtons("course-wise")}
                 </div>
                 <Card className="table-card">
                 <Table striped bordered hover responsive>
@@ -964,10 +1412,11 @@ const Analysis = () => {
               </Card>
             ) : analysisType === 'competition-quiz-analysis' ? (
               <>
-                <div className="d-flex justify-content-end mb-3">
+                <div className="d-flex justify-content-end gap-2 mb-3">
                   <Button variant="primary" onClick={handleShowCompetitionQuizOverallAnalysis}>
                     Overall Analysis
                   </Button>
+                  {renderExportButtons("competition-quiz-analysis")}
                 </div>
                 {!loading && Object.keys(filteredCompetitionInstitutionSummary).length > 0 && (
                   <>
@@ -1040,10 +1489,11 @@ const Analysis = () => {
               </>
             ) : analysisType === 'test-series-quiz-analysis' ? (
               <>
-                <div className="d-flex justify-content-end mb-3">
+                <div className="d-flex justify-content-end gap-2 mb-3">
                   <Button variant="primary" onClick={handleShowTestSeriesQuizOverallAnalysis}>
                     Overall Analysis
                   </Button>
+                  {renderExportButtons("test-series-quiz-analysis")}
                 </div>
                 {!loading && Object.keys(testSeriesQuizInstitutionSummary).length > 0 && (
                   <>
