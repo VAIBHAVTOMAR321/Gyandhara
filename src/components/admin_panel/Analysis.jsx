@@ -37,6 +37,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
+import gyandharaLogo from "../../assets/images/gyandharalogo.png";
 
 
 const Analysis = () => {
@@ -863,16 +864,17 @@ const Analysis = () => {
     const pageH = doc.internal.pageSize.getHeight();
     const marginX = 14;
 
-    // Cover header
-    doc.setFillColor(...chartColors.primary);
-    doc.rect(0, 0, pageW, 22, "F");
-    doc.setFillColor(255, 255, 255);
+    // PDF Header with Logo
+    doc.addImage(gyandharaLogo, 'PNG', marginX, 6, 40, 10); // Logo
+    doc.setTextColor(40, 40, 40);
     doc.setFontSize(17);
-    doc.text("Gyaan Dhara", marginX, 11);
+    doc.text("Gyaan Dhara", marginX + 45, 11); // Title next to logo
     doc.setFontSize(13);
-    doc.text(title, marginX, 18);
+    doc.text(title, marginX + 45, 17); // Subtitle
     doc.setFontSize(8);
-    doc.text(`Generated on: ${nowStr()}`, pageW - marginX, 11, { align: "right" });
+    doc.text(`Generated on: ${nowStr()}`, pageW - marginX, 17, { align: "right" });
+    doc.setDrawColor(220, 220, 220);
+    doc.line(marginX, 22, pageW - marginX, 22); // Header separator line
 
     let y = 30;
     if (summaryCards && summaryCards.length) {
