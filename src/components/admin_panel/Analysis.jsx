@@ -661,56 +661,90 @@ const Analysis = () => {
     </div>
   );
 
-  // Draw a donut/ring progress chart with jsPDF primitives
-  const drawDonut = (doc, x, y, radius, percent, label, color) => {
+  // ---------- Drawing primitives (jsPDF-based, no external chart lib) ----------
+  const chartColors = {
+    primary: [13, 110, 253],
+    purple: [136, 132, 216],
+    teal: [32, 201, 151],
+    green: [40, 167, 69],
+    red: [220, 53, 69],
+    amber: [255, 193, 7],
+    blue: [23, 162, 184],
+    indigo: [102, 16, 242],
+  };
+
+  // Panel background behind a chart block
+  const drawPanel = (doc, x, y, w, h, title) => {
+    doc.setFillColor(248, 249, 252);
+    doc.setDrawColor(225, 229, 235);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(x, y, w, h, 3, 3, "FD");
+    if (title) {
+      doc.setFillColor(...chartColors.primary);
+      doc.roundedRect(x, y, 3, h, 3, 3, "F");
+      doc.setFontSize(8.5);
+      doc.setTextColor(40);
+      doc.text(title, x + 6, y + 8);
+      doc.setDrawColor(235);
+      doc.line(x + 6, y + 11, x + w - 6, y + 11);
+    }
+  };
+
+  // Donut / ring progress chart (centered inside a panel)
+  const drawDonut = (doc, cx, cy, radius, percent, label, color) => {
     const start = -90;
     const end = start + (percent / 100) * 360;
-    doc.setDrawColor(225);
-    doc.setLineWidth(6);
-    doc.circle(x, y, radius, "S");
-    doc.setDrawColor(color[0], color[1], color[2]);
-    doc.setLineWidth(6);
-    doc.circle(x, y, radius, "FD", (start * Math.PI) / 180, (end * Math.PI) / 180, false);
+    doc.setDrawColor(232);
+    doc.setLineWidth(7);
+    doc.circle(cx, cy, radius, "S");
+    if (percent > 0) {
+      doc.setDrawColor(color[0], color[1], color[2]);
+      doc.setLineWidth(7);
+      doc.circle(cx, cy, radius, "FD", (start * Math.PI) / 180, (end * Math.PI) / 180, false);
+    }
     doc.setDrawColor(0);
     doc.setLineWidth(0.2);
-    doc.setFontSize(10);
-    doc.setTextColor(40);
-    doc.text(`${percent.toFixed(1)}%`, x, y + 3, { align: "center" });
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text(`${percent.toFixed(1)}%`, cx, cy + 4, { align: "center" });
     doc.setFontSize(7);
-    doc.setTextColor(120);
-    doc.text(label, x, y + radius + 6, { align: "center" });
+    doc.setTextColor(110);
+    doc.text(label, cx, cy + radius + 8, { align: "center" });
     doc.setTextColor(0);
   };
 
-  // Draw a bar chart with jsPDF primitives
+  // Horizontal-aware bar chart with axis
   const drawBarChart = (doc, x, y, w, h, data, color, label) => {
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(60);
-    if (label) doc.text(label, x, y - 4);
+    if (label) doc.text(label, x, y - 3);
     const max = Math.max(...data.map((d) => d.value), 1);
     const n = data.length;
-    const gap = 6;
+    const innerTop = y + 4;
+    const axisY = innerTop + h - 14;
+    const gap = w / n < 28 ? 4 : 8;
     const barW = (w - gap * (n + 1)) / n;
-    doc.setDrawColor(220);
-    doc.line(x, y + h, x + w, y + h);
+    doc.setDrawColor(225);
+    doc.setLineWidth(0.3);
+    doc.line(x, axisY, x + w, axisY);
     data.forEach((d, i) => {
-      const bh = (d.value / max) * (h - 14);
+      const bh = (d.value / max) * (h - 22);
       const bx = x + gap + i * (barW + gap);
-      const by = y + h - bh;
+      const by = axisY - bh;
       doc.setFillColor(color[0], color[1], color[2]);
-      doc.rect(bx, by, barW, bh, "F");
+      doc.roundedRect(bx, by, barW, bh, 1.5, 1.5, "F");
       doc.setFontSize(6);
-      doc.setTextColor(80);
+      doc.setTextColor(70);
       doc.text(String(d.value), bx + barW / 2, by - 2, { align: "center" });
-      const lbl = d.label.length > 10 ? `${d.label.substring(0, 9)}..` : d.label;
-      doc.text(lbl, bx + barW / 2, y + h + 6, { align: "center", angle: 0 });
+      const lbl = d.label.length > 12 ? `${d.label.substring(0, 11)}..` : d.label;
+      doc.text(lbl, bx + barW / 2, axisY + 7, { align: "center" });
     });
     doc.setTextColor(0);
   };
 
-  // Draw a pie chart with jsPDF primitives
+  // Pie chart (proportional slices) with side legend
   const drawPie = (doc, cx, cy, radius, data, label) => {
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setTextColor(60);
     if (label) doc.text(label, cx - radius, cy - radius - 6);
     const total = data.reduce((s, d) => s + d.value, 0) || 1;
@@ -719,7 +753,7 @@ const Analysis = () => {
       const slice = (d.value / total) * 2 * Math.PI;
       doc.setFillColor(d.color[0], d.color[1], d.color[2]);
       doc.setDrawColor(255);
-      doc.setLineWidth(0.5);
+      doc.setLineWidth(0.6);
       doc.path([
         [cx, cy],
         [cx + radius * Math.cos(startAngle), cy + radius * Math.sin(startAngle)],
@@ -728,91 +762,158 @@ const Analysis = () => {
       ], "FD");
       startAngle += slice;
     });
-    // legend
-    let ly = cy + radius + 6;
+    let ly = cy - radius;
+    const legendX = cx + radius + 14;
     data.forEach((d) => {
       doc.setFillColor(d.color[0], d.color[1], d.color[2]);
-      doc.rect(cx - radius, ly, 4, 4, "F");
+      doc.roundedRect(legendX, ly, 5, 5, 1, 1, "F");
       doc.setFontSize(7);
       doc.setTextColor(60);
-      doc.text(`${d.label}: ${d.value}`, cx - radius + 6, ly + 3.5);
-      ly += 6;
+      doc.text(`${d.label}: ${d.value}`, legendX + 8, ly + 4);
+      ly += 8;
     });
     doc.setTextColor(0);
   };
 
   const addStatCards = (doc, x, y, cards, colW) => {
-    const cardH = 18;
+    const cardH = 20;
     cards.forEach((c, i) => {
       const cx = x + i * colW;
-      doc.setFillColor(245, 247, 250);
-      doc.setDrawColor(220);
-      doc.setLineWidth(0.3);
-      doc.roundedRect(cx, y, colW - 6, cardH, 2, 2, "FD");
-      doc.setFontSize(13);
+      doc.setFillColor(255, 255, 255);
+      doc.setDrawColor(225, 229, 235);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(cx, y, colW - 8, cardH, 3, 3, "FD");
+      doc.setFillColor(...chartColors.primary);
+      doc.roundedRect(cx, y, 2, cardH, 3, 3, "F");
+      doc.setFontSize(15);
       doc.setTextColor(20);
-      doc.text(String(c.value), cx + (colW - 6) / 2, y + 9, { align: "center" });
+      doc.text(String(c.value), cx + 10, y + 11, { align: "left" });
       doc.setFontSize(6.5);
       doc.setTextColor(120);
-      doc.text(c.label, cx + (colW - 6) / 2, y + 15, { align: "center" });
+      doc.text(c.label.toUpperCase(), cx + 10, y + 16, { align: "left" });
     });
     doc.setTextColor(0);
     return y + cardH;
   };
 
-  const exportToPDF = ({ title, summaryCards, charts, tables, fileName }) => {
-    const doc = new jsPDF({ orientation: "landscape" });
-    doc.setFontSize(16);
-    doc.setTextColor(20);
-    doc.text(title, 14, 14);
-    doc.setFontSize(8);
-    doc.setTextColor(120);
-    doc.text(`Generated on: ${nowStr()}`, 14, 20);
+  // Auto-flow charts responsively; returns next y position
+  const renderCharts = (doc, charts, marginX, startY, pageW, pageH) => {
+    if (!charts || !charts.length) return startY;
+    const perRow = charts.length >= 4 ? 2 : charts.length === 3 ? 2 : 1;
+    const colW = (pageW - marginX * 2 - (perRow - 1) * 10) / perRow;
+    const panelH = 62;
+    const pieLegendExtra = (data) => (data || []).length * 8;
+    let col = 0;
+    let rowY = startY;
+    let rowMaxBottom = startY;
+
+    charts.forEach((ch) => {
+      let chartH = panelH;
+      if (ch.type === "bar") chartH = panelH + (ch.data.length > 6 ? 6 : 0);
+      if (ch.type === "pie") chartH = panelH + pieLegendExtra(ch.data) - 8;
+
+      if (col === 0 && rowY + chartH > pageH - 18) {
+        doc.addPage();
+        rowY = 16;
+        rowMaxBottom = 16;
+      }
+      const px = marginX + col * (colW + 10);
+      const py = rowY;
+
+      if (ch.type === "donut") {
+        drawPanel(doc, px, py, colW, panelH, ch.label);
+        drawDonut(doc, px + colW / 2, py + panelH / 2 + 4, 18, ch.percent, ch.label, ch.color);
+      } else if (ch.type === "bar") {
+        drawPanel(doc, px, py, colW, chartH, ch.label);
+        drawBarChart(doc, px + 8, py + 16, colW - 16, chartH - 22, ch.data, ch.color, null);
+      } else if (ch.type === "pie") {
+        drawPanel(doc, px, py, colW, chartH, ch.label);
+        drawPie(doc, px + colW / 3, py + 16 + (chartH - 22) / 2, 14, ch.data, null);
+      }
+
+      rowMaxBottom = Math.max(rowMaxBottom, py + chartH);
+      col += 1;
+      if (col >= perRow) { col = 0; rowY = rowMaxBottom + 10; }
+    });
+    if (col !== 0) rowY = rowMaxBottom + 10;
+    return rowY;
+  };
+
+  // Page header & footer
+  const drawPageChrome = (doc, title, pageNum, totalPages, pageW, pageH) => {
+    doc.setFillColor(...chartColors.primary);
+    doc.rect(0, 0, pageW, 2, "F");
+    if (pageNum > 1) {
+      doc.setFontSize(9);
+      doc.setTextColor(30);
+      doc.text(title, 14, 12);
+      doc.setDrawColor(235);
+      doc.line(14, 15, pageW - 14, 15);
+    }
+    doc.setFontSize(7);
+    doc.setTextColor(150);
+    doc.text("Gyaan Dhara - Analytics Report", 14, pageH - 6);
+    doc.text(`Page ${pageNum} of ${totalPages}`, pageW - 14, pageH - 6, { align: "right" });
     doc.setTextColor(0);
+  };
 
-    let y = 28;
+  const exportToPDF = ({ title, summaryCards, charts, tables, fileName }) => {
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm" });
+    const pageW = doc.internal.pageSize.getWidth();
+    const pageH = doc.internal.pageSize.getHeight();
+    const marginX = 14;
+
+    // Cover header
+    doc.setFillColor(...chartColors.primary);
+    doc.rect(0, 0, pageW, 22, "F");
+    doc.setFillColor(255, 255, 255);
+    doc.setFontSize(17);
+    doc.text("Gyaan Dhara", marginX, 11);
+    doc.setFontSize(13);
+    doc.text(title, marginX, 18);
+    doc.setFontSize(8);
+    doc.text(`Generated on: ${nowStr()}`, pageW - marginX, 11, { align: "right" });
+
+    let y = 30;
     if (summaryCards && summaryCards.length) {
-      const colW = (doc.internal.pageSize.getWidth() - 28) / summaryCards.length;
-      y = addStatCards(doc, 14, y, summaryCards, colW) + 6;
+      const colW = (pageW - marginX * 2) / summaryCards.length;
+      y = addStatCards(doc, marginX, y, summaryCards, colW) + 12;
     }
 
-    if (charts && charts.length) {
-      charts.forEach((ch) => {
-        if (y > 170) { doc.addPage(); y = 16; }
-        if (ch.type === "donut") {
-          drawDonut(doc, ch.x, y + ch.radius, ch.radius, ch.percent, ch.label, ch.color);
-        } else if (ch.type === "bar") {
-          drawBarChart(doc, ch.x, y, ch.w, ch.h, ch.data, ch.color, ch.label);
-          y += ch.h + 18;
-        } else if (ch.type === "pie") {
-          drawPie(doc, ch.cx, y + ch.radius, ch.radius, ch.data, ch.label);
-          y += ch.radius * 2 + 14 + ch.data.length * 6;
-        }
-      });
-    }
+    y = renderCharts(doc, charts, marginX, y, pageW, pageH);
 
-    tables.forEach((t, idx) => {
-      if (y > 160) { doc.addPage(); y = 16; }
-      doc.setFontSize(10);
-      doc.setTextColor(20);
-      doc.text(t.title, 14, y);
-      y += 4;
+    tables.forEach((t) => {
+      if (y > pageH - 40) { doc.addPage(); y = 16; }
+      doc.setFillColor(...chartColors.primary);
+      doc.setFontSize(11);
+      doc.setTextColor(255, 255, 255);
+      const labelW = Math.min(pageW - marginX * 2, 60 + t.title.length * 1.6);
+      doc.roundedRect(marginX, y, labelW, 7, 1.5, 1.5, "F");
+      doc.text(t.title, marginX + 4, y + 5);
+      doc.setTextColor(0);
+      y += 9;
       autoTable(doc, {
         startY: y,
         head: [t.columns],
         body: t.rows,
-        styles: { fontSize: 7, cellPadding: 1.5 },
-        headStyles: { fillColor: [13, 110, 253] },
-        margin: { left: 14, right: 14 },
-        didDrawPage: () => {},
+        styles: { fontSize: 7, cellPadding: 1.5, lineColor: [230, 232, 236], lineWidth: 0.2 },
+        headStyles: { fillColor: chartColors.primary, fontSize: 7.5 },
+        alternateRowStyles: { fillColor: [246, 248, 251] },
+        margin: { left: marginX, right: marginX },
         didParseCell: (h) => {
           if (t.columnStyles && t.columnStyles[h.column]) {
             h.cell.styles = { ...h.cell.styles, ...t.columnStyles[h.column] };
           }
         },
       });
-      y = doc.lastAutoTable.finalY + 8;
+      y = doc.lastAutoTable.finalY + 10;
     });
+
+    const totalPages = doc.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      doc.setPage(p);
+      drawPageChrome(doc, title, p, totalPages, pageW, pageH);
+    }
 
     doc.save(fileName);
   };
@@ -826,37 +927,56 @@ const Analysis = () => {
 
   const exportToExcel = ({ title, summaryCards, tables, charts, fileName }) => {
     const wb = XLSX.utils.book_new();
-    const sheetName = title.substring(0, 28);
 
-    // Summary sheet
-    const summaryRows = [["Gyaan Dhara - Analysis Report"], [title], [`Generated on: ${nowStr()}`], []];
+    // ---- Summary sheet (styled) ----
+    const summaryAoa = [
+      ["GYAAN DHARA - ANALYTICS REPORT"],
+      [title],
+      [`Generated on: ${nowStr()}`],
+      [],
+    ];
     if (summaryCards && summaryCards.length) {
-      summaryRows.push(summaryCards.map((c) => c.label));
-      summaryRows.push(summaryCards.map((c) => c.value));
+      summaryAoa.push(["KEY METRICS"]);
+      summaryAoa.push(summaryCards.map((c) => c.label));
+      summaryAoa.push(summaryCards.map((c) => c.value));
+      summaryAoa.push([]);
     }
     if (charts && charts.length) {
+      summaryAoa.push(["CHART DATA"]);
       charts.forEach((ch) => {
-        summaryRows.push([]);
-        summaryRows.push([ch.label || ch.type]);
+        summaryAoa.push([(ch.label || ch.type).toUpperCase()]);
         if (ch.type === "bar" || ch.type === "pie") {
-          ch.data.forEach((d) => summaryRows.push([d.label, d.value]));
+          summaryAoa.push(["Category", "Value"]);
+          ch.data.forEach((d) => summaryAoa.push([d.label, d.value]));
         } else if (ch.type === "donut") {
-          summaryRows.push([ch.label, `${ch.percent.toFixed(1)}%`]);
+          summaryAoa.push([ch.label, `${ch.percent.toFixed(1)}%`]);
         }
+        summaryAoa.push([]);
       });
     }
-    const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+    const wsSummary = XLSX.utils.aoa_to_sheet(summaryAoa);
+    wsSummary["!cols"] = [{ wch: 32 }, { wch: 22 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
+    if (!wsSummary["!merges"]) wsSummary["!merges"] = [];
+    wsSummary["!merges"].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 4 } });
+    wsSummary["!merges"].push({ s: { r: 1, c: 0 }, e: { r: 1, c: 4 } });
+    wsSummary["!merges"].push({ s: { r: 2, c: 0 }, e: { r: 2, c: 4 } });
     XLSX.utils.book_append_sheet(wb, wsSummary, "Summary");
 
-    // Detail tables sheets
+    // ---- Detail sheets ----
     tables.forEach((t) => {
       const data = rowsToObjectsArray(t.columns, t.rows);
       const ws = XLSX.utils.json_to_sheet(data, { header: t.columns });
-      let name = t.title.replace(/[^a-zA-Z0-9 ]/g, "").substring(0, 28) || "Sheet";
-      let finalName = name;
-      let n = 1;
-      while (wb.SheetNames.includes(finalName)) { finalName = `${name.slice(0, 24)}_${n}`; n++; }
-      XLSX.utils.book_append_sheet(wb, ws, finalName);
+      // column widths based on content
+      const widths = t.columns.map((col) => {
+        const maxLen = Math.max(
+          String(col).length,
+          ...data.map((row) => String(row[col] ?? "").length)
+        );
+        return { wch: Math.min(Math.max(maxLen + 3, 10), 40) };
+      });
+      ws["!cols"] = widths;
+      ws["!autofilter"] = { ref: ws["!ref"] };
+      XLSX.utils.book_append_sheet(wb, ws, t.title.replace(/[^a-zA-Z0-9 ]/g, "").substring(0, 28) || "Sheet");
     });
 
     XLSX.writeFile(wb, fileName);
@@ -898,8 +1018,8 @@ const Analysis = () => {
       { label: "Completion Rate", value: `${completionRate.toFixed(1)}%` },
     ];
     const charts = [
-      { type: "donut", x: 60, radius: 28, percent: completionRate, label: "Course Completion", color: [13, 110, 253] },
-      { type: "bar", x: 160, y: 0, w: 240, h: 60, data: topCourses, label: "Top Enrolled Courses", color: [136, 132, 216] },
+      { type: "donut", percent: completionRate, label: "Course Completion", color: chartColors.primary },
+      { type: "bar", data: topCourses, label: "Top Enrolled Courses", color: chartColors.purple },
     ];
     const tables = [
       { title: "Course Summary", columns: ["#", "Course Name", "Enrolled", "Completed", "Completion %"], rows: courseRows },
@@ -944,11 +1064,11 @@ const Analysis = () => {
       { label: "Pass Rate", value: `${passRate.toFixed(1)}%` },
     ];
     const charts = [
-      { type: "donut", x: 60, radius: 28, percent: passRate, label: "Pass Rate", color: [40, 167, 69] },
-      { type: "bar", x: 160, y: 0, w: 260, h: 60, data: quizWise, label: "Avg Score per Quiz", color: [136, 132, 216] },
-      { type: "pie", cx: 60, cy: 0, radius: 24, label: "Pass / Fail", data: [
-        { label: "Passed", value: passCount, color: [40, 167, 69] },
-        { label: "Not Passed", value: totalParticipants - passCount, color: [220, 53, 69] },
+      { type: "donut", percent: passRate, label: "Pass Rate", color: chartColors.green },
+      { type: "bar", data: quizWise, label: "Avg Score per Quiz", color: chartColors.purple },
+      { type: "pie", label: "Pass / Fail", data: [
+        { label: "Passed", value: passCount, color: chartColors.green },
+        { label: "Not Passed", value: totalParticipants - passCount, color: chartColors.red },
       ] },
     ];
     const tables = [
@@ -992,11 +1112,11 @@ const Analysis = () => {
       { label: "Pass Rate", value: `${passRate.toFixed(1)}%` },
     ];
     const charts = [
-      { type: "donut", x: 60, radius: 28, percent: passRate, label: "Pass Rate", color: [40, 167, 69] },
-      { type: "bar", x: 160, y: 0, w: 260, h: 60, data: quizWise, label: "Avg Score per Quiz", color: [136, 132, 216] },
-      { type: "pie", cx: 60, cy: 0, radius: 24, label: "Pass / Fail", data: [
-        { label: "Passed", value: passCount, color: [40, 167, 69] },
-        { label: "Failed", value: totalParticipants - passCount, color: [220, 53, 69] },
+      { type: "donut", percent: passRate, label: "Pass Rate", color: chartColors.green },
+      { type: "bar", data: quizWise, label: "Avg Score per Quiz", color: chartColors.purple },
+      { type: "pie", label: "Pass / Fail", data: [
+        { label: "Passed", value: passCount, color: chartColors.green },
+        { label: "Failed", value: totalParticipants - passCount, color: chartColors.red },
       ] },
     ];
     const tables = [
@@ -1060,12 +1180,12 @@ const Analysis = () => {
       { label: "Pass Rate", value: `${passRate.toFixed(1)}%` },
     ];
     const charts = [
-      { type: "donut", x: 60, radius: 28, percent: passRate, label: "Pass Rate", color: [40, 167, 69] },
-      { type: "bar", x: 160, y: 0, w: 240, h: 60, data: quizWise, label: "Avg Score per Quiz", color: [136, 132, 216] },
-      { type: "bar", x: 510, y: 0, w: 180, h: 60, data: scoreDistData, label: "Score Distribution", color: [32, 201, 151] },
-      { type: "pie", cx: 60, cy: 0, radius: 24, label: "Pass / Fail", data: [
-        { label: "Passed/Merit", value: passCount, color: [40, 167, 69] },
-        { label: "Failed", value: totalAttempts - passCount, color: [220, 53, 69] },
+      { type: "donut", percent: passRate, label: "Pass Rate", color: chartColors.green },
+      { type: "bar", data: quizWise, label: "Avg Score per Quiz", color: chartColors.purple },
+      { type: "bar", data: scoreDistData, label: "Score Distribution", color: chartColors.teal },
+      { type: "pie", label: "Pass / Fail", data: [
+        { label: "Passed/Merit", value: passCount, color: chartColors.green },
+        { label: "Failed", value: totalAttempts - passCount, color: chartColors.red },
       ] },
     ];
     const tables = [
