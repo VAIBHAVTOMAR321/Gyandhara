@@ -58,11 +58,6 @@ const UserQuiz = () => {
   const [showWrongAnswersModal, setShowWrongAnswersModal] = useState(false)
   const [wrongAnswers, setWrongAnswers] = useState([])
 
-  // Navigation warning state
-  const [showNavigationWarning, setShowNavigationWarning] = useState(false)
-  const [navigationWarningShown, setNavigationWarningShown] = useState(false)
-  const [pendingNavigation, setPendingNavigation] = useState(null)
-
   // Check mobile view
   useEffect(() => {
     const checkMobile = () => {
@@ -86,156 +81,6 @@ const UserQuiz = () => {
       }
     }
   }, [isMobile])
-
-  // Handle navigation prevention during quiz
-  useEffect(() => {
-    if (!takingQuiz) return
-
-    // Prevent browser back button and tab close
-    const handleBeforeUnload = (e) => {
-      if (navigationWarningShown) {
-        // Auto-submit on second attempt
-        confirmSubmitQuiz()
-        e.preventDefault()
-        e.returnValue = ''
-        return
-      } else {
-        // Show warning on first attempt
-        setNavigationWarningShown(true)
-        setShowNavigationWarning(true)
-        e.preventDefault()
-        e.returnValue = ''
-        return
-      }
-    }
-
-    // Handle browser back button
-    const handlePopState = (e) => {
-      if (navigationWarningShown) {
-        // Auto-submit on second attempt
-        confirmSubmitQuiz()
-      } else {
-        // Show warning on first attempt
-        setNavigationWarningShown(true)
-        setShowNavigationWarning(true)
-        // Push a new entry to prevent default back behavior
-        window.history.pushState(null, null, window.location.href)
-      }
-    }
-
-    // Handle keyboard shortcuts for new tab/window
-    const handleKeyDown = (e) => {
-      // Ctrl+T (new tab on Windows/Linux), Cmd+T (new tab on Mac)
-      if ((e.ctrlKey || e.metaKey) && e.key === 't') {
-        e.preventDefault()
-        if (navigationWarningShown) {
-          confirmSubmitQuiz()
-        } else {
-          setNavigationWarningShown(true)
-          setShowNavigationWarning(true)
-        }
-        return
-      }
-      
-      // Ctrl+N (new window)
-      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
-        e.preventDefault()
-        if (navigationWarningShown) {
-          confirmSubmitQuiz()
-        } else {
-          setNavigationWarningShown(true)
-          setShowNavigationWarning(true)
-        }
-        return
-      }
-
-      // Ctrl+Tab (switch tab)
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Tab') {
-        e.preventDefault()
-        if (navigationWarningShown) {
-          confirmSubmitQuiz()
-        } else {
-          setNavigationWarningShown(true)
-          setShowNavigationWarning(true)
-        }
-        return
-      }
-
-      // Alt+Left Arrow (browser back on Windows)
-      if (e.altKey && e.key === 'ArrowLeft') {
-        e.preventDefault()
-        if (navigationWarningShown) {
-          confirmSubmitQuiz()
-        } else {
-          setNavigationWarningShown(true)
-          setShowNavigationWarning(true)
-        }
-        return
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    window.addEventListener('popstate', handlePopState)
-    window.addEventListener('keydown', handleKeyDown)
-    
-    // Push initial state to track back button
-    window.history.pushState(null, null, window.location.href)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-      window.removeEventListener('popstate', handlePopState)
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [takingQuiz, navigationWarningShown, answers, currentQuiz])
-
-  // Handle tab switching during quiz
-  useEffect(() => {
-    if (!takingQuiz) return
-
-    const handleVisibilityChange = () => {
-      // When tab/window loses focus or another tab is opened
-      if (document.hidden) {
-        if (!navigationWarningShown) {
-          setNavigationWarningShown(true)
-          setShowNavigationWarning(true)
-        }
-      }
-    }
-
-    const handleWindowBlur = () => {
-      // When user switches to another window/tab
-      if (!navigationWarningShown && takingQuiz) {
-        // Only show warning once per quiz session
-        console.log('User left the tab/window')
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('blur', handleWindowBlur)
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('blur', handleWindowBlur)
-    }
-  }, [takingQuiz, navigationWarningShown])
-
-  const handleLeftNavClick = (callback) => {
-    if (!takingQuiz) {
-      callback && callback()
-      return
-    }
-
-    if (navigationWarningShown) {
-      // Auto-submit on second attempt
-      confirmSubmitQuiz()
-      return
-    }
-
-    // Show warning on first attempt
-    setNavigationWarningShown(true)
-    setShowNavigationWarning(true)
-    setPendingNavigation(callback)
-  }
 
   // Fetch quizzes
   useEffect(() => {
@@ -275,18 +120,18 @@ const UserQuiz = () => {
           
           response.data.data.forEach(participant => {
             if (participant.student?.student_id === uniqueId) {
-              participated[participant.quiz_id] = true
-              
-              // API returns 'attempt' as an array, extract the first element
               const userAttempt = Array.isArray(participant.attempt) ? participant.attempt[0] : participant.attempt;
               
-              if (userAttempt?.rank) {
-                if (!ranks[participant.quiz_id]) {
-                  ranks[participant.quiz_id] = {
-                    userRank: userAttempt.rank,
-                    userScore: userAttempt.score,
-                    totalParticipants: 0,
-                    topThree: []
+              if (userAttempt && (userAttempt.status === 'passed' || userAttempt.status === 'failed')) {
+                participated[participant.quiz_id] = true;
+                if (userAttempt?.rank) {
+                  if (!ranks[participant.quiz_id]) {
+                    ranks[participant.quiz_id] = {
+                      userRank: userAttempt.rank,
+                      userScore: userAttempt.score,
+                      totalParticipants: 0, // This will be updated later
+                      topThree: []
+                    }
                   }
                 }
               }
@@ -307,7 +152,9 @@ const UserQuiz = () => {
               )
               if (rankResponse.data.status && rankResponse.data.data) {
                 const participantsData = rankResponse.data.data
-                const sorted = participantsData
+                const completedParticipants = participantsData.filter(p => p.attempt && (p.attempt.status === 'passed' || p.attempt.status === 'failed'));
+
+                const sorted = completedParticipants
                   .map(p => ({
                     ...p,
                     // Extract attempt object from array for each participant
@@ -321,7 +168,7 @@ const UserQuiz = () => {
                   ...prev,
                   [quizId]: {
                     ...prev[quizId],
-                    totalParticipants: participantsData.length,
+                    totalParticipants: completedParticipants.length,
                     topThree: sorted.map(p => ({
                       student_id: p.student?.student_id,
                       full_name: p.student?.full_name,
@@ -365,44 +212,6 @@ const UserQuiz = () => {
 
   const handleMenuToggle = () => {
     setShowOffcanvas(!showOffcanvas)
-  }
-  
-  // Handle continuing navigation after warning
-  const handleContinueNavigation = () => {
-    setShowNavigationWarning(false)
-    // Execute pending navigation if it exists, or auto-submit
-    if (pendingNavigation) {
-      confirmSubmitQuiz()
-    } else {
-      confirmSubmitQuiz()
-    }
-  }
-
-  // Handle dismissing warning (stay on quiz)
-  const handleStayOnQuiz = () => {
-    setShowNavigationWarning(false)
-    setPendingNavigation(null)
-  }
-
-  // Handle navigation attempts from leftnav
-  const handleNavFromLeftNav = (path) => {
-    if (!takingQuiz) {
-      navigate(path)
-      return
-    }
-
-    if (navigationWarningShown) {
-      // Auto-submit on second attempt
-      confirmSubmitQuiz()
-      // Navigate after submission completes
-      setTimeout(() => navigate(path), 500)
-      return
-    }
-
-    // Show warning on first attempt
-    setNavigationWarningShown(true)
-    setShowNavigationWarning(true)
-    setPendingNavigation(() => () => navigate(path))
   }
   
   const formatDateDDMMYY = (date) => {
@@ -640,11 +449,6 @@ const UserQuiz = () => {
 
       setShowResults(true)
       setTakingQuiz(false)
-      
-      // Reset navigation warning state after submission
-      setShowNavigationWarning(false)
-      setNavigationWarningShown(false)
-      setPendingNavigation(null)
     } catch (error) {
       console.error('Error submitting quiz:', error)
       const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message
@@ -681,53 +485,6 @@ const UserQuiz = () => {
   }
 
   const currentQuestion = getCurrentQuestion()
-
-  // Navigation Warning Modal Component
-  const NavigationWarningModal = () => (
-    <Modal show={showNavigationWarning} onHide={handleStayOnQuiz} centered backdrop="static" keyboard={false}>
-      <Modal.Header closeButton={false}>
-        <Modal.Title style={{ color: '#dc3545', fontWeight: 'bold' }}>
-          Quiz In Progress
-        </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="text-center mb-3">
-          <p style={{ fontSize: '16px', fontWeight: '500' }}>
-            ⚠️ You are currently taking a quiz!
-          </p>
-        </div>
-        <Alert variant="warning" className="mb-3">
-          <strong>Important:</strong> If you navigate away now, your quiz will be automatically submitted with your current answers.
-          {navigationWarningShown && (
-            <div className="mt-2">
-              <strong className="text-danger">This is your final warning. Any further navigation will auto-submit your quiz.</strong>
-            </div>
-          )}
-        </Alert>
-        <p className="text-muted">
-          {navigationWarningShown 
-            ? 'Are you sure you want to continue and submit the quiz?' 
-            : 'Would you like to continue taking the quiz or submit now?'}
-        </p>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button 
-          variant="primary" 
-          onClick={handleStayOnQuiz}
-          className="fw-bold"
-        >
-          Continue Quiz
-        </Button>
-        <Button 
-          variant={navigationWarningShown ? "danger" : "warning"} 
-          onClick={handleContinueNavigation}
-          className="fw-bold"
-        >
-          {navigationWarningShown ? '⚠️ Submit & Leave' : 'Submit Now'}
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  )
 
   // Wrong Answers Modal Component
   const WrongAnswersModal = () => (
@@ -902,7 +659,6 @@ const UserQuiz = () => {
         setSidebarOpen={setSidebarOpen}
         isMobile={isMobile}
         isTablet={isTablet}
-        onNavClick={handleNavFromLeftNav}
       />
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />
@@ -1219,7 +975,6 @@ const UserQuiz = () => {
         </Container>
       </div>
 
-      <NavigationWarningModal />
       <WrongAnswersModal />
       <RankModal />
     </div>

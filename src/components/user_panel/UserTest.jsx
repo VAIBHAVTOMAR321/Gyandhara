@@ -29,10 +29,6 @@ const UserTest = () => {
   const [showCelebrationModal, setShowCelebrationModal] = useState(false);
   const [attemptsLeft, setAttemptsLeft] = useState(0);
 
-  const [showNavigationWarning, setShowNavigationWarning] = useState(false);
-  const [navigationWarningShown, setNavigationWarningShown] = useState(false);
-  const [pendingNavigation, setPendingNavigation] = useState(null);
-
   const location = useLocation()
   const navigate = useNavigate()
   const { uniqueId, accessToken, isAuthenticated } = useAuth()
@@ -133,82 +129,6 @@ const UserTest = () => {
       handleTestComplete()
     }
   }, [timer, testCompleted])
-
-  const [navigationAttempts, setNavigationAttempts] = useState(0)
-
-  useEffect(() => {
-    const handleLinkClick = (e) => {
-      if (testCompleted) return
-      const href = e.target.closest('a')?.href
-      if (href && !href.includes(window.location.pathname)) {
-        e.preventDefault()
-        if (navigationAttempts === 0) {
-          alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.')
-          setNavigationAttempts(1)
-        } else {
-          handleTestComplete()
-        }
-      }
-    }
-    
-    document.addEventListener('click', handleLinkClick, true)
-    return () => document.removeEventListener('click', handleLinkClick, true)
-  }, [testCompleted, navigationAttempts])
-
-  useEffect(() => {
-    if (testCompleted) return
-
-    const handlePopState = (e) => {
-      if (!testCompleted) {
-        if (navigationAttempts === 0) {
-          alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.')
-          setNavigationAttempts(1)
-          window.history.pushState(null, '', window.location.href)
-        } else {
-          handleTestComplete()
-        }
-      }
-    }
-
-    window.history.pushState(null, '', window.location.href)
-    window.addEventListener('popstate', handlePopState)
-    return () => window.removeEventListener('popstate', handlePopState)
-  }, [testCompleted, navigationAttempts])
-
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (!testCompleted) {
-        if (navigationAttempts === 0) {
-          e.preventDefault()
-          e.returnValue = ''
-          setNavigationAttempts(1)
-          alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.')
-          return ''
-        } else {
-          handleTestComplete()
-        }
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [testCompleted, navigationAttempts])
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.hidden && !testCompleted) {
-        if (navigationAttempts === 0) {
-          alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.')
-          setNavigationAttempts(1)
-        } else {
-          handleTestComplete()
-        }
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
-  }, [testCompleted, navigationAttempts])
 
   const handleAnswerSelect = (answerIndex) => {
     const newAnswers = [...userAnswers]
@@ -335,21 +255,8 @@ const UserTest = () => {
       navigate('/UserDashboard')
       return
     }
-    handleNavFromLeftNav('/UserDashboard')
+    navigate('/UserDashboard')
   }
-
-  const handleNavFromLeftNav = (path) => {
-    if (!testCompleted) {
-      if (navigationAttempts === 0) {
-        alert('Are you sure you want to leave? Your test will be submitted automatically if you leave again.');
-        setNavigationAttempts(1);
-      } else {
-        handleTestComplete();
-      }
-    } else {
-      navigate(path);
-    }
-  };
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -368,7 +275,6 @@ const UserTest = () => {
         setSidebarOpen={setSidebarOpen}
         isMobile={isMobile}
         isTablet={isTablet}
-        onNavClick={handleNavFromLeftNav}
       />
       <div className="main-content-dash">
         <UserHeader toggleSidebar={toggleSidebar} />

@@ -46,7 +46,7 @@ import { useAuth } from "../all_login/AuthContext";
 import { useLanguage } from "../all_login/LanguageContext";
 
 
-const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavClick }) => {
+const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet }) => {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,15 +64,6 @@ const UserLeftNav = ({ sidebarOpen, setSidebarOpen, isMobile, isTablet, onNavCli
       setSidebarOpen(false);
     }
   }, [location.pathname, isMobile, isTablet, setSidebarOpen]);
-
-  const handleItemClick = (e, path) => {
-    if (onNavClick) {
-      e.preventDefault();
-      onNavClick(path);
-    } else {
-      setSidebarOpen(false);
-    }
-  };
 
 const menuItems = [
      {
@@ -217,7 +208,7 @@ const menuItems = [
         <Link
           to={item.path}
           className={`nav-item nav-link ${item.active ? "active" : ""}`}
-          onClick={(e) => handleItemClick(e, item.path)}
+          onClick={() => setSidebarOpen(false)}
         >
           <span className="nav-icon">{item.icon}</span>
           <span className="nav-text">{item.label}</span>
@@ -233,7 +224,7 @@ const menuItems = [
                 key={subIndex}
                 to={subItem.path}
                 className="submenu-item-user nav-link"
-                onClick={(e) => handleItemClick(e, subItem.path)}
+                onClick={() => setSidebarOpen(false)}
               >
                 <span className="submenu-icon">{subItem.icon}</span>
                 <span className="nav-text br-text-sub">{subItem.label}</span>
@@ -298,7 +289,7 @@ const menuItems = [
             <Link
               to={item.path}
               className={`nav-item nav-link ${item.active ? "active" : ""}`}
-              onClick={(e) => handleItemClick(e, item.path)}
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-text br-nav-text-mob">{item.label}</span>
@@ -313,7 +304,7 @@ const menuItems = [
                     key={subIndex}
                     to={subItem.path}
                     className="submenu-item nav-link"
-                    onClick={(e) => handleItemClick(e, subItem.path)}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     <span className="nav-text">{subItem.label}</span>
                   </Link>

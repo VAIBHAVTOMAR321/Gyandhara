@@ -76,14 +76,6 @@ const UserDashboard = () => {
   }, [isAuthenticated, navigate, location])
 
   useEffect(() => {
-    if (location.state && location.state.testCompleted) {
-      const { moduleIndex } = location.state
-      fetchModuleProgress()
-      window.history.replaceState({}, document.title)
-    }
-  }, [location.state])
-
-  useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
       setIsMobile(width < 768)
