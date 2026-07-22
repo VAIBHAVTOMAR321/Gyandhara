@@ -1200,6 +1200,76 @@ const Analysis = () => {
     return { title: "Test Series Quiz Analysis Report", summaryCards, charts, tables };
   };
 
+  const buildStudentPerformanceReport = (studentData) => {
+    if (!studentData || studentData.notFound) {
+      return { title: "Student Performance Report", tables: [{ title: "Error", columns: ["Message"], rows: [["Student not found."]] }] };
+    }
+
+    const { student_name, student_id, courseData, quizData, competitionData, testSeriesData } = studentData;
+
+    // Summary Cards
+    const totalCourses = courseData?.courses?.length || 0;
+    const completedCourses = courseData?.courses?.filter(c => c.modules.length > 0 && c.modules.every(m => m.module_status === 'completed')).length || 0;
+    const totalQuizzes = (quizData?.attempts?.length || 0) + (competitionData?.length || 0) + (testSeriesData?.length || 0);
+
+    const summaryCards = [
+      { label: student_name, value: student_id },
+      { label: "Courses Enrolled", value: totalCourses },
+      { label: "Courses Completed", value: completedCourses },
+      { label: "Total Quizzes", value: totalQuizzes },
+    ];
+
+    // Tables
+    const tables = [];
+
+    if (courseData?.courses?.length > 0) {
+      const courseRows = courseData.courses.map(course => {
+        const completedModules = course.modules.filter(m => m.module_status === 'completed').length;
+        const progress = course.modules.length > 0 ? Math.round((completedModules / course.modules.length) * 100) : 0;
+        const status = progress === 100 ? 'Completed' : 'In Progress';
+        return [course.course_name, `${progress}%`, status];
+      });
+      tables.push({ title: "Course Analysis", columns: ["Course Name", "Progress", "Status"], rows: courseRows });
+    }
+
+    if (quizData?.attempts?.length > 0) {
+      const quizRows = quizData.attempts.map(attempt => [
+        quizTitleMap[attempt.quiz_id] || attempt.quiz_id,
+        attempt.score,
+        `#${attempt.rank}`,
+        attempt.status,
+      ]);
+      tables.push({ title: "Quiz Participant Analysis", columns: ["Quiz Title", "Score", "Rank", "Status"], rows: quizRows });
+    }
+
+    if (competitionData?.length > 0) {
+      const competitionRows = competitionData.map(entry => [
+        entry.quiz_title,
+        entry.score,
+        `#${entry.rank}`,
+        entry.status,
+      ]);
+      tables.push({ title: "Competition Quiz Analysis", columns: ["Quiz Title", "Score", "Rank", "Status"], rows: competitionRows });
+    }
+
+    if (testSeriesData?.length > 0) {
+      const testSeriesRows = testSeriesData.map(entry => [
+        entry.quiz_title,
+        entry.score,
+        `#${entry.rank}`,
+        entry.status,
+      ]);
+      tables.push({ title: "Test Series Quiz Analysis", columns: ["Quiz Title", "Score", "Rank", "Status"], rows: testSeriesRows });
+    }
+
+    return {
+      title: `Student Performance Report - ${student_name}`,
+      summaryCards,
+      charts: [], // No charts for now, can be added later
+      tables,
+    };
+  };
+
   const exportReport = (type, format) => {
     const stamp = stampStr();
     let report;
@@ -1207,6 +1277,9 @@ const Analysis = () => {
     else if (type === "quiz-participant-wise") report = buildQuizParticipantReport();
     else if (type === "competition-quiz-analysis") report = buildCompetitionQuizReport();
     else if (type === "test-series-quiz-analysis") report = buildTestSeriesReport();
+    else if (type === "student-performance" && searchedStudentData) {
+      report = buildStudentPerformanceReport(searchedStudentData);
+    }
     else return;
 
     const fileName = `${report.title.replace(/\s+/g, "-").toLowerCase()}-${stamp}`;
@@ -2721,10 +2794,16 @@ const Analysis = () => {
               {selectedStudentForPerformance && searchedStudentData && !searchedStudentData.notFound ? (
                 <Row>
                   <Col md={12} className="mb-3">
-                    <Button variant="outline-secondary" size="sm" onClick={() => { setSelectedStudentForPerformance(null); setSearchedStudentData(null); setSearchStudentId(''); }}>
-                      <FaArrowLeft className="me-1" /> Back to Students List
-                    </Button>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <Button variant="outline-secondary" size="sm" onClick={() => { setSelectedStudentForPerformance(null); setSearchedStudentData(null); setSearchStudentId(''); }}>
+                        <FaArrowLeft className="me-1" /> Back to Students List
+                      </Button>
+                      <div className="d-flex gap-2">
+                        {renderExportButtons("student-performance")}
+                      </div>
+                    </div>
                   </Col>
+
                   <Col md={12} className="mb-4">
                     <Card className="text-center">
                       <Card.Body>
