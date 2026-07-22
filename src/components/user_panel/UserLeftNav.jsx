@@ -121,6 +121,7 @@ const menuItems = [
        label: language === 'hi' ? "प्रतियोगिता" : "Competition",
        path: "/Competition",
      },
+     
      {
   icon: <FaUsers />,
   label: language === 'hi'
