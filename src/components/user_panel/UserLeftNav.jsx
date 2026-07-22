@@ -82,8 +82,7 @@ const menuItems = [
        icon: <FaTrophy />,
       label: language === 'hi' ? "सरकारी प्रतियोगी परीक्षा क्विज़" : "Govt. Competitive Quiz",
        path: "/CompetitiveQuiz",
-     },
-   
+    },   
       {
         icon: <FaChalkboardTeacher />,
         label: language === 'hi' ? "करियर मार्गदर्शन" : "Career Guidance",
@@ -123,10 +122,12 @@ const menuItems = [
        path: "/Competition",
      },
      {
-       icon: <FaUsers />,
-       label: language === 'hi' ? "शैक्षणिक संस्था प्रतियोगिताएं" : "Institutional Competitions",
-       path: "/SchoolCompetitions",
-     },
+  icon: <FaUsers />,
+  label: language === 'hi'
+    ? "ऑफलाइन शैक्षणिक संस्था प्रतियोगिताएँ"
+    : "Offline Institutional Competitions",
+  path: "/SchoolCompetitions",
+},
      {
        icon: <FaBriefcase />,
        label: language === 'hi' ? "नौकरियां और सेमिनार" : "Jobs & Seminars",
