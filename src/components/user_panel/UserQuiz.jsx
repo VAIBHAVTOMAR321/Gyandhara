@@ -115,75 +115,58 @@ const UserQuiz = () => {
         const response = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/', config)
         
         if (response.data.status && response.data.data) {
-          const participated = {}
-          const ranks = {}
-          
-          response.data.data.forEach(participant => {
-            if (participant.student?.student_id === uniqueId) {
-              const userAttempt = Array.isArray(participant.attempt) ? participant.attempt[0] : participant.attempt;
-              
-              if (userAttempt && (userAttempt.status === 'passed' || userAttempt.status === 'failed')) {
-                participated[participant.quiz_id] = true;
-                if (userAttempt?.rank) {
-                  if (!ranks[participant.quiz_id]) {
-                    ranks[participant.quiz_id] = {
-                      userRank: userAttempt.rank,
-                      userScore: userAttempt.score,
-                      totalParticipants: 0, // This will be updated later
-                      topThree: []
-                    }
-                  }
-                }
-              }
-            }
-          })
-          setParticipatedQuizzes(participated)
-          setQuizRanks(prev => ({
-            ...prev,
-            ...ranks
-          }))
-          
-          const quizIds = [...new Set(response.data.data.map(p => p.quiz_id))]
-          const rankPromises = quizIds.map(async (quizId) => {
-            try {
-              const rankResponse = await axios.get(
-                `https://brjobsedu.com/gyandhara/gyandhara_backend/api/quiz-participants/?quiz_id=${quizId}`,
-                config
-              )
-              if (rankResponse.data.status && rankResponse.data.data) {
-                const participantsData = rankResponse.data.data
-                const completedParticipants = participantsData.filter(p => p.attempt && (p.attempt.status === 'passed' || p.attempt.status === 'failed'));
+          const allParticipants = response.data.data;
+          const participated = {};
+          const ranks = {};
 
-                const sorted = completedParticipants
-                  .map(p => ({
-                    ...p,
-                    // Extract attempt object from array for each participant
-                    currentAttempt: Array.isArray(p.attempt) ? p.attempt[0] : p.attempt
-                  }))
-                  .filter(p => p.currentAttempt?.rank)
-                  .sort((a, b) => a.currentAttempt.rank - b.currentAttempt.rank)
-                  .slice(0, 3)
-                
-                setQuizRanks(prev => ({
-                  ...prev,
-                  [quizId]: {
-                    ...prev[quizId],
-                    totalParticipants: completedParticipants.length,
-                    topThree: sorted.map(p => ({
-                      student_id: p.student?.student_id,
-                      full_name: p.student?.full_name,
-                      rank: p.currentAttempt?.rank,
-                      score: p.currentAttempt?.score,
-                      status: p.currentAttempt?.status
-                    }))
-                  }
-                }))
-              }
-            } catch (err) {
-              console.error('Error fetching rank for quiz', quizId, err)
+          // Group participants by quiz_id
+          const participantsByQuiz = allParticipants.reduce((acc, participant) => {
+            if (!acc[participant.quiz_id]) {
+              acc[participant.quiz_id] = [];
             }
-          })
-          await Promise.all(rankPromises)
+            acc[participant.quiz_id].push(participant);
+            return acc;
+          }, {});
+          
+          // Process each quiz group
+          for (const quizId in participantsByQuiz) {
+            const participants = participantsByQuiz[quizId];
+            const completedParticipants = participants.filter(p => {
+              const attempt = Array.isArray(p.attempt) ? p.attempt[0] : p.attempt;
+              return attempt && (attempt.status === 'passed' || attempt.status === 'failed');
+            });
+            
+            const userParticipant = participants.find(p => p.student?.student_id === uniqueId);
+            const userAttempt = userParticipant ? (Array.isArray(userParticipant.attempt) ? userParticipant.attempt[0] : userParticipant.attempt) : null;
+
+            if (userAttempt && (userAttempt.status === 'passed' || userAttempt.status === 'failed')) {
+              participated[quizId] = true;
+            }
+
+            const sorted = completedParticipants
+              .map(p => ({
+                ...p,
+                currentAttempt: Array.isArray(p.attempt) ? p.attempt[0] : p.attempt
+              }))
+              .filter(p => p.currentAttempt?.rank)
+              .sort((a, b) => a.currentAttempt.rank - b.currentAttempt.rank)
+              .slice(0, 3);
+
+            ranks[quizId] = {
+              userRank: userAttempt?.rank,
+              userScore: userAttempt?.score,
+              totalParticipants: completedParticipants.length,
+              topThree: sorted.map(p => ({
+                student_id: p.student?.student_id,
+                full_name: p.student?.full_name,
+                rank: p.currentAttempt?.rank,
+                score: p.currentAttempt?.score,
+                status: p.currentAttempt?.status
+              }))
+            };
+          }
+          setParticipatedQuizzes(participated);
+          setQuizRanks(ranks);
         }
       } catch (error) {
         console.error('Error fetching participated quizzes:', error)
@@ -760,21 +743,11 @@ const UserQuiz = () => {
 
                                 </div>
                               ) : (
-                                <div className="d-flex flex-column gap-2">
-                                  {quizRanks[quiz.quiz_id]?.totalParticipants > 0 && (
-                                    <Button
-                                      variant="outline-primary"
-                                      className="w-100"
-                                      onClick={() => {
-                                        setSelectedQuizRank({ quizId: quiz.quiz_id, ...quizRanks[quiz.quiz_id] })
-                                        setShowRankModal(true)
-                                      }}
-                                      style={{ fontSize: '10px', padding: '6px 12px' }}
-                                    >
-                                      <FaUsers className="me-1" />
-                                      {quizRanks[quiz.quiz_id].totalParticipants}
-                                    </Button>
-                                  )}
+                                <div className="d-flex justify-content-between align-items-center">
+                                  <Badge bg="light" text="dark" className="quiz-badge-participants">
+                                    <FaUsers className="me-1" />
+                                    {quizRanks[quiz.quiz_id]?.totalParticipants ?? 0} {language === 'hi' ? 'प्रतिभागी' : 'Participants'}
+                                  </Badge>
                                   <Button
                                     variant="primary"
                                     className="w-100 quiz-btn-start"
