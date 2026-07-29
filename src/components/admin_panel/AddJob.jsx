@@ -5,8 +5,8 @@ import { useAuth } from '../all_login/AuthContext'
 import AdminHeader from './AdminHeader'
 import '../../assets/css/Enrollments.css'
 import axios from 'axios'
-import { useNavigate, useLocation } from 'react-router-dom'
-import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaClock, FaCalendar, FaBriefcase, FaLink, FaGraduationCap, FaTools } from 'react-icons/fa'
+import { useNavigate, useLocation } from "react-router-dom";
+import { FaArrowLeft, FaPlus, FaClock, FaCalendar, FaBriefcase, FaLink, FaGraduationCap, FaTools, FaInfoCircle } from "react-icons/fa";
 
 const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/job-openings/'
 
@@ -58,7 +58,12 @@ const AddJob = () => {
     skills_required: [],
     apply_link: '',
     last_date_to_apply: '',
-    is_active: true
+    status: 'active',
+    interview_title: '',
+    interview_title_hi: '',
+    interview_description: '',
+    interview_description_hi: '',
+    interview_datetime: ''
   })
 
 const [descriptionInput, setDescriptionInput] = useState('')
@@ -98,7 +103,12 @@ const skillOptions = [
         skills_required: data.skills_required || [],
         apply_link: data.apply_link || '',
         last_date_to_apply: data.last_date_to_apply ? data.last_date_to_apply.slice(0, 10) : '',
-        status: data.status || 'active'
+        status: data.status || 'active',
+        interview_title: data.interview_title || '',
+        interview_title_hi: data.interview_title_hi || '',
+        interview_description: data.interview_description || '',
+        interview_description_hi: data.interview_description_hi || '',
+        interview_datetime: data.interview_datetime ? data.interview_datetime.slice(0, 16) : ''
       })
     }
   }, [location.state])
@@ -249,7 +259,12 @@ const skillOptions = [
         skills_required: formData.skills_required,
         apply_link: formData.apply_link?.trim() || '',
         last_date_to_apply: formData.last_date_to_apply,
-        status: formData.status === 'active' ? 'active' : 'inactive'
+        status: formData.status === 'active' ? 'active' : 'inactive',
+        interview_title: formData.interview_title?.trim() || '',
+        interview_title_hi: formData.interview_title_hi?.trim() || '',
+        interview_description: formData.interview_description?.trim() || '',
+        interview_description_hi: formData.interview_description_hi?.trim() || '',
+        interview_datetime: formData.interview_datetime
       }
 
       if (editMode && editJobId) {
@@ -283,7 +298,12 @@ const skillOptions = [
       skills_required: [],
       apply_link: '',
       last_date_to_apply: '',
-      status: 'active'
+      status: 'active',
+      interview_title: '',
+      interview_title_hi: '',
+      interview_description: '',
+      interview_description_hi: '',
+      interview_datetime: ''
     })
     setEditMode(false)
     setEditJobId(null)
@@ -474,6 +494,75 @@ const skillOptions = [
                               </Form.Select>
                             </Form.Group>
                           </Col>
+
+                          <Col md={12}>
+                            <hr />
+                            <h5 className="mb-3 fw-semibold text-secondary"><FaInfoCircle className="me-2" />Interview Details</h5>
+                          </Col>
+
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Interview Title</Form.Label>
+                              <Form.Control
+                                type="text"
+                                name="interview_title"
+                                value={formData.interview_title}
+                                onChange={handleChange}
+                                placeholder="e.g. Technical Interview"
+                              />
+                            </Form.Group>
+                          </Col>
+                          <Col md={6}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>Interview Date & Time</Form.Label>
+                              <Form.Control
+                                type="datetime-local"
+                                name="interview_datetime"
+                                value={formData.interview_datetime}
+                                onChange={handleChange}
+                              />
+                            </Form.Group>
+                          </Col>
+<Col md={12}>
+                             <Form.Group className="mb-3">
+                               <Form.Label>Interview Description</Form.Label>
+                               <Form.Control
+                                 as="textarea"
+                                 rows={3}
+                                 name="interview_description"
+                                 value={formData.interview_description}
+                                 onChange={handleChange}
+                                 placeholder="e.g. Candidates should bring an updated resume..."
+                               />
+                             </Form.Group>
+                           </Col>
+
+                           <Col md={12}>
+                             <Form.Group className="mb-3">
+                               <Form.Label>Interview Title (Hindi)</Form.Label>
+                               <Form.Control
+                                 type="text"
+                                 name="interview_title_hi"
+                                 value={formData.interview_title_hi}
+                                 onChange={handleChange}
+                                 placeholder="e.g. तकनीकी साक्षात्कार"
+                               />
+                             </Form.Group>
+                           </Col>
+
+                           <Col md={12}>
+                             <Form.Group className="mb-3">
+                               <Form.Label>Interview Description (Hindi)</Form.Label>
+                               <Form.Control
+                                 as="textarea"
+                                 rows={3}
+                                 name="interview_description_hi"
+                                 value={formData.interview_description_hi}
+                                 onChange={handleChange}
+                                 placeholder="e.g. उम्मीदवारों को अपडेटेड रेज्यूमे लाना चाहिए..."
+                               />
+                             </Form.Group>
+                           </Col>
 
                           <Col md={12}>
                             <Form.Group className="mb-3">

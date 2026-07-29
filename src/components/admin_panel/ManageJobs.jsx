@@ -3,10 +3,10 @@ import { Container, Row, Col, Card, Table, Button, Spinner, Modal, Badge, Nav, T
 import AdminLeftNav from './AdminLeftNav'
 import axios from 'axios'
 import { useAuth } from '../all_login/AuthContext'
-import AdminHeader from './AdminHeader'
+import AdminHeader from "./AdminHeader";
 import '../../assets/css/Enrollments.css'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaCalendar, FaClock, FaBriefcase, FaLink, FaMapMarkerAlt, FaMoneyBillWave, FaGraduationCap, FaTools, FaToggleOn, FaToggleOff, FaChalkboardTeacher, FaUser, FaVideo } from 'react-icons/fa'
+import { FaArrowLeft, FaPlus, FaEdit, FaTrash, FaCalendar, FaClock, FaBriefcase, FaLink, FaMapMarkerAlt, FaMoneyBillWave, FaGraduationCap, FaTools, FaToggleOn, FaToggleOff, FaChalkboardTeacher, FaUser, FaVideo, FaGift, FaInfoCircle } from 'react-icons/fa'
 
 const JOB_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/job-openings/'
 const SEMINAR_API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/seminar-items/'
@@ -16,6 +16,7 @@ const statusLabels = {
   active: 'Active',
   inactive: 'Inactive'
 }
+
 
 const ManageJobs = () => {
   const { accessToken } = useAuth()
@@ -204,6 +205,17 @@ const ManageJobs = () => {
     })
   }
 
+  const formatInterviewDateTime = (dateTimeString) => {
+    if (!dateTimeString) return '-';
+    const date = new Date(dateTimeString);
+    return date.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
   const indexOfLastRecord = currentPage * recordsPerPage
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage
   
@@ -1182,6 +1194,33 @@ const ManageJobs = () => {
                   <p><strong>Status:</strong> <Badge bg={isJobActive(selectedJob) ? 'success' : 'danger'}>{isJobActive(selectedJob) ? 'Active' : 'Inactive'}</Badge></p>
                   {selectedJob.apply_link && (
                     <p><strong><FaLink className="me-1" />Apply Link:</strong> <a href={selectedJob.apply_link} target="_blank" rel="noopener noreferrer">Apply Here</a></p>
+                  )}
+                </Col>
+              </Row>
+              
+              <Row className="mt-3 pt-3 border-top g-4">
+                <Col>
+                  <h5 className="fw-bold text-dark">
+                    {selectedJob.title}
+                    {selectedJob.title_hindi && <span className="d-block text-muted small fw-normal mt-1">{selectedJob.title_hindi}</span>}
+                  </h5>
+                </Col>
+                <Col md={12}>
+                  <h6 className="fw-semibold text-secondary"><FaInfoCircle className="me-2" />Interview Information</h6>
+                  <p><strong>Interview Title:</strong> {selectedJob.interview_title || '-'}</p>
+                  <p><strong>Interview Date & Time:</strong> {formatInterviewDateTime(selectedJob.interview_datetime)}</p>
+                  <p>
+                    <strong>Interview Description:</strong>
+                    <span className="d-block text-muted" style={{ whiteSpace: 'pre-wrap' }}>{selectedJob.interview_description || '-'}</span>
+                  </p>
+                  {selectedJob.interview_title_hi && (
+                    <p><strong>Interview Title (Hindi):</strong> {selectedJob.interview_title_hi}</p>
+                  )}
+                  {selectedJob.interview_description_hi && (
+                    <p>
+                      <strong>Interview Description (Hindi):</strong>
+                      <span className="d-block text-muted" style={{ whiteSpace: 'pre-wrap' }}>{selectedJob.interview_description_hi}</span>
+                    </p>
                   )}
                 </Col>
               </Row>
