@@ -226,7 +226,11 @@ const JobOpenings = () => {
       if (err.response?.data?.message) {
         alert(err.response.data.message)
       } else {
-        alert(language === 'hi' ? 'आपातकालीन साक्षात्कार के लिए अनुरोध भेजने में विफल।' : 'Failed to submit interview request.')
+        alert(
+  language === "hi"
+    ? "आप इस नौकरी के लिए पहले ही आवेदन कर चुके हैं।"
+    : "You have already applied for this job."
+);
       }
     }
   }
