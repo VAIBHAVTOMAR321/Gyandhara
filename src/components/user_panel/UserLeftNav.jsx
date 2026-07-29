@@ -17,6 +17,7 @@ import {
   FaServer,
   FaUserCircle,
   FaCalendarAlt,
+  FaHandshake,
   FaPlusSquare,
   FaEdit,
   FaMusic,
@@ -156,6 +157,11 @@ const menuItems = [
        path: "/SendQuery",
      },
      
+     {
+      icon: <FaHandshake />,
+      label: language === 'hi' ? "मेरे परामर्श" : "My Counseling",
+      path: "/CounselingDetails",
+    },
      
       
      

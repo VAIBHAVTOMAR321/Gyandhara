@@ -94,6 +94,15 @@ const DashBord = () => {
    const [selectedProgress, setSelectedProgress] = useState(null)
    const [showProgressModal, setShowProgressModal] = useState(false)
    const [progressLoading, setProgressLoading] = useState(false)
+   const [counselors, setCounselors] = useState([]);
+   const [counselingUpdateForm, setCounselingUpdateForm] = useState({
+     status: '',
+     counseulor_id: '',
+     con_datetime: '',
+     meeting_link: ''
+   });
+   const [selectedCounselorDetails, setSelectedCounselorDetails] = useState(null);
+ 
 
     // State for Simple Course Form
     const [courseFormData, setCourseFormData] = useState({
@@ -434,6 +443,16 @@ const DashBord = () => {
         setEventsCount(0)
       }
 
+      // Fetch counselors
+      try {
+        const counselorsRes = await axios.get('https://brjobsedu.com/gyandhara/gyandhara_backend/api/counseulor/', config);
+        if (counselorsRes.data && counselorsRes.data.success) {
+          setCounselors(counselorsRes.data.data);
+        }
+      } catch (counselorError) {
+        console.error('Error fetching counselors:', counselorError);
+        setCounselors([]);
+      }
     } catch (error) {
       // Fallback data in case of error
       setUnpaidEnrollmentCount(0)
@@ -618,12 +637,57 @@ const DashBord = () => {
 
   const handleViewCounseling = (counseling) => {
     setSelectedCounseling(counseling)
+    setCounselingUpdateForm({
+      status: counseling.status || 'pending',
+      counseulor_id: counseling.counseulor_id || '',
+      con_datetime: counseling.con_datetime ? counseling.con_datetime.slice(0, 16) : '',
+      meeting_link: counseling.meeting_link || ''
+    });
+    if (counseling.counseulor_id) {
+      const assignedCounselor = counselors.find(c => c.counseulor_id === counseling.counseulor_id);
+      setSelectedCounselorDetails(assignedCounselor || null);
+    } else {
+      setSelectedCounselorDetails(null);
+    }
     setShowCounselingModal(true)
   }
 
   const handleCloseCounselingModal = () => {
     setShowCounselingModal(false)
     setSelectedCounseling(null)
+    setSelectedCounselorDetails(null);
+    setCounselingUpdateForm({ status: '', counseulor_id: '', con_datetime: '', meeting_link: '' });
+  }
+
+  const handleCounselingUpdate = async () => {
+    if (!selectedCounseling) return;
+
+    const payload = {
+      id: selectedCounseling.id,
+      status: counselingUpdateForm.status,
+      counseulor_id: counselingUpdateForm.counseulor_id,
+      con_datetime: counselingUpdateForm.con_datetime ? new Date(counselingUpdateForm.con_datetime).toISOString() : null,
+      meeting_link: counselingUpdateForm.meeting_link,
+    };
+
+    try {
+      setSubmitting(true);
+      await axios.put('https://brjobsedu.com/gyandhara/gyandhara_backend/api/student-cousult/', payload, getAuthConfig());
+      alert('Counseling request updated successfully!');
+      handleCloseCounselingModal();
+      fetchData(); // Refresh data
+    } catch (error) {
+      console.error('Error updating counseling request:', error.response?.data || error.message);
+      alert('Failed to update counseling request.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleCounselorSelection = (counseulor_id) => {
+    setCounselingUpdateForm(prev => ({ ...prev, counseulor_id }));
+    const details = counselors.find(c => c.counseulor_id === counseulor_id);
+    setSelectedCounselorDetails(details || null);
   }
 
   const handleNotificationsClick = async () => {
@@ -3806,6 +3870,7 @@ const DashBord = () => {
                        <p><strong>Email:</strong> {selectedCounseling.student_details?.email || 'N/A'}</p>
                        <p><strong>Course:</strong> {selectedCounseling.student_details?.class_name || '-'}</p>
                        <p><strong>Status:</strong> <Badge bg={selectedCounseling.status === 'pending' ? 'warning' : selectedCounseling.status === 'approved' ? 'success' : 'danger'}>{selectedCounseling.status || 'pending'}</Badge></p>
+                       
                      </Card.Body>
                    </Card>
                  </Col>
@@ -3831,6 +3896,66 @@ const DashBord = () => {
                      <Card.Body>
                        <p><strong>Category:</strong> {Array.isArray(selectedCounseling.category_consulting) ? selectedCounseling.category_consulting.join(', ') : selectedCounseling.category_consulting}</p>
                        <p><strong>Requested At:</strong> {new Date(selectedCounseling.created_at || selectedCounseling.student_details?.created_at || Date.now()).toLocaleString()}</p>
+                       {selectedCounseling.counselor_details && (
+                         <>
+                           <hr />
+                           <h6>Assigned Counselor</h6>
+                           <div className="d-flex align-items-center">
+                             {selectedCounseling.counselor_details.co_img && (
+                               <Image src={`https://brjobsedu.com/gyandhara/gyandhara_backend${selectedCounseling.counselor_details.co_img}`} roundedCircle width="50" height="50" className="me-3" />
+                             )}
+                             <div>
+                               <strong>{selectedCounseling.counselor_details.name}</strong>
+                               <p className="text-muted small mb-0">{selectedCounseling.counselor_details.description}</p>
+                             </div>
+                           </div>
+                           <p className="mt-2"><strong>Meeting Time:</strong> {selectedCounseling.con_datetime ? new Date(selectedCounseling.con_datetime).toLocaleString() : '-'}</p>
+                           <p><strong>Meeting Link:</strong> <a href={selectedCounseling.meeting_link} target="_blank" rel="noopener noreferrer">{selectedCounseling.meeting_link}</a></p>
+                         </>
+                       )}
+                     </Card.Body>
+                   </Card>
+                 </Col>
+                 <Col md={12}>
+                   <Card className="shadow-sm border-0 mt-2">
+                     <Card.Header className="bg-light">
+                       <h6 className="mb-0">Update Status</h6>
+                     </Card.Header>
+                     <Card.Body>
+                       <Form>
+                         <Form.Group as={Row} className="mb-3">
+                           <Form.Label column sm="2">Status</Form.Label>
+                           <Col sm="10">
+                             <Form.Select value={counselingUpdateForm.status} onChange={(e) => setCounselingUpdateForm(prev => ({ ...prev, status: e.target.value }))}>
+                               <option value="pending">Pending</option>
+                               <option value="approved">Approved</option>
+                               <option value="rejected">Rejected</option>
+                             </Form.Select>
+                           </Col>
+                         </Form.Group>
+                         {counselingUpdateForm.status === 'approved' && (
+                           <>
+                             <Form.Group as={Row} className="mb-3">
+                               <Form.Label column sm="2">Assign Counselor</Form.Label>
+                               <Col sm="10">
+                                 <Form.Select value={counselingUpdateForm.counseulor_id} onChange={(e) => handleCounselorSelection(e.target.value)}>
+                                   <option value="">Select a counselor</option>
+                                   {counselors.map(c => <option key={c.counseulor_id} value={c.counseulor_id}>{c.name}</option>)}
+                                 </Form.Select>
+                               </Col>
+                             </Form.Group>
+                             {selectedCounselorDetails && (
+                               <div className="mb-3 p-3 bg-light rounded">
+                                 <h6>Counselor Details</h6>
+                                 <p><strong>Name:</strong> {selectedCounselorDetails.name}</p>
+                                 <p><strong>Description:</strong> {selectedCounselorDetails.description}</p>
+                               </div>
+                             )}
+                             <Form.Group as={Row} className="mb-3"><Form.Label column sm="2">Date & Time</Form.Label><Col sm="10"><Form.Control type="datetime-local" value={counselingUpdateForm.con_datetime} onChange={(e) => setCounselingUpdateForm(prev => ({ ...prev, con_datetime: e.target.value }))} /></Col></Form.Group>
+                             <Form.Group as={Row} className="mb-3"><Form.Label column sm="2">Meeting Link</Form.Label><Col sm="10"><Form.Control type="text" placeholder="https://meet.google.com/..." value={counselingUpdateForm.meeting_link} onChange={(e) => setCounselingUpdateForm(prev => ({ ...prev, meeting_link: e.target.value }))} /></Col></Form.Group>
+                           </>
+                         )}
+                       </Form>
                      </Card.Body>
                    </Card>
                  </Col>
@@ -3841,6 +3966,9 @@ const DashBord = () => {
          <Modal.Footer>
            <Button variant="secondary" onClick={handleCloseCounselingModal}>
              Close
+           </Button>
+           <Button variant="primary" onClick={handleCounselingUpdate} disabled={submitting}>
+             {submitting ? <Spinner as="span" size="sm" /> : 'Update Request'}
            </Button>
          </Modal.Footer>
        </Modal>
