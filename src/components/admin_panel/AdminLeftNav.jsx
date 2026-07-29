@@ -25,7 +25,8 @@ import {
   FaChalkboardTeacher,
   FaIndustry,
   FaQuestionCircle,
-  FaChartBar
+  FaChartBar,
+  FaUserTie,
 } from "react-icons/fa";
 import axios from "axios";
 
@@ -174,6 +175,11 @@ const menuItems = [
         icon: <FaListUl />,
       },
     ],
+  },
+  {
+    icon: <FaUserTie />,
+    label: "Manage Counselors",
+    path: "/ManageCounselors",
   },
   {
     icon: <FaClipboardList />,

@@ -65,6 +65,7 @@ import CompetitiveExamQuiz from "./components/admin_panel/CompetitiveExamQuiz";
 import CompetitiveQuiz from "./components/user_panel/CompetitiveQuiz";
 import Analysis from "./components/admin_panel/Analysis";
 import GovtTestSeries from "./components/admin_panel/GovtTestSeries";
+import ManageCounselors from "./components/admin_panel/ManageCounselors";
 // import TwelfthGuidance from "./components/user_panel/TwelfthGuidance";
 
 //  Navbar Wrapper (Hide on specific routes)
@@ -115,6 +116,7 @@ function NavBarWrapper() {
       "/CompetitiveQuiz",
       "/GovtTestSeries",
      "/Analysis",
+     "/ManageCounselors",
 
     ];
 
@@ -175,6 +177,7 @@ function FooterWrapper() {
     "/Timeschedule",
     "/CompetitiveExamQuiz",
     "/Analysis",
+    "/ManageCounselors",
     
   ];
 
@@ -285,6 +288,14 @@ function AppContent() {
   }
 />
 
+        <Route
+        path="/ManageCounselors"
+        element={
+          <ProtectedRoute>
+            <ManageCounselors />
+          </ProtectedRoute> 
+        }
+        />
         <Route
           path="/TwelfthGuidance"
           element={
