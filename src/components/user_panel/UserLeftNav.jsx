@@ -122,18 +122,21 @@ const menuItems = [
        label: language === 'hi' ? "प्रतियोगिता" : "Competition",
        path: "/Competition",
      },
-     
+
      {
   icon: <FaUsers />,
   label: language === 'hi'
     ? "ऑफलाइन शैक्षणिक संस्था प्रतियोगिताएँ"
     : "Offline Institutional Competitions",
   path: "/SchoolCompetitions",
-},
+     },
      {
-       icon: <FaBriefcase />,
-       label: language === 'hi' ? "नौकरियां और सेमिनार" : "Jobs & Seminars",
-       path: "/JobOpenings",
+      icon: <FaBriefcase />,
+label: language === 'hi' ? "नौकरी और सेमिनार" : "Jobs & Seminars",
+      submenu: [
+        { label: language === 'hi' ? "नौकरी के अवसर" : "Job Openings", path: "/JobOpenings", icon: <FaPlusSquare /> },
+        { label: language === 'hi' ? "मेरे आवेदन" : "My Applications", path: "/JobParticipants", icon: <FaClipboardList /> },
+      ],
      },
      {
        icon: <FaBuilding />,
