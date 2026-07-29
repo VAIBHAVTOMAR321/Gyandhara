@@ -134,7 +134,7 @@ const menuItems = [
       icon: <FaBriefcase />,
 label: language === 'hi' ? "नौकरी और सेमिनार" : "Jobs & Seminars",
       submenu: [
-        { label: language === 'hi' ? "नौकरी के अवसर" : "Job Openings", path: "/JobOpenings", icon: <FaPlusSquare /> },
+        { label: language === 'hi' ? "नौकरी और सेमिनार" : "Jobs, Seminars & Workshops", path: "/JobOpenings", icon: <FaPlusSquare /> },
         { label: language === 'hi' ? "मेरे आवेदन" : "My Applications", path: "/JobParticipants", icon: <FaClipboardList /> },
       ],
      },
