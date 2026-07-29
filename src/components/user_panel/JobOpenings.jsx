@@ -14,7 +14,7 @@ import '../../assets/css/JobOpenings.css'
 import { useLanguage } from '../all_login/LanguageContext'
 
 const JobOpenings = () => {
-  const { accessToken, uniqueId } = useAuth()
+  const { accessToken, uniqueId, refreshToken, logout } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
   
@@ -201,6 +201,33 @@ const JobOpenings = () => {
       setWorkshops([])
     } finally {
       setLoadingWorkshops(false)
+    }
+  }
+
+  const handleRequestInterview = async (job) => {
+    try {
+      const payload = {
+        student: uniqueId,
+        job: job.job_id
+      }
+      const config = {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      }
+      const response = await axios.post(
+        'https://brjobsedu.com/gyandhara/gyandhara_backend/api/job-opening-participation/',
+        payload,
+        config
+      )
+      alert(language === 'hi' ? 'आपातकालीन साक्षात्कार के लिए आपका अनुरोध भेजा गया!' : 'Your interview request has been submitted!')
+    } catch (err) {
+      console.error('Error requesting interview:', err)
+      if (err.response?.data?.message) {
+        alert(err.response.data.message)
+      } else {
+        alert(language === 'hi' ? 'आपातकालीन साक्षात्कार के लिए अनुरोध भेजने में विफल।' : 'Failed to submit interview request.')
+      }
     }
   }
 
@@ -536,15 +563,15 @@ const JobOpenings = () => {
                                       {isLanguageHindi ? 'अधिक' : 'More'}
                                     </Button>
                                     <Button 
-                                      variant={isExpired ? 'secondary' : 'primary'}
+                                      variant={isExpired ? 'secondary' : 'success'}
                                       size="sm"
-                                      onClick={() => handleApplyClick(job.apply_link)}
-                                      disabled={isExpired || !job.apply_link}
+                                      onClick={() => handleRequestInterview(job)}
+                                      disabled={isExpired}
                                       className="job-btn"
                                       style={{ background: isExpired ? undefined : 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: isExpired ? undefined : 'none' }}
                                     >
-                                      <FaExternalLinkAlt className="me-1" />
-                                      {isLanguageHindi ? 'आवेदन' : 'Apply'}
+                                      <FaChalkboardTeacher className="me-1" />
+                                      {isLanguageHindi ? 'साक्षात्कार' : 'Interview'}
                                     </Button>
                                   </div>
                                 </div>
@@ -849,6 +876,23 @@ const JobOpenings = () => {
                   </ul>
                 </div>
               )}
+              {(selectedJob.interview_title || selectedJob.interview_description || selectedJob.interview_datetime) && (
+                <div className="mb-4">
+                  <h6 className="fw-bold mb-2">
+                    <FaChalkboardTeacher className="me-2" />
+                    {language === 'hi' ? 'साक्षात्कार' : 'Interview'}
+                  </h6>
+                  {selectedJob.interview_title && (
+                    <p><strong>{language === 'hi' ? 'शीर्षक:' : 'Title:'}</strong> {selectedJob.interview_title}</p>
+                  )}
+                  {selectedJob.interview_datetime && (
+                    <p><strong>{language === 'hi' ? 'तिथि और समय:' : 'Date & Time:'}</strong> {formatDate(selectedJob.interview_datetime)}</p>
+                  )}
+                  {selectedJob.interview_description && (
+                    <p>{selectedJob.interview_description}</p>
+                  )}
+                </div>
+              )}
             </>
           )}
         </Modal.Body>
@@ -857,6 +901,11 @@ const JobOpenings = () => {
           {selectedJob && !isJobExpired(selectedJob.last_date_to_apply) && selectedJob.apply_link && (
             <Button variant="primary" onClick={() => handleApplyClick(selectedJob.apply_link)} className="job-btn" style={{ background: 'linear-gradient(135deg, rgb(94 117 223), rgb(75 101 218))', border: 'none' }}>
               <FaExternalLinkAlt className="me-1" />{language === 'hi' ? 'अभी आवेदन करें' : 'Apply Now'}
+            </Button>
+          )}
+          {selectedJob && !isJobExpired(selectedJob.last_date_to_apply) && (
+            <Button variant="success" onClick={() => handleRequestInterview(selectedJob)} className="job-btn">
+              <FaChalkboardTeacher className="me-1" />{language === 'hi' ? 'आपातकालीन साक्षात्कार' : 'Request Interview'}
             </Button>
           )}
         </Modal.Footer>

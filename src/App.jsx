@@ -53,7 +53,9 @@ import AddSeminar from "./components/admin_panel/AddSeminar";
 import AddWorkshop from "./components/admin_panel/AddWorkshop";
 import Managecourse from "./components/admin_panel/Managecourse";
 
+import AllJobParticipants from "./components/admin_panel/AllJobParticipants";
 import JobOpenings from "./components/user_panel/JobOpenings";
+import JobParticipants from "./components/user_panel/JobParticipants";
 import UserEvents from "./components/user_panel/UserEvents";
 import Offlinecompetition from "./components/school_panel/Offlinecompetition";
 import NinthGuidance from "./components/user_panel/NinthGuidance";
@@ -96,6 +98,8 @@ function NavBarWrapper() {
       "/CreateGroomingClass",
       "/ManageGroomingClasses",
       "/JobOpenings",
+      "/AllJobParticipants",
+      "/JobParticipants",
       "/UserEvents",
       "/Offlinecompetition",
       "/SchoolCompetitions",
@@ -155,6 +159,8 @@ function FooterWrapper() {
     "/CreateGroomingClass",
     "/ManageGroomingClasses",
     "/JobOpenings",
+    "/AllJobParticipants",
+    "/JobParticipants",
     "/UserEvents",
     "/Offlinecompetition",
     "/SchoolCompetitions",
@@ -316,6 +322,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <JobOpenings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/JobParticipants"
+          element={
+            <ProtectedRoute>
+              <JobParticipants />
             </ProtectedRoute>
           }
         />
@@ -500,6 +514,14 @@ function AppContent() {
           element={
             <ProtectedRoute>
               <ManageJobs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/AllJobParticipants"
+          element={
+            <ProtectedRoute>
+              <AllJobParticipants />
             </ProtectedRoute>
           }
         />
