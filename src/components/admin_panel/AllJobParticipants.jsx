@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react'
-import { Container, Row, Col, Card, Table, Button, Spinner, Form, Badge, Pagination } from 'react-bootstrap'
+import { Container, Row, Col, Card, Table, Button, Spinner, Form, Badge, Pagination, Modal } from 'react-bootstrap'
 import axios from 'axios'
 import { useAuth } from '../all_login/AuthContext'
-import { useNavigate } from 'react-router-dom'
-import { FaArrowLeft, FaFilter, FaSearch, FaUser, FaBriefcase, FaEnvelope, FaPhone } from 'react-icons/fa'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { FaArrowLeft, FaFilter, FaSearch, FaUser, FaBriefcase, FaEnvelope, FaPhone, FaEye, FaInfoCircle, FaGraduationCap, FaTools, FaMapMarkerAlt, FaClock, FaMoneyBillWave, FaLink, FaBuilding, FaCalendarAlt } from 'react-icons/fa'
 import AdminLeftNav from './AdminLeftNav'
 import AdminHeader from './AdminHeader'
 import '../../assets/css/admindashboard.css'
@@ -13,6 +13,7 @@ const API_URL = 'https://brjobsedu.com/gyandhara/gyandhara_backend/api/job-openi
 const AllJobParticipants = () => {
   const { accessToken } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1024)
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
@@ -21,6 +22,8 @@ const AllJobParticipants = () => {
   const [participants, setParticipants] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showDetailsModal, setShowDetailsModal] = useState(false)
+  const [selectedParticipant, setSelectedParticipant] = useState(null)
 
   const [searchTerm, setSearchTerm] = useState('')
   const [jobFilter, setJobFilter] = useState('all')
@@ -40,6 +43,13 @@ const AllJobParticipants = () => {
   useEffect(() => {
     if (accessToken) {
       fetchParticipants()
+    }
+
+    // Check for job_id in URL and set filter
+    const params = new URLSearchParams(location.search)
+    const jobIdFromUrl = params.get('job_id')
+    if (jobIdFromUrl) {
+      setJobFilter(jobIdFromUrl)
     }
   }, [accessToken])
 
@@ -101,6 +111,20 @@ const AllJobParticipants = () => {
       day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
     })
   }
+
+  const formatInterviewDate = (dateString) => {
+    if (!dateString) return 'N/A'
+    return new Date(dateString).toLocaleString('en-IN', {
+      day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    })
+  }
+
+  const handleViewDetails = (participant) => {
+    setSelectedParticipant(participant)
+    setShowDetailsModal(true)
+  }
+
+  const closeDetailsModal = () => setShowDetailsModal(false)
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)
@@ -185,6 +209,7 @@ const AllJobParticipants = () => {
                           <th><FaEnvelope className="me-1" /> Email</th>
                           <th><FaPhone className="me-1" /> Phone</th>
                           <th>Applied At</th>
+                          <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -204,6 +229,11 @@ const AllJobParticipants = () => {
                               <td className="small">{p.student_details?.email}</td>
                               <td className="small">{p.student_details?.phone}</td>
                               <td className="small">{formatDate(p.applied_at)}</td>
+                              <td>
+                                <Button variant="outline-primary" size="sm" onClick={() => handleViewDetails(p)}>
+                                  <FaEye className="me-1" /> View
+                                </Button>
+                              </td>
                             </tr>
                           ))
                         )}
@@ -229,6 +259,111 @@ const AllJobParticipants = () => {
           </div>
         </div>
       </div>
+
+      {/* Details Modal */}
+      <Modal show={showDetailsModal} onHide={closeDetailsModal} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <FaUser className="me-2" />
+            Participant Details
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+          {selectedParticipant && (
+            <Row>
+              <Col md={6}>
+                <Card className="mb-4 h-100">
+                  <Card.Header className="bg-light fw-bold"><FaUser className="me-2" />Student Information</Card.Header>
+                  <Card.Body>
+                    <p><strong>Name:</strong> {selectedParticipant.student_details?.full_name}</p>
+                    <p><strong>Student ID:</strong> {selectedParticipant.student_details?.student_id}</p>
+                    <p><strong>Email:</strong> {selectedParticipant.student_details?.email}</p>
+                    <p><strong>Phone:</strong> {selectedParticipant.student_details?.phone}</p>
+                    <p><strong>Institution:</strong> {selectedParticipant.student_details?.school_name}</p>
+                    <p><strong>Location:</strong> {selectedParticipant.student_details?.district}, {selectedParticipant.student_details?.state}</p>
+                    <p><strong>Course:</strong> {selectedParticipant.student_details?.class_name}</p>
+                    <p><strong>Applied At:</strong> {formatDate(selectedParticipant.applied_at)}</p>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col md={6}>
+                <Card className="mb-4 h-100">
+                  <Card.Header className="bg-light fw-bold"><FaBriefcase className="me-2" />Job Information</Card.Header>
+                  <Card.Body>
+                    <p><strong>Job Title:</strong> {selectedParticipant.job_details?.title}</p>
+                    <p><strong>Job ID:</strong> {selectedParticipant.job_details?.job_id}</p>
+                    <p><strong><FaMapMarkerAlt className="me-1" /> Location:</strong> {selectedParticipant.job_details?.location}</p>
+                    <p><strong><FaClock className="me-1" /> Experience:</strong> {selectedParticipant.job_details?.experience_required}</p>
+                    <p><strong><FaMoneyBillWave className="me-1" /> Salary:</strong> {selectedParticipant.job_details?.salary}</p>
+                    <p><strong><FaCalendarAlt className="me-1" /> Last Date:</strong> {formatDate(selectedParticipant.job_details?.last_date_to_apply)}</p>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col xs={12}>
+                <Card>
+                  <Card.Header className="bg-light fw-bold"><FaInfoCircle className="me-2" />Interview Details</Card.Header>
+                  <Card.Body>
+                    <p><strong>Title:</strong> {selectedParticipant.job_details?.interview_title || 'N/A'}</p>
+                    <p><strong>Date & Time:</strong> {formatInterviewDate(selectedParticipant.job_details?.interview_datetime)}</p>
+                    <p><strong>Description:</strong> {selectedParticipant.job_details?.interview_description || 'N/A'}</p>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col xs={12} className="mt-3">
+                <Card>
+                  <Card.Header className="bg-light fw-bold"><FaGraduationCap className="me-2" />Qualifications & Skills</Card.Header>
+                  <Card.Body>
+                    <Row>
+                      <Col md={6}>
+                        <h6>Qualifications Required</h6>
+                        {selectedParticipant.job_details?.qualifications_required?.length > 0 ? (
+                          <div className="d-flex flex-wrap gap-1">
+                            {selectedParticipant.job_details.qualifications_required.map((qual, i) => (
+                              <Badge key={i} bg="info">{qual}</Badge>
+                            ))}
+                          </div>
+                        ) : <p className="text-muted">None specified.</p>}
+                      </Col>
+                      <Col md={6}>
+                        <h6>Skills Required</h6>
+                        {selectedParticipant.job_details?.skills_required?.length > 0 ? (
+                          <div className="d-flex flex-wrap gap-1">
+                            {selectedParticipant.job_details.skills_required.map((skill, i) => (
+                              <Badge key={i} bg="warning" text="dark">{skill}</Badge>
+                            ))}
+                          </div>
+                        ) : <p className="text-muted">None specified.</p>}
+                      </Col>
+                    </Row>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col xs={12} className="mt-3">
+                <Card>
+                  <Card.Header className="bg-light fw-bold"><FaInfoCircle className="me-2" />Job Description</Card.Header>
+                  <Card.Body>
+                    {selectedParticipant.job_details?.description?.length > 0 ? (
+                      <ul className="list-unstyled">
+                        {selectedParticipant.job_details.description.map((desc, i) => (
+                          <li key={i} className="mb-1 d-flex align-items-start">
+                            <span className="me-2 text-primary">•</span>
+                            <span>{desc}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : <p className="text-muted">No description provided.</p>}
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeDetailsModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   )
 }
