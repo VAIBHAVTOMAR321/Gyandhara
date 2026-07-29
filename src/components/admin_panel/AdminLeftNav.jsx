@@ -165,6 +165,11 @@ const menuItems = [
         icon: <FaListUl />,
       },
       {
+        label: "All Job Participants",
+        path: "/AllJobParticipants",
+        icon: <FaPlusSquare />,
+      },
+      {
         label: "Add Seminar",
         path: "/AddSeminar",
         icon: <FaPlusSquare />,
